@@ -24,7 +24,7 @@ const Login = () => {
         <img
           alt=""
           src={loginBanner}
-          className="absolute inset-0 size-full object-cover"
+          className="absolute inset-0 size-full object-cover object-center"
         />
         <div className="absolute bottom-0 flex bg-white w-full py-4 px-6 justify-between text-sm/6">
           <div>
@@ -55,32 +55,28 @@ const Login = () => {
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                   <div>
                     <label
-                      htmlFor="email"
+                      htmlFor="userId"
                       className="block text-sm/6 font-medium text-gray-900"
                     >
                       User Id
                     </label>
                     <div className="mt-2">
                       <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        {...register("email", {
-                          required: "Email is required",
-                          pattern: {
-                            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                            message: "Enter a valid email address",
-                          },
+                        id="userId"
+                        name="userId"
+                        type="text"
+                        {...register("userId", {
+                          required: "User Id is required",
                         })}
-                        autoComplete="email"
+                        autoComplete="username"
                         className={`block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 ${
-                          errors.email
+                          errors.userId
                             ? "outline-red-500 focus:outline-red-500"
                             : "outline-gray-300 focus:outline-[#FF5A29]"
                         } sm:text-sm/6`}
                       />
-                      {errors.email && (
-                        <ErrorMsg message={errors.email.message} />
+                      {errors.userId && (
+                        <ErrorMsg message={errors.userId.message} />
                       )}
                     </div>
                   </div>
@@ -111,7 +107,11 @@ const Login = () => {
                           },
                         })}
                         autoComplete="current-password"
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#FF5A29] sm:text-sm/6"
+                        className={`block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 ${
+                          errors.password
+                            ? "outline-red-500 focus:outline-red-500"
+                            : "outline-gray-300 focus:outline-[#FF5A29]"
+                        } sm:text-sm/6`}
                       />
                       {errors.password && (
                         <ErrorMsg message={errors.password.message} />
