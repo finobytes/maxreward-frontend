@@ -1,7 +1,22 @@
 import React from "react";
+import { useForm } from "react-hook-form";
 import { loginBanner } from "../assets/assets";
 
 const Login = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const onSubmit = async (data) => {
+    console.log("Form Data:", data);
+
+    // try {
+    // } catch (error) {
+    //   console.error("API Error:", error);
+    // }
+  };
   return (
     <div className="flex min-h-screen">
       <div className="relative hidden w-0 flex-1 lg:block">
@@ -36,7 +51,7 @@ const Login = () => {
                 </p>
               </div>
               <div className="mt-8">
-                <form action="#" method="POST" className="space-y-6">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                   <div>
                     <label
                       htmlFor="email"
@@ -49,10 +64,22 @@ const Login = () => {
                         id="email"
                         name="email"
                         type="email"
+                        {...register("email", {
+                          required: "Email is required",
+                          pattern: {
+                            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                            message: "Enter a valid email address",
+                          },
+                        })}
                         required
                         autoComplete="email"
                         className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#FF5A29] sm:text-sm/6"
                       />
+                      {errors.email && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.email.message}
+                        </p>
+                      )}
                     </div>
                   </div>
 
@@ -68,10 +95,28 @@ const Login = () => {
                         id="password"
                         name="password"
                         type="password"
+                        {...register("password", {
+                          required: "Password is required",
+                          minLength: {
+                            value: 8,
+                            message: "Password must be at least 8 characters",
+                          },
+                          pattern: {
+                            value:
+                              /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
+                            message:
+                              "Password must contain at least 1 uppercase, 1 number & 1 special character",
+                          },
+                        })}
                         required
                         autoComplete="current-password"
                         className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#FF5A29] sm:text-sm/6"
                       />
+                      {errors.password && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.password.message}
+                        </p>
+                      )}
                     </div>
                   </div>
 
@@ -83,6 +128,7 @@ const Login = () => {
                             id="remember-me"
                             name="remember-me"
                             type="checkbox"
+                            {...register("remember")}
                             className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-[#FF5A29] checked:bg-[#FF5A29] indeterminate:border-[#FF5A29] indeterminate:bg-[#FF5A29] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF5A29] disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
                           />
                           <svg
