@@ -1,7 +1,8 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { loginBanner } from "../assets/assets";
-import ErrorMsg from "../components/errorMsg/ErrorMsg";
+import { loginBanner } from "../../assets/assets";
+import ErrorMsg from "../../components/errorMsg/ErrorMsg";
+import { Link } from "react-router";
 
 const Login = () => {
   const {
@@ -161,12 +162,12 @@ const Login = () => {
                     </div>
 
                     <div className="text-sm/6">
-                      <a
-                        href="#"
+                      <Link
+                        to="/reset-password"
                         className="font-semibold text-[#FF5A29] hover:text-[#FF5A29]/50"
                       >
                         Forgot password?
-                      </a>
+                      </Link>
                     </div>
                   </div>
 
