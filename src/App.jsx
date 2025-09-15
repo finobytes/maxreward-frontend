@@ -1,11 +1,13 @@
 import React from "react";
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
+import Login from "./pages/Login";
 
 const App = () => {
-  return <div className="flex min-h-svh flex-col items-center justify-center bg-red-500">
-      <Button>Click me</Button>
+  return (
+    <div>
+      <Login />
     </div>
-;
+  );
 };
 
 export default App;
