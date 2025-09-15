@@ -89,7 +89,7 @@ const Login = () => {
                     >
                       Password
                     </label>
-                    <div className="mt-2">
+                    <div className="">
                       <input
                         id="password"
                         name="password"

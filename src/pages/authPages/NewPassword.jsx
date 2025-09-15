@@ -4,7 +4,7 @@ import { logo, resetPassBgLeft, resetPassBgRight } from "../../assets/assets";
 import ErrorMsg from "../../components/errorMsg/ErrorMsg";
 import { useNavigate } from "react-router";
 
-const ResetPassword = () => {
+const NewPassword = () => {
   const {
     register,
     handleSubmit,
@@ -15,7 +15,7 @@ const ResetPassword = () => {
 
   const onSubmit = (data) => {
     console.log("Form Data:", data);
-    navigate("/otp");
+    navigate("/reset-success");
   };
 
   return (
@@ -44,47 +44,70 @@ const ResetPassword = () => {
           </div>
           <div className="mt-10">
             <h2 className="w-full text-2xl sm:text-3xl font-bold text-gray-600 mt-10">
-              Forgot Password
+              Reset Your Password
             </h2>
-            <p className="w-full text-gray-600 mt-2">
-              Please enter email address / user ID you’d like the password reset
-              information sent to
-            </p>
           </div>
 
           {/* Form */}
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="mt-8 space-y-5 w-full"
+            className="mt-6 space-y-5 w-full"
           >
             <div>
-              <label
-                htmlFor="userId"
-                className="block text-lg font-medium text-gray-900"
-              >
-                User Id / Email Address
-              </label>
-              <div className="mt-2">
-                <input
-                  id="userId"
-                  name="userId"
-                  type="text"
-                  {...register("userId", {
-                    required: "User Id / Email Address is required",
-                  })}
-                  autoComplete="username"
-                  className={`block w-full rounded-md px-3 py-2 text-base text-gray-900 border ${
-                    errors.userId
-                      ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                      : "border-gray-300 focus:border-[#FF5A29] focus:ring-[#FF5A29]"
-                  } placeholder:text-gray-400 focus:ring-2`}
-                />
-                {errors.userId && <ErrorMsg message={errors.userId.message} />}
+              <div>
+                <label
+                  htmlFor="newPassword"
+                  className="block text-sm font-medium text-gray-900"
+                >
+                  New Password
+                </label>
+                <div className="mt-2">
+                  <input
+                    id="newPassword"
+                    name="newPassword"
+                    type="password"
+                    {...register("newPassword", {
+                      required: "new Password is required",
+                    })}
+                    autoComplete="username"
+                    className={`block w-full rounded-md px-3 py-2 text-base text-gray-900 border ${
+                      errors.newPassword
+                        ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:border-[#FF5A29] focus:ring-[#FF5A29]"
+                    } placeholder:text-gray-400 focus:ring-2`}
+                  />
+                  {errors.newPassword && (
+                    <ErrorMsg message={errors.newPassword.message} />
+                  )}
+                </div>
               </div>
-              <p className="mt-2 text-sm text-gray-500">
-                If an account exists for that email, you’ll receive a password
-                reset code shortly.
-              </p>
+              <div className="mt-4">
+                <label
+                  htmlFor="newPassword"
+                  className="block text-sm font-medium text-gray-900"
+                >
+                  Confirm Password
+                </label>
+                <div className="mt-2">
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    {...register("confirmPassword", {
+                      required: "Confirm Password is required",
+                    })}
+                    autoComplete="username"
+                    className={`block w-full rounded-md px-3 py-2 text-base text-gray-900 border ${
+                      errors.confirmPassword
+                        ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:border-[#FF5A29] focus:ring-[#FF5A29]"
+                    } placeholder:text-gray-400 focus:ring-2`}
+                  />
+                  {errors.confirmPassword && (
+                    <ErrorMsg message={errors.confirmPassword.message} />
+                  )}
+                </div>
+              </div>
             </div>
 
             <div>
@@ -92,7 +115,7 @@ const ResetPassword = () => {
                 type="submit"
                 className="w-full rounded-md bg-[#FF5A29] mt-8 px-4 py-2 text-sm sm:text-base font-semibold text-white shadow hover:bg-[#FF5A29]/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF5A29]"
               >
-                Send Reset Link
+                Set Password
               </button>
             </div>
           </form>
@@ -112,4 +135,4 @@ const ResetPassword = () => {
   );
 };
 
-export default ResetPassword;
+export default NewPassword;

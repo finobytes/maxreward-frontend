@@ -1,20 +1,8 @@
 import React from "react";
-import { useForm } from "react-hook-form";
 import { logo, resetPassBgLeft, resetPassBgRight } from "../../assets/assets";
-import ErrorMsg from "../../components/errorMsg/ErrorMsg";
 import { Link } from "react-router";
-import OTPInput from "../../components/formComponents/OTPInput";
 
-const OTP = () => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
-  const onSubmit = (data) => {
-    console.log("Form Data:", data);
-  };
-
+const ResetSuccess = () => {
   return (
     <div className="relative min-h-screen bg-gray-50 flex flex-col overflow-hidden">
       {/* Background Images (responsive scaling based on Figma ratio) */}
@@ -40,40 +28,21 @@ const OTP = () => {
             />
           </div>
           <div className="mt-10">
-            <h2 className="w-full text-2xl sm:text-3xl font-bold text-gray-600 mt-10">
-              Get Code From Your Email
+            <h2 className="text-center w-full text-2xl sm:text-3xl font-bold text-gray-600 mt-10">
+              Password Changed
             </h2>
-            <p className="w-full text-gray-600 mt-2 text-sm">
-              We’ve sent a password reset code to your registered email address.
-              Please check your inbox (and spam folder) and enter the code to
-              continue.
+            <p className="text-center mt-4">
+              Your Password was changed successfully
             </p>
           </div>
-
-          {/* Form */}
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="mt-6 space-y-5 w-full"
+          <Link
+            to={"/"}
+            className="block max-w-[252px] mx-auto rounded-md
+            bg-[#FF5A29] mt-12 px-4 py-2 text-sm sm:text-base font-semibold
+            text-white shadow hover:bg-[#FF5A29]/80 text-center"
           >
-            <div className="mt-2 flex justify-center">
-              <OTPInput />
-            </div>
-
-            <Link
-              to="#"
-              className="block mt-8 text-indigo-500 text-center font-semibold"
-            >
-              Resend Code
-            </Link>
-            <div>
-              <Link
-                to="/new-password"
-                className="w-full block text-center rounded-md bg-[#FF5A29] mt-8 px-4 py-2 text-sm sm:text-base font-semibold text-white shadow hover:bg-[#FF5A29]/80"
-              >
-                Continue
-              </Link>
-            </div>
-          </form>
+            Back to Log In
+          </Link>
         </div>
       </div>
 
@@ -90,4 +59,4 @@ const OTP = () => {
   );
 };
 
-export default OTP;
+export default ResetSuccess;
