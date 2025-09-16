@@ -4,10 +4,15 @@ import ResetPassword from "../pages/authPages/ResetPassword";
 import OTP from "../pages/authPages/OTP";
 import NewPassword from "../pages/authPages/NewPassword";
 import ResetSuccess from "../pages/authPages/ResetSuccess";
+import AppLayout from "../components/layouts/MainLayout";
 
 const router = createBrowserRouter([
   {
     path: "/",
+    element: <AppLayout />,
+  },
+  {
+    path: "/login",
     element: <Login />,
   },
   {

@@ -1,12 +1,8 @@
-import React from "react";
-import Login from "./pages/authPages/Login";
+import AppLayout from "./components/layouts/MainLayout";
+import { SidebarProvider } from "./context/SidebarContext";
 
 const App = () => {
-  return (
-    <div>
-      <Login />
-    </div>
-  );
+  return <AppLayout />;
 };
 
 export default App;
