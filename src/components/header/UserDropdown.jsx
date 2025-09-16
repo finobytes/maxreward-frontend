@@ -61,17 +61,17 @@ export default function UserDropdown({ user }) {
           </span>
         </div>
 
-        <Link className="flex items-center gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 ">
-          <UserCircle />
+        <Link className="flex items-center gap-3 px-3 py-2 mt-3 text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 ">
+          <UserCircle className="w-4.5 h-4.5" />
           Profile
         </Link>
 
-        <Link className="flex items-center gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 ">
-          <Settings />
+        <Link className="flex items-center gap-3 px-3 py-2 mt-3 text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 ">
+          <Settings className="w-4.5 h-4.5" />
           Settings
         </Link>
-        <Link className="flex items-center gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 ">
-          <LogOut />
+        <Link className="flex items-center gap-3 px-3 py-2 mt-3 text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 ">
+          <LogOut className="w-4.5 h-4.5" />
           Logout
         </Link>
       </Dropdown>

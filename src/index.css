@@ -156,7 +156,7 @@ layer(base);
 }
 
 @utility menu-dropdown-item-active {
-  @apply bg-brand-50 text-white;
+  @apply text-brand-100;
 }
 
 @utility menu-dropdown-item-inactive {
