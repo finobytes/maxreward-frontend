@@ -19,60 +19,63 @@ const navItems = [
   {
     icon: <LayoutDashboard />,
     name: "Dashboard",
-    path: "/",
+    path: "/admin",
   },
   {
     name: "Member Manage",
     icon: <Users />,
-    path: "/member-manage",
+    path: "/admin/member-manage",
   },
   {
     name: "Staff Manage",
     icon: <UserCog />,
-    path: "/staff-manage",
+    path: "/admin/staff-manage",
   },
   {
     name: "Merchant",
     icon: <ShoppingBag />,
     subItems: [
-      { name: "Pending Merchant", path: "/pending-merchant" },
-      { name: "Active Merchant", path: "/active-merchant" },
+      { name: "Pending Merchant", path: "/admin/merchant/pending-merchant" },
+      { name: "Active Merchant", path: "/admin/merchant/active-merchant" },
     ],
   },
   {
     name: "Accounts",
     icon: <ChartArea />,
     subItems: [
-      { name: "Income", path: "/income" },
-      { name: "Expense", path: "/expense" },
+      { name: "Income", path: "/admin/accounts/income" },
+      { name: "Expense", path: "/admin/accounts/expense" },
     ],
   },
   {
     name: "Reports",
     icon: <ChartLine />,
     subItems: [
-      { name: "Transaction", path: "/transaction" },
-      { name: "Voucher Purchase", path: "/voucher-purchase" },
-      { name: "Member Points Report", path: "/member-points-report" },
-      { name: "Tree Performance", path: "/tree-performance" },
-      { name: "Redemption", path: "/redemption" },
+      { name: "Transaction", path: "/admin/reports/transaction" },
+      { name: "Voucher Purchase", path: "/admin/reports/voucher-purchase" },
+      {
+        name: "Member Points Report",
+        path: "/admin/reports/member-points-report",
+      },
+      { name: "Tree Performance", path: "/admin/reports/tree-performance" },
+      { name: "Redemption", path: "/admin/reports/redemption" },
     ],
   },
   {
     name: "Profile",
     icon: <UserCircle2 />,
-    path: "/profile",
+    path: "/admin/profile",
   },
   {
     name: "Logout",
     icon: <LogOut />,
-    path: "/logout",
+    path: "/",
   },
 ];
 
 const othersItems = [];
 
-const AppSidebar = () => {
+const Sidebar = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const location = useLocation();
 
@@ -312,4 +315,4 @@ const AppSidebar = () => {
   );
 };
 
-export default AppSidebar;
+export default Sidebar;

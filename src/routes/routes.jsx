@@ -4,12 +4,18 @@ import ResetPassword from "../pages/authPages/ResetPassword";
 import OTP from "../pages/authPages/OTP";
 import NewPassword from "../pages/authPages/NewPassword";
 import ResetSuccess from "../pages/authPages/ResetSuccess";
-import AppLayout from "../components/layouts/MainLayout";
+import App from "../App";
+import { adminRoutes } from "./admin.route";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <AppLayout />,
+    element: <App />,
+  },
+  {
+    path: "/admin",
+    element: <App />,
+    children: adminRoutes,
   },
   {
     path: "/login",

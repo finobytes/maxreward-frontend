@@ -1,9 +1,9 @@
 import { Outlet } from "react-router";
 
 import { SidebarProvider, useSidebar } from "../../context/SidebarContext";
-import AppSidebar from "./Sidebar";
+import Sidebar from "./Sidebar";
 import Backdrop from "./Backdrop";
-import AppHeader from "./Header";
+import Header from "./Header";
 
 const LayoutContent = () => {
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
@@ -11,7 +11,7 @@ const LayoutContent = () => {
   return (
     <div className="min-h-screen xl:flex  dark:bg-gray-900">
       <div>
-        <AppSidebar />
+        <Sidebar />
         <Backdrop />
       </div>
       <div
@@ -19,8 +19,11 @@ const LayoutContent = () => {
           isExpanded || isHovered ? "lg:ml-[290px]" : "lg:ml-[90px]"
         } ${isMobileOpen ? "ml-0" : ""}`}
       >
-        <AppHeader />
+        <Header />
         <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
+          <h2 className="mb-4 text-2xl font-semibold text-gray-900 lg:mb-6 dark:text-white">
+            Dashboard Content goes here
+          </h2>
           <Outlet />
         </div>
       </div>
@@ -28,7 +31,7 @@ const LayoutContent = () => {
   );
 };
 
-const AppLayout = () => {
+const MainLayout = () => {
   return (
     <SidebarProvider>
       <LayoutContent />
@@ -36,4 +39,4 @@ const AppLayout = () => {
   );
 };
 
-export default AppLayout;
+export default MainLayout;

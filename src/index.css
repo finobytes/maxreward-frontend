@@ -1,9 +1,15 @@
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap")
+layer(base);
+
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --font-*: initial;
+  --font-quicksand: "Quicksand", sans-serif;
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -95,7 +101,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-quicksand;
   }
 }
 
@@ -138,7 +144,7 @@
 }
 
 @utility menu-item-arrow-active {
-  @apply rotate-180 text-brand-500;
+  @apply rotate-180 text-white;
 }
 
 @utility menu-item-arrow-inactive {
@@ -150,7 +156,7 @@
 }
 
 @utility menu-dropdown-item-active {
-  @apply bg-brand-50 text-brand-500;
+  @apply bg-brand-50 text-white;
 }
 
 @utility menu-dropdown-item-inactive {

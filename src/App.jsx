@@ -1,8 +1,7 @@
-import AppLayout from "./components/layouts/MainLayout";
-import { SidebarProvider } from "./context/SidebarContext";
+import MainLayout from "./components/layouts/MainLayout";
 
 const App = () => {
-  return <AppLayout />;
+  return <MainLayout />;
 };
 
 export default App;

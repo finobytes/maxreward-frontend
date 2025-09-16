@@ -11,7 +11,7 @@ const user = {
   email: "john.doe@example.com",
 };
 
-const AppHeader = () => {
+const Header = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
 
   const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
@@ -99,4 +99,4 @@ const AppHeader = () => {
   );
 };
 
-export default AppHeader;
+export default Header;
