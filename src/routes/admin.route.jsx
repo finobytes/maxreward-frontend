@@ -14,55 +14,55 @@ import Transaction from "../pages/admin/reports/Transaction";
 
 export const adminRoutes = [
   {
-    path: "/admin",
-    component: <AdminDashboard />,
+    index: true,
+    element: <AdminDashboard />,
   },
   {
     path: "member-manage",
-    component: <MemberManage />,
+    element: <MemberManage />,
   },
   {
     path: "staff-manage",
-    component: <StaffManage />,
+    element: <StaffManage />,
   },
   {
     path: "merchant/pending-merchant",
-    component: <PendingMerchant />,
+    element: <PendingMerchant />,
   },
   {
     path: "merchant/active-merchant",
-    component: <ActiveMerchant />,
+    element: <ActiveMerchant />,
   },
   {
     path: "accounts/income",
-    component: <Income />,
+    element: <Income />,
   },
   {
     path: "accounts/expense",
-    component: <Expense />,
+    element: <Expense />,
   },
   {
     path: "reports/transaction",
-    component: <Transaction />,
+    element: <Transaction />,
   },
   {
     path: "reports/voucher-purchase",
-    component: <VoucherPurchase />,
+    element: <VoucherPurchase />,
   },
   {
     path: "reports/member-points-report",
-    component: <MemberPointsReport />,
+    element: <MemberPointsReport />,
   },
   {
     path: "reports/tree-performance",
-    component: <TreePerformance />,
+    element: <TreePerformance />,
   },
   {
     path: "reports/redemption",
-    component: <Redemption />,
+    element: <Redemption />,
   },
   {
     path: "profile",
-    component: <Profile />,
+    element: <Profile />,
   },
 ];
