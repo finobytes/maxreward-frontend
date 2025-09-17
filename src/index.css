@@ -10,6 +10,16 @@ layer(base);
   --font-*: initial;
   --font-quicksand: "Quicksand", sans-serif;
 
+  --breakpoint-*: initial;
+  --breakpoint-2xsm: 375px;
+  --breakpoint-xsm: 425px;
+  --breakpoint-3xl: 2000px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -57,6 +67,8 @@ layer(base);
   --color-brand-800: #ff5a29;
   --color-brand-900: #ff5a29;
   --color-brand-950: #ff5a29;
+  --shadow-theme-md: 0px 4px 8px -2px rgba(16, 24, 40, 0.1),
+    0px 2px 4px -2px rgba(16, 24, 40, 0.06);
   --text-theme-sm: 14px;
   --text-theme-sm--line-height: 20px;
 }

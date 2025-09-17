@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { Dropdown } from "../ui/Dropdown";
 import { userImage } from "../../assets/assets";
 import { LogOut, Settings, UserCircle } from "lucide-react";
+import { Dropdown } from "../ui/dropdown/Dropdown";
 
 export default function UserDropdown({ user }) {
   const [isOpen, setIsOpen] = useState(false);

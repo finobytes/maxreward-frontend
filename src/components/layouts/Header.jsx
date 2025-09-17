@@ -5,6 +5,7 @@ import { useSidebar } from "../../context/SidebarContext";
 import UserDropdown from "../header/UserDropdown";
 import { logo } from "../../assets/assets";
 import { Bell, Menu, X } from "lucide-react";
+import NotificationDropdown from "../header/NotificationDropdown";
 
 const user = {
   name: "Mr. Jack",
@@ -89,7 +90,7 @@ const Header = () => {
         >
           <div className="flex items-center gap-2 2xsm:gap-3">
             {/* <!-- Notification Menu Area --> */}
-            <Bell />
+            <NotificationDropdown />
           </div>
           {/* <!-- User Area --> */}
           <UserDropdown user={user} />
