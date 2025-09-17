@@ -1,12 +1,7 @@
-import React from "react";
-import Login from "./pages/authPages/Login";
+import MainLayout from "./components/layouts/MainLayout";
 
 const App = () => {
-  return (
-    <div>
-      <Login />
-    </div>
-  );
+  return <MainLayout />;
 };
 
 export default App;
