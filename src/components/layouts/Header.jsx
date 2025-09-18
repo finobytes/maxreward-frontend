@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 import { Link } from "react-router";
 import { useSidebar } from "../../context/SidebarContext";
 import UserDropdown from "../header/UserDropdown";
 import { logo } from "../../assets/assets";
-import { Bell, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import NotificationDropdown from "../header/NotificationDropdown";
 
 const user = {
@@ -28,23 +28,6 @@ const Header = () => {
   const toggleApplicationMenu = () => {
     setApplicationMenuOpen(!isApplicationMenuOpen);
   };
-
-  const inputRef = useRef(null);
-
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if ((event.metaKey || event.ctrlKey) && event.key === "k") {
-        event.preventDefault();
-        inputRef.current?.focus();
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
 
   return (
     <header className="sticky top-0 flex w-full bg-white border-b border-gray-200 z-99999 ">
