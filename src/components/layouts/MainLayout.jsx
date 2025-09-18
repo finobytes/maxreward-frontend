@@ -9,7 +9,7 @@ const LayoutContent = () => {
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
 
   return (
-    <div className="min-h-screen xl:flex  dark:bg-gray-900">
+    <div className="min-h-screen xl:flex bg-gray-100">
       <div>
         <Sidebar />
         <Backdrop />
@@ -21,9 +21,6 @@ const LayoutContent = () => {
       >
         <Header />
         <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
-          <h2 className="mb-4 text-2xl font-semibold text-gray-900 lg:mb-6 dark:text-white">
-            Dashboard Content goes here
-          </h2>
           <Outlet />
         </div>
       </div>

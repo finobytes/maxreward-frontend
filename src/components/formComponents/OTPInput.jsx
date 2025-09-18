@@ -58,7 +58,7 @@ const OTPInput = () => {
   };
 
   return (
-    <section className="bg-white py-10 dark:bg-dark">
+    <section className="bg-white py-10">
       <div className="container">
         <form id="otp-form" className="flex gap-2">
           {otp.map((digit, index) => (
@@ -72,7 +72,7 @@ const OTPInput = () => {
               onFocus={handleFocus}
               onPaste={handlePaste}
               ref={(el) => (inputRefs.current[index] = el)}
-              className="shadow-xs flex w-[64px] items-center justify-center rounded-lg border border-stroke bg-white p-2 text-center text-2xl font-medium text-gray-5 outline-none sm:text-3xl dark:border-dark-3 dark:bg-white/5"
+              className="shadow-xs flex w-[64px] items-center justify-center rounded-lg border border-stroke bg-white p-2 text-center text-2xl font-medium text-gray-5 outline-none sm:text-3xl"
             />
           ))}
         </form>

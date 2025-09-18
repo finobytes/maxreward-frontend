@@ -4,8 +4,6 @@ layer(base);
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
-
 @theme inline {
   --font-*: initial;
   --font-quicksand: "Quicksand", sans-serif;
@@ -118,7 +116,7 @@ layer(base);
 }
 
 @utility menu-item {
-  @apply relative flex items-center w-full gap-3 px-3 py-2 rounded-lg text-theme-sm;
+  @apply relative flex items-center w-full gap-3 px-3 py-2 font-medium rounded-lg text-theme-sm;
 }
 
 @utility menu-item-text {
@@ -143,7 +141,7 @@ layer(base);
 
 @utility menu-item-icon-size {
   & svg {
-    @apply !size-4.5;
+    @apply !size-6;
   }
 }
 
