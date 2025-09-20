@@ -12,6 +12,13 @@ import lineChart1 from "./icons/lineChart1.svg";
 import lineChart2 from "./icons/lineChart2.svg";
 import lineChart3 from "./icons/lineChart3.svg";
 import lineChart4 from "./icons/lineChart4.svg";
+import kebabMenu from "./icons/kebab-menu.svg";
+import visits from "./icons/visits.svg";
+import totalProducts from "./icons/total-products.svg";
+import totalSales from "./icons/total-sales.svg";
+import totalRevenue from "./icons/total-revenue.svg";
+import totalProfit from "./icons/total-profit.svg";
+import totalIncome from "./icons/total-income.svg";
 
 export {
   loginBanner,
@@ -28,4 +35,11 @@ export {
   lineChart2,
   lineChart3,
   lineChart4,
+  kebabMenu,
+  visits,
+  totalProducts,
+  totalSales,
+  totalRevenue,
+  totalProfit,
+  totalIncome,
 };

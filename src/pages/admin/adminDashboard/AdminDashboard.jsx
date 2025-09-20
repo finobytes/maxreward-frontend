@@ -10,6 +10,8 @@ import {
   users,
 } from "../../../assets/assets";
 import DashboardCard from "./components/DashboardCard";
+import RealTimeTransactions from "./components/RealTimeTransactions";
+import MemberActivity from "./components/MemberActivity";
 
 const AdminDashboard = () => {
   const cardsData = [
@@ -54,6 +56,14 @@ const AdminDashboard = () => {
         {cardsData.map((card, index) => (
           <DashboardCard key={index} {...card} />
         ))}
+      </div>
+      <div className="mt-6 grid grid-cols-1 lg:grid-cols-4 gap-4">
+        <div className="lg:col-span-3">
+          <RealTimeTransactions />
+        </div>
+        <div className="lg:col-span-1">
+          <MemberActivity />
+        </div>
       </div>
     </div>
   );

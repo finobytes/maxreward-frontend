@@ -12,10 +12,12 @@
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
     "@tailwindcss/vite": "^4.1.13",
+    "apexcharts": "^5.3.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.544.0",
     "react": "^19.1.1",
+    "react-apexcharts": "^1.7.0",
     "react-dom": "^19.1.1",
     "react-hook-form": "^7.62.0",
     "react-router": "^7.9.1",
