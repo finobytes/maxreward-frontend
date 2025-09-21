@@ -12,6 +12,9 @@ import {
 import DashboardCard from "./components/DashboardCard";
 import RealTimeTransactions from "./components/RealTimeTransactions";
 import MemberActivity from "./components/MemberActivity";
+import PointsIssuedRedeemed from "./components/PointsIssuedRedeemed";
+import PointsRedeemed from "./components/PointsRedeemed";
+import PointsPurchased from "./components/PointsPurchased";
 
 const AdminDashboard = () => {
   const cardsData = [
@@ -64,6 +67,11 @@ const AdminDashboard = () => {
         <div className="lg:col-span-1">
           <MemberActivity />
         </div>
+      </div>
+      <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <PointsIssuedRedeemed />
+        <PointsRedeemed />
+        <PointsPurchased />
       </div>
     </div>
   );
