@@ -10,7 +10,6 @@ import {
   totalSales,
   visits,
 } from "../../../../assets/assets";
-import { View } from "lucide-react";
 
 const MemberActivity = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,7 +22,7 @@ const MemberActivity = () => {
     setIsOpen(false);
   }
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 sm:px-6 sm:pt-6">
+    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 sm:px-2 sm:pt-6 2xl:px-6 shadow-md">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-800 ">
           Member Activity
@@ -58,101 +57,105 @@ const MemberActivity = () => {
           </Dropdown>
         </div>
       </div>
-      <div className="mt-4 space-y-2">
-        <div className=" flex justify-between">
-          <div className="flex items-center gap-4 mb-4">
-            <div>
-              <img src={visits} alt="Visits" className="" />
+      <div className="max-w-full overflow-x-auto custom-scrollbar">
+        <div className=" max-h-[390px]">
+          <div className="mt-4 space-y-2">
+            <div className=" flex justify-between">
+              <div className="flex items-center gap-4 mb-4">
+                <div>
+                  <img src={visits} alt="Visits" className="" />
+                </div>
+                <div>
+                  <p className="text-ms text-gray-800">Total Visits</p>
+                  <p className="text-xs text-gray-600">
+                    Increased by <span className="text-green-500">1.75%</span>
+                  </p>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-bold text-gray-800">23,124</p>
+              </div>
             </div>
-            <div>
-              <p className="text-ms text-gray-800">Total Visits</p>
-              <p className="text-xs text-gray-600">
-                Increased by <span className="text-green-500">1.75%</span>
-              </p>
+            <div className=" flex justify-between">
+              <div className="flex items-center gap-4 mb-4">
+                <div>
+                  <img src={totalProducts} alt="Total Products" className="" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-800">Total Products</p>
+                  <p className="text-xs text-gray-600">
+                    Increased by <span className="text-green-500">1.75%</span>
+                  </p>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-bold text-gray-800">23,124</p>
+              </div>
             </div>
-          </div>
-          <div>
-            <p className="text-sm font-bold text-gray-800">23,124</p>
-          </div>
-        </div>
-        <div className=" flex justify-between">
-          <div className="flex items-center gap-4 mb-4">
-            <div>
-              <img src={totalProducts} alt="Total Products" className="" />
+            <div className=" flex justify-between">
+              <div className="flex items-center gap-4 mb-4">
+                <div>
+                  <img src={totalSales} alt="Total Sales" className="" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-800">Total Sales</p>
+                  <p className="text-xs text-gray-600">
+                    Increased by <span className="text-green-500">1.75%</span>
+                  </p>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-bold text-gray-800">23,124</p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-gray-800">Total Products</p>
-              <p className="text-xs text-gray-600">
-                Increased by <span className="text-green-500">1.75%</span>
-              </p>
+            <div className=" flex justify-between">
+              <div className="flex items-center gap-4 mb-4">
+                <div>
+                  <img src={totalRevenue} alt="Total Revenue" className="" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-800">Total Revenue</p>
+                  <p className="text-xs text-gray-600">
+                    Increased by <span className="text-green-500">1.75%</span>
+                  </p>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-bold text-gray-800">23,124</p>
+              </div>
             </div>
-          </div>
-          <div>
-            <p className="text-sm font-bold text-gray-800">23,124</p>
-          </div>
-        </div>
-        <div className=" flex justify-between">
-          <div className="flex items-center gap-4 mb-4">
-            <div>
-              <img src={totalSales} alt="Total Sales" className="" />
+            <div className=" flex justify-between">
+              <div className="flex items-center gap-4 mb-4">
+                <div>
+                  <img src={totalProfit} alt="Total Profit" className="" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-800">Total Profit</p>
+                  <p className="text-xs text-gray-600">
+                    Increased by <span className="text-green-500">1.75%</span>
+                  </p>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-bold text-gray-800">23,124</p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-gray-800">Total Sales</p>
-              <p className="text-xs text-gray-600">
-                Increased by <span className="text-green-500">1.75%</span>
-              </p>
+            <div className=" flex justify-between">
+              <div className="flex items-center gap-4 mb-4">
+                <div>
+                  <img src={totalIncome} alt="Total Income" className="" />
+                </div>
+                <div className="">
+                  <p className="text-sm text-gray-800">Total Income</p>
+                  <p className="text-xs text-gray-600">
+                    Increased by <span className="text-green-500">1.75%</span>
+                  </p>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-bold text-gray-800">23,124</p>
+              </div>
             </div>
-          </div>
-          <div>
-            <p className="text-sm font-bold text-gray-800">23,124</p>
-          </div>
-        </div>
-        <div className=" flex justify-between">
-          <div className="flex items-center gap-4 mb-4">
-            <div>
-              <img src={totalRevenue} alt="Total Revenue" className="" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-800">Total Revenue</p>
-              <p className="text-xs text-gray-600">
-                Increased by <span className="text-green-500">1.75%</span>
-              </p>
-            </div>
-          </div>
-          <div>
-            <p className="text-sm font-bold text-gray-800">23,124</p>
-          </div>
-        </div>
-        <div className=" flex justify-between">
-          <div className="flex items-center gap-4 mb-4">
-            <div>
-              <img src={totalProfit} alt="Total Profit" className="" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-800">Total Profit</p>
-              <p className="text-xs text-gray-600">
-                Increased by <span className="text-green-500">1.75%</span>
-              </p>
-            </div>
-          </div>
-          <div>
-            <p className="text-sm font-bold text-gray-800">23,124</p>
-          </div>
-        </div>
-        <div className=" flex justify-between">
-          <div className="flex items-center gap-4 mb-4">
-            <div>
-              <img src={totalIncome} alt="Total Income" className="" />
-            </div>
-            <div className="">
-              <p className="text-sm text-gray-800">Total Income</p>
-              <p className="text-xs text-gray-600">
-                Increased by <span className="text-green-500">1.75%</span>
-              </p>
-            </div>
-          </div>
-          <div>
-            <p className="text-sm font-bold text-gray-800">23,124</p>
           </div>
         </div>
       </div>

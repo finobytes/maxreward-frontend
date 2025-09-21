@@ -2,18 +2,18 @@ import Chart from "react-apexcharts";
 
 const RealTimeTransactions = () => {
   const options = {
-    colors: ["#FF5A29", "#6366F1"],
+    colors: ["#FF5A29", "#6366F1"], // Redeemed = orange, Purchased = purple
     chart: {
       fontFamily: "Outfit, sans-serif",
       type: "line",
-      height: 400,
+      height: 388,
       stacked: false,
       toolbar: {
         show: false,
       },
     },
     stroke: {
-      width: [0, 3],
+      width: [0, 3], // Bar = 0, Line = 3
       curve: "smooth",
     },
     plotOptions: {
@@ -25,6 +25,23 @@ const RealTimeTransactions = () => {
     },
     dataLabels: {
       enabled: false,
+    },
+    labels: [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ],
+    markers: {
+      size: 4,
     },
     xaxis: {
       categories: [
@@ -43,6 +60,11 @@ const RealTimeTransactions = () => {
       ],
       axisBorder: { show: false },
       axisTicks: { show: false },
+    },
+    yaxis: {
+      title: {
+        text: undefined,
+      },
     },
     legend: {
       show: true,
@@ -75,16 +97,14 @@ const RealTimeTransactions = () => {
   ];
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 sm:px-6 sm:pt-6">
+    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 sm:px-6 sm:pt-6 shadow-md">
       <div>
         <h3 className="text-lg font-semibold text-gray-800">
           Real-Time Transactions
         </h3>
       </div>
-      <div className="max-w-full overflow-x-auto custom-scrollbar">
-        <div className="-ml-5 min-w-[640px] xl:min-w-full pl-2">
-          <Chart options={options} series={series} type="line" height={400} />
-        </div>
+      <div className="w-full">
+        <Chart options={options} series={series} type="line" height={388} />
       </div>
     </div>
   );
