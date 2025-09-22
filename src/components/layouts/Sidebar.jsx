@@ -19,7 +19,7 @@ const navItems = [
   {
     icon: <LayoutDashboard />,
     name: "Dashboard",
-    path: "/admin",
+    path: "/",
   },
   {
     name: "Member Manage",
@@ -69,7 +69,7 @@ const navItems = [
   {
     name: "Logout",
     icon: <LogOut />,
-    path: "/",
+    path: "/login",
   },
 ];
 

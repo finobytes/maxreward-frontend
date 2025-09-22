@@ -34,7 +34,7 @@ const Header = () => {
       <div className="flex flex-col items-center justify-between grow lg:flex-row lg:px-6">
         <div className="flex items-center justify-between w-full gap-2 px-3 py-3 ">
           <button
-            className="items-center justify-center w-10 h-10 text-gray-500  rounded-lg "
+            className="items-center justify-center w-10 h-10 text-gray-500 rounded-lg"
             onClick={handleToggle}
             aria-label="Toggle Sidebar"
           >

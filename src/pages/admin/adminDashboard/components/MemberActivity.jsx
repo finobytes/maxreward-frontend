@@ -28,7 +28,10 @@ const MemberActivity = () => {
           Member Activity
         </h3>
         <div className="relative inline-block">
-          <button className="dropdown-toggle" onClick={toggleDropdown}>
+          <button
+            className="dropdown-toggle cursor-pointer"
+            onClick={toggleDropdown}
+          >
             <img src={kebabMenu} alt="View Options" className="" />
           </button>
           <Dropdown
