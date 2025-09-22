@@ -8,10 +8,6 @@ import bag from "./icons/bag.svg";
 import dollar from "./icons/dollar.svg";
 import users from "./icons/users.svg";
 import clock from "./icons/clock.svg";
-import lineChart1 from "./icons/lineChart1.svg";
-import lineChart2 from "./icons/lineChart2.svg";
-import lineChart3 from "./icons/lineChart3.svg";
-import lineChart4 from "./icons/lineChart4.svg";
 import kebabMenu from "./icons/kebab-menu.svg";
 import visits from "./icons/visits.svg";
 import totalProducts from "./icons/total-products.svg";
@@ -19,6 +15,7 @@ import totalSales from "./icons/total-sales.svg";
 import totalRevenue from "./icons/total-revenue.svg";
 import totalProfit from "./icons/total-profit.svg";
 import totalIncome from "./icons/total-income.svg";
+import audienceReport from "./icons/audience-report.svg";
 
 export {
   loginBanner,
@@ -31,10 +28,6 @@ export {
   dollar,
   users,
   clock,
-  lineChart1,
-  lineChart2,
-  lineChart3,
-  lineChart4,
   kebabMenu,
   visits,
   totalProducts,
@@ -42,4 +35,5 @@ export {
   totalRevenue,
   totalProfit,
   totalIncome,
+  audienceReport,
 };
