@@ -1,20 +1,14 @@
 import React from "react";
-import {
-  bag,
-  clock,
-  dollar,
-  lineChart1,
-  lineChart2,
-  lineChart3,
-  lineChart4,
-  users,
-} from "../../../assets/assets";
+import { bag, clock, dollar, users } from "../../../assets/assets";
 import DashboardCard from "./components/DashboardCard";
 import RealTimeTransactions from "./components/RealTimeTransactions";
 import MemberActivity from "./components/MemberActivity";
 import PointsIssuedRedeemed from "./components/PointsIssuedRedeemed";
 import PointsRedeemed from "./components/PointsRedeemed";
 import PointsPurchased from "./components/PointsPurchased";
+import AudienceReport from "./components/AudienceReport";
+import MemberOnboard from "./components/MemberOnboard";
+import VisitorsByGender from "./components/VisitorsByGender";
 
 const AdminDashboard = () => {
   const cardsData = [
@@ -22,33 +16,41 @@ const AdminDashboard = () => {
       icon: users,
       title: "Total Users",
       value: "12,432",
-      changeText: "+0.892 increased",
+      changeText: "+0.892",
       changeColor: "text-green-500",
-      chart: lineChart1,
+      subtitle: "Increased",
+      chartColor: "#8B5CF6", // purple
+      chartData: [10, 14, 12, 18, 16, 20, 17],
     },
     {
       icon: bag,
-      title: "Total Orders",
-      value: "8,540",
-      changeText: "+1.25 increased",
+      title: "Total Merchants",
+      value: "12,432",
+      changeText: "+0.892",
       changeColor: "text-green-500",
-      chart: lineChart2,
+      subtitle: "Increased",
+      chartColor: "#F97316", // orange
+      chartData: [8, 10, 9, 13, 11, 15, 14],
     },
     {
       icon: dollar,
-      title: "Revenue",
-      value: "$25,430",
-      changeText: "-0.54 decreased",
-      changeColor: "text-red-500",
-      chart: lineChart3,
+      title: "Total Transactions",
+      value: "12,432",
+      changeText: "+0.892",
+      changeColor: "text-green-500",
+      subtitle: "Increased",
+      chartColor: "#10B981", // green
+      chartData: [5, 7, 9, 12, 11, 9, 10],
     },
     {
       icon: clock,
-      title: "Active Sessions",
-      value: "1,230",
-      changeText: "+2.14 increased",
+      title: "Merchant Approvals",
+      value: "45",
+      changeText: "+0.892",
       changeColor: "text-green-500",
-      chart: lineChart4,
+      subtitle: "Increased",
+      chartColor: "#3B82F6", // blue
+      chartData: [6, 8, 7, 9, 8, 10, 9],
     },
   ];
 
@@ -72,6 +74,11 @@ const AdminDashboard = () => {
         <PointsIssuedRedeemed />
         <PointsRedeemed />
         <PointsPurchased />
+      </div>
+      <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <AudienceReport />
+        <MemberOnboard />
+        <VisitorsByGender />
       </div>
     </div>
   );
