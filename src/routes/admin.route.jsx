@@ -18,51 +18,51 @@ export const adminRoutes = [
     element: <AdminDashboard />,
   },
   {
-    path: "member-manage",
+    path: "admin/member-manage",
     element: <MemberManage />,
   },
   {
-    path: "staff-manage",
+    path: "admin/staff-manage",
     element: <StaffManage />,
   },
   {
-    path: "merchant/pending-merchant",
+    path: "admin/merchant/pending-merchant",
     element: <PendingMerchant />,
   },
   {
-    path: "merchant/active-merchant",
+    path: "admin/merchant/active-merchant",
     element: <ActiveMerchant />,
   },
   {
-    path: "accounts/income",
+    path: "admin/accounts/income",
     element: <Income />,
   },
   {
-    path: "accounts/expense",
+    path: "admin/accounts/expense",
     element: <Expense />,
   },
   {
-    path: "reports/transaction",
+    path: "admin/reports/transaction",
     element: <Transaction />,
   },
   {
-    path: "reports/voucher-purchase",
+    path: "admin/reports/voucher-purchase",
     element: <VoucherPurchase />,
   },
   {
-    path: "reports/member-points-report",
+    path: "admin/reports/member-points-report",
     element: <MemberPointsReport />,
   },
   {
-    path: "reports/tree-performance",
+    path: "admin/reports/tree-performance",
     element: <TreePerformance />,
   },
   {
-    path: "reports/redemption",
+    path: "admin/reports/redemption",
     element: <Redemption />,
   },
   {
-    path: "profile",
+    path: "admin/profile",
     element: <Profile />,
   },
 ];
