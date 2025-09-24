@@ -9,6 +9,7 @@ import {
 import React, { useState, useMemo } from "react";
 import { Link } from "react-router";
 import { userImage } from "../../../../assets/assets";
+import StatusBadge from "../../../../components/ui/table/StatusBadge";
 
 const dummyMembers = Array.from({ length: 55 }).map((_, i) => ({
   id: i + 1,
@@ -251,17 +252,7 @@ const MemberList = () => {
                   <td className="py-4 text-center">{member.referrals}</td>
                   <td className="py-4">{member.points}</td>
                   <td className="py-4">
-                    <span
-                      className={`px-3 py-1 text-xs font-medium rounded-full ${
-                        member.status === "Active"
-                          ? "bg-green-100 text-green-700"
-                          : member.status === "Blocked"
-                          ? "bg-red-100 text-red-700"
-                          : "bg-yellow-100 text-yellow-700"
-                      }`}
-                    >
-                      {member.status}
-                    </span>
+                    <StatusBadge status={member.status} />
                   </td>
                   <td className="py-4">{member.purchased}</td>
                   <td className="py-4">{member.created}</td>
