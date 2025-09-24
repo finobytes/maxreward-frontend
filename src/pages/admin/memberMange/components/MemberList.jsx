@@ -10,7 +10,6 @@ import React, { useState, useMemo } from "react";
 import { Link } from "react-router";
 import { userImage } from "../../../../assets/assets";
 
-// Dummy Data
 const dummyMembers = Array.from({ length: 55 }).map((_, i) => ({
   id: i + 1,
   fullName: `Member ${i + 1}`,
@@ -29,11 +28,12 @@ const MemberList = () => {
   const [selected, setSelected] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
+  const [members, setMembers] = useState(dummyMembers);
+
   const rowsPerPage = 10;
 
-  // Filter + Search
   const filteredData = useMemo(() => {
-    return dummyMembers.filter((m) => {
+    return members.filter((m) => {
       const matchesSearch =
         m.fullName.toLowerCase().includes(search.toLowerCase()) ||
         m.memberId.toLowerCase().includes(search.toLowerCase()) ||
@@ -42,16 +42,14 @@ const MemberList = () => {
         statusFilter === "All" ? true : m.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
-  }, [search, statusFilter]);
+  }, [search, statusFilter, members]);
 
-  // Pagination
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
   const paginatedData = filteredData.slice(
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
   );
 
-  // Select All
   const toggleSelectAll = (checked) => {
     if (checked) {
       setSelected(paginatedData.map((m) => m.id));
@@ -66,17 +64,30 @@ const MemberList = () => {
     );
   };
 
+  // Bulk Actions
+  const bulkUpdateStatus = (newStatus) => {
+    setMembers((prev) =>
+      prev.map((m) =>
+        selected.includes(m.id) ? { ...m, status: newStatus } : m
+      )
+    );
+    setSelected([]);
+  };
+
+  const bulkDelete = () => {
+    setMembers((prev) => prev.filter((m) => !selected.includes(m.id)));
+    setSelected([]);
+  };
+
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white p-4">
       <div className="max-w-full overflow-x-auto">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          {/* Title */}
           <h3 className="text-lg font-semibold text-gray-800">
             All Member List
           </h3>
 
-          {/* Controls */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
             {/* Search */}
             <form className="relative flex-1 sm:flex-none">
@@ -149,6 +160,37 @@ const MemberList = () => {
             </div>
           </div>
         </div>
+
+        {/* Bulk Actions Bar */}
+        {selected.length > 0 && (
+          <div className="mt-4 flex flex-wrap items-center gap-2 bg-gray-50 p-3 rounded-md border">
+            <p className="text-sm text-gray-700">{selected.length} selected</p>
+            <button
+              onClick={() => bulkUpdateStatus("Active")}
+              className="px-3 py-1 text-sm rounded-md bg-green-600 text-white hover:bg-green-500"
+            >
+              Set Active
+            </button>
+            <button
+              onClick={() => bulkUpdateStatus("Blocked")}
+              className="px-3 py-1 text-sm rounded-md bg-red-600 text-white hover:bg-red-500"
+            >
+              Set Blocked
+            </button>
+            <button
+              onClick={() => bulkUpdateStatus("Suspended")}
+              className="px-3 py-1 text-sm rounded-md bg-yellow-600 text-white hover:bg-yellow-500"
+            >
+              Set Suspended
+            </button>
+            <button
+              onClick={bulkDelete}
+              className="px-3 py-1 text-sm rounded-md bg-gray-700 text-white hover:bg-gray-600"
+            >
+              Delete Selected
+            </button>
+          </div>
+        )}
 
         {/* Table */}
         <div className="mt-4 relative overflow-x-auto">
