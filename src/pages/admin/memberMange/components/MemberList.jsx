@@ -9,7 +9,7 @@ import {
 import React, { useState, useMemo } from "react";
 import { Link } from "react-router";
 import { userImage } from "../../../../assets/assets";
-import StatusBadge from "../../../../components/ui/table/StatusBadge";
+import StatusBadge from "../../../../components/table/StatusBadge";
 
 const dummyMembers = Array.from({ length: 55 }).map((_, i) => ({
   id: i + 1,
