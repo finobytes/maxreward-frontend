@@ -12,6 +12,7 @@ import { userImage } from "../../../../assets/assets";
 import StatusBadge from "../../../../components/table/StatusBadge";
 import SearchInput from "../../../../components/form/SearchInput";
 import DropdownSelect from "../../../../components/ui/dropdown/DropdownSelect";
+import PrimaryButton from "../../../../components/ui/PrimaryButton";
 
 const dummyMembers = Array.from({ length: 55 }).map((_, i) => ({
   id: i + 1,
@@ -134,13 +135,10 @@ const MemberList = () => {
               )}
             </form> */}
             {/* Add Member Button */}
-            <button
-              type="button"
-              className="inline-flex items-center justify-center gap-x-2 rounded-md bg-brand-600 px-4 py-2.5 text-sm font-medium text-white shadow hover:bg-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-600"
-            >
+            <PrimaryButton variant="primary" size="md" to="/members/register">
               <Plus size={18} />
               Register New Member
-            </button>
+            </PrimaryButton>
 
             {/* Sort Dropdown */}
             <DropdownSelect
