@@ -1,5 +1,6 @@
 import { useDropzone } from "react-dropzone";
 import { useState, useEffect } from "react";
+import { upload } from "../../../assets/assets";
 
 const Dropzone = ({ onFilesChange, multiple = false, maxFiles = 1 }) => {
   const [files, setFiles] = useState([]);
@@ -52,33 +53,17 @@ const Dropzone = ({ onFilesChange, multiple = false, maxFiles = 1 }) => {
           <input {...getInputProps()} />
           <div className="dz-message flex flex-col items-center">
             {/* Icon */}
-            <div className="mb-[22px] flex justify-center">
-              <div className="flex h-[68px] w-[68px] items-center justify-center rounded-full bg-gray-200 text-gray-700">
-                <svg
-                  className="fill-current"
-                  width="29"
-                  height="28"
-                  viewBox="0 0 29 28"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M14.5 3.917a.7.7 0 0 0-.549.239L8.574 9.532a.667.667 0 0 0 .948.948L13.75 6.478V18.667a.75.75 0 0 0 1.5 0V6.482l4.114 4.11a.667.667 0 1 0 .948-.948l-5.342-5.338a.7.7 0 0 0-.47-.29ZM5.916 18.667a.75.75 0 0 0-1.5 0v3.167c0 1.243 1.007 2.25 2.25 2.25h15.668c1.243 0 2.25-1.007 2.25-2.25v-3.167a.75.75 0 0 0-1.5 0v3.167c0 .414-.336.75-.75.75H6.666a.75.75 0 0 1-.75-.75v-3.167Z"
-                  />
-                </svg>
+            <div className="mb-[22px] flex justify-center items-center bg-brand-500 rounded-full p-1">
+              <div className="rounded-full bg-white w-12 h-12 p-2">
+                <img className="" src={upload} alt="upload icon" />
               </div>
+              <p className="text-white px-5">Drop here to attach or upload</p>
             </div>
             {/* Text */}
-            <h4 className="mb-3 font-semibold text-gray-800 text-theme-xl">
-              {isDragActive ? "Drop Files Here" : "Drag & Drop Files Here"}
-            </h4>
-            <span className="mb-5 block w-full max-w-[290px] text-center text-sm text-gray-700">
-              Drag and drop your PNG, JPG, WebP, SVG images here or browse
-            </span>
             <span className="font-medium underline text-theme-sm text-brand-500">
               Browse File
             </span>
+            <span className="text-gray-400 text-xs mt-2">Max size: 10MB</span>
           </div>
         </div>
       </div>

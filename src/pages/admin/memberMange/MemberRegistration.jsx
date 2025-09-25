@@ -5,6 +5,7 @@ import Label from "../../../components/form/Label";
 import Input from "../../../components/form/input/InputField";
 import { useState } from "react";
 import Dropzone from "../../../components/form/form-elements/Dropzone";
+import PrimaryButton from "../../../components/ui/PrimaryButton";
 
 const MemberRegistration = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -15,7 +16,6 @@ const MemberRegistration = () => {
   const handleSubmit = () => {
     console.log("Profile Picture:", profilePic);
     console.log("Passport Files:", passportFiles);
-    // এখানে backend এ পাঠানোর জন্য formData বানাতে পারবে
   };
   return (
     <div>
@@ -104,6 +104,35 @@ const MemberRegistration = () => {
           </div>
         </div>
       </ComponentCard>
+      <div className="mt-8">
+        <ComponentCard>
+          <div className=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 lg:gap-4">
+            <div>
+              <Label htmlFor="fullName">
+                Referral Code (<span className="text-red-500">*</span>)
+              </Label>
+              <Input type="text" id="fullName" placeholder="Referral Code" />
+            </div>
+            <div>
+              <Label htmlFor="phoneNumber">Referred By</Label>
+              <Input
+                type="text"
+                id="phoneNumber"
+                placeholder=""
+                disabled="true"
+              />
+            </div>
+            <div>
+              <Label htmlFor="Address">Referral Status</Label>
+              <Input type="text" id="Address" placeholder="" disabled="true" />
+            </div>
+          </div>
+          <div className="mt-8 flex gap-4">
+            <PrimaryButton>Submit</PrimaryButton>
+            <PrimaryButton variant="secondary">Back</PrimaryButton>
+          </div>
+        </ComponentCard>
+      </div>
     </div>
   );
 };
