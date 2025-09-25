@@ -16,6 +16,7 @@ import totalRevenue from "./icons/total-revenue.svg";
 import totalProfit from "./icons/total-profit.svg";
 import totalIncome from "./icons/total-income.svg";
 import audienceReport from "./icons/audience-report.svg";
+import upload from "./icons/upload.svg";
 
 export {
   loginBanner,
@@ -36,4 +37,5 @@ export {
   totalProfit,
   totalIncome,
   audienceReport,
+  upload,
 };

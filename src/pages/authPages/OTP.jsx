@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { logo, resetPassBgLeft, resetPassBgRight } from "../../assets/assets";
 import ErrorMsg from "../../components/errorMsg/ErrorMsg";
 import { Link } from "react-router";
-import OTPInput from "../../components/form/OTPInput";
+import OTPInput from "../../components/form/form-elements/OTPInput";
 
 const OTP = () => {
   const {
