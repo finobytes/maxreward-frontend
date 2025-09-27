@@ -6,9 +6,13 @@ import Input from "../../../components/form/input/InputField";
 import { useState } from "react";
 import Dropzone from "../../../components/form/form-elements/Dropzone";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
+import Select from "../../../components/form/Select";
 
 const MemberRegistration = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [gender, setGender] = useState("");
+  const [referralCode, setReferralCode] = useState("");
+
   // state for files
   const [profilePic, setProfilePic] = useState([]);
   const [passportFiles, setPassportFiles] = useState([]);
@@ -48,6 +52,22 @@ const MemberRegistration = () => {
               placeholder="Enter Phone Number"
             />
           </div>
+          <div>
+            <Label htmlFor="gender">Gender</Label>
+            <Select
+              id="gender"
+              name="gender"
+              placeholder="Select Gender"
+              options={[
+                { value: "male", label: "Male" },
+                { value: "female", label: "Female" },
+                { value: "other", label: "Other" },
+              ]}
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+            />
+          </div>
+
           <div>
             <Label htmlFor="Address">Full Address</Label>
             <Input type="text" id="Address" placeholder="Enter Full Address" />
@@ -108,16 +128,27 @@ const MemberRegistration = () => {
         <ComponentCard>
           <div className=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 lg:gap-4">
             <div>
-              <Label htmlFor="fullName">
+              <Label htmlFor="referralCode">
                 Referral Code (<span className="text-red-500">*</span>)
               </Label>
-              <Input type="text" id="fullName" placeholder="Referral Code" />
+              <Select
+                id="referralCode"
+                name="referralCode"
+                placeholder="Referral Code"
+                options={[
+                  { value: "MAX-1001", label: "MAX-1001" },
+                  { value: "MAX-1002", label: "MAX-1002" },
+                  { value: "MAX-1003", label: "MAX-1003" },
+                ]}
+                value={referralCode}
+                onChange={(e) => setReferralCode(e.target.value)}
+              />
             </div>
             <div>
-              <Label htmlFor="phoneNumber">Referred By</Label>
+              <Label htmlFor="referredBy">Referred By</Label>
               <Input
                 type="text"
-                id="phoneNumber"
+                id="referredBy"
                 placeholder=""
                 disabled="true"
               />
