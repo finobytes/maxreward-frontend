@@ -31,7 +31,7 @@ const MemberRegistration = () => {
         ]}
       />
       <ComponentCard title="Member Information">
-        <div className=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 lg:gap-4">
+        <div className=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-3 lg:gap-4">
           <div>
             <Label htmlFor="fullName">
               Full Name (<span className="text-red-500">*</span>)
@@ -105,7 +105,7 @@ const MemberRegistration = () => {
           </div>
         </div>
         {/* Dropzones */}
-        <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label>Profile Picture</Label>
             <Dropzone
@@ -126,7 +126,7 @@ const MemberRegistration = () => {
       </ComponentCard>
       <div className="mt-8">
         <ComponentCard>
-          <div className=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 lg:gap-4">
+          <div className=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-3 lg:gap-4">
             <div>
               <Label htmlFor="referralCode">
                 Referral Code (<span className="text-red-500">*</span>)
