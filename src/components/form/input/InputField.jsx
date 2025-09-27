@@ -1,5 +1,4 @@
 import React from "react";
-import { cn } from "../../../lib/utils";
 
 const Input = ({
   type = "text",
@@ -17,22 +16,22 @@ const Input = ({
   error = false,
   hint,
 }) => {
-  let inputClasses = cn(
-    "h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3",
-    disabled
-      ? "text-gray-500 border-gray-300 opacity-40 bg-gray-100 cursor-not-allowed"
-      : error
-      ? "border-error-500 focus:border-error-300 focus:ring-error-500/20"
-      : success
-      ? "border-success-500 focus:border-success-300 focus:ring-success-500/20"
-      : "bg-transparent text-gray-800 border-gray-300 focus:border-brand-300 focus:ring-brand-500/20",
-    className
-  );
+  let inputClasses = ` h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 ${className}`;
+
+  if (disabled) {
+    inputClasses += ` text-gray-500 border-gray-300 opacity-40 bg-gray-100 cursor-not-allowed`;
+  } else if (error) {
+    inputClasses += `  border-error-500 focus:border-error-300 focus:ring-error-500/20`;
+  } else if (success) {
+    inputClasses += `  border-success-500 focus:border-success-300 focus:ring-success-500/20`;
+  } else {
+    inputClasses += ` bg-transparent text-gray-800 border-gray-300 focus:border-brand-300 focus:ring-brand-500/20`;
+  }
 
   return (
     <div className="relative">
       <input
-        type={type}
+        type={type} /*  */
         id={id}
         name={name}
         placeholder={placeholder}
@@ -47,14 +46,13 @@ const Input = ({
 
       {hint && (
         <p
-          className={cn(
-            "mt-1.5 text-xs",
+          className={`mt-1.5 text-xs ${
             error
               ? "text-error-500"
               : success
               ? "text-success-500"
               : "text-gray-500"
-          )}
+          }`}
         >
           {hint}
         </p>
