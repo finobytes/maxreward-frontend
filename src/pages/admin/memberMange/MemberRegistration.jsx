@@ -24,6 +24,16 @@ const MemberRegistration = () => {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(memberSchema),
+    defaultValues: {
+      fullName: "",
+      phoneNumber: "",
+      gender: "",
+      address: "",
+      city: "",
+      email: "",
+      password: "",
+      referralCode: "",
+    },
   });
 
   const onSubmit = (data) => {
