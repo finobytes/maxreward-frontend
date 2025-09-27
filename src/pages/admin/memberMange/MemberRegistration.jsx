@@ -146,7 +146,9 @@ const MemberRegistration = () => {
 
             {/* Password */}
             <div>
-              <Label>Password</Label>
+              <Label>
+                Password (<span className="text-red-500">*</span>)
+              </Label>
               <div className="relative">
                 <Input
                   type={showPassword ? "text" : "password"}

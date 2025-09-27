@@ -22,11 +22,8 @@ export const memberSchema = z.object({
     .optional(),
 
   password: z
-    .union([
-      z.string().min(6, "Password must be at least 6 characters"),
-      z.literal(""),
-    ])
-    .optional(),
+    .string({ required_error: "Password is required" })
+    .min(6, "Password must be at least 6 characters"),
 
   referralCode: z
     .string({ required_error: "Referral Code is required" })
