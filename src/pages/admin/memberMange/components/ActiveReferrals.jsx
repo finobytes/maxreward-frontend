@@ -1,35 +1,74 @@
 import React from "react";
-
+import { Link } from "react-router";
+import {
+  plusButton,
+  user1,
+  user2,
+  user3,
+  user4,
+  user5,
+} from "../../../../assets/assets";
+const people = [
+  {
+    name: "Henry Philips",
+    icon: user1,
+  },
+  {
+    name: "Henry Morgan",
+    icon: user2,
+  },
+  {
+    name: "Aurora Reed",
+    icon: user3,
+  },
+  {
+    name: "Leo Philips",
+    icon: user4,
+  },
+  {
+    name: "Ava Taylor",
+    icon: user5,
+  },
+];
 const ActiveReferrals = () => {
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 sm:px-2 sm:pt-6 lg:px-6 shadow-md">
-      {/* Referral List */}
-      <ul className="space-y-3 text-sm text-gray-700">
-        <li className="flex justify-between items-center">
-          <span className="font-medium">Referral Code :</span>
-          <span className="text-gray-600">#REF-12345</span>
-        </li>
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="text-lg font-semibold text-gray-800 ">
+          Active Referrals
+        </h3>
+        <div>
+          <Link to="" className="text-sm text-gray-400">
+            View All
+          </Link>
+        </div>
+      </div>
 
-        <li className="flex justify-between items-center">
-          <span className="font-medium">Total Referrals :</span>
-          <span className="text-gray-600">18</span>
-        </li>
-
-        <li className="flex justify-between items-center">
-          <span className="font-medium">Active Referrals :</span>
-          <span className="text-green-600 font-semibold">12</span>
-        </li>
-
-        <li className="flex justify-between items-center">
-          <span className="font-medium">Inactive Referrals :</span>
-          <span className="text-red-500 font-semibold">6</span>
-        </li>
-
-        <li className="flex justify-between items-center">
-          <span className="font-medium">Referral Bonus :</span>
-          <span className="text-indigo-600 font-semibold">$250</span>
-        </li>
-      </ul>
+      <div className="mt-2 w-full border-t border-gray-300"></div>
+      <div className="mt-2 flow-root">
+        <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+          <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+            <div className="relative min-w-full divide-y divide-gray-200">
+              <ul className="divide-y divide-gray-200">
+                {people.map((person) => (
+                  <li
+                    className="flex justify-between items-center"
+                    key={person.email}
+                  >
+                    <div className="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-0 flex items-center gap-2">
+                      <img src={person.icon} alt={person.name} />
+                      <span>{person.name}</span>
+                    </div>
+                    <p className="py-4 text-sm whitespace-nowrap text-gray-900">
+                      <img src={plusButton} alt={person.name} />
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

@@ -30,11 +30,9 @@ const PersonalInfo = () => {
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 sm:px-2 sm:pt-6 lg:px-6 shadow-md">
       {/* Info List */}
-      <h3 className="text-lg font-semibold text-gray-700 mb-2">
-        Personal Info
-      </h3>
-      <div className="relative min-w-full divide-y divide-gray-200"></div>
-      <div className="mt-2 flow-root">
+      <h3 className="text-lg font-semibold text-gray-700">Personal Info</h3>
+      <div className="mt-2 w-full border-t border-gray-300"></div>
+      <div className="flow-root">
         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
             <div className="relative min-w-full divide-y divide-gray-200">
