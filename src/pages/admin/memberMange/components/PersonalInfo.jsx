@@ -1,40 +1,59 @@
 import React from "react";
+const people = [
+  {
+    key: "Name:",
+    value: "Leo Phillips",
+  },
+  {
+    key: "Email:",
+    value: "youremail@example.com",
+  },
+  {
+    key: "Phone:",
+    value: "+1 (555) 123-4567",
+  },
+  {
+    key: "Designation:",
+    value: "C.E.O",
+  },
+  {
+    key: "Address:",
+    value: "Washington D.C",
+  },
+  {
+    key: "Contributor level :",
+    value: "Level-3",
+  },
+];
 
 const PersonalInfo = () => {
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 sm:px-2 sm:pt-6 lg:px-6 shadow-md">
       {/* Info List */}
-      <ul className="space-y-3 text-sm text-gray-700">
-        <li className="flex">
-          <span className="w-32 font-medium">Name :</span>
-          <span className="text-gray-600">Leo Phillips</span>
-        </li>
-
-        <li className="flex">
-          <span className="w-32 font-medium">Email :</span>
-          <span className="text-primary">youremail@example.com</span>
-        </li>
-
-        <li className="flex">
-          <span className="w-32 font-medium">Phone :</span>
-          <span className="text-gray-600">+1 (555) 123-4567</span>
-        </li>
-
-        <li className="flex">
-          <span className="w-32 font-medium">Designation :</span>
-          <span className="text-gray-600">C.E.O</span>
-        </li>
-
-        <li className="flex">
-          <span className="w-32 font-medium">Address :</span>
-          <span className="text-gray-600">Washington D.C</span>
-        </li>
-
-        <li className="flex">
-          <span className="w-32 font-medium">Contributor level :</span>
-          <span className="text-indigo-600">Level-3</span>
-        </li>
-      </ul>
+      <h3 className="text-lg font-semibold text-gray-700 mb-2">
+        Personal Info
+      </h3>
+      <div className="relative min-w-full divide-y divide-gray-200"></div>
+      <div className="mt-2 flow-root">
+        <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+          <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+            <div className="relative min-w-full divide-y divide-gray-200">
+              <ul className="divide-y divide-gray-200">
+                {people.map((person) => (
+                  <li className="flex" key={person.email}>
+                    <p className="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-0">
+                      {person.key}
+                    </p>
+                    <p className="py-4 text-sm whitespace-nowrap text-gray-900">
+                      {person.value}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

@@ -24,6 +24,12 @@ import locationIcon from "./icons/location.svg";
 import bag2 from "./icons/bag2.svg";
 import users2 from "./icons/users2.svg";
 import profile from "./icons/profile.svg";
+import plusButton from "./icons/plusButton.svg";
+import user1 from "./images/user/user1.png";
+import user2 from "./images/user/user2.png";
+import user3 from "./images/user/user3.png";
+import user4 from "./images/user/user4.png";
+import user5 from "./images/user/user5.png";
 
 export {
   loginBanner,
@@ -52,4 +58,10 @@ export {
   bag2,
   users2,
   profile,
+  plusButton,
+  user1,
+  user2,
+  user3,
+  user4,
+  user5,
 };
