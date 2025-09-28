@@ -59,7 +59,7 @@ const ActiveReferrals = () => {
                       <img src={person.icon} alt={person.name} />
                       <span>{person.name}</span>
                     </div>
-                    <p className="py-4 text-sm whitespace-nowrap text-gray-900">
+                    <p className="pr-3 md:pr-0 py-4 text-sm whitespace-nowrap text-gray-900">
                       <img src={plusButton} alt={person.name} />
                     </p>
                   </li>

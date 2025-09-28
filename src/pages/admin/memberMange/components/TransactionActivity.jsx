@@ -109,7 +109,7 @@ const TransactionActivity = () => {
                 </div>
               </div>
               <div>
-                <p className="text-sm font-bold text-gray-800">1,824</p>
+                <p className="text-sm font-bold text-gray-800">1,850</p>
               </div>
             </div>
             <div className=" flex justify-between">
@@ -125,7 +125,7 @@ const TransactionActivity = () => {
                 </div>
               </div>
               <div>
-                <p className="text-sm font-bold text-gray-800">2,124</p>
+                <p className="text-sm font-bold text-gray-800">2,670</p>
               </div>
             </div>
             <div className=" flex justify-between">
@@ -141,7 +141,7 @@ const TransactionActivity = () => {
                 </div>
               </div>
               <div>
-                <p className="text-sm font-bold text-gray-800">3,124</p>
+                <p className="text-sm font-bold text-gray-800">3,260</p>
               </div>
             </div>
           </div>
