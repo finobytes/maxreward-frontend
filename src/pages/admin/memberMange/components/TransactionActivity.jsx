@@ -141,7 +141,7 @@ const TransactionActivity = () => {
                 </div>
               </div>
               <div>
-                <p className="text-sm font-bold text-gray-800">3,760</p>
+                <p className="text-sm font-bold text-gray-800">3,124</p>
               </div>
             </div>
           </div>
