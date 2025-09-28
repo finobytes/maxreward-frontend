@@ -44,7 +44,7 @@ const ActiveReferrals = () => {
         </div>
       </div>
 
-      <div className="mt-2 w-full border-t border-gray-300"></div>
+      <div className="mt-2 flow-root w-full border-t border-gray-300"></div>
       <div className="mt-2 flow-root">
         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
@@ -59,7 +59,7 @@ const ActiveReferrals = () => {
                       <img src={person.icon} alt={person.name} />
                       <span>{person.name}</span>
                     </div>
-                    <p className="py-4 text-sm whitespace-nowrap text-gray-900">
+                    <p className="pr-3 md:pr-0 py-4 text-sm whitespace-nowrap text-gray-900">
                       <img src={plusButton} alt={person.name} />
                     </p>
                   </li>
