@@ -8,6 +8,7 @@ import StatusBadge from "../../../components/table/StatusBadge";
 import { Eye, PencilLine, Trash2Icon, Plus } from "lucide-react";
 import Pagination from "../../../components/table/Pagination";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
+import { Link } from "react-router";
 
 const dummyMembers = Array.from({ length: 55 }).map((_, i) => ({
   id: i + 1,
@@ -198,9 +199,12 @@ const MemberManage = () => {
                       <td className="py-4">{member.purchased}</td>
                       <td className="py-4">{member.created}</td>
                       <td className="py-4 flex gap-2">
-                        <button className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500">
+                        <Link
+                          to="/admin/member-details"
+                          className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500"
+                        >
                           <Eye size={16} />
-                        </button>
+                        </Link>
                         <button className="p-2 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-500">
                           <PencilLine size={16} />
                         </button>
