@@ -105,60 +105,60 @@ const Statements = () => {
     <div>
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
-        <div className="bg-white border-0 shadow-sm p-2">
+        <div className="bg-white border-0 shadow-sm p-2 rounded-b-sm">
           <div className="">
-            <div className="flex items-center justify-between">
+            <div className="flex justify-between">
               <div>
                 <p className="text-xs text-gray-500 mb-1">Available Points</p>
                 <p className="text-xl font-semibold text-gray-900">12,432</p>
                 <p className="text-xs text-green-500 mt-1">+0.892 Increased</p>
               </div>
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
                 <CreditCard className="w-5 h-5 text-purple-600" />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white border-0 shadow-sm p-2">
+        <div className="bg-white border-0 shadow-sm p-2 rounded-b-sm">
           <div className="">
-            <div className="flex items-center justify-between">
+            <div className="flex justify-between">
               <div>
                 <p className="text-xs text-gray-500 mb-1">On Hold Points</p>
                 <p className="text-xl font-semibold text-gray-900">12,432</p>
                 <p className="text-xs text-green-500 mt-1">+0.892 Increased</p>
               </div>
-              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
                 <Hand className="w-5 h-5 text-orange-600" />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white border-0 shadow-sm p-2">
+        <div className="bg-white border-0 shadow-sm p-2 rounded-b-sm">
           <div className="">
-            <div className="flex items-center justify-between">
+            <div className="flex justify-between">
               <div>
                 <p className="text-xs text-gray-500 mb-1">Refer Points</p>
                 <p className="text-xl font-semibold text-gray-900">12,432</p>
                 <p className="text-xs text-green-500 mt-1">+0.892 Increased</p>
               </div>
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
                 <Users className="w-5 h-5 text-green-600" />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white border-0 shadow-sm p-2">
+        <div className="bg-white border-0 shadow-sm p-2 rounded-b-sm">
           <div className="">
-            <div className="flex items-center justify-between">
+            <div className="flex justify-between">
               <div>
                 <p className="text-xs text-gray-500 mb-1">Community Member</p>
                 <p className="text-xl font-semibold text-gray-900">45</p>
                 <p className="text-xs text-green-500 mt-1">+0.892 Increased</p>
               </div>
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                 <UserCheck className="w-5 h-5 text-blue-600" />
               </div>
             </div>
@@ -168,16 +168,16 @@ const Statements = () => {
 
       {/* User Statement Section */}
       <div className="mt-6 p-4">
-        <div className="flex items-center justify-between">
+        <div className="lg:flex lg:items-center lg:justify-between">
           <h2 className="font-semibold text-gray-900">User Statement</h2>
-          <div className="flex gap-2">
+          <div className="flex gap-2 mt-2 lg:mt-0">
             <PrimaryButton>Export as CSV</PrimaryButton>
             <PrimaryButton variant="secondary">Export as PDF</PrimaryButton>
           </div>
         </div>
 
         {/* Controls */}
-        <div className="mt-10 flex items-center justify-between mb-4">
+        <div className="mt-10 lg:flex lg:items-center lg:justify-between mb-4">
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-600">Show</span>
             <Select value={entriesPerPage} onValueChange={setEntriesPerPage}>
@@ -192,7 +192,7 @@ const Statements = () => {
             </Select>
             {/* <span className="text-sm text-gray-600">entries</span> */}
           </div>
-          <div className="relative">
+          <div className="relative mt-4 lg:mt-0">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
               placeholder="Search..."
