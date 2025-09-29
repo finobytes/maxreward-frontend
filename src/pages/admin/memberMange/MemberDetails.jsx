@@ -14,7 +14,6 @@ import ProfileTabContent from "./components/ProfileTabContent";
 
 const tabs = [
   { name: "Community", icon: UsersRound, key: "community" },
-  { name: "Add Payment", icon: BanknoteArrowUp, key: "payment" },
   { name: "Statements", icon: ScrollText, key: "statements" },
 ];
 const MemberDetails = () => {
