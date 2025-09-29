@@ -5,6 +5,8 @@ import MemberProfile from "./components/MemberProfile";
 import PersonalInfo from "./components/PersonalInfo";
 import ActiveReferrals from "./components/ActiveReferrals";
 import TransactionActivity from "./components/TransactionActivity";
+import ProfileTabs from "./components/ProfileTabs";
+import CommunityTree from "./components/CommunityTree";
 
 const MemberDetails = () => {
   return (
@@ -44,7 +46,10 @@ const MemberDetails = () => {
 
         {/* Right Column */}
         <div className="lg:col-span-1">
-          <ComponentCard>{/* Manual Payment Form Component */}</ComponentCard>
+          <ComponentCard>
+            <ProfileTabs />
+            <CommunityTree />
+          </ComponentCard>
         </div>
       </div>
     </div>
