@@ -62,7 +62,7 @@ const MemberDetails = () => {
               currentTab={currentTab}
               setCurrentTab={setCurrentTab}
             />
-            <div className="mt-4">
+            <div className="">
               <ProfileTabContent currentTab={currentTab} />
             </div>
           </ComponentCard>
