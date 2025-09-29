@@ -146,7 +146,94 @@ const PendingMerchant = () => {
             )}
 
             {/* Table */}
-            <div className="mt-4 relative overflow-x-auto"></div>
+            <div className="mt-4 relative overflow-x-auto">
+              <table className="w-full min-w-[1000px] text-sm text-left text-gray-500">
+                <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                  <tr>
+                    <th className="p-4">
+                      <input
+                        type="checkbox"
+                        checked={
+                          paginatedData.length > 0 &&
+                          selected.length === paginatedData.length
+                        }
+                        onChange={(e) => toggleSelectAll(e.target.checked)}
+                        className="w-4 h-4 rounded"
+                      />
+                    </th>
+                    <th className="py-3">Application ID</th>
+                    <th className="py-3">Merchant ID</th>
+                    <th className="py-3">Merchant Name</th>
+                    <th className="py-3">Phone Number</th>
+                    <th className="py-3">Email Address</th>
+                    <th className="py-3">Business Name</th>
+                    <th className="py-3">Business Type</th>
+                    <th className="py-3">Submitted Docs</th>
+                    <th className="py-3">Application Date</th>
+                    <th className="py-3">Status</th>
+                    <th className="py-3">Date Created</th>
+                    <th className="py-3">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginatedData.map((merchant) => (
+                    <tr
+                      key={merchant.id}
+                      className="bg-white border-b hover:bg-gray-50 transition"
+                    >
+                      <td className="p-4">
+                        <input
+                          type="checkbox"
+                          checked={selected.includes(merchant.id)}
+                          onChange={() => toggleSelect(merchant.id)}
+                          className="w-4 h-4 rounded"
+                        />
+                      </td>
+                      <td className="py-4">{merchant.applicationId}</td>
+                      <td className="py-4">{merchant.merchantId}</td>
+                      <td className="py-4">
+                        <div>
+                          <p className="">{merchant.merchantName}</p>
+                        </div>
+                      </td>
+                      <td className="py-4">{merchant.phone}</td>
+                      <td className="py-4">{merchant.email}</td>
+                      <td className="py-4">{merchant.businessName}</td>
+                      <td className="py-4">{merchant.businessType}</td>
+                      <td className="py-4">{merchant.submittedDocs}</td>
+                      <td className="py-4">{merchant.applicationDate}</td>
+                      <td className="py-4">
+                        <StatusBadge status={merchant.status} />
+                      </td>
+                      <td className="py-4">{merchant.created}</td>
+                      <td className="py-4 flex gap-2">
+                        <div className="relative inline-block">
+                          <button
+                            className="dropdown-toggle cursor-pointer"
+                            onClick={() => toggleDropdown(merchant.id)}
+                          >
+                            <img src={kebabMenu} alt="View Options" />
+                          </button>
+
+                          <Dropdown
+                            isOpen={openDropdownId === merchant.id}
+                            onClose={closeDropdown}
+                            className="w-40 p-2"
+                          >
+                            <DropdownItem onItemClick={closeDropdown}>
+                              Approve
+                            </DropdownItem>
+                            <DropdownItem onItemClick={closeDropdown}>
+                              Reject
+                            </DropdownItem>
+                          </Dropdown>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
             {/* Pagination */}
             <Pagination
               currentPage={currentPage}
