@@ -12,7 +12,7 @@ import { Dropdown } from "../../../components/ui/dropdown/Dropdown";
 import { DropdownItem } from "../../../components/ui/dropdown/DropdownItem";
 import BulkActionBar from "./components/BulkActionBar";
 
-const dummyMerchants = Array.from({ length: 55 }).map((_, i) => ({
+const dummyMerchants = Array.from({ length: 35 }).map((_, i) => ({
   id: i + 1,
   applicationId: `MAX-${1000 + i}`,
   merchantId: `MAX-${4325000 + i}`,
@@ -147,7 +147,7 @@ const PendingMerchant = () => {
 
             {/* Table */}
             <div className="mt-4 relative overflow-x-auto">
-              <table className="w-full min-w-[1000px] text-sm text-left text-gray-500">
+              <table className="w-full min-w-[1000px] text-sm text-center text-gray-500">
                 <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                   <tr>
                     <th className="p-4">

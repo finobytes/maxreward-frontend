@@ -26,7 +26,7 @@ const PrimaryButton = ({
   ...props
 }) => {
   const classes = cn(
-    "inline-flex items-center justify-center gap-x-2 rounded-md font-medium shadow focus:outline-none focus:ring-2 transition-colors",
+    "inline-flex items-center justify-center gap-x-2 rounded-md font-medium shadow focus:outline-none focus:ring-1 transition-colors",
     VARIANTS[variant],
     SIZES[size]
   );

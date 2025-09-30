@@ -10,7 +10,7 @@ import Pagination from "../../../components/table/Pagination";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import { Link } from "react-router";
 
-const dummyMembers = Array.from({ length: 55 }).map((_, i) => ({
+const dummyMembers = Array.from({ length: 30 }).map((_, i) => ({
   id: i + 1,
   fullName: `Member ${i + 1}`,
   memberId: `MAX-${4325000 + i}`,
