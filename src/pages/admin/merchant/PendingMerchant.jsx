@@ -107,7 +107,7 @@ const PendingMerchant = () => {
                 All Merchant Pending List
               </h3>
 
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
                 {/* Search */}
                 <SearchInput
                   value={search}

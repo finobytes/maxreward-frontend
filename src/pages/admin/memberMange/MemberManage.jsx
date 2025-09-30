@@ -111,16 +111,21 @@ const MemberManage = () => {
                 </PrimaryButton>
 
                 {/* Sort Dropdown */}
-                <DropdownSelect
-                  value={statusFilter}
-                  onChange={setStatusFilter}
-                  options={[
-                    { label: "All", value: "All" },
-                    { label: "Active", value: "Active" },
-                    { label: "Blocked", value: "Blocked" },
-                    { label: "Suspended", value: "Suspended" },
-                  ]}
-                />
+                <div className="flex items-center gap-4">
+                  <DropdownSelect
+                    value={statusFilter}
+                    onChange={setStatusFilter}
+                    options={[
+                      { label: "All", value: "All" },
+                      { label: "Active", value: "Active" },
+                      { label: "Blocked", value: "Blocked" },
+                      { label: "Suspended", value: "Suspended" },
+                    ]}
+                  />
+                  <PrimaryButton variant="secondary" size="md">
+                    Clear
+                  </PrimaryButton>
+                </div>
               </div>
             </div>
 
