@@ -21,6 +21,7 @@ import {
 
 import Pagination from "./../../../../components/table/Pagination";
 import PrimaryButton from "../../../../components/ui/PrimaryButton";
+import SearchInput from "../../../../components/form/form-elements/SearchInput";
 
 const mockData = [
   {
@@ -98,7 +99,7 @@ const mockData = [
 const Statements = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage, setEntriesPerPage] = useState("10");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [search, setSearch] = useState("");
 
   const totalPages = 5;
   return (
@@ -113,8 +114,8 @@ const Statements = () => {
                 <p className="text-xl font-semibold text-gray-900">12,432</p>
                 <p className="text-xs text-green-500 mt-1">+0.892 Increased</p>
               </div>
-              <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                <CreditCard className="w-5 h-5 text-purple-600" />
+              <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                <CreditCard className="w-4 h-4 text-purple-600" />
               </div>
             </div>
           </div>
@@ -128,8 +129,8 @@ const Statements = () => {
                 <p className="text-xl font-semibold text-gray-900">12,432</p>
                 <p className="text-xs text-green-500 mt-1">+0.892 Increased</p>
               </div>
-              <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                <Hand className="w-5 h-5 text-orange-600" />
+              <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                <Hand className="w-4 h-4 text-orange-600" />
               </div>
             </div>
           </div>
@@ -143,8 +144,8 @@ const Statements = () => {
                 <p className="text-xl font-semibold text-gray-900">12,432</p>
                 <p className="text-xs text-green-500 mt-1">+0.892 Increased</p>
               </div>
-              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                <Users className="w-5 h-5 text-green-600" />
+              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                <Users className="w-4 h-4 text-green-600" />
               </div>
             </div>
           </div>
@@ -158,8 +159,8 @@ const Statements = () => {
                 <p className="text-xl font-semibold text-gray-900">45</p>
                 <p className="text-xs text-green-500 mt-1">+0.892 Increased</p>
               </div>
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <UserCheck className="w-5 h-5 text-blue-600" />
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                <UserCheck className="w-4 h-4 text-blue-600" />
               </div>
             </div>
           </div>
@@ -193,12 +194,10 @@ const Statements = () => {
             {/* <span className="text-sm text-gray-600">entries</span> */}
           </div>
           <div className="relative mt-4 lg:mt-0">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <Input
-              placeholder="Search..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 w-64"
+            <SearchInput
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search here..."
             />
           </div>
         </div>
