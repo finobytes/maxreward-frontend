@@ -100,7 +100,7 @@ const Statements = () => {
   const [entriesPerPage, setEntriesPerPage] = useState("10");
   const [searchTerm, setSearchTerm] = useState("");
 
-  const totalPages = 6;
+  const totalPages = 5;
   return (
     <div>
       {/* Stats Cards */}

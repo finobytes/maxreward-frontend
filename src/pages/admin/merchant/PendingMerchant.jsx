@@ -4,13 +4,13 @@ import SearchInput from "../../../components/form/form-elements/SearchInput";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
 import { Eye } from "lucide-react";
 import DropdownSelect from "../../../components/ui/dropdown/DropdownSelect";
-import BulkActionBar from "../memberMange/components/BulkActionBar";
 import StatusBadge from "../../../components/table/StatusBadge";
 import { Link } from "react-router";
 import Pagination from "../../../components/table/Pagination";
 import { kebabMenu } from "../../../assets/assets";
 import { Dropdown } from "../../../components/ui/dropdown/Dropdown";
 import { DropdownItem } from "../../../components/ui/dropdown/DropdownItem";
+import BulkActionBar from "./components/BulkActionBar";
 
 const dummyMerchants = Array.from({ length: 55 }).map((_, i) => ({
   id: i + 1,
