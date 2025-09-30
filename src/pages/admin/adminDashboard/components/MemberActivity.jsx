@@ -22,7 +22,7 @@ const MemberActivity = () => {
     setIsOpen(false);
   }
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 sm:px-2 sm:pt-6 2xl:px-6 shadow-md">
+    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 sm:px-4 sm:pt-6 2xl:px-6 shadow-md">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-800 ">
           Member Activity
