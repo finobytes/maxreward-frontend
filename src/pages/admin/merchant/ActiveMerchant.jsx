@@ -102,6 +102,28 @@ const ActiveMerchant = () => {
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search here..."
                 />
+
+                {/* Add Member Button */}
+                <PrimaryButton variant="primary" size="md" to="">
+                  <Plus size={18} />
+                  Add New Merchant
+                </PrimaryButton>
+                <div className="flex justify-between items-center gap-4 md:px-2">
+                  {/* Sort Dropdown */}
+                  <DropdownSelect
+                    value={statusFilter}
+                    onChange={setStatusFilter}
+                    options={[
+                      { label: "Short By", value: "All" },
+                      { label: "Active", value: "Active" },
+                      { label: "Blocked", value: "Blocked" },
+                      { label: "Suspended", value: "Suspended" },
+                    ]}
+                  />
+                  <PrimaryButton variant="secondary" size="md">
+                    Clear
+                  </PrimaryButton>
+                </div>
               </div>
             </div>
 
