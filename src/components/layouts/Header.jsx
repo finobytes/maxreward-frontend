@@ -9,7 +9,7 @@ import NotificationDropdown from "../header/NotificationDropdown";
 
 const user = {
   name: "Mr. Jack",
-  email: "john.doe@example.com",
+  email: "Mr.Jack@example.com",
 };
 
 const Header = () => {
