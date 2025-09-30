@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import SearchInput from "../../../components/form/form-elements/SearchInput";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
@@ -25,7 +25,41 @@ const dummyMerchants = Array.from({ length: 35 }).map((_, i) => ({
 }));
 
 const ActiveMerchant = () => {
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
   const [selected, setSelected] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const [members, setMembers] = useState(dummyMerchants);
+
+  const rowsPerPage = 10;
+
+  const filteredData = useMemo(() => {
+    return members.filter((m) => {
+      const matchesSearch =
+        m.merchantName.toLowerCase().includes(search.toLowerCase()) ||
+        m.merchantId.toLowerCase().includes(search.toLowerCase()) ||
+        m.phone.toLowerCase().includes(search.toLowerCase()) ||
+        m.email.toLowerCase().includes(search.toLowerCase());
+      const matchesStatus =
+        statusFilter === "All" ? true : m.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [search, statusFilter, members]);
+
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage
+  );
+
+  const toggleSelectAll = (checked) => {
+    if (checked) {
+      setSelected(paginatedData.map((m) => m.id));
+    } else {
+      setSelected([]);
+    }
+  };
 
   const toggleSelect = (id) => {
     setSelected((prev) =>
@@ -33,6 +67,20 @@ const ActiveMerchant = () => {
     );
   };
 
+  // Bulk Actions
+  const bulkUpdateStatus = (newStatus) => {
+    setMembers((prev) =>
+      prev.map((m) =>
+        selected.includes(m.id) ? { ...m, status: newStatus } : m
+      )
+    );
+    setSelected([]);
+  };
+
+  const bulkDelete = () => {
+    setMembers((prev) => prev.filter((m) => !selected.includes(m.id)));
+    setSelected([]);
+  };
   return (
     <div>
       <PageBreadcrumb
@@ -47,13 +95,33 @@ const ActiveMerchant = () => {
                 All Merchant List
               </h3>
             </div>
+
+            {/* Bulk Actions Bar */}
+            {selected.length > 0 && (
+              <BulkActionBar
+                selectedCount={selected.length}
+                onSetActive={() => bulkUpdateStatus("Active")}
+                onSetBlocked={() => bulkUpdateStatus("Blocked")}
+                onSetSuspended={() => bulkUpdateStatus("Suspended")}
+                onDelete={bulkDelete}
+              />
+            )}
+
             {/* Table */}
             <div className="mt-4 relative overflow-x-auto">
               <table className="w-full min-w-[1000px] text-sm text-center text-gray-500 custom-scrollbar">
                 <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                   <tr>
                     <th className="p-4">
-                      <input type="checkbox" className="w-4 h-4 rounded" />
+                      <input
+                        type="checkbox"
+                        checked={
+                          paginatedData.length > 0 &&
+                          selected.length === paginatedData.length
+                        }
+                        onChange={(e) => toggleSelectAll(e.target.checked)}
+                        className="w-4 h-4 rounded"
+                      />
                     </th>
                     <th className="py-3">Merchant ID</th>
                     <th className="py-3">Merchant Name</th>
@@ -70,7 +138,7 @@ const ActiveMerchant = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {dummyMerchants.map((merchant) => (
+                  {paginatedData.map((merchant) => (
                     <tr
                       key={merchant.id}
                       className="bg-white border-b hover:bg-gray-50 transition"
@@ -119,7 +187,6 @@ const ActiveMerchant = () => {
                 </tbody>
               </table>
             </div>
-            {/* Pagination */}
           </div>
         </div>
       </div>
