@@ -26,6 +26,9 @@ const BulkActionBar = ({
       <PrimaryButton variant="danger" size="sm" onClick={onSetSuspended}>
         Reject
       </PrimaryButton>
+      <PrimaryButton variant="success" size="sm" onClick={onDelete}>
+        <Download size={20} /> Export CSV
+      </PrimaryButton>
     </div>
   );
 };
