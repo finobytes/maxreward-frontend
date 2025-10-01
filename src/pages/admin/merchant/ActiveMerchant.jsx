@@ -104,7 +104,11 @@ const ActiveMerchant = () => {
                 />
 
                 {/* Add Member Button */}
-                <PrimaryButton variant="primary" size="md" to="">
+                <PrimaryButton
+                  variant="primary"
+                  size="md"
+                  to="/admin/merchant/merchant-registration"
+                >
                   <Plus size={18} />
                   Add New Merchant
                 </PrimaryButton>

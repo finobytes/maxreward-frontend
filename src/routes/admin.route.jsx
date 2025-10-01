@@ -13,6 +13,7 @@ import Expense from "../pages/admin/Accounts/Expense";
 import Transaction from "../pages/admin/reports/Transaction";
 import MemberRegistration from "../pages/admin/memberMange/MemberRegistration";
 import MemberDetails from "../pages/admin/memberMange/MemberDetails";
+import MerchantRegistrationForm from "../pages/admin/merchant/MerchantRegistrationForm";
 
 export const adminRoutes = [
   {
@@ -42,6 +43,10 @@ export const adminRoutes = [
   {
     path: "admin/merchant/active-merchant",
     element: <ActiveMerchant />,
+  },
+  {
+    path: "admin/merchant/merchant-registration",
+    element: <MerchantRegistrationForm />,
   },
   {
     path: "admin/accounts/income",
