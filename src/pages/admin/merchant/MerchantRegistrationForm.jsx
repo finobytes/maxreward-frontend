@@ -5,6 +5,7 @@ import Label from "../../../components/form/Label";
 import Input from "../../../components/form/input/InputField";
 import Select from "../../../components/form/Select";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
+import DatePicker from "../../../components/form/DatePicker"
 
 const MerchantRegistrationForm = () => {
   return (
@@ -41,6 +42,13 @@ const MerchantRegistrationForm = () => {
                 id="phoneNumber"
                 placeholder="Enter Phone Number"
               />
+            </div>
+            
+            <div>
+              <Label htmlFor="phoneNumber">
+                Date picker (<span className="text-red-500">*</span>)
+              </Label>
+              <DatePicker/>
             </div>
 
             {/* Gender */}
