@@ -5,7 +5,8 @@ import Label from "../../../components/form/Label";
 import Input from "../../../components/form/input/InputField";
 import Select from "../../../components/form/Select";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
-import DatePicker from "../../../components/form/DatePicker"
+import DatePicker from "../../../components/form/DatePicker";
+import Dropzone from "../../../components/form/form-elements/Dropzone";
 
 const MerchantRegistrationForm = () => {
   return (
@@ -19,108 +20,280 @@ const MerchantRegistrationForm = () => {
       />
       <form>
         <ComponentCard title="Member Information">
-          <div className=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-3 lg:gap-4">
-            {/* Full Name */}
-            <div>
-              <Label htmlFor="fullName">
-                Full Name (<span className="text-red-500">*</span>)
-              </Label>
-              <Input
-                type="text"
-                id="fullName"
-                placeholder="Enter member full name"
-              />
-            </div>
-
-            {/* Phone Number */}
-            <div>
-              <Label htmlFor="phoneNumber">
-                Phone Number (<span className="text-red-500">*</span>)
-              </Label>
-              <Input
-                type="text"
-                id="phoneNumber"
-                placeholder="Enter Phone Number"
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="phoneNumber">
-                Date picker (<span className="text-red-500">*</span>)
-              </Label>
-              <DatePicker/>
-            </div>
-
-            {/* Gender */}
-            <div>
-              <Label htmlFor="gender">Gender</Label>
-              <Select
-                id="gender"
-                name="gender"
-                placeholder="Select Gender"
-                options={[
-                  { value: "male", label: "Male" },
-                  { value: "female", label: "Female" },
-                  { value: "other", label: "Other" },
-                ]}
-              />
-            </div>
-
-            {/* Address */}
-            <div>
-              <Label htmlFor="address">Full Address</Label>
-              <Input
-                type="text"
-                id="address"
-                placeholder="Enter Full Address"
-              />
-            </div>
-
-            {/* City */}
-            <div>
-              <Label htmlFor="city">City</Label>
-              <Input type="text" id="city" placeholder="Enter City" />
-            </div>
-
-            {/* Email */}
-            <div>
-              <Label htmlFor="email">Email Address</Label>
-              <Input
-                type="email"
-                id="email"
-                placeholder="Enter Email Address"
-              />
-            </div>
-          </div>
-        </ComponentCard>
-
-        {/* Referral */}
-        <div className="mt-8">
-          <ComponentCard>
-            <div className=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-3 lg:gap-4">
+          <div className=" grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:col-span-2">
               <div>
-                <Label htmlFor="referralCode">
-                  Referral Code (<span className="text-red-500">*</span>)
-                </Label>
+                <Label htmlFor="date picker">Date picker</Label>
+                <DatePicker />
+              </div>
+              <div>
+                <Label htmlFor="fullName">Merchant ID</Label>
+                <Input
+                  type="text"
+                  id="fullName"
+                  placeholder="MAX-1010"
+                  disabled
+                />
+              </div>
+              <div>
+                <Label htmlFor="fullName">Business Name</Label>
+                <Input
+                  type="text"
+                  id="fullName"
+                  placeholder="Enter member full name"
+                />
+              </div>
+              <div>
+                <Label htmlFor="referralCode">Business Type</Label>
                 <Select
                   id="referralCode"
                   name="referralCode"
                   placeholder="Referral Code"
                   options={[
-                    { value: "MAX-1001", label: "MAX-1001" },
-                    { value: "MAX-1002", label: "MAX-1002" },
-                    { value: "MAX-1003", label: "MAX-1003" },
+                    { value: "", label: "Retail" },
+                    { value: "", label: "Service" },
                   ]}
                 />
               </div>
-
               <div>
-                <Label htmlFor="referredBy">Referred By</Label>
-                <Input type="text" id="referredBy" disabled />
+                <Label htmlFor="fullName">Business Description</Label>
+                <Input
+                  type="text"
+                  id="fullName"
+                  placeholder="Enter member full name"
+                />
               </div>
               <div>
-                <Label htmlFor="referralStatus">Referral Status</Label>
-                <Input type="text" id="referralStatus" disabled />
+                <Label htmlFor="fullName">Company Address</Label>
+                <Input
+                  type="text"
+                  id="fullName"
+                  placeholder="Enter member full name"
+                />
+              </div>
+              <div>
+                <Label htmlFor="referralCode">Status</Label>
+                <Select
+                  id="referralCode"
+                  name="referralCode"
+                  placeholder="Referral Code"
+                  options={[
+                    { value: "", label: "" },
+                    { value: "", label: "" },
+                  ]}
+                />
+              </div>
+              <div>
+                <Label htmlFor="fullName">
+                  Registration Number / License No
+                </Label>
+                <Input
+                  type="text"
+                  id="fullName"
+                  placeholder="Enter member full name"
+                />
+              </div>
+            </div>
+            <div className="md:col-span-1">
+              <Label htmlFor="logo"> Upload Company Logo</Label>
+              <Dropzone />
+            </div>
+          </div>
+        </ComponentCard>
+
+        <div className="mt-6">
+          <ComponentCard title="Bank Information">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="fullName">Business Name</Label>
+                <Input
+                  type="text"
+                  id="fullName"
+                  placeholder="Enter member full name"
+                />
+              </div>
+              <div>
+                <Label htmlFor="fullName">Business Name</Label>
+                <Input
+                  type="text"
+                  id="fullName"
+                  placeholder="Enter member full name"
+                />
+              </div>
+              <div>
+                <Label htmlFor="fullName">Business Name</Label>
+                <Input
+                  type="text"
+                  id="fullName"
+                  placeholder="Enter member full name"
+                />
+              </div>
+              <div>
+                <Label htmlFor="fullName">Business Name</Label>
+                <Input
+                  type="text"
+                  id="fullName"
+                  placeholder="Enter member full name"
+                />
+              </div>
+              <div>
+                <Label htmlFor="fullName">Business Name</Label>
+                <Input
+                  type="text"
+                  id="fullName"
+                  placeholder="Enter member full name"
+                />
+              </div>
+              <div>
+                <Label htmlFor="fullName">Business Name</Label>
+                <Input
+                  type="text"
+                  id="fullName"
+                  placeholder="Enter member full name"
+                />
+              </div>
+            </div>
+          </ComponentCard>
+        </div>
+        <div className="mt-6">
+          <ComponentCard title="Owner Information">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <Label htmlFor="fullName">Business Name</Label>
+                  <Input
+                    type="text"
+                    id="fullName"
+                    placeholder="Enter member full name"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="fullName">Business Name</Label>
+                  <Input
+                    type="text"
+                    id="fullName"
+                    placeholder="Enter member full name"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="fullName">Business Name</Label>
+                  <Input
+                    type="text"
+                    id="fullName"
+                    placeholder="Enter member full name"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="fullName">Business Name</Label>
+                  <Input
+                    type="text"
+                    id="fullName"
+                    placeholder="Enter member full name"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="fullName">Business Name</Label>
+                  <Input
+                    type="text"
+                    id="fullName"
+                    placeholder="Enter member full name"
+                  />
+                </div>
+              </div>
+
+              <div className="">
+                <Label htmlFor="logo"> Upload Company Logo</Label>
+                <Dropzone />
+              </div>
+              <div className="">
+                <Label htmlFor="logo"> Upload Company Logo</Label>
+                <Dropzone />
+              </div>
+            </div>
+          </ComponentCard>
+        </div>
+
+        {/* Referral */}
+        <div className="mt-6">
+          <ComponentCard title="Referral Information">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="fullName">Business Name</Label>
+                <Input
+                  type="text"
+                  id="fullName"
+                  placeholder="Enter member full name"
+                />
+              </div>
+              <div>
+                <Label htmlFor="fullName">Business Name</Label>
+                <Input
+                  type="text"
+                  id="fullName"
+                  placeholder="Enter member full name"
+                />
+              </div>
+              <div>
+                <Label htmlFor="fullName">Business Name</Label>
+                <Input
+                  type="text"
+                  id="fullName"
+                  placeholder="Enter member full name"
+                />
+              </div>
+            </div>
+          </ComponentCard>
+        </div>
+        <div className="mt-6">
+          <ComponentCard title="Platform Settings">
+            <div className=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-3 lg:gap-4">
+              <div>
+                <Label htmlFor="fullName">Business Name</Label>
+                <Input
+                  type="text"
+                  id="fullName"
+                  placeholder="Enter member full name"
+                />
+              </div>{" "}
+              <div>
+                <Label htmlFor="fullName">Business Name</Label>
+                <Input
+                  type="text"
+                  id="fullName"
+                  placeholder="Enter member full name"
+                />
+              </div>{" "}
+              <div>
+                <Label htmlFor="fullName">Business Name</Label>
+                <Input
+                  type="text"
+                  id="fullName"
+                  placeholder="Enter member full name"
+                />
+              </div>{" "}
+              <div>
+                <Label htmlFor="fullName">Business Name</Label>
+                <Input
+                  type="text"
+                  id="fullName"
+                  placeholder="Enter member full name"
+                />
+              </div>{" "}
+              <div>
+                <Label htmlFor="fullName">Business Name</Label>
+                <Input
+                  type="text"
+                  id="fullName"
+                  placeholder="Enter member full name"
+                />
+              </div>{" "}
+              <div>
+                <Label htmlFor="fullName">Business Name</Label>
+                <Input
+                  type="text"
+                  id="fullName"
+                  placeholder="Enter member full name"
+                />
               </div>
             </div>
 
