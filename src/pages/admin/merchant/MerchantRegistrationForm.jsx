@@ -23,32 +23,32 @@ const MerchantRegistrationForm = () => {
           <div className=" grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:col-span-2">
               <div>
-                <Label htmlFor="date picker">Date picker</Label>
+                <Label htmlFor="date picker">Create Date</Label>
                 <DatePicker />
               </div>
               <div>
-                <Label htmlFor="fullName">Merchant ID</Label>
+                <Label htmlFor="merchantId">Merchant ID</Label>
                 <Input
                   type="text"
-                  id="fullName"
+                  id="merchantId"
                   placeholder="MAX-1010"
                   disabled
                 />
               </div>
               <div>
-                <Label htmlFor="fullName">Business Name</Label>
+                <Label htmlFor="businessName">Business Name</Label>
                 <Input
                   type="text"
-                  id="fullName"
-                  placeholder="Enter member full name"
+                  id="businessName"
+                  placeholder="Enter business name"
                 />
               </div>
               <div>
-                <Label htmlFor="referralCode">Business Type</Label>
+                <Label htmlFor="businessType">Business Type</Label>
                 <Select
-                  id="referralCode"
-                  name="referralCode"
-                  placeholder="Referral Code"
+                  id="businessType"
+                  name="businessType"
+                  placeholder="Business Type"
                   options={[
                     { value: "", label: "Retail" },
                     { value: "", label: "Service" },
@@ -56,41 +56,44 @@ const MerchantRegistrationForm = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="fullName">Business Description</Label>
+                <Label htmlFor="businessDescription">
+                  Business Description
+                </Label>
                 <Input
                   type="text"
-                  id="fullName"
-                  placeholder="Enter member full name"
+                  id="businessDescription"
+                  placeholder="Enter Business Description"
                 />
               </div>
               <div>
                 <Label htmlFor="fullName">Company Address</Label>
                 <Input
                   type="text"
-                  id="fullName"
+                  id="companyAddress"
                   placeholder="Enter member full name"
                 />
               </div>
               <div>
-                <Label htmlFor="referralCode">Status</Label>
+                <Label htmlFor="status">Status</Label>
                 <Select
-                  id="referralCode"
-                  name="referralCode"
-                  placeholder="Referral Code"
+                  id="status"
+                  name="status"
+                  placeholder="Status"
                   options={[
-                    { value: "", label: "" },
-                    { value: "", label: "" },
+                    { value: "", label: "Block" },
+                    { value: "", label: "Suspended" },
+                    { value: "", label: "Active" },
                   ]}
                 />
               </div>
               <div>
-                <Label htmlFor="fullName">
+                <Label htmlFor="registrationNumber">
                   Registration Number / License No
                 </Label>
                 <Input
                   type="text"
-                  id="fullName"
-                  placeholder="Enter member full name"
+                  id="registrationNumber"
+                  placeholder="Registration Number / License No"
                 />
               </div>
             </div>
@@ -105,51 +108,56 @@ const MerchantRegistrationForm = () => {
           <ComponentCard title="Bank Information">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="fullName">Business Name</Label>
+                <Label htmlFor="bankName">Bank Name</Label>
                 <Input
                   type="text"
-                  id="fullName"
-                  placeholder="Enter member full name"
+                  id="bankName"
+                  placeholder="Enter Bank Name"
                 />
               </div>
               <div>
-                <Label htmlFor="fullName">Business Name</Label>
+                <Label htmlFor="accountHolderName">Account Holder Name</Label>
                 <Input
                   type="text"
-                  id="fullName"
-                  placeholder="Enter member full name"
+                  id="accountHolderName"
+                  placeholder="Enter Account Holder Name"
                 />
               </div>
               <div>
-                <Label htmlFor="fullName">Business Name</Label>
+                <Label htmlFor="accountNumber">Account Number / IBAN</Label>
                 <Input
                   type="text"
-                  id="fullName"
-                  placeholder="Enter member full name"
+                  id="accountNumber"
+                  placeholder="Enter Account Number / IBAN"
                 />
               </div>
               <div>
-                <Label htmlFor="fullName">Business Name</Label>
-                <Input
-                  type="text"
-                  id="fullName"
-                  placeholder="Enter member full name"
+                <Label htmlFor="paymentMethod">Preferred Payment Method</Label>
+
+                <Select
+                  id="paymentMethod"
+                  name="paymentMethod"
+                  placeholder="Preferred Payment Method"
+                  options={[
+                    { value: "", label: "Online" },
+                    { value: "", label: "Offline" },
+                  ]}
                 />
               </div>
               <div>
-                <Label htmlFor="fullName">Business Name</Label>
+                <Label htmlFor="routingNumber">Routing Number</Label>
                 <Input
                   type="text"
-                  id="fullName"
-                  placeholder="Enter member full name"
+                  id="routingNumber"
+                  placeholder="Enter Routing Number"
                 />
               </div>
               <div>
-                <Label htmlFor="fullName">Business Name</Label>
+                <Label htmlFor="swiftCode">Swift Code</Label>
                 <Input
                   type="text"
-                  id="fullName"
-                  placeholder="Enter member full name"
+                  id="swiftCode"
+                  placeholder="Enter Swift Code"
                 />
               </div>
             </div>
@@ -160,53 +168,62 @@ const MerchantRegistrationForm = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="grid grid-cols-1 gap-4">
                 <div>
-                  <Label htmlFor="fullName">Business Name</Label>
+                  <Label htmlFor="ownerName">Owner Name</Label>
                   <Input
                     type="text"
-                    id="fullName"
-                    placeholder="Enter member full name"
+                    id="ownerName"
+                    placeholder="Enter Owner Name"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="fullName">Business Name</Label>
+                  <Label htmlFor="fullName">Phone Number</Label>
                   <Input
-                    type="text"
-                    id="fullName"
-                    placeholder="Enter member full name"
+                    type="phoneNumber"
+                    id="phoneNumber"
+                    placeholder="Enter Phone Number"
                   />
                 </div>
+                {/* Gender */}
                 <div>
-                  <Label htmlFor="fullName">Business Name</Label>
-                  <Input
-                    type="text"
-                    id="fullName"
-                    placeholder="Enter member full name"
+                  <Label htmlFor="gender">Gender</Label>
+                  <Select
+                    id="gender"
+                    name="gender"
+                    placeholder="Select Gender"
+                    options={[
+                      { value: "male", label: "Male" },
+                      { value: "female", label: "Female" },
+                      { value: "other", label: "Others" },
+                    ]}
                   />
                 </div>
+
+                {/* Address */}
                 <div>
-                  <Label htmlFor="fullName">Business Name</Label>
+                  <Label htmlFor="address">Full Address</Label>
                   <Input
                     type="text"
-                    id="fullName"
-                    placeholder="Enter member full name"
+                    id="address"
+                    placeholder="Enter Full Address"
                   />
                 </div>
+                {/* Email */}
                 <div>
-                  <Label htmlFor="fullName">Business Name</Label>
+                  <Label htmlFor="email">Email Address</Label>
                   <Input
-                    type="text"
-                    id="fullName"
-                    placeholder="Enter member full name"
+                    type="email"
+                    id="email"
+                    placeholder="Enter Email Address"
                   />
                 </div>
               </div>
 
               <div className="">
-                <Label htmlFor="logo"> Upload Company Logo</Label>
+                <Label htmlFor="logo"> Upload Owner ID</Label>
                 <Dropzone />
               </div>
               <div className="">
-                <Label htmlFor="logo"> Upload Company Logo</Label>
+                <Label htmlFor="logo"> Upload Tax Certificate</Label>
                 <Dropzone />
               </div>
             </div>
@@ -218,27 +235,45 @@ const MerchantRegistrationForm = () => {
           <ComponentCard title="Referral Information">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="fullName">Business Name</Label>
-                <Input
-                  type="text"
-                  id="fullName"
-                  placeholder="Enter member full name"
+                <Label htmlFor="fullName">Referrer Name</Label>
+
+                <Select
+                  id="gender"
+                  name="gender"
+                  placeholder="Select Referrer Name"
+                  options={[
+                    { value: "male", label: "" },
+                    { value: "female", label: "" },
+                    { value: "other", label: "" },
+                  ]}
                 />
               </div>
               <div>
-                <Label htmlFor="fullName">Business Name</Label>
-                <Input
-                  type="text"
-                  id="fullName"
-                  placeholder="Enter member full name"
+                <Label htmlFor="fullName">Referrer ID</Label>
+
+                <Select
+                  id="gender"
+                  name="gender"
+                  placeholder="Select Referrer ID"
+                  options={[
+                    { value: "male", label: "" },
+                    { value: "female", label: "" },
+                    { value: "other", label: "" },
+                  ]}
                 />
               </div>
               <div>
-                <Label htmlFor="fullName">Business Name</Label>
-                <Input
-                  type="text"
-                  id="fullName"
-                  placeholder="Enter member full name"
+                <Label htmlFor="fullName">Referrer Status</Label>
+
+                <Select
+                  id="gender"
+                  name="gender"
+                  placeholder="Select Referrer Status"
+                  options={[
+                    { value: "male", label: "" },
+                    { value: "female", label: "" },
+                    { value: "other", label: "" },
+                  ]}
                 />
               </div>
             </div>
@@ -248,7 +283,43 @@ const MerchantRegistrationForm = () => {
           <ComponentCard title="Platform Settings">
             <div className=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-3 lg:gap-4">
               <div>
-                <Label htmlFor="fullName">Business Name</Label>
+                <Label htmlFor="fullName">Commission Rate (%)</Label>
+                <Input
+                  type="text"
+                  id="fullName"
+                  placeholder="Enter Commission Rate (%)"
+                />
+              </div>{" "}
+              <div>
+                <Label htmlFor="fullName">Settlement Period</Label>
+
+                <Select
+                  id="gender"
+                  name="gender"
+                  placeholder="Select Settlement Period"
+                  options={[
+                    { value: "male", label: "" },
+                    { value: "female", label: "" },
+                    { value: "other", label: "" },
+                  ]}
+                />
+              </div>{" "}
+              <div>
+                <Label htmlFor="fullName">APProved By</Label>
+
+                <Select
+                  id="gender"
+                  name="gender"
+                  placeholder="Select "
+                  options={[
+                    { value: "male", label: "" },
+                    { value: "female", label: "" },
+                    { value: "other", label: "" },
+                  ]}
+                />
+              </div>{" "}
+              <div>
+                <Label htmlFor="fullName">User Name</Label>
                 <Input
                   type="text"
                   id="fullName"
@@ -256,43 +327,15 @@ const MerchantRegistrationForm = () => {
                 />
               </div>{" "}
               <div>
-                <Label htmlFor="fullName">Business Name</Label>
-                <Input
-                  type="text"
-                  id="fullName"
-                  placeholder="Enter member full name"
-                />
+                <Label htmlFor="fullName">Password</Label>
+                <Input type="text" id="fullName" placeholder="Enter Password" />
               </div>{" "}
               <div>
-                <Label htmlFor="fullName">Business Name</Label>
+                <Label htmlFor="fullName">Confirm Password</Label>
                 <Input
                   type="text"
                   id="fullName"
-                  placeholder="Enter member full name"
-                />
-              </div>{" "}
-              <div>
-                <Label htmlFor="fullName">Business Name</Label>
-                <Input
-                  type="text"
-                  id="fullName"
-                  placeholder="Enter member full name"
-                />
-              </div>{" "}
-              <div>
-                <Label htmlFor="fullName">Business Name</Label>
-                <Input
-                  type="text"
-                  id="fullName"
-                  placeholder="Enter member full name"
-                />
-              </div>{" "}
-              <div>
-                <Label htmlFor="fullName">Business Name</Label>
-                <Input
-                  type="text"
-                  id="fullName"
-                  placeholder="Enter member full name"
+                  placeholder="Enter Confirm Password"
                 />
               </div>
             </div>
