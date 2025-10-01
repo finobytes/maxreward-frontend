@@ -10,7 +10,7 @@ import Pagination from "../../../components/table/Pagination";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import { Link } from "react-router";
 
-const dummyMembers = Array.from({ length: 55 }).map((_, i) => ({
+const dummyMembers = Array.from({ length: 30 }).map((_, i) => ({
   id: i + 1,
   fullName: `Member ${i + 1}`,
   memberId: `MAX-${4325000 + i}`,
@@ -111,16 +111,21 @@ const MemberManage = () => {
                 </PrimaryButton>
 
                 {/* Sort Dropdown */}
-                <DropdownSelect
-                  value={statusFilter}
-                  onChange={setStatusFilter}
-                  options={[
-                    { label: "All", value: "All" },
-                    { label: "Active", value: "Active" },
-                    { label: "Blocked", value: "Blocked" },
-                    { label: "Suspended", value: "Suspended" },
-                  ]}
-                />
+                <div className="flex items-center gap-4">
+                  <DropdownSelect
+                    value={statusFilter}
+                    onChange={setStatusFilter}
+                    options={[
+                      { label: "All", value: "All" },
+                      { label: "Active", value: "Active" },
+                      { label: "Blocked", value: "Blocked" },
+                      { label: "Suspended", value: "Suspended" },
+                    ]}
+                  />
+                  <PrimaryButton variant="secondary" size="md">
+                    Clear
+                  </PrimaryButton>
+                </div>
               </div>
             </div>
 

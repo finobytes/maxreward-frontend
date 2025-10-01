@@ -1,12 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import ComponentCard from "../../../components/common/ComponentCard";
 import MemberProfile from "./components/MemberProfile";
 import PersonalInfo from "./components/PersonalInfo";
 import ActiveReferrals from "./components/ActiveReferrals";
 import TransactionActivity from "./components/TransactionActivity";
+import ProfileTabs from "./components/ProfileTabs";
+import CommunityTree from "./components/CommunityTree";
+import AddPayment from "./components/AddPayment";
+import Statements from "./components/Statements";
+import { BanknoteArrowUp, ScrollText, UsersRound } from "lucide-react";
+import ProfileTabContent from "./components/ProfileTabContent";
 
+const tabs = [
+  { name: "Community", icon: UsersRound, key: "community" },
+  { name: "Statements", icon: ScrollText, key: "statements" },
+];
 const MemberDetails = () => {
+  const [currentTab, setCurrentTab] = useState("community");
   return (
     <div>
       <PageBreadcrumb
@@ -44,7 +55,16 @@ const MemberDetails = () => {
 
         {/* Right Column */}
         <div className="lg:col-span-1">
-          <ComponentCard>{/* Manual Payment Form Component */}</ComponentCard>
+          <ComponentCard>
+            <ProfileTabs
+              tabs={tabs}
+              currentTab={currentTab}
+              setCurrentTab={setCurrentTab}
+            />
+            <div className="">
+              <ProfileTabContent currentTab={currentTab} />
+            </div>
+          </ComponentCard>
         </div>
       </div>
     </div>
