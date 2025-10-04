@@ -9,6 +9,7 @@ import ProfileTabs from "../memberMange/components/ProfileTabs";
 import ProfileTabContent from "../memberMange/components/ProfileTabContent";
 import MerchantProfileCard from "./components/MerchantProfileCard";
 import OwnerInformation from "./components/OwnerInformation";
+import TopSellingProducts from "./components/TopSellingProducts";
 
 const tabs = [
   { name: "Community", icon: UsersRound, key: "community" },
@@ -35,17 +36,14 @@ const MerchantDetails = () => {
             <MerchantProfileCard />
           </ComponentCard>
 
-          {/* Personal Info + Active Referrals */}
+          {/* Owner Info  */}
           <div>
             <OwnerInformation />
-          </div>
-          <div>
-            <ActiveReferrals />
           </div>
 
           {/* Transaction Activity */}
           <div>
-            <TransactionActivity />
+            <TopSellingProducts />
           </div>
         </div>
 
