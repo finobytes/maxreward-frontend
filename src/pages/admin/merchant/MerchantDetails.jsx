@@ -1,22 +1,27 @@
 import React, { useState } from "react";
-import { BanknoteArrowUp, ScrollText, UsersRound } from "lucide-react";
+import {
+  BanknoteArrowUp,
+  ScrollText,
+  UsersRound,
+  BoxIcon,
+  UserSquare2,
+} from "lucide-react";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import ComponentCard from "../../../components/common/ComponentCard";
-import PersonalInfo from "../memberMange/components/PersonalInfo";
-import ActiveReferrals from "../memberMange/components/ActiveReferrals";
-import TransactionActivity from "../memberMange/components/TransactionActivity";
-import ProfileTabs from "../memberMange/components/ProfileTabs";
-import ProfileTabContent from "../memberMange/components/ProfileTabContent";
 import MerchantProfileCard from "./components/MerchantProfileCard";
 import OwnerInformation from "./components/OwnerInformation";
 import TopSellingProducts from "./components/TopSellingProducts";
+import MerchantProfileTabs from "./components/MerchantProfileTabs";
+import MerchantProfileTabsContent from "./components/MerchantProfileTabsContent";
 
 const tabs = [
-  { name: "Community", icon: UsersRound, key: "community" },
-  { name: "Statements", icon: ScrollText, key: "statements" },
+  { name: "Products", icon: BoxIcon, key: "products" },
+  { name: "Statement", icon: ScrollText, key: "statements" },
+  { name: "Staff", icon: UserSquare2, key: "staff" },
+  { name: "Referred Member", icon: UsersRound, key: "referredMember" },
 ];
 const MerchantDetails = () => {
-  const [currentTab, setCurrentTab] = useState("community");
+  const [currentTab, setCurrentTab] = useState("statements");
   return (
     <div>
       <PageBreadcrumb
@@ -50,13 +55,13 @@ const MerchantDetails = () => {
         {/* Right Column */}
         <div className="lg:col-span-1">
           <ComponentCard>
-            <ProfileTabs
+            <MerchantProfileTabs
               tabs={tabs}
               currentTab={currentTab}
               setCurrentTab={setCurrentTab}
             />
             <div className="">
-              <ProfileTabContent currentTab={currentTab} />
+              <MerchantProfileTabsContent currentTab={currentTab} />
             </div>
           </ComponentCard>
         </div>
