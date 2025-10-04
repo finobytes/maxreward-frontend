@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import { BanknoteArrowUp, ScrollText, UsersRound } from "lucide-react";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import ComponentCard from "../../../components/common/ComponentCard";
-import MemberProfile from "./components/MerchantProfileCard";
 import PersonalInfo from "../memberMange/components/PersonalInfo";
 import ActiveReferrals from "../memberMange/components/ActiveReferrals";
 import TransactionActivity from "../memberMange/components/TransactionActivity";
 import ProfileTabs from "../memberMange/components/ProfileTabs";
 import ProfileTabContent from "../memberMange/components/ProfileTabContent";
+import MerchantProfileCard from "./components/MerchantProfileCard";
+import OwnerInformation from "./components/OwnerInformation";
 
 const tabs = [
   { name: "Community", icon: UsersRound, key: "community" },
@@ -28,20 +29,18 @@ const MerchantDetails = () => {
       {/* Main Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Left Column */}
-        <div className="lg:col-span-1 space-y-4">
+        <div className="space-y-4">
           {/* Profile Card */}
           <ComponentCard>
-            <MemberProfile />
+            <MerchantProfileCard />
           </ComponentCard>
 
           {/* Personal Info + Active Referrals */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div>
-              <PersonalInfo />
-            </div>
-            <div>
-              <ActiveReferrals />
-            </div>
+          <div>
+            <OwnerInformation />
+          </div>
+          <div>
+            <ActiveReferrals />
           </div>
 
           {/* Transaction Activity */}
