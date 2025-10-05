@@ -18,51 +18,51 @@ export const memberRoutes = [
     element: <MemberDashboard />,
   },
   {
-    path: "member/refer-new-member",
+    path: "refer-new-member",
     element: <ReferNewMember />,
   },
   {
-    path: "member/show-qr-code",
+    path: "show-qr-code",
     element: <ShowQrCode />,
   },
   {
-    path: "member/point-statement",
+    path: "point-statement",
     element: <PointStatement />,
   },
   {
-    path: "member/max-redeem-mall",
+    path: "max-redeem-mall",
     element: <MaxRedeemMall />,
   },
   {
-    path: "member/purchase-voucher",
+    path: "purchase-voucher",
     element: <PurchaseVoucher />,
   },
   {
-    path: "member/shop-with-merchant",
+    path: "shop-with-merchant",
     element: <ShopWithMerchant />,
   },
   {
-    path: "member/referred-member-list",
+    path: "referred-member-list",
     element: <ReferredMemberList />,
   },
   {
-    path: "member/community",
+    path: "community",
     element: <Community />,
   },
   {
-    path: "member/merchant-application",
+    path: "merchant-application",
     element: <MerchantApplication />,
   },
   {
-    path: "member/profile",
+    path: "profile",
     element: <Profile />,
   },
   {
-    path: "member/Terms-and-condition",
+    path: "Terms-and-condition",
     element: <TermsAndConditions />,
   },
   {
-    path: "member/data-privacy-policy",
+    path: "data-privacy-policy",
     element: <DataPrivacyPolicy />,
   },
 ];
