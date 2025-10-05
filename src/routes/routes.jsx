@@ -6,6 +6,7 @@ import NewPassword from "../pages/authPages/NewPassword";
 import ResetSuccess from "../pages/authPages/ResetSuccess";
 import App from "../App";
 import { adminRoutes } from "./admin.route";
+import { memberRoutes } from "./member.route";
 
 const router = createBrowserRouter([
   {
@@ -13,9 +14,14 @@ const router = createBrowserRouter([
     element: <App />,
   },
   {
-    path: "/",
+    path: "/admin",
     element: <App />,
     children: [...adminRoutes],
+  },
+  {
+    path: "/member",
+    element: <App />,
+    children: [...memberRoutes],
   },
   {
     path: "/login",
