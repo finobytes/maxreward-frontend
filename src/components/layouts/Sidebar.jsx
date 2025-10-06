@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 
 import {
   ChartArea,
@@ -22,6 +22,8 @@ import {
 } from "lucide-react";
 import { useSidebar } from "../../context/SidebarContext";
 import { logo, MaxReward } from "../../assets/assets";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../redux/features/auth/authSlice";
 
 const othersItems = [];
 
@@ -33,7 +35,16 @@ const Sidebar = () => {
   const [subMenuHeight, setSubMenuHeight] = useState({});
   const subMenuRefs = useRef({});
 
-  const role = "member";
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/login");
+  };
+
+  const { user } = useSelector((state) => state.auth);
+  const role = user?.role;
 
   const NAV_CONFIG = {
     admin: [
@@ -224,6 +235,18 @@ const Sidebar = () => {
                       : ""
                   }`}
                 />
+              )}
+            </button>
+          ) : nav.name === "Logout" ? (
+            <button
+              onClick={handleLogout}
+              className={`menu-item group menu-item-inactive w-full text-left`}
+            >
+              <span className="menu-item-icon-size menu-item-icon-inactive">
+                {nav.icon}
+              </span>
+              {(isExpanded || isHovered || isMobileOpen) && (
+                <span className="menu-item-text">Logout</span>
               )}
             </button>
           ) : (
