@@ -1,4 +1,5 @@
 import loginBanner from "./images/login.svg";
+import loginBg from "./images/loginBg.png";
 import logo from "./images/logo.svg";
 import resetPassBgLeft from "./images/reset-pass-bg-left.svg";
 import resetPassBgRight from "./images/reset-pass-bg-right.svg";
@@ -33,6 +34,7 @@ import user5 from "./images/user/user5.png";
 
 export {
   loginBanner,
+  loginBg,
   logo,
   resetPassBgLeft,
   resetPassBgRight,

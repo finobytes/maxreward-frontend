@@ -1,11 +1,21 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { userImage } from "../../assets/assets";
 import { LogOut, Settings, UserCircle } from "lucide-react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
+import { useDispatch } from "react-redux";
+import { logout } from "../../redux/features/auth/authSlice";
 
 export default function UserDropdown({ user }) {
   const [isOpen, setIsOpen] = useState(false);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/login");
+  };
 
   function toggleDropdown() {
     setIsOpen(!isOpen);
@@ -70,7 +80,10 @@ export default function UserDropdown({ user }) {
           <Settings className="w-4.5 h-4.5" />
           Settings
         </Link>
-        <Link className="flex items-center gap-3 px-3 py-2 mt-3 text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 ">
+        <Link
+          onClick={handleLogout}
+          className="flex items-center gap-3 px-3 py-2 mt-3 text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 "
+        >
           <LogOut className="w-4.5 h-4.5" />
           Logout
         </Link>
