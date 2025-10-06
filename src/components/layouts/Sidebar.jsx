@@ -32,7 +32,9 @@ const Sidebar = () => {
   const [openSubmenu, setOpenSubmenu] = useState(null);
   const [subMenuHeight, setSubMenuHeight] = useState({});
   const subMenuRefs = useRef({});
-  const role = "admin";
+
+  const role = "member";
+
   const NAV_CONFIG = {
     admin: [
       { icon: <LayoutDashboard />, name: "Dashboard", path: "/admin" },
@@ -74,7 +76,6 @@ const Sidebar = () => {
       { name: "Profile", icon: <UserCircle2 />, path: "/admin/profile" },
       { name: "Logout", icon: <LogOut />, path: "/login" },
     ],
-
     member: [
       { icon: <LayoutDashboard />, name: "Dashboard", path: "/member" },
       {
@@ -129,11 +130,8 @@ const Sidebar = () => {
         name: "Data Privacy Policy",
         path: "/member/terms-and-condition",
       },
-    ],
 
-    guest: [
-      { icon: <LayoutDashboard />, name: "Home", path: "/" },
-      { icon: <UserCircle2 />, name: "Login", path: "/login" },
+      { name: "Logout", icon: <LogOut />, path: "/login" },
     ],
   };
   const items = useMemo(() => NAV_CONFIG[role]);
