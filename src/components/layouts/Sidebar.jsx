@@ -1,77 +1,27 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation } from "react-router";
 
 import {
   ChartArea,
   ChartLine,
   ChevronDownIcon,
+  CircleUserRound,
+  DollarSign,
+  FileUser,
   LayoutDashboard,
+  List,
   LogOut,
+  QrCode,
+  ScrollText,
+  ShieldCheck,
   ShoppingBag,
+  ShoppingCart,
   UserCircle2,
   UserCog,
   Users,
 } from "lucide-react";
 import { useSidebar } from "../../context/SidebarContext";
 import { logo, MaxReward } from "../../assets/assets";
-
-const navItems = [
-  {
-    icon: <LayoutDashboard />,
-    name: "Dashboard",
-    path: "/",
-  },
-  {
-    name: "Member Manage",
-    icon: <Users />,
-    path: "/admin/member-manage",
-  },
-  {
-    name: "Staff Manage",
-    icon: <UserCog />,
-    path: "/admin/staff-manage",
-  },
-  {
-    name: "Merchant",
-    icon: <ShoppingBag />,
-    subItems: [
-      { name: "Pending Merchant", path: "/admin/merchant/pending-merchant" },
-      { name: "Active Merchant", path: "/admin/merchant/active-merchant" },
-    ],
-  },
-  {
-    name: "Accounts",
-    icon: <ChartArea />,
-    subItems: [
-      { name: "Income", path: "/admin/accounts/income" },
-      { name: "Expense", path: "/admin/accounts/expense" },
-    ],
-  },
-  {
-    name: "Reports",
-    icon: <ChartLine />,
-    subItems: [
-      { name: "Transaction", path: "/admin/reports/transaction" },
-      { name: "Voucher Purchase", path: "/admin/reports/voucher-purchase" },
-      {
-        name: "Member Points Report",
-        path: "/admin/reports/member-points-report",
-      },
-      { name: "Tree Performance", path: "/admin/reports/tree-performance" },
-      { name: "Redemption History", path: "/admin/reports/redemption" },
-    ],
-  },
-  {
-    name: "Profile",
-    icon: <UserCircle2 />,
-    path: "/admin/profile",
-  },
-  {
-    name: "Logout",
-    icon: <LogOut />,
-    path: "/login",
-  },
-];
 
 const othersItems = [];
 
@@ -83,6 +33,108 @@ const Sidebar = () => {
   const [subMenuHeight, setSubMenuHeight] = useState({});
   const subMenuRefs = useRef({});
 
+  const role = "member";
+
+  const NAV_CONFIG = {
+    admin: [
+      { icon: <LayoutDashboard />, name: "Dashboard", path: "/admin" },
+      { name: "Member Manage", icon: <Users />, path: "/admin/member-manage" },
+      { name: "Staff Manage", icon: <UserCog />, path: "/admin/staff-manage" },
+      {
+        name: "Merchant",
+        icon: <ShoppingBag />,
+        subItems: [
+          {
+            name: "Pending Merchant",
+            path: "/admin/merchant/pending-merchant",
+          },
+          { name: "Active Merchant", path: "/admin/merchant/active-merchant" },
+        ],
+      },
+      {
+        name: "Accounts",
+        icon: <ChartArea />,
+        subItems: [
+          { name: "Income", path: "/admin/accounts/income" },
+          { name: "Expense", path: "/admin/accounts/expense" },
+        ],
+      },
+      {
+        name: "Reports",
+        icon: <ChartLine />,
+        subItems: [
+          { name: "Transaction", path: "/admin/reports/transaction" },
+          { name: "Voucher Purchase", path: "/admin/reports/voucher-purchase" },
+          {
+            name: "Member Points Report",
+            path: "/admin/reports/member-points-report",
+          },
+          { name: "Tree Performance", path: "/admin/reports/tree-performance" },
+          { name: "Redemption History", path: "/admin/reports/redemption" },
+        ],
+      },
+      { name: "Profile", icon: <UserCircle2 />, path: "/admin/profile" },
+      { name: "Logout", icon: <LogOut />, path: "/login" },
+    ],
+    member: [
+      { icon: <LayoutDashboard />, name: "Dashboard", path: "/member" },
+      {
+        icon: <Users />,
+        name: "Refer New Member",
+        path: "/member/refer-new-member",
+      },
+      {
+        icon: <QrCode />,
+        name: "Show QR Code",
+        path: "/member/show-qr-code",
+      },
+      {
+        icon: <ChartArea />,
+        name: "Point Statement",
+        path: "/member/point-statement",
+      },
+      {
+        icon: <ShoppingBag />,
+        name: "Max Redeem Mall",
+        path: "/member/max-redeem-mall",
+      },
+      {
+        icon: <DollarSign />,
+        name: "Purchase Voucher",
+        path: "/member/purchase-voucher",
+      },
+      {
+        icon: <ShoppingCart />,
+        name: "Shop With Merchant",
+        path: "/member/shop-with-merchant",
+      },
+      {
+        icon: <List />,
+        name: "Referred Member List",
+        path: "/member/referred-member-list",
+      },
+      { icon: <UserCog />, name: "Community", path: "/community" },
+      {
+        icon: <FileUser />,
+        name: "Merchant Application",
+        path: "/member/merchant-application",
+      },
+      { icon: <CircleUserRound />, name: "Profile", path: "/profile" },
+      {
+        icon: <ScrollText />,
+        name: "Terms & Condition",
+        path: "/member/terms-and-condition",
+      },
+      {
+        icon: <ShieldCheck />,
+        name: "Data Privacy Policy",
+        path: "/member/terms-and-condition",
+      },
+
+      { name: "Logout", icon: <LogOut />, path: "/login" },
+    ],
+  };
+  const items = useMemo(() => NAV_CONFIG[role]);
   const isActive = useCallback(
     (path) => location.pathname === path,
     [location.pathname]
@@ -91,8 +143,8 @@ const Sidebar = () => {
   useEffect(() => {
     let submenuMatched = false;
     ["main", "others"].forEach((menuType) => {
-      const items = menuType === "main" ? navItems : othersItems;
-      items.forEach((nav, index) => {
+      const menuItems = menuType === "main" ? items : othersItems;
+      menuItems.forEach((nav, index) => {
         if (nav.subItems) {
           nav.subItems.forEach((subItem) => {
             if (isActive(subItem.path)) {
@@ -282,7 +334,7 @@ const Sidebar = () => {
               >
                 {isExpanded || isHovered || isMobileOpen ? "Menu" : null}
               </h2>
-              {renderMenuItems(navItems, "main")}
+              {renderMenuItems(items, "main")}
             </div>
           </div>
         </nav>

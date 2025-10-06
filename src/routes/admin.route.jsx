@@ -22,67 +22,67 @@ export const adminRoutes = [
     element: <AdminDashboard />,
   },
   {
-    path: "admin/member-manage",
+    path: "member-manage",
     element: <MemberManage />,
   },
   {
-    path: "admin/member-registration",
+    path: "member-registration",
     element: <MemberRegistration />,
   },
   {
-    path: "admin/member-details",
+    path: "member-details",
     element: <MemberDetails />,
   },
   {
-    path: "admin/staff-manage",
+    path: "staff-manage",
     element: <StaffManage />,
   },
   {
-    path: "admin/merchant/pending-merchant",
+    path: "merchant/pending-merchant",
     element: <PendingMerchant />,
   },
   {
-    path: "admin/merchant/active-merchant",
+    path: "merchant/active-merchant",
     element: <ActiveMerchant />,
   },
   {
-    path: "admin/merchant/merchant-registration",
+    path: "merchant/merchant-registration",
     element: <MerchantRegistrationForm />,
   },
   {
-    path: "admin/merchant/merchant-details",
+    path: "merchant/merchant-details",
     element: <MerchantDetails />,
   },
   {
-    path: "admin/accounts/income",
+    path: "accounts/income",
     element: <Income />,
   },
   {
-    path: "admin/accounts/expense",
+    path: "accounts/expense",
     element: <Expense />,
   },
   {
-    path: "admin/reports/transaction",
+    path: "reports/transaction",
     element: <Transaction />,
   },
   {
-    path: "admin/reports/voucher-purchase",
+    path: "reports/voucher-purchase",
     element: <VoucherPurchase />,
   },
   {
-    path: "admin/reports/member-points-report",
+    path: "reports/member-points-report",
     element: <MemberPointsReport />,
   },
   {
-    path: "admin/reports/tree-performance",
+    path: "reports/tree-performance",
     element: <TreePerformance />,
   },
   {
-    path: "admin/reports/redemption",
+    path: "reports/redemption",
     element: <Redemption />,
   },
   {
-    path: "admin/profile",
+    path: "profile",
     element: <Profile />,
   },
 ];
