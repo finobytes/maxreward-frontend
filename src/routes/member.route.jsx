@@ -7,6 +7,7 @@ import PointStatement from "../pages/member/pointStatement/PointStatement";
 import Profile from "../pages/member/profile/Profile";
 import PurchaseVoucher from "../pages/member/purchaseVoucher/PurchaseVoucher";
 import ReferNewMember from "../pages/member/referNewMember/ReferNewMember";
+import ReferNewMemberForm from "../pages/member/referNewMember/ReferNewMemberForm";
 import ReferredMemberList from "../pages/member/referredMemberList/ReferredMemberList";
 import ShopWithMerchant from "../pages/member/shopWithMerchant/ShopWithMerchant";
 import ShowQrCode from "../pages/member/showQrCode/ShowQrCode";
@@ -23,7 +24,7 @@ export const memberRoutes = [
   },
   {
     path: "refer-new-member",
-    element: <ReferNewMember />,
+    element: <ReferNewMemberForm />,
   },
   {
     path: "show-qr-code",

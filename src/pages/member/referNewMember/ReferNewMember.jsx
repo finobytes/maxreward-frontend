@@ -111,7 +111,7 @@ const ReferNewMember = () => {
                 <PrimaryButton
                   variant="primary"
                   size="md"
-                  to="/refer-new-member"
+                  to="/member/refer-new-member"
                 >
                   <Plus size={18} />
                   Refer New Member
