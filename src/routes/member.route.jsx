@@ -18,6 +18,10 @@ export const memberRoutes = [
     element: <MemberDashboard />,
   },
   {
+    path: "referred-member",
+    element: <ReferNewMember />,
+  },
+  {
     path: "refer-new-member",
     element: <ReferNewMember />,
   },

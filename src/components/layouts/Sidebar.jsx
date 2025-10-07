@@ -92,7 +92,7 @@ const Sidebar = () => {
       {
         icon: <Users />,
         name: "Refer New Member",
-        path: "/member/refer-new-member",
+        path: "/member/referred-member",
       },
       {
         icon: <QrCode />,
