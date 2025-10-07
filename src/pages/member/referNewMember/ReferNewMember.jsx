@@ -108,7 +108,11 @@ const ReferNewMember = () => {
                   placeholder="Search here..."
                 />
                 {/* Add Member Button */}
-                <PrimaryButton variant="primary" size="md" to="">
+                <PrimaryButton
+                  variant="primary"
+                  size="md"
+                  to="/member/refer-new-member"
+                >
                   <Plus size={18} />
                   Refer New Member
                 </PrimaryButton>
