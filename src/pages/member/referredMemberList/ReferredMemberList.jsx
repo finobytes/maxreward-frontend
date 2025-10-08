@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { DateRangePicker } from "../../../components/shared/DateRangePicker";
 
 const dummyMembers = Array.from({ length: 30 }).map((_, i) => ({
   id: i + 1,
@@ -36,6 +37,11 @@ const ReferredMemberList = () => {
 
   const [members, setMembers] = useState(dummyMembers);
 
+  const [dateRange, setDateRange] = useState({
+    from: undefined,
+    to: undefined,
+  });
+
   const rowsPerPage = 10;
 
   const filteredData = useMemo(() => {
@@ -44,11 +50,24 @@ const ReferredMemberList = () => {
         m.fullName.toLowerCase().includes(search.toLowerCase()) ||
         m.memberId.toLowerCase().includes(search.toLowerCase()) ||
         m.phone.toLowerCase().includes(search.toLowerCase());
+
       const matchesStatus =
         statusFilter === "All" ? true : m.status === statusFilter;
-      return matchesSearch && matchesStatus;
+
+      // Date filtering
+      const memberDate = new Date(m.created);
+      const matchesDate =
+        (!dateRange.from && !dateRange.to) ||
+        (dateRange.from && !dateRange.to && memberDate >= dateRange.from) ||
+        (dateRange.to && !dateRange.from && memberDate <= dateRange.to) ||
+        (dateRange.from &&
+          dateRange.to &&
+          memberDate >= dateRange.from &&
+          memberDate <= dateRange.to);
+
+      return matchesSearch && matchesStatus && matchesDate;
     });
-  }, [search, statusFilter, members]);
+  }, [search, statusFilter, members, dateRange]);
 
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
   const paginatedData = filteredData.slice(
@@ -91,10 +110,10 @@ const ReferredMemberList = () => {
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search here..."
                 />
-                {/* Add Member Button */}
-                <PrimaryButton variant="secondary" size="md">
-                  Date Range
-                </PrimaryButton>
+                <DateRangePicker
+                  value={dateRange}
+                  onChange={(range) => setDateRange(range)}
+                />
 
                 {/* Sort Dropdown */}
                 <div className="flex items-center gap-4">
