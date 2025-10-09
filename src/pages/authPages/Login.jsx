@@ -44,6 +44,9 @@ const Login = () => {
     if (role === "admin") {
       setValue("email", "admin@demo.com");
       setValue("password", "Admin@123");
+    } else if (role === "merchant") {
+      setValue("email", "merchant@demo.com");
+      setValue("password", "Merchant@123");
     } else if (role === "member") {
       setValue("email", "member@demo.com");
       setValue("password", "Member@123");
@@ -150,6 +153,13 @@ const Login = () => {
               className="px-3 py-1 text-sm border border-[#FF5A29] text-[#FF5A29] rounded-md hover:bg-[#FF5A29] hover:text-white transition"
             >
               Admin
+            </button>
+            <button
+              type="button"
+              onClick={() => handleQuickLogin("merchant")}
+              className="px-3 py-1 text-sm border border-[#FF5A29] text-[#FF5A29] rounded-md hover:bg-[#FF5A29] hover:text-white transition"
+            >
+              Merchant
             </button>
             <button
               type="button"
