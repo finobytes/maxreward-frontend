@@ -87,6 +87,59 @@ const Sidebar = () => {
       { name: "Profile", icon: <UserCircle2 />, path: "/admin/profile" },
       { name: "Logout", icon: <LogOut />, path: "/login" },
     ],
+    merchant: [
+      { icon: <LayoutDashboard />, name: "Dashboard", path: "/merchant" },
+      {
+        icon: <Users />,
+        name: "Member Registration",
+        path: "/merchant/member-registration",
+      },
+      {
+        icon: <ChartArea />,
+        name: "Transactions",
+        subItems: [
+          {
+            name: "Pending Approval",
+            path: "/merchant/transactions/pending-approval",
+          },
+          {
+            name: "Approved Transactions",
+            path: "/merchant/transactions/approved-transactions",
+          },
+        ],
+      },
+      {
+        icon: <ShoppingBag />,
+        name: "Redeem Mall",
+        path: "/merchant/redeem-mall",
+      },
+      {
+        icon: <ChartArea />,
+        name: "Voucher Purchase",
+        path: "/merchant/voucher-purchase",
+      },
+      {
+        icon: <ChartLine />,
+        name: "Reports",
+        subItems: [
+          {
+            name: "Member Transactions",
+            path: "/merchant/reports/member-transactions",
+          },
+          {
+            name: "Voucher Purchase",
+            path: "/merchant/reports/voucher-purchase",
+          },
+          {
+            name: "Redeem Transactions",
+            path: "/merchant/reports/redeem-mall-transactions",
+          },
+        ],
+      },
+      { icon: <CircleUserRound />, name: "Profile", path: "/merchant/profile" },
+
+      { name: "Logout", icon: <LogOut />, path: "/login" },
+    ],
     member: [
       { icon: <LayoutDashboard />, name: "Dashboard", path: "/member" },
       {
