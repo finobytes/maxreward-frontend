@@ -16,7 +16,7 @@ const authSlice = createSlice({
     login: (state, action) => {
       const { email, password } = action.payload;
 
-      // 🔹 Fake login logic
+      // Fake login logic
       if (email === "admin@demo.com" && password === "Admin@123") {
         state.user = { email, role: "admin" };
       } else if (email === "member@demo.com" && password === "Member@123") {
