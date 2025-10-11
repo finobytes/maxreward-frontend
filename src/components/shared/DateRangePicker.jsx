@@ -30,7 +30,7 @@ export function DateRangePicker({
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          className="w-[260px] justify-start text-left font-normal"
+          className="w-[180px] justify-start text-left font-normal"
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
           {range.from ? (
