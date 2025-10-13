@@ -1,4 +1,3 @@
-// src/pages/admin/memberMange/MemberManage.jsx
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -28,6 +27,14 @@ import StatusBadge from "../../../components/table/StatusBadge";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import { userImage } from "../../../assets/assets";
 import { Skeleton } from "@/components/ui/skeleton.jsx";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const useDebounced = (value, delay = 400) => {
   const [v, setV] = useState(value);
@@ -138,132 +145,160 @@ const MemberManage = () => {
               <Loader className="w-8 h-8 animate-spin text-gray-400" />
             </div>
           )}
-
-          <table className="w-full text-sm text-left text-gray-600">
-            <thead className="bg-gray-50 text-xs text-gray-700 uppercase">
-              <tr>
-                <th
-                  className="py-3 px-4 cursor-pointer select-none"
-                  onClick={() => handleSort("name")}
-                >
-                  <div className="flex items-center gap-1">
-                    Full Name{" "}
-                    <SortIcon active={sortBy === "name"} order={sortOrder} />
-                  </div>
-                </th>
-                <th className="py-3 px-4">Member ID</th>
-                <th
-                  className="py-3 px-4 cursor-pointer select-none"
-                  onClick={() => handleSort("phone")}
-                >
-                  <div className="flex items-center gap-1">
-                    Phone{" "}
-                    <SortIcon active={sortBy === "phone"} order={sortOrder} />
-                  </div>
-                </th>
-                <th
-                  className="py-3 px-4 cursor-pointer select-none"
-                  onClick={() => handleSort("created_at")}
-                >
-                  <div className="flex items-center gap-1">
-                    Created{" "}
-                    <SortIcon
-                      active={sortBy === "created_at"}
-                      order={sortOrder}
-                    />
-                  </div>
-                </th>
-                <th className="py-3 px-4">Status</th>
-                <th className="py-3 px-4">Action</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {isLoading && !members.length ? (
-                // Initial load skeleton shimmer rows
-                [...Array(6)].map((_, i) => (
-                  <tr key={i} className="bg-white border-b">
-                    <td className="py-4 px-4 flex items-center gap-3">
-                      <Skeleton className="w-10 h-10 rounded-full" />
-                      <div className="flex-1 space-y-1">
-                        <Skeleton className="h-4 w-32" />
-                        <Skeleton className="h-3 w-20" />
-                      </div>
-                    </td>
-                    <td className="py-4 px-4">
-                      <Skeleton className="h-4 w-20" />
-                    </td>
-                    <td className="py-4 px-4">
-                      <Skeleton className="h-4 w-24" />
-                    </td>
-                    <td className="py-4 px-4">
-                      <Skeleton className="h-4 w-28" />
-                    </td>
-                    <td className="py-4 px-4">
-                      <Skeleton className="h-4 w-16" />
-                    </td>
-                    <td className="py-4 px-4">
-                      <Skeleton className="h-4 w-20" />
-                    </td>
-                  </tr>
-                ))
-              ) : isError ? (
-                <tr>
-                  <td colSpan={6} className="py-8 text-center text-red-500">
-                    Failed to load members
-                  </td>
-                </tr>
-              ) : members.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="py-8 text-center text-gray-500">
-                    No members found
-                  </td>
-                </tr>
-              ) : (
-                members.map((m) => (
-                  <tr key={m.id} className="bg-white border-b hover:bg-gray-50">
-                    <td className="py-4 px-4 flex items-center gap-3">
-                      <img
-                        src={userImage}
-                        alt="user"
-                        className="w-10 h-10 rounded-full border"
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead
+                    onClick={() => handleSort("name")}
+                    className="cursor-pointer"
+                  >
+                    <div className="flex items-center gap-1">
+                      Full Name
+                      <SortIcon active={sortBy === "name"} order={sortOrder} />
+                    </div>
+                  </TableHead>
+                  <TableHead>Member ID</TableHead>
+                  <TableHead className="cursor-pointer">
+                    <div
+                      onClick={() => handleSort("phone")}
+                      className="flex items-center gap-1"
+                    >
+                      Phone
+                      <SortIcon active={sortBy === "phone"} order={sortOrder} />
+                    </div>
+                  </TableHead>
+                  <TableHead className="hidden md:table-cell">Email</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead className="hidden lg:table-cell">
+                    Merchant
+                  </TableHead>
+                  <TableHead>Points</TableHead>
+                  <TableHead className="hidden md:table-cell">
+                    Referral
+                  </TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead
+                    onClick={() => handleSort("created_at")}
+                    className="cursor-pointer hidden lg:table-cell"
+                  >
+                    <div className="flex items-center gap-1">
+                      Created
+                      <SortIcon
+                        active={sortBy === "created_at"}
+                        order={sortOrder}
                       />
-                      <div>
-                        <div className="font-medium text-gray-900">
-                          {m.name || m.fullName || m.user_name}
+                    </div>
+                  </TableHead>
+                  <TableHead>Action</TableHead>
+                </TableRow>
+              </TableHeader>
+
+              <TableBody>
+                {/* Skeleton Loading */}
+                {isLoading && !members?.length ? (
+                  [...Array(6)].map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Skeleton className="w-10 h-10 rounded-full" />
+                          <div className="space-y-1">
+                            <Skeleton className="h-4 w-32" />
+                            <Skeleton className="h-3 w-16" />
+                          </div>
                         </div>
-                        <div className="text-xs text-gray-500">
-                          {m.member_type}
+                      </TableCell>
+                      {[...Array(8)].map((_, j) => (
+                        <TableCell key={j}>
+                          <Skeleton className="h-4 w-20" />
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : isError ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={10}
+                      className="text-center text-red-500"
+                    >
+                      Failed to load members.
+                    </TableCell>
+                  </TableRow>
+                ) : members?.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={10}
+                      className="text-center text-gray-500"
+                    >
+                      No members found.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  members.map((m) => (
+                    <TableRow
+                      key={m.id}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      {/* Name + Avatar */}
+                      <TableCell className="py-3">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={userImage}
+                            alt="user"
+                            className="w-10 h-10 rounded-full border"
+                          />
+                          <div>
+                            <div className="font-medium text-gray-900">
+                              {m.name || m.fullName || m.user_name}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {m.member_type}
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="py-4 px-4">{m.user_name}</td>
-                    <td className="py-4 px-4">{m.phone}</td>
-                    <td className="py-4 px-4">
-                      {new Date(m.created_at).toLocaleString()}
-                    </td>
-                    <td className="py-4 px-4">
-                      <StatusBadge status={m.status} />
-                    </td>
-                    <td className="py-4 px-4 flex gap-2">
-                      <Link
-                        to={`/admin/member-manage/${m.id}`}
-                        className="p-2 rounded-md bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
-                      >
-                        <Eye size={16} />
-                      </Link>
-                      <button className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200">
-                        <PencilLine size={16} />
-                      </button>
-                      <button className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200">
-                        <Trash2Icon size={16} />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                      </TableCell>
+
+                      <TableCell>{m.user_name}</TableCell>
+                      <TableCell>{m.phone}</TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {m.email || "—"}
+                      </TableCell>
+                      <TableCell>{m.member_type}</TableCell>
+                      <TableCell className="hidden lg:table-cell">
+                        {m.member_type === "corporate"
+                          ? m.merchant?.business_name || "—"
+                          : "—"}
+                      </TableCell>
+                      <TableCell>{m.wallet?.available_points ?? 0}</TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {m.referral_code || "—"}
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge status={m.status} />
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell">
+                        {new Date(m.created_at).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Link
+                            to={`/admin/member-manage/${m.id}`}
+                            className="p-2 rounded-md bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
+                          >
+                            <Eye size={16} />
+                          </Link>
+                          <button className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200">
+                            <PencilLine size={16} />
+                          </button>
+                          <button className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200">
+                            <Trash2Icon size={16} />
+                          </button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
         </div>
 
         {/* Pagination (server) */}
