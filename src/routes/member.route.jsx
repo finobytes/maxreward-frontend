@@ -6,6 +6,7 @@ import MerchantApplication from "../pages/member/merchantApplication/MerchantApp
 import PointStatement from "../pages/member/pointStatement/PointStatement";
 import Profile from "../pages/member/profile/Profile";
 import PurchaseVoucher from "../pages/member/purchaseVoucher/PurchaseVoucher";
+import VoucherForm from "../pages/member/purchaseVoucher/VoucherFrom";
 import ReferNewMember from "../pages/member/referNewMember/ReferNewMember";
 import ReferNewMemberForm from "../pages/member/referNewMember/ReferNewMemberForm";
 import ReferredMemberList from "../pages/member/referredMemberList/ReferredMemberList";
@@ -41,6 +42,10 @@ export const memberRoutes = [
   {
     path: "purchase-voucher",
     element: <PurchaseVoucher />,
+  },
+  {
+    path: "add",
+    element: <VoucherForm />,
   },
   {
     path: "shop-with-merchant",

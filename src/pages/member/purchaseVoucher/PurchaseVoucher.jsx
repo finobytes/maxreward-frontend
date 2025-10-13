@@ -121,7 +121,7 @@ const PurchaseVoucher = () => {
                 value={dateRange}
                 onChange={(range) => setDateRange(range)}
               />
-              <PrimaryButton variant="primary" size="md" to="/voucher/add">
+              <PrimaryButton variant="primary" size="md" to="/member/add">
                 <Plus size={18} />
                 Add Voucher
               </PrimaryButton>
