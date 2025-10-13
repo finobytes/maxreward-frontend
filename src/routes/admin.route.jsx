@@ -30,7 +30,7 @@ export const adminRoutes = [
     element: <MemberRegistration />,
   },
   {
-    path: "member-details",
+    path: "member-manage/:id",
     element: <MemberDetails />,
   },
   {

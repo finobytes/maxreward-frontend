@@ -1,235 +1,278 @@
-import React, { useMemo, useState } from "react";
-import SearchInput from "../../../components/form/form-elements/SearchInput";
-import PrimaryButton from "../../../components/ui/PrimaryButton";
-import DropdownSelect from "../../../components/ui/dropdown/DropdownSelect";
-import BulkActionBar from "./components/BulkActionBar";
-import { userImage } from "../../../assets/assets";
-import StatusBadge from "../../../components/table/StatusBadge";
-import { Eye, PencilLine, Trash2Icon, Plus } from "lucide-react";
-import Pagination from "../../../components/table/Pagination";
-import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
+// src/pages/admin/memberMange/MemberManage.jsx
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  Eye,
+  PencilLine,
+  Trash2Icon,
+  Plus,
+  ChevronUp,
+  ChevronDown,
+  Loader,
+} from "lucide-react";
 import { Link } from "react-router";
+import {
+  setSearch,
+  setStatus,
+  setPage,
+  setPerPage,
+  setSort,
+  resetFilters,
+} from "../../../redux/features/admin/memberManagement/memberManagementSlice";
+import { useMembers } from "../../../redux/features/admin/memberManagement/useMembers";
+import SearchInput from "../../../components/form/form-elements/SearchInput";
+import DropdownSelect from "../../../components/ui/dropdown/DropdownSelect";
+import PrimaryButton from "../../../components/ui/PrimaryButton";
+import Pagination from "../../../components/table/Pagination";
+import StatusBadge from "../../../components/table/StatusBadge";
+import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
+import { userImage } from "../../../assets/assets";
+import { Skeleton } from "@/components/ui/skeleton.jsx";
 
-const dummyMembers = Array.from({ length: 30 }).map((_, i) => ({
-  id: i + 1,
-  fullName: `Member ${i + 1}`,
-  memberId: `MAX-${4325000 + i}`,
-  phone: `+60 12-345 ${6780 + i}`,
-  referrals: Math.floor(Math.random() * 100),
-  points: Math.floor(Math.random() * 90000),
-  status: ["Active", "Blocked", "Suspended"][Math.floor(Math.random() * 3)],
-  purchased: Math.floor(Math.random() * 5000),
-  created: `Oct ${Math.floor(Math.random() * 28) + 1} 2024`,
-}));
+const useDebounced = (value, delay = 400) => {
+  const [v, setV] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setV(value), delay);
+    return () => clearTimeout(t);
+  }, [value, delay]);
+  return v;
+};
+
+const SortIcon = ({ active, order }) => {
+  if (!active) return <span className="opacity-30">↕</span>;
+  return order === "asc" ? <ChevronUp size={14} /> : <ChevronDown size={14} />;
+};
 
 const MemberManage = () => {
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
-  const [selected, setSelected] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const [members, setMembers] = useState(dummyMembers);
-
-  const rowsPerPage = 10;
-
-  const filteredData = useMemo(() => {
-    return members.filter((m) => {
-      const matchesSearch =
-        m.fullName.toLowerCase().includes(search.toLowerCase()) ||
-        m.memberId.toLowerCase().includes(search.toLowerCase()) ||
-        m.phone.toLowerCase().includes(search.toLowerCase());
-      const matchesStatus =
-        statusFilter === "All" ? true : m.status === statusFilter;
-      return matchesSearch && matchesStatus;
-    });
-  }, [search, statusFilter, members]);
-
-  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * rowsPerPage,
-    currentPage * rowsPerPage
+  const dispatch = useDispatch();
+  const { search, status, page, perPage, sortBy, sortOrder } = useSelector(
+    (s) => s.memberManagement
   );
 
-  const toggleSelectAll = (checked) => {
-    if (checked) {
-      setSelected(paginatedData.map((m) => m.id));
+  // local input for immediate typing (debounced into redux search)
+  const [localSearch, setLocalSearch] = useState(search || "");
+  const debouncedSearch = useDebounced(localSearch, 450);
+
+  useEffect(() => {
+    // update redux search only when debounced value changes
+    dispatch(setSearch(debouncedSearch));
+  }, [debouncedSearch, dispatch]);
+
+  const { members, meta, isLoading, isError } = useMembers();
+
+  // sync page change events coming from Pagination component
+  const handlePageChange = (p) => dispatch(setPage(p));
+  const handlePerPageChange = (n) => dispatch(setPerPage(n));
+
+  const handleSort = (column) => {
+    // toggle sort order when clicking same column
+    if (sortBy === column) {
+      dispatch(
+        setSort({
+          sortBy: column,
+          sortOrder: sortOrder === "asc" ? "desc" : "asc",
+        })
+      );
     } else {
-      setSelected([]);
+      dispatch(setSort({ sortBy: column, sortOrder: "desc" }));
     }
   };
 
-  const toggleSelect = (id) => {
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
-  };
-
-  // Bulk Actions
-  const bulkUpdateStatus = (newStatus) => {
-    setMembers((prev) =>
-      prev.map((m) =>
-        selected.includes(m.id) ? { ...m, status: newStatus } : m
-      )
-    );
-    setSelected([]);
-  };
-
-  const bulkDelete = () => {
-    setMembers((prev) => prev.filter((m) => !selected.includes(m.id)));
-    setSelected([]);
-  };
+  console.log("Members:", members, "Meta:", meta);
 
   return (
     <div>
       <PageBreadcrumb
-        items={[{ label: "Home", to: "/" }, { label: "Member Manage" }]}
+        items={[{ label: "Home", to: "/" }, { label: "Member Management" }]}
       />
-      <div>
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white p-4">
-          <div className="max-w-full overflow-x-auto">
-            {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <h3 className="text-lg font-semibold text-gray-800">
-                All Member List
-              </h3>
 
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
-                {/* Search */}
-                <SearchInput
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search here..."
-                />
-                {/* Add Member Button */}
-                <PrimaryButton
-                  variant="primary"
-                  size="md"
-                  to="/admin/member-registration"
-                >
-                  <Plus size={18} />
-                  Register New Member
-                </PrimaryButton>
+      <div className="rounded-xl border bg-white p-4">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <h3 className="text-lg font-semibold">All Members</h3>
 
-                {/* Sort Dropdown */}
-                <div className="flex items-center gap-4">
-                  <DropdownSelect
-                    value={statusFilter}
-                    onChange={setStatusFilter}
-                    options={[
-                      { label: "All", value: "All" },
-                      { label: "Active", value: "Active" },
-                      { label: "Blocked", value: "Blocked" },
-                      { label: "Suspended", value: "Suspended" },
-                    ]}
-                  />
-                  <PrimaryButton variant="secondary" size="md">
-                    Clear
-                  </PrimaryButton>
-                </div>
-              </div>
-            </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <SearchInput
+              value={localSearch}
+              onChange={(e) => setLocalSearch(e.target.value)}
+              placeholder="Search by name, phone, username..."
+            />
+            <PrimaryButton to="/admin/member-registration" variant="primary">
+              <Plus size={16} /> Register Member
+            </PrimaryButton>
+            <DropdownSelect
+              value={status}
+              onChange={(val) => dispatch(setStatus(val))}
+              options={[
+                { label: "All", value: "all" },
+                { label: "Active", value: "active" },
+                { label: "Blocked", value: "blocked" },
+                { label: "Suspended", value: "suspended" },
+              ]}
+            />
 
-            {/* Bulk Actions Bar */}
-            {selected.length > 0 && (
-              <BulkActionBar
-                selectedCount={selected.length}
-                onSetActive={() => bulkUpdateStatus("Active")}
-                onSetBlocked={() => bulkUpdateStatus("Blocked")}
-                onSetSuspended={() => bulkUpdateStatus("Suspended")}
-                onDelete={bulkDelete}
-              />
-            )}
+            <DropdownSelect
+              value={perPage}
+              onChange={(val) => handlePerPageChange(Number(val))}
+              options={[
+                { label: "10", value: 10 },
+                { label: "20", value: 20 },
+                { label: "50", value: 50 },
+              ]}
+            />
 
-            {/* Table */}
-            <div className="mt-4 relative overflow-x-auto">
-              <table className="w-full text-sm text-left text-gray-500">
-                <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-                  <tr>
-                    <th className="p-4">
-                      <input
-                        type="checkbox"
-                        checked={
-                          paginatedData.length > 0 &&
-                          selected.length === paginatedData.length
-                        }
-                        onChange={(e) => toggleSelectAll(e.target.checked)}
-                        className="w-4 h-4 rounded"
-                      />
-                    </th>
-                    <th className="py-3">Full Name</th>
-                    <th className="py-3">Member ID</th>
-                    <th className="py-3">Phone</th>
-                    <th className="py-3">Referrals</th>
-                    <th className="py-3">Points</th>
-                    <th className="py-3">Status</th>
-                    <th className="py-3">Purchased (RM)</th>
-                    <th className="py-3">Created</th>
-                    <th className="py-3">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedData.map((member) => (
-                    <tr
-                      key={member.id}
-                      className="bg-white border-b hover:bg-gray-50 transition"
-                    >
-                      <td className="p-4">
-                        <input
-                          type="checkbox"
-                          checked={selected.includes(member.id)}
-                          onChange={() => toggleSelect(member.id)}
-                          className="w-4 h-4 rounded"
-                        />
-                      </td>
-                      <td className="py-4 flex items-center gap-3">
-                        <img
-                          src={userImage}
-                          alt="user"
-                          className="w-10 h-10 rounded-full object-cover border"
-                        />
-                        <div>
-                          <p className="font-medium text-gray-900">
-                            {member.fullName}
-                          </p>
-                          <p className="text-xs text-gray-500">4 Star Member</p>
-                        </div>
-                      </td>
-                      <td className="py-4">{member.memberId}</td>
-                      <td className="py-4">{member.phone}</td>
-                      <td className="py-4 text-center">{member.referrals}</td>
-                      <td className="py-4">{member.points}</td>
-                      <td className="py-4">
-                        <StatusBadge status={member.status} />
-                      </td>
-                      <td className="py-4">{member.purchased}</td>
-                      <td className="py-4">{member.created}</td>
-                      <td className="py-4 flex gap-2">
-                        <Link
-                          to="/admin/member-details"
-                          className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500"
-                        >
-                          <Eye size={16} />
-                        </Link>
-                        <button className="p-2 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-500">
-                          <PencilLine size={16} />
-                        </button>
-                        <button className="p-2 rounded-md bg-red-100 hover:bg-red-200 text-red-500">
-                          <Trash2Icon size={16} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-
-              {/* Pagination */}
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-              />
-            </div>
+            <PrimaryButton
+              variant="secondary"
+              onClick={() => dispatch(resetFilters())}
+            >
+              Clear
+            </PrimaryButton>
           </div>
+        </div>
+
+        {/* Table */}
+        {/* Table */}
+        <div className="mt-4 relative overflow-x-auto">
+          {/* Overlay spinner on interactions */}
+          {isLoading && (
+            <div className="absolute inset-0 z-10 bg-white/50 backdrop-blur-sm flex items-center justify-center">
+              <Loader className="w-8 h-8 animate-spin text-gray-400" />
+            </div>
+          )}
+
+          <table className="w-full text-sm text-left text-gray-600">
+            <thead className="bg-gray-50 text-xs text-gray-700 uppercase">
+              <tr>
+                <th
+                  className="py-3 px-4 cursor-pointer select-none"
+                  onClick={() => handleSort("name")}
+                >
+                  <div className="flex items-center gap-1">
+                    Full Name{" "}
+                    <SortIcon active={sortBy === "name"} order={sortOrder} />
+                  </div>
+                </th>
+                <th className="py-3 px-4">Member ID</th>
+                <th
+                  className="py-3 px-4 cursor-pointer select-none"
+                  onClick={() => handleSort("phone")}
+                >
+                  <div className="flex items-center gap-1">
+                    Phone{" "}
+                    <SortIcon active={sortBy === "phone"} order={sortOrder} />
+                  </div>
+                </th>
+                <th
+                  className="py-3 px-4 cursor-pointer select-none"
+                  onClick={() => handleSort("created_at")}
+                >
+                  <div className="flex items-center gap-1">
+                    Created{" "}
+                    <SortIcon
+                      active={sortBy === "created_at"}
+                      order={sortOrder}
+                    />
+                  </div>
+                </th>
+                <th className="py-3 px-4">Status</th>
+                <th className="py-3 px-4">Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {isLoading && !members.length ? (
+                // Initial load skeleton shimmer rows
+                [...Array(6)].map((_, i) => (
+                  <tr key={i} className="bg-white border-b">
+                    <td className="py-4 px-4 flex items-center gap-3">
+                      <Skeleton className="w-10 h-10 rounded-full" />
+                      <div className="flex-1 space-y-1">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-3 w-20" />
+                      </div>
+                    </td>
+                    <td className="py-4 px-4">
+                      <Skeleton className="h-4 w-20" />
+                    </td>
+                    <td className="py-4 px-4">
+                      <Skeleton className="h-4 w-24" />
+                    </td>
+                    <td className="py-4 px-4">
+                      <Skeleton className="h-4 w-28" />
+                    </td>
+                    <td className="py-4 px-4">
+                      <Skeleton className="h-4 w-16" />
+                    </td>
+                    <td className="py-4 px-4">
+                      <Skeleton className="h-4 w-20" />
+                    </td>
+                  </tr>
+                ))
+              ) : isError ? (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center text-red-500">
+                    Failed to load members
+                  </td>
+                </tr>
+              ) : members.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center text-gray-500">
+                    No members found
+                  </td>
+                </tr>
+              ) : (
+                members.map((m) => (
+                  <tr key={m.id} className="bg-white border-b hover:bg-gray-50">
+                    <td className="py-4 px-4 flex items-center gap-3">
+                      <img
+                        src={userImage}
+                        alt="user"
+                        className="w-10 h-10 rounded-full border"
+                      />
+                      <div>
+                        <div className="font-medium text-gray-900">
+                          {m.name || m.fullName || m.user_name}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {m.member_type}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-4 px-4">{m.user_name}</td>
+                    <td className="py-4 px-4">{m.phone}</td>
+                    <td className="py-4 px-4">
+                      {new Date(m.created_at).toLocaleString()}
+                    </td>
+                    <td className="py-4 px-4">
+                      <StatusBadge status={m.status} />
+                    </td>
+                    <td className="py-4 px-4 flex gap-2">
+                      <Link
+                        to={`/admin/member-manage/${m.id}`}
+                        className="p-2 rounded-md bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
+                      >
+                        <Eye size={16} />
+                      </Link>
+                      <button className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200">
+                        <PencilLine size={16} />
+                      </button>
+                      <button className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200">
+                        <Trash2Icon size={16} />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination (server) */}
+        <div className="mt-4">
+          <Pagination
+            currentPage={meta.current_page}
+            totalPages={meta.last_page}
+            onPageChange={(p) => dispatch(setPage(p))}
+          />
         </div>
       </div>
     </div>

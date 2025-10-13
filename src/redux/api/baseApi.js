@@ -6,11 +6,10 @@ export const baseApi = createApi({
     baseUrl: import.meta.env.VITE_API_URL,
     prepareHeaders: (headers, { getState }) => {
       const token = getState()?.auth?.token;
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-      }
+      if (token) headers.set("Authorization", `Bearer ${token}`);
       return headers;
     },
   }),
+  tagTypes: ["Member"],
   endpoints: () => ({}),
 });
