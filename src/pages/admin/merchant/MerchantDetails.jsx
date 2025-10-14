@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import {
-  BanknoteArrowUp,
-  ScrollText,
-  UsersRound,
-  BoxIcon,
-  UserSquare2,
-} from "lucide-react";
+import { ScrollText, UsersRound, BoxIcon, UserSquare2 } from "lucide-react";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import ComponentCard from "../../../components/common/ComponentCard";
 import MerchantProfileCard from "./components/MerchantProfileCard";
@@ -13,6 +7,8 @@ import OwnerInformation from "./components/OwnerInformation";
 import TopSellingProducts from "./components/TopSellingProducts";
 import MerchantProfileTabs from "./components/MerchantProfileTabs";
 import MerchantProfileTabsContent from "./components/MerchantProfileTabsContent";
+import { useGetMerchantByIdQuery } from "../../../redux/features/admin/merchantManagement/merchantManagementApi";
+import { useParams } from "react-router";
 
 const tabs = [
   { name: "Products", icon: BoxIcon, key: "products" },
@@ -22,6 +18,9 @@ const tabs = [
 ];
 const MerchantDetails = () => {
   const [currentTab, setCurrentTab] = useState("statements");
+  const { id } = useParams();
+  const { data, isLoading } = useGetMerchantByIdQuery(id);
+  console.log("Merchant Data:", data.data);
   return (
     <div>
       <PageBreadcrumb
@@ -38,12 +37,12 @@ const MerchantDetails = () => {
         <div className="space-y-4">
           {/* Profile Card */}
           <ComponentCard>
-            <MerchantProfileCard />
+            <MerchantProfileCard merchant={data.data} />
           </ComponentCard>
 
           {/* Owner Info  */}
           <div>
-            <OwnerInformation />
+            <OwnerInformation owner={data.data} />
           </div>
 
           {/* Transaction Activity */}

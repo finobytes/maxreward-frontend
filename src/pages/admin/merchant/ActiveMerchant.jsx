@@ -201,7 +201,7 @@ const ActiveMerchant = () => {
                       </td>
                       <td className="py-4 flex gap-2">
                         <Link
-                          to="/admin/merchant/merchant-details"
+                          to={`/admin/merchant/${merchant.id}`}
                           className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500"
                         >
                           <Eye size={16} />

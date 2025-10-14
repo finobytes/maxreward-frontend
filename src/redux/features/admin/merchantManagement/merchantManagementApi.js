@@ -2,7 +2,7 @@ import { baseApi } from "../../../api/baseApi";
 
 export const merchantManagementApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    // ✅ Get all merchants (with filters, pagination, search)
+    // Get all merchants (with filters, pagination, search)
     getMerchants: builder.query({
       query: ({
         page = 1,
@@ -23,13 +23,13 @@ export const merchantManagementApi = baseApi.injectEndpoints({
       providesTags: ["Merchant"],
     }),
 
-    // ✅ Get single merchant by ID
+    // Get single merchant by ID
     getMerchantById: builder.query({
       query: (id) => `/merchants/${id}`,
       providesTags: (result, error, id) => [{ type: "Merchant", id }],
     }),
 
-    // ✅ Get merchant by unique number
+    // Get merchant by unique number
     getMerchantByUnique: builder.query({
       query: (unique) => `/merchants/unique/${unique}`,
       providesTags: (result, error, unique) => [

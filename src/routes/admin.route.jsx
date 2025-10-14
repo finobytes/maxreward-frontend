@@ -50,7 +50,7 @@ export const adminRoutes = [
     element: <MerchantRegistrationForm />,
   },
   {
-    path: "merchant/merchant-details",
+    path: "merchant/:id",
     element: <MerchantDetails />,
   },
   {
