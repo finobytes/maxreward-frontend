@@ -53,9 +53,8 @@ const SortIcon = ({ active, order }) => {
 
 const MemberManage = () => {
   const dispatch = useDispatch();
-  const { search, status, page, perPage, sortBy, sortOrder, memberType } = useSelector(
-    (s) => s.memberManagement
-  );
+  const { search, status, page, perPage, sortBy, sortOrder, memberType } =
+    useSelector((s) => s.memberManagement);
 
   // local input for immediate typing (debounced into redux search)
   const [localSearch, setLocalSearch] = useState(search || "");
@@ -149,11 +148,11 @@ const MemberManage = () => {
         {/* Table */}
         <div className="mt-4 relative overflow-x-auto">
           {/* Overlay spinner on interactions */}
-          {isLoading && (
+          {/* {isLoading && (
             <div className="absolute inset-0 z-10 bg-white/50 backdrop-blur-sm flex items-center justify-center">
               <Loader className="w-8 h-8 animate-spin text-gray-400" />
             </div>
-          )}
+          )} */}
           <Table>
             <TableHeader>
               <TableRow>
@@ -201,7 +200,7 @@ const MemberManage = () => {
             <TableBody>
               {/* Skeleton Loading */}
               {isLoading && !members?.length ? (
-                [...Array(6)].map((_, i) => (
+                [...Array(10)].map((_, i) => (
                   <TableRow key={i}>
                     <TableCell>
                       <div className="flex items-center gap-3">

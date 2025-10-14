@@ -2,14 +2,11 @@ import React, { useMemo, useState } from "react";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import SearchInput from "../../../components/form/form-elements/SearchInput";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
-import { Eye } from "lucide-react";
+import { Eye, PencilLine, Plus, Trash2Icon } from "lucide-react";
 import DropdownSelect from "../../../components/ui/dropdown/DropdownSelect";
 import StatusBadge from "../../../components/table/StatusBadge";
 import { Link } from "react-router";
 import Pagination from "../../../components/table/Pagination";
-import { kebabMenu } from "../../../assets/assets";
-import { Dropdown } from "../../../components/ui/dropdown/Dropdown";
-import { DropdownItem } from "../../../components/ui/dropdown/DropdownItem";
 import BulkActionBar from "./components/BulkActionBar";
 
 const dummyMerchants = Array.from({ length: 35 }).map((_, i) => ({
@@ -32,7 +29,6 @@ const PendingMerchant = () => {
   const [statusFilter, setStatusFilter] = useState("All");
   const [selected, setSelected] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [openDropdownId, setOpenDropdownId] = useState(null);
 
   const [members, setMembers] = useState(dummyMerchants);
 
@@ -85,18 +81,10 @@ const PendingMerchant = () => {
     setMembers((prev) => prev.filter((m) => !selected.includes(m.id)));
     setSelected([]);
   };
-
-  function toggleDropdown(id) {
-    setOpenDropdownId(openDropdownId === id ? null : id);
-  }
-
-  function closeDropdown() {
-    setOpenDropdownId(null);
-  }
   return (
     <div>
       <PageBreadcrumb
-        items={[{ label: "Home", to: "/" }, { label: "Pending Merchant" }]}
+        items={[{ label: "Home", to: "/" }, { label: "Active Merchant" }]}
       />
       <div>
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white p-4">
@@ -104,7 +92,7 @@ const PendingMerchant = () => {
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <h3 className="text-lg font-semibold text-gray-800">
-                All Merchant Pending List
+                All Merchant List
               </h3>
 
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
@@ -115,6 +103,15 @@ const PendingMerchant = () => {
                   placeholder="Search here..."
                 />
 
+                {/* Add Member Button */}
+                <PrimaryButton
+                  variant="primary"
+                  size="md"
+                  to="/admin/merchant/merchant-registration"
+                >
+                  <Plus size={18} />
+                  Add New Merchant
+                </PrimaryButton>
                 <div className="flex justify-between items-center gap-4 md:px-2">
                   {/* Sort Dropdown */}
                   <DropdownSelect
@@ -147,7 +144,7 @@ const PendingMerchant = () => {
 
             {/* Table */}
             <div className="mt-4 relative overflow-x-auto">
-              <table className="w-full min-w-[1000px] text-sm text-center text-gray-500">
+              <table className="w-full min-w-[1000px] text-sm text-center text-gray-500 custom-scrollbar">
                 <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                   <tr>
                     <th className="p-4">
@@ -161,18 +158,18 @@ const PendingMerchant = () => {
                         className="w-4 h-4 rounded"
                       />
                     </th>
-                    <th className="py-3">Application ID</th>
                     <th className="py-3">Merchant ID</th>
                     <th className="py-3">Merchant Name</th>
-                    <th className="py-3">Phone Number</th>
                     <th className="py-3">Email Address</th>
-                    <th className="py-3">Business Name</th>
+                    <th className="py-3">Phone Number</th>
+                    <th className="py-3">Gender</th>
                     <th className="py-3">Business Type</th>
-                    <th className="py-3">Submitted Docs</th>
-                    <th className="py-3">Application Date</th>
+                    <th className="py-3">Sales</th>
+                    <th className="py-3">Redeemed</th>
+                    <th className="py-3">Balance</th>
                     <th className="py-3">Status</th>
                     <th className="py-3">Date Created</th>
-                    <th className="py-3">Action</th>
+                    <th className="py-3 text-left">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -189,45 +186,36 @@ const PendingMerchant = () => {
                           className="w-4 h-4 rounded"
                         />
                       </td>
-                      <td className="py-4">{merchant.applicationId}</td>
                       <td className="py-4">{merchant.merchantId}</td>
                       <td className="py-4">
                         <div>
                           <p className="">{merchant.merchantName}</p>
                         </div>
                       </td>
-                      <td className="py-4">{merchant.phone}</td>
                       <td className="py-4">{merchant.email}</td>
-                      <td className="py-4">{merchant.businessName}</td>
+                      <td className="py-4">{merchant.phone}</td>
+                      <td className="py-4">Gender</td>
                       <td className="py-4">{merchant.businessType}</td>
-                      <td className="py-4">{merchant.submittedDocs}</td>
-                      <td className="py-4">{merchant.applicationDate}</td>
+                      <td className="py-4">183,594</td>
+                      <td className="py-4">231,234</td>
+                      <td className="py-4">231,234</td>
                       <td className="py-4">
                         <StatusBadge status={merchant.status} />
                       </td>
                       <td className="py-4">{merchant.created}</td>
                       <td className="py-4 flex gap-2">
-                        <div className="relative inline-block">
-                          <button
-                            className="dropdown-toggle cursor-pointer"
-                            onClick={() => toggleDropdown(merchant.id)}
-                          >
-                            <img src={kebabMenu} alt="View Options" />
-                          </button>
-
-                          <Dropdown
-                            isOpen={openDropdownId === merchant.id}
-                            onClose={closeDropdown}
-                            className="w-40 p-2"
-                          >
-                            <DropdownItem onItemClick={closeDropdown}>
-                              Approve
-                            </DropdownItem>
-                            <DropdownItem onItemClick={closeDropdown}>
-                              Reject
-                            </DropdownItem>
-                          </Dropdown>
-                        </div>
+                        <Link
+                          to="/admin/merchant/merchant-details"
+                          className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500"
+                        >
+                          <Eye size={16} />
+                        </Link>
+                        <button className="p-2 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-500">
+                          <PencilLine size={16} />
+                        </button>
+                        <button className="p-2 rounded-md bg-red-100 hover:bg-red-200 text-red-500">
+                          <Trash2Icon size={16} />
+                        </button>
                       </td>
                     </tr>
                   ))}

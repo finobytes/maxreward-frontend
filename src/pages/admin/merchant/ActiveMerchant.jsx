@@ -1,61 +1,37 @@
-import React, { useMemo, useState } from "react";
-import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
-import SearchInput from "../../../components/form/form-elements/SearchInput";
-import PrimaryButton from "../../../components/ui/PrimaryButton";
-import { Eye, PencilLine, Plus, Trash2Icon } from "lucide-react";
-import DropdownSelect from "../../../components/ui/dropdown/DropdownSelect";
-import StatusBadge from "../../../components/table/StatusBadge";
-import { Link } from "react-router";
-import Pagination from "../../../components/table/Pagination";
+import React, { useState } from "react";
+import PageBreadcrumb from "@/components/common/PageBreadcrumb";
+import SearchInput from "@/components/form/form-elements/SearchInput";
+import PrimaryButton from "@/components/ui/PrimaryButton";
+import { Eye, PencilLine, Trash2Icon } from "lucide-react";
+import DropdownSelect from "@/components/ui/dropdown/DropdownSelect";
+import StatusBadge from "@/components/table/StatusBadge";
+import Pagination from "@/components/table/Pagination";
 import BulkActionBar from "./components/BulkActionBar";
-
-const dummyMerchants = Array.from({ length: 35 }).map((_, i) => ({
-  id: i + 1,
-  applicationId: `MAX-${1000 + i}`,
-  merchantId: `MAX-${4325000 + i}`,
-  merchantName: `Merchant ${i + 1}`,
-  phone: `+60 12-345 ${6780 + i}`,
-  email: `merchant${i + 1}@mail.com`,
-  businessName: `Business ${i + 1}`,
-  businessType: i % 2 === 0 ? "Retail" : "Service",
-  submittedDocs: i % 3 === 0 ? "Submitted" : "Pending",
-  applicationDate: `Oct ${Math.floor(Math.random() * 28) + 1}, 2024`,
-  status: ["Active", "Blocked", "Suspended"][Math.floor(Math.random() * 3)],
-  created: `Oct ${Math.floor(Math.random() * 28) + 1}, 2024`,
-}));
+import { Skeleton } from "@/components/ui/skeleton";
+import { useMerchantManagement } from "../../../redux/features/admin/merchantManagement/useMerchantManagement";
+import { Link } from "react-router";
 
 const ActiveMerchant = () => {
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
+  const {
+    data,
+    isFetching,
+    pagination,
+    filters,
+    debouncedSearch,
+    setDebouncedSearch,
+    handlePageChange,
+    handleFilterChange,
+  } = useMerchantManagement();
+
+  const merchants = data?.data?.data || [];
+  const currentPage = data?.data?.current_page || pagination.page;
+  const totalPages = data?.data?.last_page || 1;
+
   const [selected, setSelected] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const [members, setMembers] = useState(dummyMerchants);
-
-  const rowsPerPage = 10;
-
-  const filteredData = useMemo(() => {
-    return members.filter((m) => {
-      const matchesSearch =
-        m.merchantName.toLowerCase().includes(search.toLowerCase()) ||
-        m.merchantId.toLowerCase().includes(search.toLowerCase()) ||
-        m.phone.toLowerCase().includes(search.toLowerCase()) ||
-        m.email.toLowerCase().includes(search.toLowerCase());
-      const matchesStatus =
-        statusFilter === "All" ? true : m.status === statusFilter;
-      return matchesSearch && matchesStatus;
-    });
-  }, [search, statusFilter, members]);
-
-  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * rowsPerPage,
-    currentPage * rowsPerPage
-  );
 
   const toggleSelectAll = (checked) => {
     if (checked) {
-      setSelected(paginatedData.map((m) => m.id));
+      setSelected(merchants.map((m) => m.id));
     } else {
       setSelected([]);
     }
@@ -67,113 +43,136 @@ const ActiveMerchant = () => {
     );
   };
 
-  // Bulk Actions
+  // Bulk actions (placeholder)
   const bulkUpdateStatus = (newStatus) => {
-    setMembers((prev) =>
-      prev.map((m) =>
-        selected.includes(m.id) ? { ...m, status: newStatus } : m
-      )
-    );
-    setSelected([]);
+    console.log("Bulk update status to:", newStatus);
   };
-
   const bulkDelete = () => {
-    setMembers((prev) => prev.filter((m) => !selected.includes(m.id)));
-    setSelected([]);
+    console.log("Bulk delete selected merchants:", selected);
   };
-  return (
-    <div>
-      <PageBreadcrumb
-        items={[{ label: "Home", to: "/" }, { label: "Active Merchant" }]}
-      />
-      <div>
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white p-4">
-          <div className="max-w-full overflow-x-auto">
-            {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <h3 className="text-lg font-semibold text-gray-800">
-                All Merchant List
-              </h3>
 
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
-                {/* Search */}
-                <SearchInput
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search here..."
+  return (
+    <div className="space-y-6">
+      <PageBreadcrumb
+        items={[{ label: "Home", to: "/" }, { label: "Pending Merchant" }]}
+      />
+
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white p-4">
+        <div className="max-w-full overflow-x-auto">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <h3 className="text-lg font-semibold text-gray-800">
+              All Pending Merchants
+            </h3>
+
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
+              {/* Debounced Search */}
+              <SearchInput
+                value={debouncedSearch}
+                onChange={(e) => setDebouncedSearch(e.target.value)}
+                placeholder="Search merchant..."
+              />
+
+              <div className="flex justify-between items-center gap-4 md:px-2">
+                {/* Status Filter */}
+                <DropdownSelect
+                  value={filters.status || ""}
+                  onChange={(val) => handleFilterChange({ status: val })}
+                  options={[
+                    { label: "All", value: "" },
+                    { label: "Approved", value: "approved" },
+                    { label: "Pending", value: "pending" },
+                    { label: "Rejected", value: "rejected" },
+                  ]}
                 />
 
-                {/* Add Member Button */}
+                {/* Business Type Filter */}
+                <DropdownSelect
+                  value={filters.business_type || ""}
+                  onChange={(val) => handleFilterChange({ business_type: val })}
+                  options={[
+                    { label: "All Types", value: "" },
+                    { label: "Super Shop", value: "Super Shop" },
+                    { label: "Retail", value: "Retail" },
+                    { label: "Service", value: "Service" },
+                  ]}
+                />
+
                 <PrimaryButton
-                  variant="primary"
+                  variant="secondary"
                   size="md"
-                  to="/admin/merchant/merchant-registration"
+                  onClick={() =>
+                    handleFilterChange({
+                      status: "",
+                      business_type: "",
+                      search: "",
+                    })
+                  }
                 >
-                  <Plus size={18} />
-                  Add New Merchant
+                  Clear
                 </PrimaryButton>
-                <div className="flex justify-between items-center gap-4 md:px-2">
-                  {/* Sort Dropdown */}
-                  <DropdownSelect
-                    value={statusFilter}
-                    onChange={setStatusFilter}
-                    options={[
-                      { label: "Short By", value: "All" },
-                      { label: "Active", value: "Active" },
-                      { label: "Blocked", value: "Blocked" },
-                      { label: "Suspended", value: "Suspended" },
-                    ]}
-                  />
-                  <PrimaryButton variant="secondary" size="md">
-                    Clear
-                  </PrimaryButton>
-                </div>
               </div>
             </div>
+          </div>
 
-            {/* Bulk Actions Bar */}
-            {selected.length > 0 && (
-              <BulkActionBar
-                selectedCount={selected.length}
-                onSetActive={() => bulkUpdateStatus("Active")}
-                onSetBlocked={() => bulkUpdateStatus("Blocked")}
-                onSetSuspended={() => bulkUpdateStatus("Suspended")}
-                onDelete={bulkDelete}
-              />
-            )}
+          {/* Bulk Actions */}
+          {selected.length > 0 && (
+            <BulkActionBar
+              selectedCount={selected.length}
+              onSetActive={() => bulkUpdateStatus("Active")}
+              onSetBlocked={() => bulkUpdateStatus("Blocked")}
+              onSetSuspended={() => bulkUpdateStatus("Suspended")}
+              onDelete={bulkDelete}
+            />
+          )}
 
-            {/* Table */}
-            <div className="mt-4 relative overflow-x-auto">
-              <table className="w-full min-w-[1000px] text-sm text-center text-gray-500 custom-scrollbar">
-                <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+          {/* Table */}
+          <div className="mt-4 relative overflow-x-auto">
+            <table className="w-full min-w-[1100px] text-sm text-center text-gray-600">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                <tr>
+                  <th className="p-4">
+                    <input
+                      type="checkbox"
+                      checked={
+                        merchants.length > 0 &&
+                        selected.length === merchants.length
+                      }
+                      onChange={(e) => toggleSelectAll(e.target.checked)}
+                      className="w-4 h-4 rounded"
+                    />
+                  </th>
+                  <th className="py-3">Merchant ID</th>
+                  <th className="py-3">Business Name</th>
+                  <th className="py-3">Business Type</th>
+                  <th className="py-3">Owner Name</th>
+                  <th className="py-3">Phone</th>
+                  <th className="py-3">Email</th>
+                  <th className="py-3">Status</th>
+                  <th className="py-3">Created At</th>
+                  <th className="py-3">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {isFetching ? (
+                  // Skeleton Loader (shadcn style)
+                  Array.from({ length: 10 }).map((_, i) => (
+                    <tr key={i} className="border-b">
+                      {Array.from({ length: 10 }).map((_, j) => (
+                        <td key={j} className="py-3">
+                          <Skeleton className="h-4 w-full mx-auto" />
+                        </td>
+                      ))}
+                    </tr>
+                  ))
+                ) : merchants.length === 0 ? (
                   <tr>
-                    <th className="p-4">
-                      <input
-                        type="checkbox"
-                        checked={
-                          paginatedData.length > 0 &&
-                          selected.length === paginatedData.length
-                        }
-                        onChange={(e) => toggleSelectAll(e.target.checked)}
-                        className="w-4 h-4 rounded"
-                      />
-                    </th>
-                    <th className="py-3">Merchant ID</th>
-                    <th className="py-3">Merchant Name</th>
-                    <th className="py-3">Email Address</th>
-                    <th className="py-3">Phone Number</th>
-                    <th className="py-3">Gender</th>
-                    <th className="py-3">Business Type</th>
-                    <th className="py-3">Sales</th>
-                    <th className="py-3">Redeemed</th>
-                    <th className="py-3">Balance</th>
-                    <th className="py-3">Status</th>
-                    <th className="py-3">Date Created</th>
-                    <th className="py-3 text-left">Action</th>
+                    <td colSpan={10} className="py-6 text-gray-500">
+                      No merchants found
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {paginatedData.map((merchant) => (
+                ) : (
+                  merchants.map((merchant) => (
                     <tr
                       key={merchant.id}
                       className="bg-white border-b hover:bg-gray-50 transition"
@@ -186,23 +185,20 @@ const ActiveMerchant = () => {
                           className="w-4 h-4 rounded"
                         />
                       </td>
-                      <td className="py-4">{merchant.merchantId}</td>
-                      <td className="py-4">
-                        <div>
-                          <p className="">{merchant.merchantName}</p>
-                        </div>
+                      <td className="py-4 font-medium text-gray-700">
+                        {merchant.unique_number}
                       </td>
-                      <td className="py-4">{merchant.email}</td>
+                      <td className="py-4">{merchant.business_name}</td>
+                      <td className="py-4">{merchant.business_type}</td>
+                      <td className="py-4">{merchant.owner_name}</td>
                       <td className="py-4">{merchant.phone}</td>
-                      <td className="py-4">Gender</td>
-                      <td className="py-4">{merchant.businessType}</td>
-                      <td className="py-4">183,594</td>
-                      <td className="py-4">231,234</td>
-                      <td className="py-4">231,234</td>
+                      <td className="py-4">{merchant.email}</td>
                       <td className="py-4">
                         <StatusBadge status={merchant.status} />
                       </td>
-                      <td className="py-4">{merchant.created}</td>
+                      <td className="py-4">
+                        {new Date(merchant.created_at).toLocaleDateString()}
+                      </td>
                       <td className="py-4 flex gap-2">
                         <Link
                           to="/admin/merchant/merchant-details"
@@ -218,17 +214,18 @@ const ActiveMerchant = () => {
                         </button>
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            {/* Pagination */}
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
+
+          {/* Pagination */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
         </div>
       </div>
     </div>
