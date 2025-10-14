@@ -1,4 +1,3 @@
-// src/redux/features/admin/memberManagement/memberManagementSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {

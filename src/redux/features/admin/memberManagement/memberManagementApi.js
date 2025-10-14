@@ -1,4 +1,3 @@
-// src/redux/features/admin/memberManagement/memberApi.js
 import { baseApi } from "../../../api/baseApi";
 
 // Backend response shape (example):

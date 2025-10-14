@@ -20,7 +20,7 @@ const MemberRegistration = () => {
   const [referralInput, setReferralInput] = useState("");
   const [debouncedReferral, setDebouncedReferral] = useState("");
 
-  // ✅ Debounce effect (runs after 600 ms idle)
+  // Debounce effect (runs after 600 ms idle)
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedReferral(referralInput.trim());
@@ -28,7 +28,7 @@ const MemberRegistration = () => {
     return () => clearTimeout(timer);
   }, [referralInput]);
 
-  // ✅ Fetch referral data (only if 3+ chars)
+  // Fetch referral data (only if 3+ chars)
   const {
     data: memberData,
     isFetching,
@@ -38,7 +38,7 @@ const MemberRegistration = () => {
     skip: !debouncedReferral || debouncedReferral.length < 3,
   });
 
-  // ✅ React Hook Form setup
+  // React Hook Form setup
   const {
     register,
     handleSubmit,

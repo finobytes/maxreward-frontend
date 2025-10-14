@@ -1,4 +1,3 @@
-// src/redux/features/admin/memberManagement/useMembers.js
 import { useSelector } from "react-redux";
 import { useGetMembersQuery } from "./memberManagementApi";
 
@@ -19,7 +18,7 @@ export const useMembers = () => {
   // RTK Query: data is { members, meta } from transformResponse
   const { data, isLoading, isError, refetch } = useGetMembersQuery(params, {
     // keep previous data while fetching new pages for better UX
-    refetchOnMountOrArgChange: true,
+    refetchOnMountOrArgChange: false,
   });
 
   return {
