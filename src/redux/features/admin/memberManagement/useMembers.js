@@ -19,7 +19,7 @@ export const useMembers = () => {
   // RTK Query: data is { members, meta } from transformResponse
   const { data, isLoading, isError, refetch } = useGetMembersQuery(params, {
     // keep previous data while fetching new pages for better UX
-    refetchOnMountOrArgChange: false,
+    refetchOnMountOrArgChange: true,
   });
 
   return {
