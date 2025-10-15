@@ -60,22 +60,22 @@ const PendingMerchant = () => {
   const handleApprove = async (id) => {
     try {
       await updateMerchant({ id, status: "active" }).unwrap();
-      toast.success("Merchant approved successfully ✅");
+      toast.success("Merchant approved successfully ");
       refetch();
     } catch (error) {
       console.error("Approve failed:", error);
-      toast.error("Failed to approve merchant ❌");
+      toast.error("Failed to approve merchant ");
     }
   };
 
   const handleReject = async (id) => {
     try {
       await updateMerchant({ id, status: "rejected" }).unwrap();
-      toast.success("Merchant rejected successfully ⚠️");
+      toast.success("Merchant rejected successfully");
       refetch();
     } catch (error) {
       console.error("Reject failed:", error);
-      toast.error("Failed to reject merchant ❌");
+      toast.error("Failed to reject merchant");
     }
   };
 
@@ -113,7 +113,7 @@ const PendingMerchant = () => {
   if (isError)
     return (
       <p className="text-center text-red-500 mt-10">
-        ⚠️ Failed to load merchants. Please try again.
+        Failed to load merchants. Please try again.
       </p>
     );
 

@@ -35,18 +35,12 @@ const ActiveMerchant = () => {
   } = useMerchantManagement();
 
   const [deleteMerchant] = useDeleteMerchantMutation();
-  const [updateMerchant] = useUpdateMerchantMutation();
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure to delete this merchant?")) {
       await deleteMerchant(id);
       refetch(); // refresh list
     }
-  };
-
-  const handleEdit = async (id) => {
-    await updateMerchant({ id, status: "approved" });
-    refetch();
   };
 
   console.log("Fetched merchants data:", merchants);
@@ -222,17 +216,17 @@ const ActiveMerchant = () => {
                       </td>
                       <td className="py-4 flex gap-2">
                         <Link
-                          to={`/admin/merchant/${merchant.id}`}
+                          to={`/admin/merchant/details/${merchant.id}`}
                           className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500"
                         >
                           <Eye size={16} />
                         </Link>
-                        <button
-                          onClick={() => handleEdit(merchant.id)}
+                        <Link
+                          to={`/admin/merchant/update/${merchant.id}`}
                           className="p-2 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-500"
                         >
                           <PencilLine size={16} />
-                        </button>
+                        </Link>
                         <button
                           onClick={() => handleDelete(merchant.id)}
                           className="p-2 rounded-md bg-red-100 hover:bg-red-200 text-red-500"

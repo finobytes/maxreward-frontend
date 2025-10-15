@@ -15,6 +15,7 @@ import MemberRegistration from "../pages/admin/memberMange/MemberRegistration";
 import MemberDetails from "../pages/admin/memberMange/MemberDetails";
 import MerchantRegistrationForm from "../pages/admin/merchant/MerchantRegistrationForm";
 import MerchantDetails from "../pages/admin/merchant/MerchantDetails";
+import MerchantEdit from "../pages/admin/merchant/MerchantEdit";
 
 export const adminRoutes = [
   {
@@ -42,16 +43,20 @@ export const adminRoutes = [
     element: <PendingMerchant />,
   },
   {
+    path: "merchant/details/:id",
+    element: <MerchantDetails />,
+  },
+  {
+    path: "merchant/update/:id",
+    element: <MerchantEdit />,
+  },
+  {
     path: "merchant/active-merchant",
     element: <ActiveMerchant />,
   },
   {
     path: "merchant/merchant-registration",
     element: <MerchantRegistrationForm />,
-  },
-  {
-    path: "merchant/:id",
-    element: <MerchantDetails />,
   },
   {
     path: "accounts/income",
