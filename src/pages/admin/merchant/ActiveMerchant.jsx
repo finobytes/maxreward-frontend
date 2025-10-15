@@ -81,7 +81,7 @@ const ActiveMerchant = () => {
   return (
     <div className="space-y-6">
       <PageBreadcrumb
-        items={[{ label: "Home", to: "/" }, { label: "Pending Merchant" }]}
+        items={[{ label: "Home", to: "/" }, { label: "Active Merchant" }]}
       />
 
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white p-4">

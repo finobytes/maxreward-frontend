@@ -11,9 +11,11 @@ import Select from "@/components/form/Select";
 import PrimaryButton from "@/components/ui/PrimaryButton";
 import Dropzone from "@/components/form/form-elements/Dropzone";
 import { toast } from "sonner";
+import { useNavigate } from "react-router";
 
 const MerchantRegistrationForm = () => {
   const [createMerchant, { isLoading }] = useCreateMerchantMutation();
+  const navigate = useNavigate();
 
   const {
     register,
@@ -37,6 +39,7 @@ const MerchantRegistrationForm = () => {
 
       toast.success("Merchant created successfully!");
       reset();
+      navigate("/admin/merchant/pending-merchant");
     } catch (err) {
       console.error("Create Error:", err);
       toast.error("Failed to create merchant!");
@@ -54,7 +57,7 @@ const MerchantRegistrationForm = () => {
       />
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/* 🧾 Member Information */}
+        {/* Member Information */}
         <ComponentCard title="Member Information">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:col-span-2">
@@ -132,7 +135,7 @@ const MerchantRegistrationForm = () => {
           </div>
         </ComponentCard>
 
-        {/* 🏦 Bank Information */}
+        {/* Bank Information */}
         <div className="mt-6">
           <ComponentCard title="Bank Information">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -193,7 +196,7 @@ const MerchantRegistrationForm = () => {
           </ComponentCard>
         </div>
 
-        {/* ⚙️ Platform Settings */}
+        {/* Platform Settings */}
         <div className="mt-6">
           <ComponentCard title="Platform Settings">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
