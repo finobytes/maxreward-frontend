@@ -11,6 +11,7 @@ import ProfileTabContent from "./components/ProfileTabContent";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UsersRound, ScrollText } from "lucide-react";
 import { useGetMemberByIdQuery } from "../../../redux/features/admin/memberManagement/memberManagementApi";
+import MerchantDetailsSkeleton from "../../../components/skeleton/MerchantDetailsSkeleton";
 
 const tabs = [
   { name: "Community", icon: UsersRound, key: "community" },
@@ -39,11 +40,7 @@ const MemberDetails = () => {
       />
 
       {isLoading ? (
-        <div className="space-y-4">
-          {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-32 w-full rounded-lg" />
-          ))}
-        </div>
+        <MerchantDetailsSkeleton />
       ) : isError ? (
         <div className="text-center text-red-500 py-10">
           Failed to load member details.

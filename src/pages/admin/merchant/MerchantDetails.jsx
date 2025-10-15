@@ -9,6 +9,7 @@ import MerchantProfileTabs from "./components/MerchantProfileTabs";
 import MerchantProfileTabsContent from "./components/MerchantProfileTabsContent";
 import { useGetMerchantByIdQuery } from "../../../redux/features/admin/merchantManagement/merchantManagementApi";
 import { useParams } from "react-router";
+import MerchantDetailsSkeleton from "../../../components/skeleton/MerchantDetailsSkeleton";
 
 const tabs = [
   { name: "Products", icon: BoxIcon, key: "products" },
@@ -20,7 +21,8 @@ const MerchantDetails = () => {
   const [currentTab, setCurrentTab] = useState("statements");
   const { id } = useParams();
   const { data, isLoading } = useGetMerchantByIdQuery(id);
-  console.log("Merchant Data:", data.data);
+  console.log("Merchant Data:", data?.data);
+  if (isLoading) return <MerchantDetailsSkeleton />;
   return (
     <div>
       <PageBreadcrumb
@@ -37,12 +39,12 @@ const MerchantDetails = () => {
         <div className="space-y-4">
           {/* Profile Card */}
           <ComponentCard>
-            <MerchantProfileCard merchant={data.data} />
+            <MerchantProfileCard merchant={data?.data} />
           </ComponentCard>
 
           {/* Owner Info  */}
           <div>
-            <OwnerInformation owner={data.data} />
+            <OwnerInformation owner={data?.data} />
           </div>
 
           {/* Transaction Activity */}
