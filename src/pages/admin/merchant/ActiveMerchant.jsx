@@ -10,22 +10,49 @@ import BulkActionBar from "./components/BulkActionBar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMerchantManagement } from "../../../redux/features/admin/merchantManagement/useMerchantManagement";
 import { Link } from "react-router";
+import {
+  useDeleteMerchantMutation,
+  useUpdateMerchantMutation,
+} from "../../../redux/features/admin/merchantManagement/merchantManagementApi";
 
 const ActiveMerchant = () => {
   const {
-    data,
-    isFetching,
+    merchants,
     pagination,
+    isFetching,
+    isLoading,
+    isError,
+    refetch,
     filters,
-    debouncedSearch,
-    setDebouncedSearch,
-    handlePageChange,
-    handleFilterChange,
+    actions: {
+      setPage,
+      setPerPage,
+      setStatus,
+      setBusinessType,
+      setDebouncedSearch,
+      clearFilters,
+    },
   } = useMerchantManagement();
 
-  const merchants = data?.data?.data || [];
-  const currentPage = data?.data?.current_page || pagination.page;
-  const totalPages = data?.data?.last_page || 1;
+  const [deleteMerchant] = useDeleteMerchantMutation();
+  const [updateMerchant] = useUpdateMerchantMutation();
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure to delete this merchant?")) {
+      await deleteMerchant(id);
+      refetch(); // refresh list
+    }
+  };
+
+  const handleEdit = async (id) => {
+    await updateMerchant({ id, status: "approved" });
+    refetch();
+  };
+
+  console.log("Fetched merchants data:", merchants);
+
+  const currentPage = pagination?.currentPage || 1;
+  const totalPages = pagination?.lastPage || 1;
 
   const [selected, setSelected] = useState([]);
 
@@ -68,7 +95,7 @@ const ActiveMerchant = () => {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
               {/* Debounced Search */}
               <SearchInput
-                value={debouncedSearch}
+                value={filters.search}
                 onChange={(e) => setDebouncedSearch(e.target.value)}
                 placeholder="Search merchant..."
               />
@@ -76,8 +103,8 @@ const ActiveMerchant = () => {
               <div className="flex justify-between items-center gap-4 md:px-2">
                 {/* Status Filter */}
                 <DropdownSelect
-                  value={filters.status || ""}
-                  onChange={(val) => handleFilterChange({ status: val })}
+                  value={filters.status}
+                  onChange={(val) => setStatus(val)}
                   options={[
                     { label: "All", value: "" },
                     { label: "Approved", value: "approved" },
@@ -88,8 +115,8 @@ const ActiveMerchant = () => {
 
                 {/* Business Type Filter */}
                 <DropdownSelect
-                  value={filters.business_type || ""}
-                  onChange={(val) => handleFilterChange({ business_type: val })}
+                  value={filters.businessType}
+                  onChange={(val) => setBusinessType(val)}
                   options={[
                     { label: "All Types", value: "" },
                     { label: "Super Shop", value: "Super Shop" },
@@ -101,13 +128,7 @@ const ActiveMerchant = () => {
                 <PrimaryButton
                   variant="secondary"
                   size="md"
-                  onClick={() =>
-                    handleFilterChange({
-                      status: "",
-                      business_type: "",
-                      search: "",
-                    })
-                  }
+                  onClick={clearFilters}
                 >
                   Clear
                 </PrimaryButton>
@@ -206,10 +227,16 @@ const ActiveMerchant = () => {
                         >
                           <Eye size={16} />
                         </Link>
-                        <button className="p-2 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-500">
+                        <button
+                          onClick={() => handleEdit(merchant.id)}
+                          className="p-2 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-500"
+                        >
                           <PencilLine size={16} />
                         </button>
-                        <button className="p-2 rounded-md bg-red-100 hover:bg-red-200 text-red-500">
+                        <button
+                          onClick={() => handleDelete(merchant.id)}
+                          className="p-2 rounded-md bg-red-100 hover:bg-red-200 text-red-500"
+                        >
                           <Trash2Icon size={16} />
                         </button>
                       </td>
@@ -224,7 +251,7 @@ const ActiveMerchant = () => {
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            onPageChange={handlePageChange}
+            onPageChange={(page) => setPage(page)}
           />
         </div>
       </div>

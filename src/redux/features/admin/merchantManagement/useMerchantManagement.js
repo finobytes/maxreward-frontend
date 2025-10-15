@@ -1,58 +1,65 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import {
+  setPage,
+  setPerPage,
+  setStatus,
+  setBusinessType,
+  setSearch,
+} from "./merchantManagementSlice";
 import { useGetMerchantsQuery } from "./merchantManagementApi";
-import { setPagination, setFilters } from "./merchantManagementSlice";
 
 export const useMerchantManagement = () => {
   const dispatch = useDispatch();
-  const { pagination, filters } = useSelector(
+  const { page, perPage, status, businessType, search } = useSelector(
     (state) => state.merchantManagement
   );
 
-  const [debouncedSearch, setDebouncedSearch] = useState(filters.search);
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
 
-  // Debounce search input (600ms)
+  // 🕒 Debounce search for 600ms
   useEffect(() => {
     const handler = setTimeout(() => {
-      dispatch(setFilters({ search: debouncedSearch }));
+      dispatch(setSearch(debouncedSearch));
     }, 600);
     return () => clearTimeout(handler);
   }, [debouncedSearch, dispatch]);
 
-  const queryParams = {
-    page: pagination.page,
-    per_page: pagination.per_page,
-    status: filters.status,
-    business_type: filters.business_type,
-    search: filters.search,
-  };
+  const { data, isFetching, isLoading, isError, refetch } =
+    useGetMerchantsQuery({
+      page,
+      per_page: perPage,
+      status,
+      business_type: businessType,
+      search,
+    });
 
-  const { data, error, isFetching, refetch } =
-    useGetMerchantsQuery(queryParams);
-
-  const handlePageChange = (page) => {
-    dispatch(setPagination({ page }));
-  };
-
-  const handlePerPageChange = (per_page) => {
-    dispatch(setPagination({ per_page, page: 1 }));
-  };
-
-  const handleFilterChange = (filter) => {
-    dispatch(setFilters(filter));
+  const merchants = data?.merchants ?? [];
+  const pagination = data?.pagination ?? {};
+  const clearFilters = () => {
+    dispatch(setStatus(""));
+    dispatch(setBusinessType(""));
+    dispatch(setSearch(""));
+    dispatch(setPage(1));
+    dispatch(setPerPage(10));
+    refetch();
   };
 
   return {
-    data,
-    error,
-    isFetching,
-    refetch,
+    merchants,
     pagination,
-    filters,
-    debouncedSearch,
-    setDebouncedSearch,
-    handlePageChange,
-    handlePerPageChange,
-    handleFilterChange,
+    isFetching,
+    isLoading,
+    isError,
+    refetch,
+    filters: { page, perPage, status, businessType, search },
+    actions: {
+      setPage: (val) => dispatch(setPage(val)),
+      setPerPage: (val) => dispatch(setPerPage(val)),
+      setStatus: (val) => dispatch(setStatus(val)),
+      setBusinessType: (val) => dispatch(setBusinessType(val)),
+      setDebouncedSearch,
+      clearFilters,
+    },
   };
 };
