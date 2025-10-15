@@ -8,6 +8,7 @@ import App from "../App";
 import { adminRoutes } from "./admin.route";
 import { memberRoutes } from "./member.route";
 import ProtectedRoute from "../components/layouts/ProtectedRoute";
+import { merchantRoute } from "./merchant.route";
 
 const router = createBrowserRouter([
   {
@@ -22,6 +23,15 @@ const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [...adminRoutes],
+  },
+  {
+    path: "/merchant",
+    element: (
+      <ProtectedRoute role="merchant">
+        <App />
+      </ProtectedRoute>
+    ),
+    children: [...merchantRoute],
   },
   {
     path: "/member",

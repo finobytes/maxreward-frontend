@@ -9,7 +9,7 @@ import {
   users2,
 } from "../../../../assets/assets";
 
-const MemberProfile = () => {
+const MemberProfile = ({ member }) => {
   return (
     <section className="w-full overflow-hidden">
       <div className="w-full">
@@ -31,7 +31,7 @@ const MemberProfile = () => {
       </div>
       <div className=" block 2xl:flex gap-4 2xl:justify-between relative -top-8">
         <div className="ml-2">
-          <h3 className="text-2xl font-semibold">Leo Philips</h3>
+          <h3 className="text-2xl font-semibold">{member.name}</h3>
           <p className="mt-4 text-gray-400">Chief Executive Officer</p>
           <div className="flex gap-4 mt-1">
             <div className="flex gap-1">

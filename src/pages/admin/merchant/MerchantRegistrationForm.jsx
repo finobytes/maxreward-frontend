@@ -1,14 +1,51 @@
 import React from "react";
-import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
-import ComponentCard from "../../../components/common/ComponentCard";
-import Label from "../../../components/form/Label";
-import Input from "../../../components/form/input/InputField";
-import Select from "../../../components/form/Select";
-import PrimaryButton from "../../../components/ui/PrimaryButton";
-import DatePicker from "../../../components/form/DatePicker";
-import Dropzone from "../../../components/form/form-elements/Dropzone";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { merchantSchema } from "@/schemas/merchantSchema";
+import { useCreateMerchantMutation } from "@/redux/features/admin/merchantManagement/merchantManagementApi";
+import PageBreadcrumb from "@/components/common/PageBreadcrumb";
+import ComponentCard from "@/components/common/ComponentCard";
+import Label from "@/components/form/Label";
+import Input from "@/components/form/input/InputField";
+import Select from "@/components/form/Select";
+import PrimaryButton from "@/components/ui/PrimaryButton";
+import Dropzone from "@/components/form/form-elements/Dropzone";
+import { toast } from "sonner";
+import { useNavigate } from "react-router";
 
 const MerchantRegistrationForm = () => {
+  const [createMerchant, { isLoading }] = useCreateMerchantMutation();
+  const navigate = useNavigate();
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(merchantSchema),
+    defaultValues: {
+      status: "pending",
+    },
+  });
+
+  const onSubmit = async (data) => {
+    try {
+      const payload = { ...data };
+      delete payload.confirm_password;
+
+      const response = await createMerchant(payload).unwrap();
+      console.log("Merchant Created:", response);
+
+      toast.success("Merchant created successfully!");
+      reset();
+      navigate("/admin/merchant/pending-merchant");
+    } catch (err) {
+      console.error("Create Error:", err);
+      toast.error("Failed to create merchant!");
+    }
+  };
+
   return (
     <div>
       <PageBreadcrumb
@@ -18,332 +55,184 @@ const MerchantRegistrationForm = () => {
           { label: "Merchant Registration" },
         ]}
       />
-      <form>
+
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {/* Member Information */}
         <ComponentCard title="Member Information">
-          <div className=" grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:col-span-2">
               <div>
-                <Label htmlFor="date picker">Create Date</Label>
-                <DatePicker />
-              </div>
-              <div>
-                <Label htmlFor="merchantId">Merchant ID</Label>
+                <Label>Business Name</Label>
                 <Input
-                  type="text"
-                  id="merchantId"
-                  placeholder="MAX-1010"
-                  disabled
+                  {...register("business_name")}
+                  placeholder="Business name"
                 />
+                {errors.business_name && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.business_name.message}
+                  </p>
+                )}
               </div>
+
               <div>
-                <Label htmlFor="businessName">Business Name</Label>
-                <Input
-                  type="text"
-                  id="businessName"
-                  placeholder="Enter business name"
-                />
-              </div>
-              <div>
-                <Label htmlFor="businessType">Business Type</Label>
+                <Label>Business Type</Label>
                 <Select
-                  id="businessType"
-                  name="businessType"
-                  placeholder="Business Type"
+                  {...register("business_type")}
                   options={[
-                    { value: "", label: "Retail" },
-                    { value: "", label: "Service" },
+                    { value: "Retail", label: "Retail" },
+                    { value: "Service", label: "Service" },
+                    { value: "Super Shop", label: "Super Shop" },
+                  ]}
+                />
+                {errors.business_type && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.business_type.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <Label>Business Description</Label>
+                <Input
+                  {...register("business_description")}
+                  placeholder="Business Description"
+                />
+              </div>
+
+              <div>
+                <Label>Company Address</Label>
+                <Input
+                  {...register("company_address")}
+                  placeholder="Company Address"
+                />
+              </div>
+
+              <div>
+                <Label>Status</Label>
+                <Select
+                  {...register("status")}
+                  options={[
+                    { value: "pending", label: "Pending" },
+                    { value: "approved", label: "Approved" },
+                    { value: "rejected", label: "Rejected" },
                   ]}
                 />
               </div>
+
               <div>
-                <Label htmlFor="businessDescription">
-                  Business Description
-                </Label>
+                <Label>License Number</Label>
                 <Input
-                  type="text"
-                  id="businessDescription"
-                  placeholder="Enter Business Description"
-                />
-              </div>
-              <div>
-                <Label htmlFor="fullName">Company Address</Label>
-                <Input
-                  type="text"
-                  id="companyAddress"
-                  placeholder="Enter member full name"
-                />
-              </div>
-              <div>
-                <Label htmlFor="status">Status</Label>
-                <Select
-                  id="status"
-                  name="status"
-                  placeholder="Status"
-                  options={[
-                    { value: "", label: "Block" },
-                    { value: "", label: "Suspended" },
-                    { value: "", label: "Active" },
-                  ]}
-                />
-              </div>
-              <div>
-                <Label htmlFor="registrationNumber">
-                  Registration Number / License No
-                </Label>
-                <Input
-                  type="text"
-                  id="registrationNumber"
-                  placeholder="Registration Number / License No"
+                  {...register("license_number")}
+                  placeholder="License Number"
                 />
               </div>
             </div>
+
             <div className="md:col-span-1">
-              <Label htmlFor="logo"> Upload Company Logo</Label>
+              <Label>Upload Company Logo</Label>
               <Dropzone />
             </div>
           </div>
         </ComponentCard>
 
+        {/* Bank Information */}
         <div className="mt-6">
           <ComponentCard title="Bank Information">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="bankName">Bank Name</Label>
+                <Label>Bank Name</Label>
+                <Input {...register("bank_name")} placeholder="Bank Name" />
+              </div>
+              <div>
+                <Label>Account Holder Name</Label>
                 <Input
-                  type="text"
-                  id="bankName"
-                  placeholder="Enter Bank Name"
+                  {...register("account_holder_name")}
+                  placeholder="Account Holder Name"
                 />
               </div>
               <div>
-                <Label htmlFor="accountHolderName">Account Holder Name</Label>
+                <Label>Account Number / IBAN</Label>
                 <Input
-                  type="text"
-                  id="accountHolderName"
-                  placeholder="Enter Account Holder Name"
-                />
-              </div>
-              <div>
-                <Label htmlFor="accountNumber">Account Number / IBAN</Label>
-                <Input
-                  type="text"
-                  id="accountNumber"
-                  placeholder="Enter Account Number / IBAN"
-                />
-              </div>
-              <div>
-                <Label htmlFor="paymentMethod">Preferred Payment Method</Label>
-
-                <Select
-                  id="paymentMethod"
-                  name="paymentMethod"
-                  placeholder="Preferred Payment Method"
-                  options={[
-                    { value: "", label: "Online" },
-                    { value: "", label: "Offline" },
-                  ]}
-                />
-              </div>
-              <div>
-                <Label htmlFor="routingNumber">Routing Number</Label>
-                <Input
-                  type="text"
-                  id="routingNumber"
-                  placeholder="Enter Routing Number"
-                />
-              </div>
-              <div>
-                <Label htmlFor="swiftCode">Swift Code</Label>
-                <Input
-                  type="text"
-                  id="swiftCode"
-                  placeholder="Enter Swift Code"
+                  {...register("account_number")}
+                  placeholder="Account Number"
                 />
               </div>
             </div>
           </ComponentCard>
         </div>
+
+        {/* 👤 Owner Information */}
         <div className="mt-6">
           <ComponentCard title="Owner Information">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="grid grid-cols-1 gap-4">
-                <div>
-                  <Label htmlFor="ownerName">Owner Name</Label>
-                  <Input
-                    type="text"
-                    id="ownerName"
-                    placeholder="Enter Owner Name"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="fullName">Phone Number</Label>
-                  <Input
-                    type="phoneNumber"
-                    id="phoneNumber"
-                    placeholder="Enter Phone Number"
-                  />
-                </div>
-                {/* Gender */}
-                <div>
-                  <Label htmlFor="gender">Gender</Label>
-                  <Select
-                    id="gender"
-                    name="gender"
-                    placeholder="Select Gender"
-                    options={[
-                      { value: "male", label: "Male" },
-                      { value: "female", label: "Female" },
-                      { value: "other", label: "Others" },
-                    ]}
-                  />
-                </div>
-
-                {/* Address */}
-                <div>
-                  <Label htmlFor="address">Full Address</Label>
-                  <Input
-                    type="text"
-                    id="address"
-                    placeholder="Enter Full Address"
-                  />
-                </div>
-                {/* Email */}
-                <div>
-                  <Label htmlFor="email">Email Address</Label>
-                  <Input
-                    type="email"
-                    id="email"
-                    placeholder="Enter Email Address"
-                  />
-                </div>
+              <div>
+                <Label>Owner Name</Label>
+                <Input {...register("owner_name")} placeholder="Owner Name" />
               </div>
-
-              <div className="">
-                <Label htmlFor="logo"> Upload Owner ID</Label>
-                <Dropzone />
+              <div>
+                <Label>Phone</Label>
+                <Input {...register("phone")} placeholder="Phone Number" />
               </div>
-              <div className="">
-                <Label htmlFor="logo"> Upload Tax Certificate</Label>
-                <Dropzone />
+              <div>
+                <Label>Gender</Label>
+                <Select
+                  {...register("gender")}
+                  options={[
+                    { value: "male", label: "Male" },
+                    { value: "female", label: "Female" },
+                    { value: "other", label: "Other" },
+                  ]}
+                />
+              </div>
+              <div>
+                <Label>Address</Label>
+                <Input {...register("address")} placeholder="Full Address" />
+              </div>
+              <div>
+                <Label>Email</Label>
+                <Input {...register("email")} placeholder="Email" />
               </div>
             </div>
           </ComponentCard>
         </div>
 
-        {/* Referral */}
-        <div className="mt-6">
-          <ComponentCard title="Referral Information">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="fullName">Referrer Name</Label>
-
-                <Select
-                  id="gender"
-                  name="gender"
-                  placeholder="Select Referrer Name"
-                  options={[
-                    { value: "male", label: "" },
-                    { value: "female", label: "" },
-                    { value: "other", label: "" },
-                  ]}
-                />
-              </div>
-              <div>
-                <Label htmlFor="fullName">Referrer ID</Label>
-
-                <Select
-                  id="gender"
-                  name="gender"
-                  placeholder="Select Referrer ID"
-                  options={[
-                    { value: "male", label: "" },
-                    { value: "female", label: "" },
-                    { value: "other", label: "" },
-                  ]}
-                />
-              </div>
-              <div>
-                <Label htmlFor="fullName">Referrer Status</Label>
-
-                <Select
-                  id="gender"
-                  name="gender"
-                  placeholder="Select Referrer Status"
-                  options={[
-                    { value: "male", label: "" },
-                    { value: "female", label: "" },
-                    { value: "other", label: "" },
-                  ]}
-                />
-              </div>
-            </div>
-          </ComponentCard>
-        </div>
+        {/* Platform Settings */}
         <div className="mt-6">
           <ComponentCard title="Platform Settings">
-            <div className=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-3 lg:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="fullName">Commission Rate (%)</Label>
+                <Label>Password</Label>
                 <Input
-                  type="text"
-                  id="fullName"
-                  placeholder="Enter Commission Rate (%)"
+                  type="password"
+                  {...register("merchant_password")}
+                  placeholder="Password"
                 />
-              </div>{" "}
+              </div>
               <div>
-                <Label htmlFor="fullName">Settlement Period</Label>
-
-                <Select
-                  id="gender"
-                  name="gender"
-                  placeholder="Select Settlement Period"
-                  options={[
-                    { value: "male", label: "" },
-                    { value: "female", label: "" },
-                    { value: "other", label: "" },
-                  ]}
-                />
-              </div>{" "}
-              <div>
-                <Label htmlFor="fullName">APProved By</Label>
-
-                <Select
-                  id="gender"
-                  name="gender"
-                  placeholder="Select "
-                  options={[
-                    { value: "male", label: "" },
-                    { value: "female", label: "" },
-                    { value: "other", label: "" },
-                  ]}
-                />
-              </div>{" "}
-              <div>
-                <Label htmlFor="fullName">User Name</Label>
+                <Label>Confirm Password</Label>
                 <Input
-                  type="text"
-                  id="fullName"
-                  placeholder="Enter member full name"
+                  type="password"
+                  {...register("confirm_password")}
+                  placeholder="Confirm Password"
                 />
-              </div>{" "}
-              <div>
-                <Label htmlFor="fullName">Password</Label>
-                <Input type="text" id="fullName" placeholder="Enter Password" />
-              </div>{" "}
-              <div>
-                <Label htmlFor="fullName">Confirm Password</Label>
-                <Input
-                  type="text"
-                  id="fullName"
-                  placeholder="Enter Confirm Password"
-                />
+                {errors.confirm_password && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.confirm_password.message}
+                  </p>
+                )}
               </div>
             </div>
 
             <div className="mt-8 flex gap-4">
-              <PrimaryButton type="submit">Submit</PrimaryButton>
-              <PrimaryButton variant="secondary" type="button">
-                Back
+              <PrimaryButton type="submit" disabled={isLoading}>
+                {isLoading ? "Submitting..." : "Submit"}
+              </PrimaryButton>
+              <PrimaryButton
+                variant="secondary"
+                type="button"
+                onClick={() => reset()}
+              >
+                Reset
               </PrimaryButton>
             </div>
           </ComponentCard>

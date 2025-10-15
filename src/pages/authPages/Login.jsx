@@ -1,58 +1,60 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginBg, logo } from "../../assets/assets";
 import { Link, useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "../../redux/features/auth/authSlice";
-
-// Validation schema
-const loginSchema = z.object({
-  email: z.string().min(1, "Email is required").email("Enter a valid email"),
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .regex(/[A-Z]/, "Must contain at least one uppercase letter")
-    .regex(/[0-9]/, "Must contain at least one number")
-    .regex(/[@$!%*?&]/, "Must contain at least one special character"),
-  remember: z.boolean().optional(),
-});
+import { setCredentials } from "../../redux/features/auth/authSlice";
+import { useLoginMutation } from "../../redux/features/auth/authApi";
+import { loginSchema } from "../../schemas/auth/loginSchema";
+import { Spinner } from "@/components/ui/spinner.jsx";
+import { toast } from "sonner";
 
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useSelector((state) => state.auth);
-
+  const [loginApi, { data, isSuccess, isError, error, isLoading }] =
+    useLoginMutation();
   // React Hook Form setup
   const {
     register,
     handleSubmit,
     formState: { errors },
-    setValue,
   } = useForm({ resolver: zodResolver(loginSchema) });
 
-  // Redirect user if already logged in
-  useEffect(() => {
-    if (isAuthenticated && user?.role) {
-      navigate(`/${user.role}`);
-    }
-  }, [isAuthenticated, user, navigate]);
-
-  // Quick Login Prefill Function
-  const handleQuickLogin = (role) => {
-    if (role === "admin") {
-      setValue("email", "admin@demo.com");
-      setValue("password", "Admin@123");
-    } else if (role === "member") {
-      setValue("email", "member@demo.com");
-      setValue("password", "Member@123");
-    }
-  };
-
   // Form submit
-  const onSubmit = (data) => {
-    dispatch(login(data));
+  const onSubmit = async (formData) => {
+    try {
+      const res = await loginApi(formData).unwrap();
+      console.log("Login success:", res);
+      toast.success("Login successful");
+
+      dispatch(
+        setCredentials({
+          user: {
+            role: formData.userName.startsWith("A")
+              ? "admin"
+              : formData.userName.startsWith("M")
+              ? "merchant"
+              : "member",
+          },
+          token: res.access_token,
+        })
+      );
+
+      // Redirect role
+      navigate(
+        formData.userName.startsWith("A")
+          ? "/admin"
+          : formData.userName.startsWith("M")
+          ? "/merchant"
+          : "/member"
+      );
+    } catch (err) {
+      toast.error("Invalid username or password");
+      console.error(" Login failed:", err);
+    }
   };
 
   // Redirect after login
@@ -71,7 +73,7 @@ const Login = () => {
         className="absolute inset-0 w-full h-full object-cover object-center -z-10"
       />
 
-      {/* 🔹 Login Card */}
+      {/* Login Card */}
       <div className="relative bg-white shadow-md rounded-2xl px-10 py-8 w-[400px] max-w-full z-10">
         <div className="flex flex-col items-center">
           <div className="w-24 h-24 rounded-full bg-[#FF5A29]/10 flex items-center justify-center">
@@ -87,22 +89,22 @@ const Login = () => {
 
         {/* Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Email */}
+          {/* User Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Email Address
+              User Name
             </label>
             <input
-              type="email"
-              {...register("email")}
-              placeholder="Enter your email"
+              type="userName"
+              {...register("userName")}
+              placeholder="Enter your user name"
               className={`mt-1 w-full border rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#FF5A29] ${
-                errors.email ? "border-red-500" : "border-gray-300"
+                errors.userName ? "border-red-500" : "border-gray-300"
               }`}
             />
-            {errors.email && (
+            {errors.userName && (
               <p className="text-xs text-red-500 mt-1">
-                {errors.email.message}
+                {errors.userName.message}
               </p>
             )}
           </div>
@@ -142,34 +144,19 @@ const Login = () => {
               Forgot password?
             </Link>
           </div>{" "}
-          {/*  Quick Login Buttons */}
-          <div className="flex justify-center gap-3">
-            <button
-              type="button"
-              onClick={() => handleQuickLogin("admin")}
-              className="px-3 py-1 text-sm border border-[#FF5A29] text-[#FF5A29] rounded-md hover:bg-[#FF5A29] hover:text-white transition"
-            >
-              Admin
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickLogin("member")}
-              className="px-3 py-1 text-sm border border-[#FF5A29] text-[#FF5A29] rounded-md hover:bg-[#FF5A29] hover:text-white transition"
-            >
-              Member
-            </button>
-          </div>
           {/* Submit */}
           <button
             type="submit"
-            className=" w-full bg-[#FF5A29] text-white py-2 rounded-md font-semibold hover:bg-[#FF5A29]/80 transition"
+            disabled={isLoading}
+            className="flex justify-center items-center gap-2 w-full bg-[#FF5A29] text-white py-2 rounded-md font-semibold hover:bg-[#FF5A29]/80 transition disabled:opacity-70"
           >
-            Log In
+            {isLoading && <Spinner />} {/* ✅ Spinner when loading */}
+            {isLoading ? "Logging in..." : "Log In"}
           </button>
         </form>
       </div>
 
-      {/* 🔹 Footer */}
+      {/* Footer */}
       <div className="absolute bottom-0 w-full bg-white py-3 px-6 flex justify-between text-xs text-gray-500">
         <p>
           Copyright © 2025{" "}

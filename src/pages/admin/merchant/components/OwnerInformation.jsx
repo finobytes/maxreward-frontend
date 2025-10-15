@@ -1,32 +1,34 @@
 import React from "react";
-const people = [
-  {
-    key: "Name:",
-    value: "Leo Phillips",
-  },
-  {
-    key: "Email:",
-    value: "youremail@example.com",
-  },
-  {
-    key: "Phone:",
-    value: "+1 (555) 123-4567",
-  },
-  {
-    key: "Designation:",
-    value: "C.E.O",
-  },
-  {
-    key: "Address:",
-    value: "Washington D.C",
-  },
-  {
-    key: "Create at :",
-    value: "01-sept-2025",
-  },
-];
 
-const OwnerInformation = () => {
+const OwnerInformation = ({ owner }) => {
+  const people = [
+    {
+      key: "Name:",
+      value: owner ? owner.owner_name : "John Doe",
+    },
+    {
+      key: "Email:",
+      value: owner ? owner.email : "youremail@example.com",
+    },
+    {
+      key: "Phone:",
+      value: owner ? owner.phone : "+1 234 567 890",
+    },
+    {
+      key: "Designation:",
+      value: "C.E.O",
+    },
+    {
+      key: "Address:",
+      value: owner ? owner.address : "1234 Street, City, Country",
+    },
+    {
+      key: "Create at :",
+      value: owner
+        ? new Date(owner.created_at).toLocaleDateString()
+        : "01 Jan, 2023",
+    },
+  ];
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 sm:px-2 sm:pt-6 lg:px-6 shadow-md">
       {/* Info List */}

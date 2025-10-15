@@ -1,23 +1,44 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { EyeIcon, EyeOffIcon, Loader2 } from "lucide-react";
 
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import ComponentCard from "../../../components/common/ComponentCard";
-import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Label from "../../../components/form/Label";
 import Input from "../../../components/form/input/InputField";
 import Dropzone from "../../../components/form/form-elements/Dropzone";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
 import Select from "../../../components/form/Select";
 import { memberSchema } from "../../../schemas/memberSchema";
+import { useGetMemberByReferralQuery } from "../../../redux/features/admin/memberManagement/memberManagementApi";
 
 const MemberRegistration = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [profilePic, setProfilePic] = useState([]);
   const [passportFiles, setPassportFiles] = useState([]);
+  const [referralInput, setReferralInput] = useState("");
+  const [debouncedReferral, setDebouncedReferral] = useState("");
 
-  // ✅ setup react-hook-form with zod
+  // Debounce effect (runs after 600 ms idle)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedReferral(referralInput.trim());
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [referralInput]);
+
+  // Fetch referral data (only if 3+ chars)
+  const {
+    data: memberData,
+    isFetching,
+    isError,
+    error,
+  } = useGetMemberByReferralQuery(debouncedReferral, {
+    skip: !debouncedReferral || debouncedReferral.length < 3,
+  });
+
+  // React Hook Form setup
   const {
     register,
     handleSubmit,
@@ -51,9 +72,11 @@ const MemberRegistration = () => {
           { label: "Member Registration" },
         ]}
       />
+
       <form onSubmit={handleSubmit(onSubmit)}>
+        {/* Member Info */}
         <ComponentCard title="Member Information">
-          <div className=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-3 lg:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Full Name */}
             <div>
               <Label htmlFor="fullName">
@@ -160,7 +183,7 @@ const MemberRegistration = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"
                 >
                   {showPassword ? <EyeIcon /> : <EyeOffIcon />}
                 </button>
@@ -189,42 +212,63 @@ const MemberRegistration = () => {
           </div>
         </ComponentCard>
 
-        {/* Referral */}
+        {/* Referral Info */}
         <div className="mt-8">
-          <ComponentCard>
-            <div className=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-3 lg:gap-4">
+          <ComponentCard title="Referral Information">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Referral Code */}
               <div>
                 <Label htmlFor="referralCode">
                   Referral Code (<span className="text-red-500">*</span>)
                 </Label>
-                <Select
+                <Input
+                  type="text"
                   id="referralCode"
-                  name="referralCode"
-                  placeholder="Referral Code"
-                  options={[
-                    { value: "MAX-1001", label: "MAX-1001" },
-                    { value: "MAX-1002", label: "MAX-1002" },
-                    { value: "MAX-1003", label: "MAX-1003" },
-                  ]}
+                  placeholder="Enter Referral Code"
                   {...register("referralCode")}
+                  value={referralInput}
+                  onChange={(e) => setReferralInput(e.target.value)}
+                  error={!!errors.referralCode}
+                  hint={errors.referralCode?.message}
                 />
-                {errors.referralCode && (
-                  <p className="text-xs text-error-500 mt-1.5">
-                    {errors.referralCode.message}
+                {referralInput && referralInput.length < 3 && (
+                  <p className="text-xs text-gray-400 mt-1">
+                    Type at least 3 characters...
                   </p>
                 )}
               </div>
 
+              {/* Referred By */}
               <div>
                 <Label htmlFor="referredBy">Referred By</Label>
-                <Input type="text" id="referredBy" disabled />
+                {isFetching ? (
+                  <div className="flex items-center gap-2 text-gray-500">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Fetching...</span>
+                  </div>
+                ) : (
+                  <Input
+                    value={
+                      isError ? "Referral Not Found" : memberData?.name ?? ""
+                    }
+                    readOnly
+                    id="referredBy"
+                  />
+                )}
               </div>
+
+              {/* Referral Status */}
               <div>
                 <Label htmlFor="referralStatus">Referral Status</Label>
-                <Input type="text" id="referralStatus" disabled />
+                <Input
+                  value={isError ? "Invalid" : memberData?.status ?? ""}
+                  readOnly
+                  id="referralStatus"
+                />
               </div>
             </div>
 
+            {/* Actions */}
             <div className="mt-8 flex gap-4">
               <PrimaryButton type="submit">Submit</PrimaryButton>
               <PrimaryButton variant="secondary" type="button">

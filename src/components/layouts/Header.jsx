@@ -6,11 +6,7 @@ import UserDropdown from "../header/UserDropdown";
 import { logo } from "../../assets/assets";
 import { Menu, X } from "lucide-react";
 import NotificationDropdown from "../header/NotificationDropdown";
-
-const user = {
-  name: "Mr. Jack",
-  email: "Mr.Jack@example.com",
-};
+import { useSelector } from "react-redux";
 
 const Header = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
@@ -29,6 +25,12 @@ const Header = () => {
     setApplicationMenuOpen(!isApplicationMenuOpen);
   };
 
+  const { user } = useSelector((state) => state.auth);
+  const userInfo = {
+    name: "Mr. Jack",
+    email: "Mr.Jack@example.com",
+    ...user,
+  };
   return (
     <header className="sticky top-0 flex w-full bg-white border-b border-gray-200 z-99999 ">
       <div className="flex flex-col items-center justify-between grow lg:flex-row lg:px-6">
@@ -76,7 +78,7 @@ const Header = () => {
             <NotificationDropdown />
           </div>
           {/* <!-- User Area --> */}
-          <UserDropdown user={user} />
+          <UserDropdown user={userInfo} />
         </div>
       </div>
     </header>

@@ -6,7 +6,7 @@ import {
   userProfile,
 } from "../../../../assets/assets";
 
-const MerchantProfileCard = () => {
+const MerchantProfileCard = ({ merchant }) => {
   return (
     <section className="w-full overflow-hidden">
       <div className="w-full relative">
@@ -35,15 +35,16 @@ const MerchantProfileCard = () => {
       </div>
       <div className=" block 2xl:flex gap-4 2xl:justify-between relative -top-8">
         <div className="ml-2">
-          <h3 className="text-xl font-semibold">Urban Style Fashion</h3>
+          <h3 className="text-xl font-semibold">
+            {merchant.account_holder_name}
+          </h3>
           <p className="text-sm mt-2 text-gray-400 font-medium">
-            Lot 12, Jalan SS15/4D, 47500 Subang Jaya, Selangor Darul Ehsan,
-            Malaysia
+            {merchant.company_address}
           </p>
           <div className="flex gap-4 mt-1">
             <div className="flex gap-1">
               <img src={locationIcon} alt="icon" />
-              <span className="text-sm text-gray-400">Washington D.C</span>
+              <span className="text-sm text-gray-400">{merchant.address}</span>
             </div>
           </div>
         </div>

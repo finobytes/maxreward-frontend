@@ -1,65 +1,95 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import SearchInput from "../../../components/form/form-elements/SearchInput";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
-import { Eye } from "lucide-react";
-import DropdownSelect from "../../../components/ui/dropdown/DropdownSelect";
+import { Eye, Plus } from "lucide-react";
 import StatusBadge from "../../../components/table/StatusBadge";
-import { Link } from "react-router";
 import Pagination from "../../../components/table/Pagination";
-import { kebabMenu } from "../../../assets/assets";
-import { Dropdown } from "../../../components/ui/dropdown/Dropdown";
-import { DropdownItem } from "../../../components/ui/dropdown/DropdownItem";
 import BulkActionBar from "./components/BulkActionBar";
 
-const dummyMerchants = Array.from({ length: 35 }).map((_, i) => ({
-  id: i + 1,
-  applicationId: `MAX-${1000 + i}`,
-  merchantId: `MAX-${4325000 + i}`,
-  merchantName: `Merchant ${i + 1}`,
-  phone: `+60 12-345 ${6780 + i}`,
-  email: `merchant${i + 1}@mail.com`,
-  businessName: `Business ${i + 1}`,
-  businessType: i % 2 === 0 ? "Retail" : "Service",
-  submittedDocs: i % 3 === 0 ? "Submitted" : "Pending",
-  applicationDate: `Oct ${Math.floor(Math.random() * 28) + 1}, 2024`,
-  status: ["Active", "Blocked", "Suspended"][Math.floor(Math.random() * 3)],
-  created: `Oct ${Math.floor(Math.random() * 28) + 1}, 2024`,
-}));
+import {
+  useGetMerchantsQuery,
+  useUpdateMerchantMutation,
+} from "../../../redux/features/admin/merchantManagement/merchantManagementApi";
+import { useDispatch } from "react-redux";
+import {
+  setStatus,
+  setPage,
+  setPerPage,
+} from "../../../redux/features/admin/merchantManagement/merchantManagementSlice";
+import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const PendingMerchant = () => {
+  const dispatch = useDispatch();
+
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
-  const [selected, setSelected] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [openDropdownId, setOpenDropdownId] = useState(null);
+  const perPage = 10;
+  const [selected, setSelected] = useState([]);
 
-  const [members, setMembers] = useState(dummyMerchants);
+  // ✅ Mount এ global filters ঠিক করে দাও
+  useEffect(() => {
+    dispatch(setStatus("pending"));
+    dispatch(setPage(1));
+    dispatch(setPerPage(perPage));
 
-  const rowsPerPage = 10;
+    return () => {
+      dispatch(setStatus(""));
+      dispatch(setPage(1));
+    };
+  }, [dispatch]);
 
-  const filteredData = useMemo(() => {
-    return members.filter((m) => {
-      const matchesSearch =
-        m.merchantName.toLowerCase().includes(search.toLowerCase()) ||
-        m.merchantId.toLowerCase().includes(search.toLowerCase()) ||
-        m.phone.toLowerCase().includes(search.toLowerCase()) ||
-        m.email.toLowerCase().includes(search.toLowerCase());
-      const matchesStatus =
-        statusFilter === "All" ? true : m.status === statusFilter;
-      return matchesSearch && matchesStatus;
+  // ✅ RTK Query Fetch
+  const { data, isLoading, isFetching, isError, refetch } =
+    useGetMerchantsQuery({
+      page: currentPage,
+      per_page: perPage,
+      status: "pending",
+      search,
     });
-  }, [search, statusFilter, members]);
 
-  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * rowsPerPage,
-    currentPage * rowsPerPage
-  );
+  const merchants = data?.merchants || [];
+  const pagination = data?.pagination || {};
+
+  // ✅ Update Mutation
+  const [updateMerchant, { isLoading: isUpdating }] =
+    useUpdateMerchantMutation();
+
+  const handleApprove = async (id) => {
+    try {
+      await updateMerchant({ id, status: "active" }).unwrap();
+      toast.success("Merchant approved successfully ");
+      refetch();
+    } catch (error) {
+      console.error("Approve failed:", error);
+      toast.error("Failed to approve merchant ");
+    }
+  };
+
+  const handleReject = async (id) => {
+    try {
+      await updateMerchant({ id, status: "rejected" }).unwrap();
+      toast.success("Merchant rejected successfully");
+      refetch();
+    } catch (error) {
+      console.error("Reject failed:", error);
+      toast.error("Failed to reject merchant");
+    }
+  };
+
+  // ✅ Search Debounce Effect
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      refetch();
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [search, currentPage]);
 
   const toggleSelectAll = (checked) => {
     if (checked) {
-      setSelected(paginatedData.map((m) => m.id));
+      setSelected(merchants.map((m) => m.id));
     } else {
       setSelected([]);
     }
@@ -71,176 +101,190 @@ const PendingMerchant = () => {
     );
   };
 
-  // Bulk Actions
   const bulkUpdateStatus = (newStatus) => {
-    setMembers((prev) =>
-      prev.map((m) =>
-        selected.includes(m.id) ? { ...m, status: newStatus } : m
-      )
-    );
-    setSelected([]);
+    toast(`Bulk update to ${newStatus} (not implemented yet)`, { icon: "ℹ️" });
   };
 
   const bulkDelete = () => {
-    setMembers((prev) => prev.filter((m) => !selected.includes(m.id)));
-    setSelected([]);
+    toast("Bulk delete (not implemented yet)", { icon: "🗑️" });
   };
 
-  function toggleDropdown(id) {
-    setOpenDropdownId(openDropdownId === id ? null : id);
-  }
+  // ✅ Render States
+  if (isError)
+    return (
+      <p className="text-center text-red-500 mt-10">
+        Failed to load merchants. Please try again.
+      </p>
+    );
 
-  function closeDropdown() {
-    setOpenDropdownId(null);
-  }
   return (
     <div>
       <PageBreadcrumb
-        items={[{ label: "Home", to: "/" }, { label: "Pending Merchant" }]}
+        items={[
+          { label: "Home", to: "/" },
+          { label: "Merchant Management", to: "/admin/merchant" },
+          { label: "Pending Merchant" },
+        ]}
       />
-      <div>
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white p-4">
-          <div className="max-w-full overflow-x-auto">
-            {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <h3 className="text-lg font-semibold text-gray-800">
-                All Merchant Pending List
-              </h3>
 
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
-                {/* Search */}
-                <SearchInput
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search here..."
-                />
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white p-4">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <h3 className="text-lg font-semibold text-gray-800">
+            Pending Merchant List
+          </h3>
 
-                <div className="flex justify-between items-center gap-4 md:px-2">
-                  {/* Sort Dropdown */}
-                  <DropdownSelect
-                    value={statusFilter}
-                    onChange={setStatusFilter}
-                    options={[
-                      { label: "Short By", value: "All" },
-                      { label: "Active", value: "Active" },
-                      { label: "Blocked", value: "Blocked" },
-                      { label: "Suspended", value: "Suspended" },
-                    ]}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
+            <SearchInput
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by name, email, phone..."
+            />
+
+            <PrimaryButton
+              variant="primary"
+              size="md"
+              to="/admin/merchant/merchant-registration"
+            >
+              <Plus size={18} />
+              Add New Merchant
+            </PrimaryButton>
+
+            <PrimaryButton
+              variant="secondary"
+              size="md"
+              onClick={() => {
+                setSearch("");
+                refetch();
+              }}
+            >
+              Clear
+            </PrimaryButton>
+          </div>
+        </div>
+
+        {/* Bulk Actions */}
+        {selected.length > 0 && (
+          <BulkActionBar
+            selectedCount={selected.length}
+            onSetActive={() => bulkUpdateStatus("Active")}
+            onSetBlocked={() => bulkUpdateStatus("Blocked")}
+            onSetSuspended={() => bulkUpdateStatus("Suspended")}
+            onDelete={bulkDelete}
+          />
+        )}
+
+        {/* Table */}
+        <div className="mt-4 relative overflow-x-auto">
+          <table className="w-full min-w-[1000px] text-sm text-center text-gray-500">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+              <tr>
+                <th className="p-4">
+                  <input
+                    type="checkbox"
+                    checked={
+                      merchants.length > 0 &&
+                      selected.length === merchants.length
+                    }
+                    onChange={(e) => toggleSelectAll(e.target.checked)}
+                    className="w-4 h-4 rounded"
                   />
-                  <PrimaryButton variant="secondary" size="md">
-                    Clear
-                  </PrimaryButton>
-                </div>
-              </div>
-            </div>
+                </th>
+                <th className="py-3">Merchant ID</th>
+                <th className="py-3">Business Name</th>
+                <th className="py-3">Business Type</th>
+                <th className="py-3">Owner Name</th>
+                <th className="py-3">Phone</th>
+                <th className="py-3">Email</th>
+                <th className="py-3">Status</th>
+                <th className="py-3">Created At</th>
+                <th className="py-3">Action</th>
+              </tr>
+            </thead>
 
-            {/* Bulk Actions Bar */}
-            {selected.length > 0 && (
-              <BulkActionBar
-                selectedCount={selected.length}
-                onSetActive={() => bulkUpdateStatus("Active")}
-                onSetBlocked={() => bulkUpdateStatus("Blocked")}
-                onSetSuspended={() => bulkUpdateStatus("Suspended")}
-                onDelete={bulkDelete}
-              />
-            )}
-
-            {/* Table */}
-            <div className="mt-4 relative overflow-x-auto">
-              <table className="w-full min-w-[1000px] text-sm text-center text-gray-500">
-                <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-                  <tr>
-                    <th className="p-4">
+            <tbody>
+              {isLoading || isFetching || isUpdating ? (
+                Array.from({ length: 10 }).map((_, i) => (
+                  <tr key={i} className="border-b">
+                    {Array.from({ length: 10 }).map((_, j) => (
+                      <td key={j} className="py-3">
+                        <Skeleton className="h-4 w-full mx-auto" />
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              ) : merchants.length === 0 ? (
+                <tr>
+                  <td colSpan={10} className="py-6 text-gray-500">
+                    No pending merchants found
+                  </td>
+                </tr>
+              ) : (
+                merchants.map((merchant) => (
+                  <tr
+                    key={merchant.id}
+                    className="bg-white border-b hover:bg-gray-50 transition"
+                  >
+                    <td className="p-4">
                       <input
                         type="checkbox"
-                        checked={
-                          paginatedData.length > 0 &&
-                          selected.length === paginatedData.length
-                        }
-                        onChange={(e) => toggleSelectAll(e.target.checked)}
+                        checked={selected.includes(merchant.id)}
+                        onChange={() => toggleSelect(merchant.id)}
                         className="w-4 h-4 rounded"
                       />
-                    </th>
-                    <th className="py-3">Application ID</th>
-                    <th className="py-3">Merchant ID</th>
-                    <th className="py-3">Merchant Name</th>
-                    <th className="py-3">Phone Number</th>
-                    <th className="py-3">Email Address</th>
-                    <th className="py-3">Business Name</th>
-                    <th className="py-3">Business Type</th>
-                    <th className="py-3">Submitted Docs</th>
-                    <th className="py-3">Application Date</th>
-                    <th className="py-3">Status</th>
-                    <th className="py-3">Date Created</th>
-                    <th className="py-3">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedData.map((merchant) => (
-                    <tr
-                      key={merchant.id}
-                      className="bg-white border-b hover:bg-gray-50 transition"
-                    >
-                      <td className="p-4">
-                        <input
-                          type="checkbox"
-                          checked={selected.includes(merchant.id)}
-                          onChange={() => toggleSelect(merchant.id)}
-                          className="w-4 h-4 rounded"
-                        />
-                      </td>
-                      <td className="py-4">{merchant.applicationId}</td>
-                      <td className="py-4">{merchant.merchantId}</td>
-                      <td className="py-4">
-                        <div>
-                          <p className="">{merchant.merchantName}</p>
-                        </div>
-                      </td>
-                      <td className="py-4">{merchant.phone}</td>
-                      <td className="py-4">{merchant.email}</td>
-                      <td className="py-4">{merchant.businessName}</td>
-                      <td className="py-4">{merchant.businessType}</td>
-                      <td className="py-4">{merchant.submittedDocs}</td>
-                      <td className="py-4">{merchant.applicationDate}</td>
-                      <td className="py-4">
-                        <StatusBadge status={merchant.status} />
-                      </td>
-                      <td className="py-4">{merchant.created}</td>
-                      <td className="py-4 flex gap-2">
-                        <div className="relative inline-block">
-                          <button
-                            className="dropdown-toggle cursor-pointer"
-                            onClick={() => toggleDropdown(merchant.id)}
-                          >
-                            <img src={kebabMenu} alt="View Options" />
-                          </button>
+                    </td>
+                    <td className="py-4 font-medium text-gray-700">
+                      {merchant.unique_number}
+                    </td>
+                    <td className="py-4">{merchant.business_name}</td>
+                    <td className="py-4">{merchant.business_type}</td>
+                    <td className="py-4">{merchant.owner_name}</td>
+                    <td className="py-4">{merchant.phone}</td>
+                    <td className="py-4">{merchant.email}</td>
+                    <td className="py-4">
+                      <StatusBadge status={merchant.status} />
+                    </td>
+                    <td className="py-4">
+                      {new Date(merchant.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="py-4 flex gap-2 justify-center">
+                      <Link
+                        to={`/admin/merchant/${merchant.id}`}
+                        className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500"
+                      >
+                        <Eye size={16} />
+                      </Link>
 
-                          <Dropdown
-                            isOpen={openDropdownId === merchant.id}
-                            onClose={closeDropdown}
-                            className="w-40 p-2"
-                          >
-                            <DropdownItem onItemClick={closeDropdown}>
-                              Approve
-                            </DropdownItem>
-                            <DropdownItem onItemClick={closeDropdown}>
-                              Reject
-                            </DropdownItem>
-                          </Dropdown>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            {/* Pagination */}
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
-          </div>
+                      <button
+                        onClick={() => handleApprove(merchant.id)}
+                        disabled={isUpdating}
+                        className="p-2 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-500 disabled:opacity-50"
+                      >
+                        Approve
+                      </button>
+
+                      <button
+                        onClick={() => handleReject(merchant.id)}
+                        disabled={isUpdating}
+                        className="p-2 rounded-md bg-red-100 hover:bg-red-200 text-red-500 disabled:opacity-50"
+                      >
+                        Reject
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        <div className="mt-4">
+          <Pagination
+            currentPage={pagination.currentPage || 1}
+            totalPages={pagination.lastPage || 1}
+            onPageChange={(page) => setCurrentPage(page)}
+          />
         </div>
       </div>
     </div>

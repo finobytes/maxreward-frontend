@@ -4,17 +4,34 @@ import { userImage } from "../../assets/assets";
 import { LogOut, Settings, UserCircle } from "lucide-react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { useDispatch } from "react-redux";
-import { logout } from "../../redux/features/auth/authSlice";
+import { logout as logoutAction } from "../../redux/features/auth/authSlice";
+import { useLogoutMutation } from "../../redux/features/auth/authApi";
+import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner.jsx";
 
 export default function UserDropdown({ user }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [logoutApi, { isLoading }] = useLogoutMutation();
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      // call backend logout endpoint
+      const res = await logoutApi(user?.role).unwrap();
+
+      // clear local Redux state & localStorage
+      dispatch(logoutAction());
+      toast.success(res?.message || "Logged out successfully ");
+      // redirect to login
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      toast.error("Logout failed ");
+      dispatch(logoutAction());
+      navigate("/login");
+    }
   };
 
   function toggleDropdown() {
@@ -84,8 +101,8 @@ export default function UserDropdown({ user }) {
           onClick={handleLogout}
           className="flex items-center gap-3 px-3 py-2 mt-3 text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 "
         >
-          <LogOut className="w-4.5 h-4.5" />
-          Logout
+          {isLoading ? <Spinner /> : <LogOut className="w-4.5 h-4.5" />}
+          {isLoading ? "Logging out..." : "Logout"}
         </Link>
       </Dropdown>
     </div>
