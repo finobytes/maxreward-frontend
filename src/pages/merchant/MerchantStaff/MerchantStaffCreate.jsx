@@ -10,10 +10,12 @@ import { merchantStaffSchema } from "../../../schemas/merchantStaffSchema";
 import { useCreateStaffMutation } from "../../../redux/features/merchant/merchantStaff/merchantStaffApi";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router";
 
 const MerchantStaffCreate = () => {
   const [createStaff, { isLoading }] = useCreateStaffMutation();
   const { user } = useSelector((state) => state.auth); //  current merchant
+  const navigate = useNavigate();
 
   const {
     register,
@@ -51,6 +53,7 @@ const MerchantStaffCreate = () => {
       console.log(" API Response:", response);
 
       reset(); // clear form
+      navigate("/merchant/merchant-staff"); // redirect after success
     } catch (err) {
       console.error(" Create Failed:", err);
       toast.error(err?.data?.message || "Failed to create staff");

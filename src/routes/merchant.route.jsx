@@ -10,6 +10,7 @@ import RedeemMallTransactions from "../pages/merchant/Reports/RedeemMallTransact
 import Profile from "../pages/merchant/Profile/Profile";
 import MerchantStaff from "../pages/merchant/MerchantStaff/MerchantStaff";
 import MerchantStaffCreate from "../pages/merchant/MerchantStaff/MerchantStaffCreate";
+import MerchantStaffDetails from "../pages/merchant/MerchantStaff/MerchantStaffDetails";
 
 export const merchantRoute = [
   {
@@ -27,6 +28,10 @@ export const merchantRoute = [
   {
     path: "merchant-staff/create",
     element: <MerchantStaffCreate />,
+  },
+  {
+    path: "merchant-staff/:id",
+    element: <MerchantStaffDetails />,
   },
   {
     path: "transactions/pending-approval",
