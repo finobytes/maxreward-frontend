@@ -63,12 +63,30 @@ const MerchantStaffUpdate = () => {
       toast.error(err?.data?.message || "Failed to update staff");
     }
   };
-
-  if (isFetching) {
+  if (isFetching)
     return (
-      <div className="p-6 text-center text-gray-600">Loading staff data...</div>
+      <div className="p-6 space-y-4">
+        {/* Skeleton for breadcrumb */}
+        <div className="h-6 w-1/4 bg-gray-200 rounded animate-pulse"></div>
+
+        {/* Skeleton for cards */}
+        <div className="space-y-4">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="p-4 bg-white rounded shadow">
+              <div className="h-6 w-1/3 bg-gray-200 rounded animate-pulse mb-4"></div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[...Array(6)].map((_, j) => (
+                  <div
+                    key={j}
+                    className="h-10 bg-gray-200 rounded animate-pulse"
+                  ></div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     );
-  }
 
   return (
     <div>
