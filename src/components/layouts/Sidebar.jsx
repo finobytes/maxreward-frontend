@@ -28,24 +28,6 @@ import { logout } from "../../redux/features/auth/authSlice";
 const othersItems = [];
 
 const Sidebar = () => {
-  const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
-  const location = useLocation();
-
-  const [openSubmenu, setOpenSubmenu] = useState(null);
-  const [subMenuHeight, setSubMenuHeight] = useState({});
-  const subMenuRefs = useRef({});
-
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate("/login");
-  };
-
-  const { user } = useSelector((state) => state.auth);
-  const role = user?.role;
-
   const NAV_CONFIG = {
     admin: [
       { icon: <LayoutDashboard />, name: "Dashboard", path: "/admin" },
@@ -198,6 +180,24 @@ const Sidebar = () => {
       { name: "Logout", icon: <LogOut />, path: "/login" },
     ],
   };
+  const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+  const location = useLocation();
+
+  const [openSubmenu, setOpenSubmenu] = useState(null);
+  const [subMenuHeight, setSubMenuHeight] = useState({});
+  const subMenuRefs = useRef({});
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/login");
+  };
+
+  const { user } = useSelector((state) => state.auth);
+  const role = user?.role;
+
   const items = useMemo(() => NAV_CONFIG[role]);
   const isActive = useCallback(
     (path) => location.pathname === path,

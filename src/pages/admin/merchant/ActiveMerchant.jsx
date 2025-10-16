@@ -143,7 +143,7 @@ const ActiveMerchant = () => {
 
           {/* Table */}
           <div className="mt-4 relative overflow-x-auto">
-            <table className="w-full min-w-[1100px] text-sm text-center text-gray-600">
+            <table className="w-full text-sm text-center text-gray-600">
               <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                 <tr>
                   <th className="p-4">

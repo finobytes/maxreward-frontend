@@ -20,7 +20,7 @@ const LayoutContent = () => {
         } ${isMobileOpen ? "ml-0" : ""}`}
       >
         <Header />
-        <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-4">
+        <div className="p-4 mx-auto max-w-[1800px] md:p-4 overflow-x-auto">
           <Outlet />
         </div>
       </div>
