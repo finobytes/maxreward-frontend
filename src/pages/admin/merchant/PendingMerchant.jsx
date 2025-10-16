@@ -248,13 +248,6 @@ const PendingMerchant = () => {
                       {new Date(merchant.created_at).toLocaleDateString()}
                     </td>
                     <td className="py-4 flex gap-2 justify-center">
-                      <Link
-                        to={`/admin/merchant/${merchant.id}`}
-                        className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500"
-                      >
-                        <Eye size={16} />
-                      </Link>
-
                       <button
                         onClick={() => handleApprove(merchant.id)}
                         disabled={isUpdating}
