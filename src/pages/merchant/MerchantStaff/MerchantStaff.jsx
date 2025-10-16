@@ -17,31 +17,9 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMerchantStaff } from "../../../redux/features/merchant/merchantStaff/useMerchantStaff";
-
-// Skeleton Loader Component
-const TableSkeleton = ({ rows = 10, cols = 6 }) => (
-  <>
-    {[...Array(rows)].map((_, i) => (
-      <TableRow key={i}>
-        <TableCell>
-          <Skeleton className="w-4 h-4 rounded" />
-        </TableCell>
-        {[...Array(cols)].map((_, j) => (
-          <TableCell key={j}>
-            <Skeleton className="h-4 w-24" />
-          </TableCell>
-        ))}
-        <TableCell>
-          <div className="flex justify-center gap-2">
-            <Skeleton className="w-8 h-8 rounded-md" />
-            <Skeleton className="w-8 h-8 rounded-md" />
-            <Skeleton className="w-8 h-8 rounded-md" />
-          </div>
-        </TableCell>
-      </TableRow>
-    ))}
-  </>
-);
+import { useDeleteStaffMutation } from "../../../redux/features/merchant/merchantStaff/merchantStaffApi";
+import { toast } from "sonner";
+import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSkeleton";
 
 const MerchantStaff = () => {
   const {
@@ -51,8 +29,9 @@ const MerchantStaff = () => {
     actions: { setDebouncedSearch, setStatus, resetFilters, setCurrentPage },
     filters: { search, status },
   } = useMerchantStaff();
-
+  const [deleteStaff, { isLoading: isDeleting }] = useDeleteStaffMutation();
   const [selected, setSelected] = useState([]);
+  const [deletingId, setDeletingId] = useState(null);
 
   const toggleSelect = (id) => {
     setSelected((prev) =>
@@ -68,8 +47,16 @@ const MerchantStaff = () => {
     }
   };
 
-  const handleDelete = (id) => {
-    // Implement delete functionality here
+  const handleDelete = async (id) => {
+    setDeletingId(id);
+    try {
+      await deleteStaff(id).unwrap();
+      toast.success("Staff deleted successfully!");
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to delete staff");
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   return (
@@ -154,7 +141,7 @@ const MerchantStaff = () => {
 
             <TableBody>
               {isLoading ? (
-                <TableSkeleton rows={8} cols={5} />
+                <MerchantStaffSkeleton rows={8} cols={5} />
               ) : staffs.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-6">
@@ -165,7 +152,11 @@ const MerchantStaff = () => {
                 staffs.map((staff) => (
                   <TableRow
                     key={staff.id}
-                    className="hover:bg-gray-50 transition"
+                    className={`transition ${
+                      deletingId === staff.id
+                        ? "opacity-50 pointer-events-none"
+                        : "hover:bg-gray-50"
+                    }`}
                   >
                     <TableCell>
                       <input
@@ -197,11 +188,17 @@ const MerchantStaff = () => {
                         >
                           <PencilLine size={16} />
                         </Link>
+
                         <button
                           onClick={() => handleDelete(staff.id)}
-                          className="p-2 rounded-md bg-red-100 hover:bg-red-200 text-red-500"
+                          disabled={deletingId === staff.id}
+                          className="p-2 rounded-md bg-red-100 hover:bg-red-200 text-red-500 flex items-center gap-1"
                         >
-                          <Trash2Icon size={16} />
+                          {deletingId === staff.id ? (
+                            <div className="h-4 w-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <Trash2Icon size={16} />
+                          )}
                         </button>
                       </div>
                     </TableCell>
