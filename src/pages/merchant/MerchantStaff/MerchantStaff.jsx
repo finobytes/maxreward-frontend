@@ -15,7 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useMerchantStaff } from "../../../redux/features/merchant/merchantStaff/useMerchantStaff";
 import { useDeleteStaffMutation } from "../../../redux/features/merchant/merchantStaff/merchantStaffApi";
 import { toast } from "sonner";
