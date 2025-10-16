@@ -1,12 +1,12 @@
 import { z } from "zod";
 
 export const merchantStaffSchema = z.object({
-  fullName: z
+  name: z
     .string()
     .min(3, { message: "Full name must be at least 3 characters long" })
     .max(100, { message: "Full name must be less than 100 characters" }),
 
-  phoneNumber: z
+  phone: z
     .string()
     .regex(/^(\+?\d{10,15})$/, { message: "Enter a valid phone number" }),
 
@@ -21,7 +21,7 @@ export const merchantStaffSchema = z.object({
     .min(6, { message: "Password must be at least 6 characters long" })
     .max(50, { message: "Password too long" }),
 
-  gender: z.enum(["male", "female", "others"], {
+  gender_type: z.enum(["male", "female", "others"], {
     errorMap: () => ({ message: "Please select a gender" }),
   }),
 

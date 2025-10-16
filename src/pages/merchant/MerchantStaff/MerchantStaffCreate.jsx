@@ -1,35 +1,60 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import ComponentCard from "../../../components/common/ComponentCard";
 import Label from "../../../components/form/Label";
 import Input from "../../../components/form/input/InputField";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
-
 import Select from "@/components/form/Select";
 import { merchantStaffSchema } from "../../../schemas/merchantStaffSchema";
+import { useCreateStaffMutation } from "../../../redux/features/merchant/merchantStaff/merchantStaffApi";
+import { toast } from "sonner";
+import { useSelector } from "react-redux";
 
 const MerchantStaffCreate = () => {
-  // setup react-hook-form with zod
+  const [createStaff, { isLoading }] = useCreateStaffMutation();
+  const { user } = useSelector((state) => state.auth); //  current merchant
+
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm({
     resolver: zodResolver(merchantStaffSchema),
     defaultValues: {
-      fullName: "",
-      phoneNumber: "",
+      name: "",
+      phone: "",
       email: "",
       password: "",
-      gender: "male",
+      gender_type: "male",
       status: "active",
     },
   });
 
-  const onSubmit = (data) => {
-    console.log("Form Data:", data);
+  const onSubmit = async (formData) => {
+    try {
+      const payload = {
+        merchant_id: user?.merchant_id || 2, // Dynamic or fallback
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        password: formData.password,
+        gender_type: formData.gender_type,
+        status: formData.status,
+      };
+
+      console.log(" Payload:", payload); // debug
+
+      const response = await createStaff(payload).unwrap();
+      toast.success(" Staff created successfully!");
+      console.log(" API Response:", response);
+
+      reset(); // clear form
+    } catch (err) {
+      console.error(" Create Failed:", err);
+      toast.error(err?.data?.message || "Failed to create staff");
+    }
   };
 
   return (
@@ -37,39 +62,37 @@ const MerchantStaffCreate = () => {
       <PageBreadcrumb
         items={[
           { label: "Home", to: "/" },
-          { label: "Refer New Member", to: "/member/referred-member" },
-          { label: "Refer New Member" },
+          { label: "Merchant Staff", to: "/merchant/merchant-staff" },
+          { label: "Create New Staff" },
         ]}
       />
+
       <form onSubmit={handleSubmit(onSubmit)}>
-        <ComponentCard title="Member Information">
-          <div className=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-3 lg:gap-4">
+        <ComponentCard title="Staff Information">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Full Name */}
             <div>
-              <Label htmlFor="fullName">Full Name</Label>
+              <Label htmlFor="name">Full Name</Label>
               <Input
                 type="text"
-                id="fullName"
-                placeholder="Enter member full name"
-                {...register("fullName")}
-                error={!!errors.fullName}
-                hint={errors.fullName?.message}
+                id="name"
+                placeholder="Enter staff full name"
+                {...register("name")}
+                error={!!errors.name}
+                hint={errors.name?.message}
               />
             </div>
 
-            {/* Phone Number */}
+            {/* Phone */}
             <div>
-              <Label htmlFor="phoneNumber">
-                Phone Number
-                {/*  (<span className="text-red-500">*</span>) */}
-              </Label>
+              <Label htmlFor="phone">Phone Number</Label>
               <Input
                 type="text"
-                id="phoneNumber"
-                placeholder="Enter Phone Number"
-                {...register("phoneNumber")}
-                error={!!errors.phoneNumber}
-                hint={errors.phoneNumber?.message}
+                id="phone"
+                placeholder="Enter phone number"
+                {...register("phone")}
+                error={!!errors.phone}
+                hint={errors.phone?.message}
               />
             </div>
 
@@ -79,27 +102,31 @@ const MerchantStaffCreate = () => {
               <Input
                 type="email"
                 id="email"
-                placeholder="Enter Email Address"
+                placeholder="Enter email"
                 {...register("email")}
                 error={!!errors.email}
                 hint={errors.email?.message}
               />
             </div>
+
+            {/* Password */}
             <div>
               <Label htmlFor="password">Password</Label>
               <Input
                 type="text"
                 id="password"
-                placeholder="Enter Password"
+                placeholder="Enter password"
                 {...register("password")}
                 error={!!errors.password}
                 hint={errors.password?.message}
               />
             </div>
+
+            {/* Gender */}
             <div>
               <Label>Gender</Label>
               <Select
-                {...register("gender")}
+                {...register("gender_type")}
                 options={[
                   { value: "male", label: "Male" },
                   { value: "female", label: "Female" },
@@ -107,6 +134,8 @@ const MerchantStaffCreate = () => {
                 ]}
               />
             </div>
+
+            {/* Status */}
             <div>
               <Label>Status</Label>
               <Select
@@ -120,7 +149,9 @@ const MerchantStaffCreate = () => {
           </div>
 
           <div className="mt-8 flex gap-4">
-            <PrimaryButton type="submit">Submit</PrimaryButton>
+            <PrimaryButton type="submit" disabled={isLoading}>
+              {isLoading ? "Creating..." : "Submit"}
+            </PrimaryButton>
             <PrimaryButton variant="secondary" type="button">
               Back
             </PrimaryButton>
