@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { merchantEditSchema } from "@/schemas/merchantEditSchema"; // ✅ নতুন schema import
+import { merchantEditSchema } from "@/schemas/merchantEditSchema";
 import {
   useGetMerchantByIdQuery,
   useUpdateMerchantMutation,
@@ -37,7 +37,7 @@ const MerchantEdit = () => {
     reset,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(merchantEditSchema), // ✅ নতুন schema ব্যবহার
+    resolver: zodResolver(merchantEditSchema),
   });
 
   // Populate existing merchant data into form
@@ -52,7 +52,6 @@ const MerchantEdit = () => {
       const payload = { ...data };
       delete payload.confirm_password;
 
-      // যদি password খালি থাকে, তাহলে payload থেকে remove করো
       if (!payload.merchant_password) {
         delete payload.merchant_password;
       }
