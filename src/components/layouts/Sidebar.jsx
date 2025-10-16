@@ -95,6 +95,11 @@ const Sidebar = () => {
         path: "/merchant/member-registration",
       },
       {
+        icon: <Users />,
+        name: "Merchant Staff",
+        path: "/merchant/merchant-staff",
+      },
+      {
         icon: <ChartArea />,
         name: "Transactions",
         subItems: [
