@@ -5,7 +5,7 @@ import DropdownSelect from "../../../components/ui/dropdown/DropdownSelect";
 import StatusBadge from "../../../components/table/StatusBadge";
 import Pagination from "../../../components/table/Pagination";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
-import { Eye, Plus } from "lucide-react";
+import { Eye, PencilLine, Plus, Trash2Icon } from "lucide-react";
 import { Link } from "react-router";
 import {
   Table,
@@ -66,6 +66,10 @@ const MerchantStaff = () => {
     } else {
       setSelected([]);
     }
+  };
+
+  const handleDelete = (id) => {
+    // Implement delete functionality here
   };
 
   return (
@@ -186,11 +190,18 @@ const MerchantStaff = () => {
                         >
                           <Eye size={20} />
                         </Link>
-                        <button className="p-2 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-500">
-                          Re-send
-                        </button>
-                        <button className="p-2 rounded-md bg-red-100 hover:bg-red-200 text-red-500">
-                          Cancel
+
+                        <Link
+                          to={`/merchant/merchant-staff/update/${staff.id}`}
+                          className="p-2 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-500"
+                        >
+                          <PencilLine size={16} />
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(staff.id)}
+                          className="p-2 rounded-md bg-red-100 hover:bg-red-200 text-red-500"
+                        >
+                          <Trash2Icon size={16} />
                         </button>
                       </div>
                     </TableCell>

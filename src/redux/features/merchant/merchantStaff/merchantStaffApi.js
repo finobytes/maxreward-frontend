@@ -2,7 +2,7 @@ import { baseApi } from "../../../api/baseApi";
 
 export const merchantStaffApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    // ✅ GET — All Staffs (no query params)
+    // GET — All Staffs (no query params)
     getAllStaffs: builder.query({
       query: () => `/staffs`,
       transformResponse: (response) => {
@@ -26,13 +26,13 @@ export const merchantStaffApi = baseApi.injectEndpoints({
           : [{ type: "Staff", id: "LIST" }],
     }),
 
-    // ✅ GET — Single staff
+    // GET — Single staff
     getStaffById: builder.query({
       query: (id) => `/staffs/${id}`,
       providesTags: (result, error, id) => [{ type: "Staff", id }],
     }),
 
-    // ✅ GET — All staffs under a merchant
+    // GET — All staffs under a merchant
     getStaffsByMerchantId: builder.query({
       query: (merchantId) => `/staffs/merchant/${merchantId}`,
       transformResponse: (response) => response?.data?.data ?? [],
@@ -41,7 +41,7 @@ export const merchantStaffApi = baseApi.injectEndpoints({
       ],
     }),
 
-    // ✅ POST — Create staff
+    // POST — Create staff
     createStaff: builder.mutation({
       query: (staffData) => ({
         url: `/staffs`,
@@ -51,7 +51,7 @@ export const merchantStaffApi = baseApi.injectEndpoints({
       invalidatesTags: [{ type: "Staff", id: "LIST" }],
     }),
 
-    // ✅ PATCH — Update staff
+    // PATCH — Update staff
     updateStaff: builder.mutation({
       query: ({ id, ...updatedData }) => ({
         url: `/staffs/${id}`,
@@ -64,7 +64,7 @@ export const merchantStaffApi = baseApi.injectEndpoints({
       ],
     }),
 
-    // ✅ DELETE — Delete staff
+    // DELETE — Delete staff
     deleteStaff: builder.mutation({
       query: (id) => ({
         url: `/staffs/${id}`,

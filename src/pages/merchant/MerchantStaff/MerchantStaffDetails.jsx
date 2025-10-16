@@ -1,10 +1,9 @@
 import React from "react";
-import { useParams, Link } from "react-router";
+import { useParams } from "react-router";
 import { useGetStaffByIdQuery } from "../../../redux/features/merchant/merchantStaff/merchantStaffApi";
 import { Skeleton } from "@/components/ui/skeleton";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import StatusBadge from "../../../components/table/StatusBadge";
-import { ArrowLeft } from "lucide-react";
 import { profileCover, userProfile } from "../../../assets/assets";
 
 const MerchantStaffDetails = () => {
@@ -26,20 +25,9 @@ const MerchantStaffDetails = () => {
         items={[
           { label: "Home", to: "/" },
           { label: "Merchant Staff", to: "/merchant/merchant-staff" },
-          { label: "Details" },
+          { label: "Staff Details" },
         ]}
       />
-
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <h3 className="text-xl font-bold text-gray-800">Staff Details</h3>
-        <Link
-          to="/merchant/merchant-staff"
-          className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800 transition"
-        >
-          <ArrowLeft size={16} /> Back to list
-        </Link>
-      </div>
 
       {/* Card */}
       <div className="max-w-[600px] h-auto rounded-xl border border-gray-200 bg-white shadow-md overflow-hidden">
