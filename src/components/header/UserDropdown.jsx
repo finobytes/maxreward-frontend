@@ -9,9 +9,10 @@ import { useLogoutMutation } from "../../redux/features/auth/authApi";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner.jsx";
 
-export default function UserDropdown({ user }) {
+export default function UserDropdown({ user, role }) {
   const [isOpen, setIsOpen] = useState(false);
   const [logoutApi, { isLoading }] = useLogoutMutation();
+  console.log("UserDropdown user:", user);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ export default function UserDropdown({ user }) {
   const handleLogout = async () => {
     try {
       // call backend logout endpoint
-      const res = await logoutApi(user?.role).unwrap();
+      const res = await logoutApi(role).unwrap();
 
       // clear local Redux state & localStorage
       dispatch(logoutAction());

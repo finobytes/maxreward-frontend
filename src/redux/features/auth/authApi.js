@@ -33,8 +33,13 @@ export const authApi = baseApi.injectEndpoints({
         let url = "/member/me";
         if (role === "admin") url = "/admin/me";
         else if (role === "merchant") url = "/merchant/me";
-        return { url };
+
+        return {
+          url,
+          method: "POST",
+        };
       },
+      providesTags: ["Member", "Merchant", "Admin"],
     }),
 
     refreshToken: builder.mutation({
