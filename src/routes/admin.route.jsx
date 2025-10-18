@@ -16,6 +16,9 @@ import MemberDetails from "../pages/admin/memberMange/MemberDetails";
 import MerchantRegistrationForm from "../pages/admin/merchant/MerchantRegistrationForm";
 import MerchantDetails from "../pages/admin/merchant/MerchantDetails";
 import MerchantEdit from "../pages/admin/merchant/MerchantEdit";
+import StaffDetails from "../pages/admin/staffManage/StaffDetails";
+import StaffUpdate from "../pages/admin/staffManage/StaffUpdate";
+import CreateStaff from "../pages/admin/staffManage/CreateStaff";
 
 export const adminRoutes = [
   {
@@ -37,6 +40,18 @@ export const adminRoutes = [
   {
     path: "staff-manage",
     element: <StaffManage />,
+  },
+  {
+    path: "staff-manage/create",
+    element: <CreateStaff />,
+  },
+  {
+    path: "staff-manage/details/:id",
+    element: <StaffDetails />,
+  },
+  {
+    path: "staff-manage/update/:id",
+    element: <StaffUpdate />,
   },
   {
     path: "merchant/pending-merchant",

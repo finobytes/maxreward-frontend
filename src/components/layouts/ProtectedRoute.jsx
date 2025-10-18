@@ -1,10 +1,31 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Navigate } from "react-router";
+import { useVerifyMeQuery } from "../../redux/features/auth/authApi";
+import { useEffect } from "react";
+import { logout } from "../../redux/features/auth/authSlice";
+import { Spinner } from "@/components/ui/spinner";
+import Loader from "../shared/Loader";
 
 const ProtectedRoute = ({ children, role }) => {
+  const dispatch = useDispatch();
   const { user, isAuthenticated } = useSelector((state) => state.auth);
 
-  if (!isAuthenticated) {
+  console.log("ProtectedRoute user:", user);
+
+  // /me API hit
+  const { data, isLoading, isError, error } = useVerifyMeQuery(user?.role, {
+    skip: !isAuthenticated || !user?.role,
+  });
+
+  useEffect(() => {
+    if (isError && error?.status === 401) {
+      dispatch(logout());
+    }
+  }, [isError]);
+
+  if (isLoading) return <Loader />;
+
+  if (!isAuthenticated || !data) {
     return <Navigate to="/login" replace />;
   }
 
