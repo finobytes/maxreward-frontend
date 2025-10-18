@@ -30,7 +30,6 @@ const Header = () => {
   const role = user?.role || "member"; // admin | merchant | member
 
   const { data, isLoading, error } = useVerifyMeQuery(role, { skip: !token });
-  console.log("Header user data:", data);
 
   const userInfo = data ||
     user || {

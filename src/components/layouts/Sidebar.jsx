@@ -199,13 +199,13 @@ const Sidebar = () => {
         name: "Referred Member List",
         path: "/member/referred-member-list",
       },
-      { icon: <UserCog />, name: "Community", path: "/community" },
+      { icon: <UserCog />, name: "Community", path: "/member/community" },
       {
         icon: <FileUser />,
         name: "Merchant Application",
         path: "/member/merchant-application",
       },
-      { icon: <CircleUserRound />, name: "Profile", path: "/profile" },
+      { icon: <CircleUserRound />, name: "Profile", path: "/member/profile" },
       {
         icon: <ScrollText />,
         name: "Terms & Condition",
@@ -217,7 +217,7 @@ const Sidebar = () => {
         path: "/member/terms-and-condition",
       },
 
-      { name: "Logout", icon: <LogOut />, path: "/login" },
+      { name: "Logout", icon: <LogOut /> },
     ],
   };
   const items = useMemo(() => NAV_CONFIG[role]);
