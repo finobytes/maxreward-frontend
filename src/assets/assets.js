@@ -31,6 +31,7 @@ import user2 from "./images/user/user2.png";
 import user3 from "./images/user/user3.png";
 import user4 from "./images/user/user4.png";
 import user5 from "./images/user/user5.png";
+import qr from "./images/qr-code.png";
 
 export {
   loginBanner,
@@ -66,4 +67,5 @@ export {
   user3,
   user4,
   user5,
+  qr,
 };
