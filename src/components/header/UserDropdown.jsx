@@ -89,22 +89,28 @@ export default function UserDropdown({ user, role }) {
           </span>
         </div>
 
-        <Link className="flex items-center gap-3 px-3 py-2 mt-3 text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 ">
+        <Link
+          to={`/${role}/profile`}
+          className="flex items-center gap-3 px-3 py-2 mt-3 text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 "
+        >
           <UserCircle className="w-4.5 h-4.5" />
           Profile
         </Link>
 
-        <Link className="flex items-center gap-3 px-3 py-2 mt-3 text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 ">
+        <Link
+          to="#settings"
+          className="flex items-center gap-3 px-3 py-2 mt-3 text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 "
+        >
           <Settings className="w-4.5 h-4.5" />
           Settings
         </Link>
-        <Link
+        <button
           onClick={handleLogout}
           className="flex items-center gap-3 px-3 py-2 mt-3 text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 "
         >
           {isLoading ? <Spinner /> : <LogOut className="w-4.5 h-4.5" />}
           {isLoading ? "Logging out..." : "Logout"}
-        </Link>
+        </button>
       </Dropdown>
     </div>
   );
