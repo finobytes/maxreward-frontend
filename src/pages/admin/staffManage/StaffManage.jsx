@@ -53,7 +53,7 @@ const StaffManage = () => {
   return (
     <div className="space-y-6">
       <PageBreadcrumb
-        items={[{ label: "Home", to: "/" }, { label: "Staff & Roles" }]}
+        items={[{ label: "Home", to: "/" }, { label: "Staff" }]}
       />
 
       <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
@@ -129,7 +129,7 @@ const StaffManage = () => {
 
             <TableBody>
               {isLoading ? (
-                <MerchantStaffSkeleton rows={8} cols={10} />
+                <MerchantStaffSkeleton rows={8} cols={7} />
               ) : staffs.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={10} className="text-center py-6">
