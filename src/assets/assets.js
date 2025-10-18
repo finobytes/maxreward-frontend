@@ -35,6 +35,7 @@ import qr from "./images/qr-code.png";
 import merchant1 from "./images/merchant/mrechant1.png";
 import merchant2 from "./images/merchant/merchant2.png";
 import merchant3 from "./images/merchant/merchant3.png";
+import memberQR from "./images/qr.svg";
 
 export {
   loginBanner,
@@ -74,4 +75,5 @@ export {
   merchant1,
   merchant2,
   merchant3,
+  memberQR,
 };
