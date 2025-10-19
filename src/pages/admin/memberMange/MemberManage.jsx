@@ -192,7 +192,7 @@ const MemberManage = () => {
                         </div>
                       </div>
                     </TableCell>
-                    {[...Array(7)].map((_, j) => (
+                    {[...Array(6)].map((_, j) => (
                       <TableCell key={j}>
                         <Skeleton className="h-4 w-20" />
                       </TableCell>
@@ -220,7 +220,9 @@ const MemberManage = () => {
                     <TableCell className="p-4">
                       <input type="checkbox" className="w-4 h-4 rounded" />
                     </TableCell>
-                    <TableCell>{m?.user_name}</TableCell>
+                    <TableCell className="whitespace-normal break-words">
+                      {m?.user_name}
+                    </TableCell>
                     {/* Name + Avatar */}
                     <TableCell className="py-3">
                       {/* <div className="flex items-center gap-3"> */}

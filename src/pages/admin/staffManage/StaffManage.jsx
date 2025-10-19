@@ -163,10 +163,17 @@ const StaffManage = () => {
                       />
                     </TableCell>
                     <TableCell>{staff.id}</TableCell>
-                    <TableCell>{staff.name}</TableCell>
+
+                    {/* FIX 1: Added classes here to make the name wrap */}
+                    <TableCell className="whitespace-normal break-words">
+                      {staff.name}
+                    </TableCell>
+
                     <TableCell>{staff.phone}</TableCell>
-                    <TableCell>{staff.email}</TableCell>
-                    <TableCell>
+                    <TableCell className="whitespace-normal break-words">
+                      {staff.email}
+                    </TableCell>
+                    <TableCell className="whitespace-normal break-words">
                       {staff?.designation || (
                         <span className="text-gray-500">N/A</span>
                       )}
@@ -177,7 +184,8 @@ const StaffManage = () => {
                     <TableCell>
                       {staff?.lastLogin ? (
                         <span>
-                          {new Date(staff.lastLogin).toLocaleString()}
+                          {/* FIX 2: Changed to toLocaleDateString() */}
+                          {new Date(staff.lastLogin).toLocaleDateString()}
                         </span>
                       ) : (
                         <span className="text-gray-500">N/A</span>
@@ -186,7 +194,8 @@ const StaffManage = () => {
                     <TableCell>
                       {staff?.created_at ? (
                         <span>
-                          {new Date(staff.created_at).toLocaleString()}
+                          {/* FIX 2: Changed to toLocaleDateString() */}
+                          {new Date(staff.created_at).toLocaleDateString()}
                         </span>
                       ) : (
                         <span className="text-gray-500">N/A</span>
