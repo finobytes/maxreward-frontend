@@ -51,7 +51,11 @@ const ShopWithMerchant = () => {
               />
             </div>
             <div className="mt-8">
-              <PrimaryButton variant="primary" size="md">
+              <PrimaryButton
+                variant="primary"
+                size="md"
+                to="/member/redeem-with-merchant"
+              >
                 Redeem
               </PrimaryButton>
             </div>

@@ -11,6 +11,7 @@ import ReferNewMember from "../pages/member/referNewMember/ReferNewMember";
 import ReferNewMemberForm from "../pages/member/referNewMember/ReferNewMemberForm";
 import ReferredMemberList from "../pages/member/referredMemberList/ReferredMemberList";
 import RedeemTransactions from "../pages/member/shopWithMerchant/RedeemTransactions";
+import RedeemWithMerchant from "../pages/member/shopWithMerchant/RedeemWithMerchant";
 import ShopWithMerchant from "../pages/member/shopWithMerchant/ShopWithMerchant";
 import ShowQrCode from "../pages/member/showQrCode/ShowQrCode";
 import TermsAndConditions from "../pages/member/termsAndConditions/TermsAndConditions";
@@ -51,6 +52,10 @@ export const memberRoutes = [
   {
     path: "shop-with-merchant",
     element: <ShopWithMerchant />,
+  },
+  {
+    path: "redeem-with-merchant",
+    element: <RedeemWithMerchant />,
   },
   {
     path: "redeem-transactions",
