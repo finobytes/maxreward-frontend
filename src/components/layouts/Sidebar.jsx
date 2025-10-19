@@ -23,13 +23,17 @@ import {
 import { useSidebar } from "../../context/SidebarContext";
 import { logo, MaxReward } from "../../assets/assets";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../../redux/features/auth/authSlice";
+import { logout as logoutAction } from "../../redux/features/auth/authSlice";
+import { useLogoutMutation } from "../../redux/features/auth/authApi";
+import { toast } from "sonner";
 
 const othersItems = [];
 
 const Sidebar = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const location = useLocation();
+
+  const [logoutApi, { isLoading }] = useLogoutMutation();
 
   const [openSubmenu, setOpenSubmenu] = useState(null);
   const [subMenuHeight, setSubMenuHeight] = useState({});
@@ -38,9 +42,22 @@ const Sidebar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      // call backend logout endpoint
+      const res = await logoutApi(user?.role).unwrap();
+
+      // clear local Redux state & localStorage
+      dispatch(logoutAction());
+      toast.success(res?.message || "Logged out successfully ");
+      // redirect to login
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      toast.error("Logout failed ");
+      dispatch(logoutAction());
+      navigate("/login");
+    }
   };
 
   const { user } = useSelector((state) => state.auth);
@@ -93,6 +110,11 @@ const Sidebar = () => {
         icon: <Users />,
         name: "Member Registration",
         path: "/merchant/member-registration",
+      },
+      {
+        icon: <Users />,
+        name: "Merchant Staff",
+        path: "/merchant/merchant-staff",
       },
       {
         icon: <ChartArea />,
@@ -177,13 +199,13 @@ const Sidebar = () => {
         name: "Referred Member List",
         path: "/member/referred-member-list",
       },
-      { icon: <UserCog />, name: "Community", path: "/community" },
+      { icon: <UserCog />, name: "Community", path: "/member/community" },
       {
         icon: <FileUser />,
         name: "Merchant Application",
         path: "/member/merchant-application",
       },
-      { icon: <CircleUserRound />, name: "Profile", path: "/profile" },
+      { icon: <CircleUserRound />, name: "Profile", path: "/member/profile" },
       {
         icon: <ScrollText />,
         name: "Terms & Condition",
@@ -195,7 +217,7 @@ const Sidebar = () => {
         path: "/member/terms-and-condition",
       },
 
-      { name: "Logout", icon: <LogOut />, path: "/login" },
+      { name: "Logout", icon: <LogOut /> },
     ],
   };
   const items = useMemo(() => NAV_CONFIG[role]);
@@ -299,7 +321,9 @@ const Sidebar = () => {
                 {nav.icon}
               </span>
               {(isExpanded || isHovered || isMobileOpen) && (
-                <span className="menu-item-text">Logout</span>
+                <span className="menu-item-text">
+                  {isLoading ? "Logging out..." : "Logout"}
+                </span>
               )}
             </button>
           ) : (
@@ -381,7 +405,7 @@ const Sidebar = () => {
           !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
         }`}
       >
-        <Link to="/">
+        <Link to={`/${role}`}>
           {isExpanded || isHovered || isMobileOpen ? (
             <>
               <img

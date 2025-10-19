@@ -29,7 +29,7 @@ const PendingMerchant = () => {
   const perPage = 10;
   const [selected, setSelected] = useState([]);
 
-  // ✅ Mount এ global filters ঠিক করে দাও
+  // Mount এ global filters ঠিক করে দাও
   useEffect(() => {
     dispatch(setStatus("pending"));
     dispatch(setPage(1));
@@ -41,7 +41,7 @@ const PendingMerchant = () => {
     };
   }, [dispatch]);
 
-  // ✅ RTK Query Fetch
+  // RTK Query Fetch
   const { data, isLoading, isFetching, isError, refetch } =
     useGetMerchantsQuery({
       page: currentPage,
@@ -53,7 +53,7 @@ const PendingMerchant = () => {
   const merchants = data?.merchants || [];
   const pagination = data?.pagination || {};
 
-  // ✅ Update Mutation
+  // Update Mutation
   const [updateMerchant, { isLoading: isUpdating }] =
     useUpdateMerchantMutation();
 
@@ -79,7 +79,7 @@ const PendingMerchant = () => {
     }
   };
 
-  // ✅ Search Debounce Effect
+  // Search Debounce Effect
   useEffect(() => {
     const timeout = setTimeout(() => {
       refetch();
@@ -109,7 +109,7 @@ const PendingMerchant = () => {
     toast("Bulk delete (not implemented yet)", { icon: "🗑️" });
   };
 
-  // ✅ Render States
+  // Render States
   if (isError)
     return (
       <p className="text-center text-red-500 mt-10">
@@ -248,13 +248,6 @@ const PendingMerchant = () => {
                       {new Date(merchant.created_at).toLocaleDateString()}
                     </td>
                     <td className="py-4 flex gap-2 justify-center">
-                      <Link
-                        to={`/admin/merchant/${merchant.id}`}
-                        className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500"
-                      >
-                        <Eye size={16} />
-                      </Link>
-
                       <button
                         onClick={() => handleApprove(merchant.id)}
                         disabled={isUpdating}

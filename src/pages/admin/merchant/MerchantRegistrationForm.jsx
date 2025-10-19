@@ -161,7 +161,7 @@ const MerchantRegistrationForm = () => {
           </ComponentCard>
         </div>
 
-        {/* 👤 Owner Information */}
+        {/* Owner Information */}
         <div className="mt-6">
           <ComponentCard title="Owner Information">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

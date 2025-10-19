@@ -28,8 +28,8 @@ const MerchantDetails = () => {
       <PageBreadcrumb
         items={[
           { label: "Home", to: "/" },
-          { label: "Member Manage", to: "/admin/member-manage" },
-          { label: "Member Profile" },
+          { label: "Merchant Manage", to: "/admin/merchant-manage" },
+          { label: "Merchant Profile" },
         ]}
       />
 

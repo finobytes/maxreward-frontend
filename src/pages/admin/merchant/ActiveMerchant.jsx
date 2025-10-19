@@ -83,7 +83,7 @@ const ActiveMerchant = () => {
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <h3 className="text-lg font-semibold text-gray-800">
-              All Pending Merchants
+              All Active Merchants
             </h3>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">

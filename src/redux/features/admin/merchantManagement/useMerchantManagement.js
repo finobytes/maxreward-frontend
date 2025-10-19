@@ -17,7 +17,7 @@ export const useMerchantManagement = () => {
 
   const [debouncedSearch, setDebouncedSearch] = useState(search);
 
-  // 🕒 Debounce search for 600ms
+  // Debounce search for 600ms
   useEffect(() => {
     const handler = setTimeout(() => {
       dispatch(setSearch(debouncedSearch));

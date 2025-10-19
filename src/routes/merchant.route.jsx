@@ -8,6 +8,10 @@ import VoucherPurchase from "../pages/merchant/VoucherPurchase/VoucherPurchase";
 import VoucherPurchaseReport from "../pages/merchant/Reports/VoucherPurchase";
 import RedeemMallTransactions from "../pages/merchant/Reports/RedeemMallTransactions";
 import Profile from "../pages/merchant/Profile/Profile";
+import MerchantStaff from "../pages/merchant/MerchantStaff/MerchantStaff";
+import MerchantStaffCreate from "../pages/merchant/MerchantStaff/MerchantStaffCreate";
+import MerchantStaffDetails from "../pages/merchant/MerchantStaff/MerchantStaffDetails";
+import MerchantStaffUpdate from "../pages/merchant/MerchantStaff/MerchantStaffUpdate";
 
 export const merchantRoute = [
   {
@@ -17,6 +21,22 @@ export const merchantRoute = [
   {
     path: "member-registration",
     element: <MemberRegistration />,
+  },
+  {
+    path: "merchant-staff",
+    element: <MerchantStaff />,
+  },
+  {
+    path: "merchant-staff/create",
+    element: <MerchantStaffCreate />,
+  },
+  {
+    path: "merchant-staff/:id",
+    element: <MerchantStaffDetails />,
+  },
+  {
+    path: "merchant-staff/update/:id",
+    element: <MerchantStaffUpdate />,
   },
   {
     path: "transactions/pending-approval",

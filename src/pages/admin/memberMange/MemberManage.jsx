@@ -26,7 +26,7 @@ import PrimaryButton from "../../../components/ui/PrimaryButton";
 import Pagination from "../../../components/table/Pagination";
 import StatusBadge from "../../../components/table/StatusBadge";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
-import { userImage } from "../../../assets/assets";
+import { memberQR, userImage } from "../../../assets/assets";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -95,7 +95,7 @@ const MemberManage = () => {
 
       <div className="rounded-xl border bg-white p-4">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <h3 className="text-lg font-semibold">All Members</h3>
+          <h3 className="text-lg font-semibold">All Member List</h3>
 
           <div className="flex flex-wrap items-center gap-3">
             <SearchInput
@@ -110,9 +110,9 @@ const MemberManage = () => {
               value={memberType}
               onChange={(val) => dispatch(setMemberType(val))}
               options={[
-                { label: "All Members", value: "all" },
-                { label: "General Members", value: "general" },
-                { label: "Corporate Members", value: "corporate" },
+                { label: "All", value: "all" },
+                { label: "General", value: "general" },
+                { label: "Corporate", value: "corporate" },
               ]}
             />
             <DropdownSelect
@@ -156,51 +156,32 @@ const MemberManage = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead
-                  onClick={() => handleSort("name")}
-                  className="cursor-pointer"
-                >
-                  <div className="flex items-center gap-1">
-                    Full Name
-                    <SortIcon active={sortBy === "name"} order={sortOrder} />
-                  </div>
+                <TableHead className="p-4">
+                  <input type="checkbox" className="w-4 h-4 rounded" />
                 </TableHead>
+
                 <TableHead>Member ID</TableHead>
-                <TableHead className="cursor-pointer">
-                  <div
-                    onClick={() => handleSort("phone")}
-                    className="flex items-center gap-1"
-                  >
-                    Phone
-                    <SortIcon active={sortBy === "phone"} order={sortOrder} />
-                  </div>
+                <TableHead>Full Name</TableHead>
+                <TableHead>Phone Number</TableHead>
+                <TableHead className="hidden md:table-cell">
+                  Total Referrals
                 </TableHead>
-                <TableHead className="hidden md:table-cell">Email</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead className="hidden lg:table-cell">Merchant</TableHead>
-                <TableHead>Points</TableHead>
-                <TableHead className="hidden md:table-cell">Referral</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead
-                  onClick={() => handleSort("created_at")}
-                  className="cursor-pointer hidden lg:table-cell"
-                >
-                  <div className="flex items-center gap-1">
-                    Created
-                    <SortIcon
-                      active={sortBy === "created_at"}
-                      order={sortOrder}
-                    />
-                  </div>
+                <TableHead className="hidden lg:table-cell">
+                  Available Points
                 </TableHead>
-                <TableHead>Action</TableHead>
+                <TableHead className="hidden md:table-cell">
+                  Lifetime Purchase
+                </TableHead>
+                <TableHead>Date Registered</TableHead>
+                <TableHead>QR</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
 
             <TableBody>
               {/* Skeleton Loading */}
               {isLoading && !members?.length ? (
-                [...Array(10)].map((_, i) => (
+                [...Array(6)].map((_, i) => (
                   <TableRow key={i}>
                     <TableCell>
                       <div className="flex items-center gap-3">
@@ -211,7 +192,7 @@ const MemberManage = () => {
                         </div>
                       </div>
                     </TableCell>
-                    {[...Array(8)].map((_, j) => (
+                    {[...Array(6)].map((_, j) => (
                       <TableCell key={j}>
                         <Skeleton className="h-4 w-20" />
                       </TableCell>
@@ -236,50 +217,53 @@ const MemberManage = () => {
                     key={m.id}
                     className="hover:bg-gray-50 transition-colors"
                   >
+                    <TableCell className="p-4">
+                      <input type="checkbox" className="w-4 h-4 rounded" />
+                    </TableCell>
+                    <TableCell className="whitespace-normal break-words">
+                      {m?.user_name}
+                    </TableCell>
                     {/* Name + Avatar */}
                     <TableCell className="py-3">
-                      <div className="flex items-center gap-3">
-                        <img
+                      {/* <div className="flex items-center gap-3"> */}
+                      {/* <img
                           src={userImage}
                           alt="user"
                           className="w-10 h-10 rounded-full border"
-                        />
-                        <div>
-                          <div className="font-medium text-gray-900">
-                            {m.name || m.fullName || m.user_name}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {m.member_type}
-                          </div>
+                        /> */}
+                      <div>
+                        <div className="font-medium text-gray-900">
+                          {m?.name}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {m?.wallet?.unlocked_level} Star Member
                         </div>
                       </div>
+                      {/* </div> */}
                     </TableCell>
 
-                    <TableCell>{m.user_name}</TableCell>
-                    <TableCell>{m.phone}</TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      {m.email || "—"}
-                    </TableCell>
-                    <TableCell>{m.member_type}</TableCell>
-                    <TableCell className="hidden lg:table-cell">
-                      {m.member_type === "corporate"
-                        ? m.merchant?.business_name || "—"
-                        : "—"}
-                    </TableCell>
-                    <TableCell>{m.wallet?.available_points ?? 0}</TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      {m.referral_code || "—"}
+                    <TableCell>{m?.phone}</TableCell>
+                    <TableCell>{m?.wallet?.total_referrals ?? "N/A"}</TableCell>
+                    <TableCell>
+                      {m?.wallet?.available_points ?? "N/A"}
                     </TableCell>
                     <TableCell>
-                      <StatusBadge status={m.status} />
+                      {m?.wallet?.lifetime_purchase_amount ?? "N/A"}
+                    </TableCell>
+                    <TableCell>
+                      {new Date(m?.created_at).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="hidden lg:table-cell">
-                      {new Date(m.created_at).toLocaleDateString()}
+                      <img
+                        src={memberQR}
+                        alt="Member QR Code"
+                        className="w-7 h-7"
+                      />
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
                         <Link
-                          to={`/admin/member-manage/${m.id}`}
+                          to={`/admin/member-manage/${m?.id}`}
                           className="p-2 rounded-md bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
                         >
                           <Eye size={16} />

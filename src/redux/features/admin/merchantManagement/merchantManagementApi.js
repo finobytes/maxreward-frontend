@@ -2,7 +2,7 @@ import { baseApi } from "../../../api/baseApi";
 
 export const merchantManagementApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    // 🟩 GET — All merchants (supports pagination, filters, and search)
+    // GET — All merchants (supports pagination, filters, and search)
     getMerchants: builder.query({
       query: ({
         page = 1,
@@ -46,13 +46,13 @@ export const merchantManagementApi = baseApi.injectEndpoints({
       },
     }),
 
-    // 🟩 GET — Single merchant by ID
+    // GET — Single merchant by ID
     getMerchantById: builder.query({
       query: (id) => `/merchants/${id}`,
       providesTags: (result, error, id) => [{ type: "Merchant", id }],
     }),
 
-    // 🟩 GET — Merchant by unique number
+    // GET — Merchant by unique number
     getMerchantByUnique: builder.query({
       query: (unique) => `/merchants/unique/${unique}`,
       providesTags: (result, error, unique) => [
@@ -60,7 +60,7 @@ export const merchantManagementApi = baseApi.injectEndpoints({
       ],
     }),
 
-    // 🟦 POST — Create new merchant
+    // POST — Create new merchant
     createMerchant: builder.mutation({
       query: (merchantData) => ({
         url: `/merchants`,
@@ -70,7 +70,7 @@ export const merchantManagementApi = baseApi.injectEndpoints({
       invalidatesTags: [{ type: "Merchant", id: "LIST" }],
     }),
 
-    // 🟨 PATCH — Update merchant by ID
+    // PATCH — Update merchant by ID
     updateMerchant: builder.mutation({
       query: ({ id, ...updatedData }) => ({
         url: `/merchants/${id}`,
@@ -83,7 +83,7 @@ export const merchantManagementApi = baseApi.injectEndpoints({
       ],
     }),
 
-    // 🟥 DELETE — Delete merchant by ID
+    // DELETE — Delete merchant by ID
     deleteMerchant: builder.mutation({
       query: (id) => ({
         url: `/merchants/${id}`,

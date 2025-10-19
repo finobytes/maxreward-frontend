@@ -9,9 +9,10 @@ import { useLogoutMutation } from "../../redux/features/auth/authApi";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner.jsx";
 
-export default function UserDropdown({ user }) {
+export default function UserDropdown({ user, role }) {
   const [isOpen, setIsOpen] = useState(false);
   const [logoutApi, { isLoading }] = useLogoutMutation();
+  console.log("UserDropdown user:", user);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ export default function UserDropdown({ user }) {
   const handleLogout = async () => {
     try {
       // call backend logout endpoint
-      const res = await logoutApi(user?.role).unwrap();
+      const res = await logoutApi(role).unwrap();
 
       // clear local Redux state & localStorage
       dispatch(logoutAction());
@@ -88,22 +89,28 @@ export default function UserDropdown({ user }) {
           </span>
         </div>
 
-        <Link className="flex items-center gap-3 px-3 py-2 mt-3 text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 ">
+        <Link
+          to={`/${role}/profile`}
+          className="flex items-center gap-3 px-3 py-2 mt-3 text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 "
+        >
           <UserCircle className="w-4.5 h-4.5" />
           Profile
         </Link>
 
-        <Link className="flex items-center gap-3 px-3 py-2 mt-3 text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 ">
+        <Link
+          to="#settings"
+          className="flex items-center gap-3 px-3 py-2 mt-3 text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 "
+        >
           <Settings className="w-4.5 h-4.5" />
           Settings
         </Link>
-        <Link
+        <button
           onClick={handleLogout}
           className="flex items-center gap-3 px-3 py-2 mt-3 text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 "
         >
           {isLoading ? <Spinner /> : <LogOut className="w-4.5 h-4.5" />}
           {isLoading ? "Logging out..." : "Logout"}
-        </Link>
+        </button>
       </Dropdown>
     </div>
   );
