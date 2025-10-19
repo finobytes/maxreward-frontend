@@ -405,7 +405,7 @@ const Sidebar = () => {
           !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
         }`}
       >
-        <Link to="/">
+        <Link to={`/${role}`}>
           {isExpanded || isHovered || isMobileOpen ? (
             <>
               <img
