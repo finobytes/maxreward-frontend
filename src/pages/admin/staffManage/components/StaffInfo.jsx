@@ -1,32 +1,32 @@
 import React from "react";
-const people = [
-  {
-    key: "Name:",
-    value: "Leo Phillips",
-  },
-  {
-    key: "Email:",
-    value: "youremail@example.com",
-  },
-  {
-    key: "Phone:",
-    value: "+1 (555) 123-4567",
-  },
-  {
-    key: "Designation:",
-    value: "C.E.O",
-  },
-  {
-    key: "Address:",
-    value: "Washington D.C",
-  },
-  {
-    key: "Contributor level :",
-    value: "Level-3",
-  },
-];
 
-const StaffInfo = () => {
+const StaffInfo = ({ staff }) => {
+  const staffInfo = [
+    {
+      key: "Name:",
+      value: staff?.name,
+    },
+    {
+      key: "Email:",
+      value: staff?.email,
+    },
+    {
+      key: "Phone:",
+      value: staff?.phone,
+    },
+    {
+      key: "Designation:",
+      value: staff?.designation,
+    },
+    {
+      key: "Address:",
+      value: staff?.address,
+    },
+    {
+      key: "Contributor level :",
+      value: staff?.contributorLevel,
+    },
+  ];
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 sm:px-2 sm:pt-6 lg:px-6 shadow-md">
       {/* Info List */}
@@ -37,13 +37,13 @@ const StaffInfo = () => {
           <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
             <div className="relative min-w-full divide-y divide-gray-200">
               <ul className="divide-y divide-gray-200">
-                {people.map((person) => (
-                  <li className="flex" key={person.email}>
+                {staffInfo.map((info) => (
+                  <li className="flex" key={info.key}>
                     <p className="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-0">
-                      {person.key}
+                      {info.key}
                     </p>
                     <p className="py-4 text-sm whitespace-nowrap text-gray-900">
-                      {person.value}
+                      {info.value}
                     </p>
                   </li>
                 ))}

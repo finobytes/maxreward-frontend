@@ -6,17 +6,27 @@ import Label from "../../../components/form/Label";
 import Input from "../../../components/form/input/InputField";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
 import Select from "@/components/form/Select";
-import { merchantStaffSchema } from "../../../schemas/merchantStaffSchema";
-import { useCreateStaffMutation } from "../../../redux/features/merchant/merchantStaff/merchantStaffApi";
-import { toast } from "sonner";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router";
 import Dropzone from "../../../components/form/form-elements/Dropzone";
+import { toast } from "sonner";
+import { useNavigate } from "react-router";
+import { z } from "zod";
+import { useCreateAdminStaffMutation } from "../../../redux/features/admin/adminStaff/adminStaffApi";
 
-const CreateStaff = () => {
-  const [createStaff, { isLoading }] = useCreateStaffMutation();
-  const { user } = useSelector((state) => state.auth); //  current merchant
+// Schema Validation (Zod)
+const adminStaffSchema = z.object({
+  name: z.string().min(2, "Full name is required"),
+  phone: z.string().min(8, "Phone number must be at least 8 digits"),
+  email: z.string().email("Enter a valid email"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  designation: z.string().min(2, "Designation is required"),
+  address: z.string().min(3, "Address is required"),
+  gender: z.enum(["male", "female", "others"]),
+  status: z.enum(["active", "inactive"]),
+});
+
+const CreateAdminStaff = () => {
   const navigate = useNavigate();
+  const [createAdminStaff, { isLoading }] = useCreateAdminStaffMutation();
 
   const {
     register,
@@ -24,40 +34,55 @@ const CreateStaff = () => {
     formState: { errors },
     reset,
   } = useForm({
-    resolver: zodResolver(merchantStaffSchema),
+    resolver: zodResolver(adminStaffSchema),
     defaultValues: {
       name: "",
       phone: "",
       email: "",
       password: "",
-      gender_type: "male",
+      designation: "",
+      address: "",
+      gender: "male",
       status: "active",
     },
   });
 
+  // ✅ Form Submit
   const onSubmit = async (formData) => {
     try {
       const payload = {
-        merchant_id: user?.merchant_id || 2, // Dynamic or fallback
+        user_name: `A${Date.now()}`, // unique ID
         name: formData.name,
         phone: formData.phone,
         email: formData.email,
         password: formData.password,
-        gender_type: formData.gender_type,
+        address: formData.address,
+        designation: formData.designation,
+        gender: formData.gender,
         status: formData.status,
       };
 
-      console.log(" Payload:", payload); // debug
+      console.log("Submitting payload:", payload);
 
-      const response = await createStaff(payload).unwrap();
-      toast.success(" Staff created successfully!");
-      console.log(" API Response:", response);
+      const res = await createAdminStaff(payload).unwrap();
 
-      reset(); // clear form
-      navigate("/merchant/merchant-staff"); // redirect after success
+      if (res?.success) {
+        toast.success(res?.message || "Admin staff created successfully!");
+        reset();
+        navigate("/admin/staff-manage");
+      } else {
+        toast.error(res?.message || "Failed to create admin staff");
+      }
     } catch (err) {
-      console.error(" Create Failed:", err);
-      toast.error(err?.data?.message || "Failed to create staff");
+      console.error("❌ Create Failed:", err);
+      const validationErrors = err?.data?.errors;
+      if (validationErrors) {
+        Object.entries(validationErrors).forEach(([field, messages]) =>
+          toast.error(`${field}: ${messages.join(", ")}`)
+        );
+      } else {
+        toast.error(err?.data?.message || "Something went wrong!");
+      }
     }
   };
 
@@ -66,13 +91,13 @@ const CreateStaff = () => {
       <PageBreadcrumb
         items={[
           { label: "Home", to: "/" },
-          { label: "Staff Form", to: "/admin/staff-manage" },
-          { label: "Staff Form" },
+          { label: "Staff Manage", to: "/admin/staff-manage" },
+          { label: "Create Staff" },
         ]}
       />
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        <ComponentCard title="Staff Information">
+        <ComponentCard title="Create New Admin Staff">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Full Name */}
             <div>
@@ -138,11 +163,12 @@ const CreateStaff = () => {
                 hint={errors.address?.message}
               />
             </div>
+
             {/* Password */}
             <div>
               <Label htmlFor="password">Password</Label>
               <Input
-                type="text"
+                type="password"
                 id="password"
                 placeholder="Enter password"
                 {...register("password")}
@@ -153,9 +179,9 @@ const CreateStaff = () => {
 
             {/* Gender */}
             <div>
-              <Label>Gender</Label>
+              <Label htmlFor="gender">Gender</Label>
               <Select
-                {...register("gender_type")}
+                {...register("gender")}
                 options={[
                   { value: "male", label: "Male" },
                   { value: "female", label: "Female" },
@@ -166,7 +192,7 @@ const CreateStaff = () => {
 
             {/* Status */}
             <div>
-              <Label>Status</Label>
+              <Label htmlFor="status">Status</Label>
               <Select
                 {...register("status")}
                 options={[
@@ -176,6 +202,8 @@ const CreateStaff = () => {
               />
             </div>
           </div>
+
+          {/* Optional File Uploads */}
           <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div>
               <Label>Profile Picture</Label>
@@ -186,6 +214,8 @@ const CreateStaff = () => {
               <Dropzone />
             </div>
           </div>
+
+          {/* Buttons */}
           <div className="mt-8 flex gap-4">
             <PrimaryButton type="submit" disabled={isLoading}>
               {isLoading ? "Creating..." : "Submit"}
@@ -204,4 +234,4 @@ const CreateStaff = () => {
   );
 };
 
-export default CreateStaff;
+export default CreateAdminStaff;

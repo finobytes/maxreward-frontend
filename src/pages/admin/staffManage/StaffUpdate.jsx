@@ -1,77 +1,120 @@
 import React, { useEffect } from "react";
-import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
-import {
-  useUpdateStaffMutation,
-  useGetStaffByIdQuery,
-} from "../../../redux/features/merchant/merchantStaff/merchantStaffApi";
-import { useNavigate, useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import Label from "../../../components/form/Label";
+
+import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import ComponentCard from "../../../components/common/ComponentCard";
+import Label from "../../../components/form/Label";
 import Input from "../../../components/form/input/InputField";
 import Select from "../../../components/form/Select";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
-import { merchantStaffUpdateSchema } from "../../../schemas/merchantStaffUpdateSchema";
-
 import Dropzone from "../../../components/form/form-elements/Dropzone";
 
+import {
+  useGetSingleAdminStaffQuery,
+  useUpdateAdminStaffMutation,
+} from "../../../redux/features/admin/adminStaff/adminStaffApi";
+
+// ✅ Zod Schema (same as Create but password optional)
+const adminStaffUpdateSchema = z.object({
+  name: z.string().min(2, "Full name is required"),
+  phone: z.string().min(8, "Phone number must be at least 8 digits"),
+  email: z.string().email("Enter a valid email"),
+  password: z
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .optional()
+    .or(z.literal("")),
+  designation: z.string().min(2, "Designation is required"),
+  address: z.string().min(3, "Address is required"),
+  gender: z.enum(["male", "female", "others"]),
+  status: z.enum(["active", "inactive"]),
+});
+
 const StaffUpdate = () => {
-  const { id } = useParams(); // get staff id from URL
+  const { id } = useParams();
   const navigate = useNavigate();
 
-  // API hooks
-  const { data: staffData, isLoading: isFetching } = useGetStaffByIdQuery(id);
-  const [updateStaff, { isLoading }] = useUpdateStaffMutation();
+  // ✅ API hooks
+  const { data: staffData, isLoading: isFetching } =
+    useGetSingleAdminStaffQuery(id);
+  const [updateAdminStaff, { isLoading }] = useUpdateAdminStaffMutation();
 
-  // form setup
+  // ✅ React Hook Form
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
   } = useForm({
-    resolver: zodResolver(merchantStaffUpdateSchema),
+    resolver: zodResolver(adminStaffUpdateSchema),
+    defaultValues: {
+      name: "",
+      phone: "",
+      email: "",
+      designation: "",
+      address: "",
+      password: "",
+      gender: "male",
+      status: "active",
+    },
   });
 
-  // populate form when staff data is loaded
+  // ✅ Prefill form when data arrives
   useEffect(() => {
     if (staffData?.data) {
+      const d = staffData.data;
       reset({
-        name: staffData.data.name || "",
-        phone: staffData.data.phone || "",
-        email: staffData.data.email || "",
-        password: "", // keep empty for security, unless backend requires it
-        gender_type: staffData.data.gender_type || "male",
-        status: staffData.data.status || "active",
+        name: d.name || "",
+        phone: d.phone || "",
+        email: d.email || "",
+        designation: d.designation || "",
+        address: d.address || "",
+        password: "",
+        gender: d.gender || "male",
+        status: d.status || "active",
       });
     }
   }, [staffData, reset]);
 
+  // ✅ Submit handler
   const onSubmit = async (formData) => {
     try {
-      const payload = { id, ...formData };
+      // omit empty password
+      const payload = {
+        ...formData,
+        ...(formData.password ? {} : { password: undefined }),
+      };
 
-      console.log("Update Payload:", payload);
+      const res = await updateAdminStaff({ id, data: payload }).unwrap();
 
-      const response = await updateStaff(payload).unwrap();
-      toast.success("Staff updated successfully!");
-      console.log("API Response:", response);
-
-      navigate("/merchant/merchant-staff");
+      if (res?.success) {
+        toast.success(res?.message || "Admin staff updated successfully!");
+        navigate("/admin/staff-manage");
+      } else {
+        toast.error(res?.message || "Failed to update admin staff");
+      }
     } catch (err) {
       console.error("Update Failed:", err);
-      toast.error(err?.data?.message || "Failed to update staff");
+      const validationErrors = err?.data?.errors;
+      if (validationErrors) {
+        Object.entries(validationErrors).forEach(([field, messages]) =>
+          toast.error(`${field}: ${messages.join(", ")}`)
+        );
+      } else {
+        toast.error(err?.data?.message || "Something went wrong!");
+      }
     }
   };
-  if (isFetching)
+
+  // ✅ Skeleton while fetching
+  if (isFetching) {
     return (
       <div className="p-6 space-y-4">
-        {/* Skeleton for breadcrumb */}
         <div className="h-6 w-1/4 bg-gray-200 rounded animate-pulse"></div>
-
-        {/* Skeleton for cards */}
         <div className="space-y-4">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="p-4 bg-white rounded shadow">
@@ -89,27 +132,28 @@ const StaffUpdate = () => {
         </div>
       </div>
     );
+  }
 
+  // ✅ Main Form UI
   return (
     <div>
       <PageBreadcrumb
         items={[
           { label: "Home", to: "/" },
-          { label: "Staff Update", to: "/admin/staff-manage" },
+          { label: "Staff Manage", to: "/admin/staff-manage" },
           { label: "Update Staff" },
         ]}
       />
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        <ComponentCard title=" Staff Information">
+        <ComponentCard title="Update Admin Staff">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Full Name */}
             <div>
               <Label htmlFor="name">Full Name</Label>
               <Input
-                type="text"
                 id="name"
-                placeholder="Enter staff full name"
+                placeholder="Enter full name"
                 {...register("name")}
                 error={!!errors.name}
                 hint={errors.name?.message}
@@ -120,7 +164,6 @@ const StaffUpdate = () => {
             <div>
               <Label htmlFor="phone">Phone Number</Label>
               <Input
-                type="text"
                 id="phone"
                 placeholder="Enter phone number"
                 {...register("phone")}
@@ -133,8 +176,8 @@ const StaffUpdate = () => {
             <div>
               <Label htmlFor="email">Email Address</Label>
               <Input
-                type="email"
                 id="email"
+                type="email"
                 placeholder="Enter email"
                 {...register("email")}
                 error={!!errors.email}
@@ -146,9 +189,8 @@ const StaffUpdate = () => {
             <div>
               <Label htmlFor="designation">Designation</Label>
               <Input
-                type="text"
                 id="designation"
-                placeholder="Enter staff designation"
+                placeholder="Enter designation"
                 {...register("designation")}
                 error={!!errors.designation}
                 hint={errors.designation?.message}
@@ -159,20 +201,20 @@ const StaffUpdate = () => {
             <div>
               <Label htmlFor="address">Address</Label>
               <Input
-                type="text"
                 id="address"
-                placeholder="Enter staff address"
+                placeholder="Enter address"
                 {...register("address")}
                 error={!!errors.address}
                 hint={errors.address?.message}
               />
             </div>
+
             {/* Password */}
             <div>
               <Label htmlFor="password">Password</Label>
               <Input
-                type="text"
                 id="password"
+                type="password"
                 placeholder="Leave blank if not changing"
                 {...register("password")}
                 error={!!errors.password}
@@ -182,9 +224,9 @@ const StaffUpdate = () => {
 
             {/* Gender */}
             <div>
-              <Label>Gender</Label>
+              <Label htmlFor="gender">Gender</Label>
               <Select
-                {...register("gender_type")}
+                {...register("gender")}
                 options={[
                   { value: "male", label: "Male" },
                   { value: "female", label: "Female" },
@@ -195,7 +237,7 @@ const StaffUpdate = () => {
 
             {/* Status */}
             <div>
-              <Label>Status</Label>
+              <Label htmlFor="status">Status</Label>
               <Select
                 {...register("status")}
                 options={[
@@ -206,6 +248,7 @@ const StaffUpdate = () => {
             </div>
           </div>
 
+          {/* File Uploads */}
           <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div>
               <Label>Profile Picture</Label>
@@ -216,6 +259,8 @@ const StaffUpdate = () => {
               <Dropzone />
             </div>
           </div>
+
+          {/* Buttons */}
           <div className="mt-8 flex gap-4">
             <PrimaryButton type="submit" disabled={isLoading}>
               {isLoading ? "Updating..." : "Update Staff"}

@@ -15,20 +15,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useMerchantStaff } from "../../../redux/features/merchant/merchantStaff/useMerchantStaff";
-import { useDeleteStaffMutation } from "../../../redux/features/merchant/merchantStaff/merchantStaffApi";
 import { toast } from "sonner";
 import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSkeleton";
+import { useAdminStaff } from "../../../redux/features/admin/adminStaff/useAdminStaff";
+import { useDeleteAdminStaffMutation } from "../../../redux/features/admin/adminStaff/adminStaffApi";
 
 const StaffManage = () => {
   const {
     staffs,
     pagination,
     isLoading,
-    actions: { setStatus, resetFilters, setCurrentPage },
-    filters: { search, status },
-  } = useMerchantStaff();
-  const [deleteStaff, { isLoading: isDeleting }] = useDeleteStaffMutation();
+    error,
+    actions: { setSearch, setStatus, setCurrentPage, resetFilters },
+    filters: { debouncedSearch, status },
+  } = useAdminStaff();
+
+  const [deleteStaff, { isLoading: isDeleting }] =
+    useDeleteAdminStaffMutation();
   const [selected, setSelected] = useState([]);
   const [deletingId, setDeletingId] = useState(null);
 
@@ -64,18 +67,15 @@ const StaffManage = () => {
           </h3>
 
           <div className="flex flex-col sm:flex-row gap-3 items-center">
-            <SearchInput placeholder="Search staff..." />
-
-            <PrimaryButton
-              variant="primary"
-              size="md"
-              to="/admin/staff-manage/create"
-            >
-              <Plus size={18} /> Add New Staff
-            </PrimaryButton>
+            <SearchInput
+              placeholder="Search staff..."
+              value={debouncedSearch}
+              onChange={(e) => setSearch(e.target.value)}
+            />
 
             <DropdownSelect
               value={status}
+              onChange={(val) => setStatus(val)}
               options={[
                 { label: "All", value: "" },
                 { label: "Active", value: "active" },
@@ -83,8 +83,16 @@ const StaffManage = () => {
               ]}
             />
 
-            <PrimaryButton variant="secondary" size="md">
+            <PrimaryButton variant="secondary" size="md" onClick={resetFilters}>
               Clear
+            </PrimaryButton>
+
+            <PrimaryButton
+              variant="primary"
+              size="md"
+              to="/admin/staff-manage/create"
+            >
+              <Plus size={18} /> Add New Staff
             </PrimaryButton>
           </div>
         </div>
@@ -154,7 +162,7 @@ const StaffManage = () => {
                         className="w-4 h-4 rounded"
                       />
                     </TableCell>
-                    <TableCell>{staff.staffId || staff.id}</TableCell>
+                    <TableCell>{staff.id}</TableCell>
                     <TableCell>{staff.name}</TableCell>
                     <TableCell>{staff.phone}</TableCell>
                     <TableCell>{staff.email}</TableCell>
@@ -176,8 +184,10 @@ const StaffManage = () => {
                       )}
                     </TableCell>
                     <TableCell>
-                      {staff?.joinDate ? (
-                        <span>{new Date(staff.joinDate).toLocaleString()}</span>
+                      {staff?.created_at ? (
+                        <span>
+                          {new Date(staff.created_at).toLocaleString()}
+                        </span>
                       ) : (
                         <span className="text-gray-500">N/A</span>
                       )}

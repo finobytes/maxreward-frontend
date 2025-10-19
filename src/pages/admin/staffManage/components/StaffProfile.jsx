@@ -1,13 +1,13 @@
 import React from "react";
 import {
-  cityIcon,
   locationIcon,
   profile,
   profileCover,
   userProfile,
 } from "../../../../assets/assets";
 
-const StaffProfile = ({ member }) => {
+const StaffProfile = ({ staff }) => {
+  console.log("Staff in StaffProfile:", staff);
   return (
     <section className="w-full overflow-hidden">
       <div className="w-full">
@@ -29,20 +29,22 @@ const StaffProfile = ({ member }) => {
       </div>
       <div className=" block 2xl:flex gap-4 2xl:justify-between relative -top-8">
         <div className="ml-2">
-          <h3 className="text-2xl font-semibold">{member.name}</h3>
-          <p className="mt-4 text-gray-400">Chief Executive Officer</p>
+          <h3 className="text-2xl font-semibold">{staff.name}</h3>
+          <p className="mt-4 text-gray-400">{staff?.designation}</p>
           <div className="flex gap-4 mt-1">
-            <div className="flex gap-1">
+            {/* <div className="flex gap-1">
               <img src={cityIcon} alt="icon" />
-              <span className="text-sm text-gray-400">Georgia</span>
-            </div>
+              <span className="text-sm text-gray-400">
+                {staff?.designation}
+              </span>
+            </div> */}
             <div className="flex gap-1">
               <img src={locationIcon} alt="icon" />
-              <span className="text-sm text-gray-400">Washington D.C</span>
+              <span className="text-sm text-gray-400">{staff?.address}</span>
             </div>
           </div>
         </div>
-        <div className="mt-4 2xl:mt-0">
+        <div className="max-w-[180px] mt-4 2xl:mt-0">
           <div className="border-2 border-gray-300 flex items-center gap-4 px-2 py-0.5 rounded-full">
             <img className="w-10 h-10" src={profile} alt="icon" />
             <div className="">
