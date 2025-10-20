@@ -20,6 +20,15 @@ import {
 } from "../../../redux/features/admin/merchantManagement/merchantManagementSlice";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSkeleton";
 
 const PendingMerchant = () => {
   const dispatch = useDispatch();
@@ -120,27 +129,19 @@ const PendingMerchant = () => {
   return (
     <div>
       <PageBreadcrumb
-        items={[
-          { label: "Home", to: "/" },
-          { label: "Merchant Management", to: "/admin/merchant" },
-          { label: "Pending Merchant" },
-        ]}
+        items={[{ label: "Home", to: "/" }, { label: "Pending Merchant" }]}
       />
 
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white p-4">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <h3 className="text-lg font-semibold text-gray-800">
-            Pending Merchant List
-          </h3>
+          <SearchInput
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by name, email, phone..."
+          />
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
-            <SearchInput
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name, email, phone..."
-            />
-
             <PrimaryButton
               variant="primary"
               size="md"
@@ -176,10 +177,10 @@ const PendingMerchant = () => {
 
         {/* Table */}
         <div className="mt-4 relative overflow-x-auto">
-          <table className="w-full min-w-[1000px] text-sm text-center text-gray-500">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-              <tr>
-                <th className="p-4">
+          <Table className="w-full min-w-[1000px] text-sm text-center text-gray-500">
+            <TableHeader className="text-xs text-gray-700 uppercase bg-gray-50">
+              <TableRow>
+                <TableHead className="p-4">
                   <input
                     type="checkbox"
                     checked={
@@ -189,65 +190,63 @@ const PendingMerchant = () => {
                     onChange={(e) => toggleSelectAll(e.target.checked)}
                     className="w-4 h-4 rounded"
                   />
-                </th>
-                <th className="py-3">Merchant ID</th>
-                <th className="py-3">Business Name</th>
-                <th className="py-3">Business Type</th>
-                <th className="py-3">Owner Name</th>
-                <th className="py-3">Phone</th>
-                <th className="py-3">Email</th>
-                <th className="py-3">Status</th>
-                <th className="py-3">Created At</th>
-                <th className="py-3">Action</th>
-              </tr>
-            </thead>
+                </TableHead>
+                <TableHead className="py-3">Merchant ID</TableHead>
+                <TableHead className="py-3">Business Name</TableHead>
+                <TableHead className="py-3">Business Type</TableHead>
+                <TableHead className="py-3">Owner Name</TableHead>
+                <TableHead className="py-3">Phone</TableHead>
+                <TableHead className="py-3">Email</TableHead>
+                <TableHead className="py-3">Status</TableHead>
+                <TableHead className="py-3">Created At</TableHead>
+                <TableHead className="py-3">Action</TableHead>
+              </TableRow>
+            </TableHeader>
 
-            <tbody>
+            <TableBody>
               {isLoading || isFetching || isUpdating ? (
-                Array.from({ length: 10 }).map((_, i) => (
-                  <tr key={i} className="border-b">
-                    {Array.from({ length: 10 }).map((_, j) => (
-                      <td key={j} className="py-3">
-                        <Skeleton className="h-4 w-full mx-auto" />
-                      </td>
-                    ))}
-                  </tr>
-                ))
+                <MerchantStaffSkeleton rows={8} cols={7} />
               ) : merchants.length === 0 ? (
-                <tr>
-                  <td colSpan={10} className="py-6 text-gray-500">
+                <TableRow>
+                  <TableCell colSpan={7} className="py-6 text-gray-500">
                     No pending merchants found
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ) : (
                 merchants.map((merchant) => (
-                  <tr
+                  <TableRow
                     key={merchant.id}
                     className="bg-white border-b hover:bg-gray-50 transition"
                   >
-                    <td className="p-4">
+                    <TableCell className="p-4">
                       <input
                         type="checkbox"
                         checked={selected.includes(merchant.id)}
                         onChange={() => toggleSelect(merchant.id)}
                         className="w-4 h-4 rounded"
                       />
-                    </td>
-                    <td className="py-4 font-medium text-gray-700">
+                    </TableCell>
+                    <TableCell className="py-4 font-medium text-gray-700">
                       {merchant.unique_number}
-                    </td>
-                    <td className="py-4">{merchant.business_name}</td>
-                    <td className="py-4">{merchant.business_type}</td>
-                    <td className="py-4">{merchant.owner_name}</td>
-                    <td className="py-4">{merchant.phone}</td>
-                    <td className="py-4">{merchant.email}</td>
-                    <td className="py-4">
+                    </TableCell>
+                    <TableCell className="py-4">
+                      {merchant.business_name}
+                    </TableCell>
+                    <TableCell className="py-4">
+                      {merchant.business_type}
+                    </TableCell>
+                    <TableCell className="py-4">
+                      {merchant.owner_name}
+                    </TableCell>
+                    <TableCell className="py-4">{merchant.phone}</TableCell>
+                    <TableCell className="py-4">{merchant.email}</TableCell>
+                    <TableCell className="py-4">
                       <StatusBadge status={merchant.status} />
-                    </td>
-                    <td className="py-4">
+                    </TableCell>
+                    <TableCell className="py-4">
                       {new Date(merchant.created_at).toLocaleDateString()}
-                    </td>
-                    <td className="py-4 flex gap-2 justify-center">
+                    </TableCell>
+                    <TableCell className="py-4 flex gap-2 justify-center">
                       <button
                         onClick={() => handleApprove(merchant.id)}
                         disabled={isUpdating}
@@ -263,12 +262,12 @@ const PendingMerchant = () => {
                       >
                         Reject
                       </button>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
 
         {/* Pagination */}

@@ -20,6 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { memberQR, qr } from "../../../assets/assets";
+import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSkeleton";
 
 const AllMerchant = () => {
   const {
@@ -88,18 +89,14 @@ const AllMerchant = () => {
         <div className="max-w-full overflow-x-auto">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <h3 className="text-lg font-semibold text-gray-800">
-              All Active Merchants
-            </h3>
+            <SearchInput
+              value={filters.search}
+              onChange={(e) => setDebouncedSearch(e.target.value)}
+              placeholder="Search merchant..."
+            />
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
               {/* Debounced Search */}
-              <SearchInput
-                value={filters.search}
-                onChange={(e) => setDebouncedSearch(e.target.value)}
-                placeholder="Search merchant..."
-              />
-
               <div className="flex justify-between items-center gap-4 md:px-2">
                 {/* Status Filter */}
                 <DropdownSelect
@@ -190,24 +187,7 @@ const AllMerchant = () => {
               <TableBody>
                 {/* Skeleton Loading */}
                 {isLoading && !merchants?.length ? (
-                  [...Array(6)].map((_, i) => (
-                    <TableRow key={i}>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <Skeleton className="w-10 h-10 rounded-full" />
-                          <div className="space-y-1">
-                            <Skeleton className="h-4 w-32" />
-                            <Skeleton className="h-3 w-16" />
-                          </div>
-                        </div>
-                      </TableCell>
-                      {[...Array(6)].map((_, j) => (
-                        <TableCell key={j}>
-                          <Skeleton className="h-4 w-20" />
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
+                  <MerchantStaffSkeleton />
                 ) : isError ? (
                   <TableRow>
                     <TableCell

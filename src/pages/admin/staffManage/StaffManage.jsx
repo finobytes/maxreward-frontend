@@ -62,17 +62,13 @@ const StaffManage = () => {
       <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
         {/* Header + Filters */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <h3 className="text-lg font-semibold text-gray-800">
-            All Staff List
-          </h3>
+          <SearchInput
+            placeholder="Search staff..."
+            value={debouncedSearch}
+            onChange={(e) => setSearch(e.target.value)}
+          />
 
           <div className="flex flex-col sm:flex-row gap-3 items-center">
-            <SearchInput
-              placeholder="Search staff..."
-              value={debouncedSearch}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-
             <DropdownSelect
               value={status}
               onChange={(val) => setStatus(val)}

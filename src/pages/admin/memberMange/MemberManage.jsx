@@ -36,6 +36,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSkeleton";
 
 const useDebounced = (value, delay = 400) => {
   const [v, setV] = useState(value);
@@ -95,14 +96,13 @@ const MemberManage = () => {
 
       <div className="rounded-xl border bg-white p-4">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <h3 className="text-lg font-semibold">All Member List</h3>
+          <SearchInput
+            value={localSearch}
+            onChange={(e) => setLocalSearch(e.target.value)}
+            placeholder="Search by name, phone, username..."
+          />
 
           <div className="flex flex-wrap items-center gap-3">
-            <SearchInput
-              value={localSearch}
-              onChange={(e) => setLocalSearch(e.target.value)}
-              placeholder="Search by name, phone, username..."
-            />
             <PrimaryButton to="/admin/member-registration" variant="primary">
               <Plus size={16} /> Register Member
             </PrimaryButton>
@@ -181,24 +181,7 @@ const MemberManage = () => {
             <TableBody>
               {/* Skeleton Loading */}
               {isLoading && !members?.length ? (
-                [...Array(6)].map((_, i) => (
-                  <TableRow key={i}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Skeleton className="w-10 h-10 rounded-full" />
-                        <div className="space-y-1">
-                          <Skeleton className="h-4 w-32" />
-                          <Skeleton className="h-3 w-16" />
-                        </div>
-                      </div>
-                    </TableCell>
-                    {[...Array(6)].map((_, j) => (
-                      <TableCell key={j}>
-                        <Skeleton className="h-4 w-20" />
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
+                <MerchantStaffSkeleton rows={8} cols={7} />
               ) : isError ? (
                 <TableRow>
                   <TableCell colSpan={10} className="text-center text-red-500">
