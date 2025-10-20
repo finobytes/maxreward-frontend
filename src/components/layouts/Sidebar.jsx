@@ -76,7 +76,7 @@ const Sidebar = () => {
             name: "Pending Merchant",
             path: "/admin/merchant/pending-merchant",
           },
-          { name: "Active Merchant", path: "/admin/merchant/active-merchant" },
+          { name: "All Merchant", path: "/admin/merchant/all-merchant" },
         ],
       },
       {

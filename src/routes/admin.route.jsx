@@ -7,7 +7,6 @@ import VoucherPurchase from "../pages/admin/reports/VoucherPurchase";
 import MemberManage from "../pages/admin/memberMange/MemberManage";
 import StaffManage from "../pages/admin/staffManage/StaffManage";
 import PendingMerchant from "../pages/admin/merchant/PendingMerchant";
-import ActiveMerchant from "../pages/admin/merchant/ActiveMerchant";
 import Income from "../pages/admin/Accounts/Income";
 import Expense from "../pages/admin/Accounts/Expense";
 import Transaction from "../pages/admin/reports/Transaction";
@@ -19,6 +18,7 @@ import MerchantEdit from "../pages/admin/merchant/MerchantEdit";
 import StaffDetails from "../pages/admin/staffManage/StaffDetails";
 import StaffUpdate from "../pages/admin/staffManage/StaffUpdate";
 import CreateStaff from "../pages/admin/staffManage/CreateStaff";
+import AllMerchant from "../pages/admin/merchant/AllMerchant";
 
 export const adminRoutes = [
   {
@@ -66,8 +66,8 @@ export const adminRoutes = [
     element: <MerchantEdit />,
   },
   {
-    path: "merchant/active-merchant",
-    element: <ActiveMerchant />,
+    path: "merchant/all-merchant",
+    element: <AllMerchant />,
   },
   {
     path: "merchant/merchant-registration",

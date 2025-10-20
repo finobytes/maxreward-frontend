@@ -56,7 +56,7 @@ const StaffManage = () => {
   return (
     <div className="space-y-6">
       <PageBreadcrumb
-        items={[{ label: "Home", to: "/" }, { label: "Staff" }]}
+        items={[{ label: "Home", to: "/" }, { label: "Staff Manage" }]}
       />
 
       <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
