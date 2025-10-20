@@ -118,14 +118,6 @@ const PendingMerchant = () => {
     toast("Bulk delete (not implemented yet)", { icon: "🗑️" });
   };
 
-  // Render States
-  if (isError)
-    return (
-      <p className="text-center text-red-500 mt-10">
-        Failed to load merchants. Please try again.
-      </p>
-    );
-
   return (
     <div>
       <PageBreadcrumb
@@ -206,6 +198,12 @@ const PendingMerchant = () => {
             <TableBody>
               {isLoading || isFetching || isUpdating ? (
                 <MerchantStaffSkeleton rows={8} cols={7} />
+              ) : isError ? (
+                <TableRow>
+                  <TableCell colSpan={10} className="text-center text-red-500">
+                    Failed to load Merchants.
+                  </TableCell>
+                </TableRow>
               ) : merchants.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="py-6 text-gray-500">

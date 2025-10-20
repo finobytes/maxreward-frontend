@@ -5,7 +5,7 @@ import DropdownSelect from "../../../components/ui/dropdown/DropdownSelect";
 import StatusBadge from "../../../components/table/StatusBadge";
 import Pagination from "../../../components/table/Pagination";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
-import { Eye, PencilLine, Plus, Trash2Icon } from "lucide-react";
+import { Eye, Loader, PencilLine, Plus, Trash2Icon } from "lucide-react";
 import { Link } from "react-router";
 import {
   Table,
@@ -25,6 +25,7 @@ const StaffManage = () => {
     staffs,
     pagination,
     isLoading,
+    isFetching,
     error,
     actions: { setSearch, setStatus, setCurrentPage, resetFilters },
     filters: { debouncedSearch, status },
@@ -95,6 +96,12 @@ const StaffManage = () => {
 
         {/* Table Section */}
         <div className="mt-4 relative overflow-x-auto w-full">
+          {/* Overlay spinner when fetching new data */}
+          {isFetching && !isLoading && (
+            <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-sm flex items-center justify-center rounded-xl">
+              <Loader className="w-6 h-6 animate-spin text-gray-500" />
+            </div>
+          )}
           <Table className="w-full table-auto border-collapse">
             <TableHeader>
               <TableRow>

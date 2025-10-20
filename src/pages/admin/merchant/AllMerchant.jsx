@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import PageBreadcrumb from "@/components/common/PageBreadcrumb";
 import SearchInput from "@/components/form/form-elements/SearchInput";
 import PrimaryButton from "@/components/ui/PrimaryButton";
-import { Eye, PencilLine, Trash2Icon } from "lucide-react";
+import { Eye, Loader, PencilLine, Trash2Icon } from "lucide-react";
 import DropdownSelect from "@/components/ui/dropdown/DropdownSelect";
 import StatusBadge from "@/components/table/StatusBadge";
 import Pagination from "@/components/table/Pagination";
@@ -146,11 +146,11 @@ const AllMerchant = () => {
           {/* Table */}
           <div className="mt-4 relative overflow-x-auto">
             {/* Overlay spinner on interactions */}
-            {/* {isLoading && (
-            <div className="absolute inset-0 z-10 bg-white/50 backdrop-blur-sm flex items-center justify-center">
-              <Loader className="w-8 h-8 animate-spin text-gray-400" />
-            </div>
-          )} */}
+            {isFetching && !isLoading && (
+              <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-sm flex items-center justify-center rounded-xl">
+                <Loader className="w-6 h-6 animate-spin text-gray-500" />
+              </div>
+            )}
             <Table>
               <TableHeader>
                 <TableRow>
@@ -194,7 +194,7 @@ const AllMerchant = () => {
                       colSpan={10}
                       className="text-center text-red-500"
                     >
-                      Failed to load members.
+                      Failed to load Merchants.
                     </TableCell>
                   </TableRow>
                 ) : merchants?.length === 0 ? (
@@ -258,14 +258,17 @@ const AllMerchant = () => {
                       <TableCell>
                         <div className="flex gap-2">
                           <Link
-                            to={`/admin/member-manage/${m?.id}`}
+                            to={`/admin/merchant/details/${m?.id}`}
                             className="p-2 rounded-md bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
                           >
                             <Eye size={16} />
                           </Link>
-                          <button className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200">
+                          <Link
+                            to={`/admin/merchant/update/${m?.id}`}
+                            className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200"
+                          >
                             <PencilLine size={16} />
-                          </button>
+                          </Link>
                           <button className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200">
                             <Trash2Icon size={16} />
                           </button>

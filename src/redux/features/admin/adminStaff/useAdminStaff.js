@@ -23,16 +23,20 @@ export const useAdminStaff = () => {
     return () => clearTimeout(handler);
   }, [debouncedSearch, dispatch]);
 
-  const { data, isLoading, error } = useGetAdminStaffsQuery({
-    page: currentPage,
-    search,
-    status,
-  });
+  const { data, isLoading, isFetching, error } = useGetAdminStaffsQuery(
+    {
+      page: currentPage,
+      search,
+      status,
+    },
+    { keepPreviousData: true }
+  );
 
   return {
     staffs: data?.staffs || [],
     pagination: data?.pagination || { currentPage: 1, totalPages: 1 },
     isLoading,
+    isFetching,
     error,
     filters: { search, status, debouncedSearch },
     actions: {
