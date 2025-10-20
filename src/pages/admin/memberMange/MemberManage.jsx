@@ -110,7 +110,10 @@ const MemberManage = () => {
 
             <PrimaryButton
               variant="secondary"
-              onClick={() => dispatch(resetFilters())}
+              onClick={() => {
+                dispatch(resetFilters());
+                setLocalSearch("");
+              }}
             >
               Clear
             </PrimaryButton>
