@@ -69,7 +69,7 @@ const Sidebar = () => {
       { name: "Member Manage", icon: <Users />, path: "/admin/member-manage" },
       { name: "Staff Manage", icon: <UserCog />, path: "/admin/staff-manage" },
       {
-        name: "Merchant",
+        name: "Merchant Manage",
         icon: <ShoppingBag />,
         subItems: [
           {
