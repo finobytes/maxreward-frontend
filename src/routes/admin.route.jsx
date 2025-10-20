@@ -19,6 +19,7 @@ import StaffDetails from "../pages/admin/staffManage/StaffDetails";
 import StaffUpdate from "../pages/admin/staffManage/StaffUpdate";
 import CreateStaff from "../pages/admin/staffManage/CreateStaff";
 import AllMerchant from "../pages/admin/merchant/AllMerchant";
+import MemberUpdate from "../pages/admin/memberMange/MemberUpdate";
 
 export const adminRoutes = [
   {
@@ -34,8 +35,12 @@ export const adminRoutes = [
     element: <MemberRegistration />,
   },
   {
-    path: "member-manage/:id",
+    path: "member-manage/details/:id",
     element: <MemberDetails />,
+  },
+  {
+    path: "member-manage/edit/:id",
+    element: <MemberUpdate />,
   },
   {
     path: "staff-manage",
