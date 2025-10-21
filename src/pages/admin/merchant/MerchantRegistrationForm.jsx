@@ -58,7 +58,7 @@ const MerchantRegistrationForm = () => {
       <PageBreadcrumb
         items={[
           { label: "Home", to: "/" },
-          { label: "Merchant", to: "/admin/merchant/active-merchant" },
+          { label: "Pending Merchant", to: "/admin/merchant/pending-merchant" },
           { label: "Merchant Registration" },
         ]}
       />
