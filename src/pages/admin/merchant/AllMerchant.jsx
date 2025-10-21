@@ -11,6 +11,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useMerchantManagement } from "../../../redux/features/admin/merchantManagement/useMerchantManagement";
 import { Link } from "react-router";
 import { useDeleteMerchantMutation } from "../../../redux/features/admin/merchantManagement/merchantManagementApi";
+import { useGetAllBusinessTypesQuery } from "../../../redux/features/admin/businessType/businessTypeApi";
+
 import {
   Table,
   TableBody,
@@ -23,6 +25,12 @@ import { memberQR, qr } from "../../../assets/assets";
 import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSkeleton";
 
 const AllMerchant = () => {
+  const {
+    data: businessTypes,
+    isLoading: isBusinessTypeLoading,
+    isError: isBusinessTypeError,
+  } = useGetAllBusinessTypesQuery();
+
   const {
     merchants,
     pagination,
@@ -111,16 +119,23 @@ const AllMerchant = () => {
                 />
 
                 {/* Business Type Filter */}
-                <DropdownSelect
-                  value={filters.businessType}
-                  onChange={(val) => setBusinessType(val)}
-                  options={[
-                    { label: "All Types", value: "" },
-                    { label: "Super Shop", value: "Super Shop" },
-                    { label: "Retail", value: "Retail" },
-                    { label: "Service", value: "Service" },
-                  ]}
-                />
+                {isBusinessTypeLoading ? (
+                  <div className="animate-pulse w-32 h-10 bg-gray-100 rounded"></div>
+                ) : isBusinessTypeError ? (
+                  <p className="text-red-500 text-sm">Failed to load types</p>
+                ) : (
+                  <DropdownSelect
+                    value={filters.businessType}
+                    onChange={(val) => setBusinessType(val)}
+                    options={[
+                      { label: "All Types", value: "" },
+                      ...(businessTypes?.data?.business_types?.map((type) => ({
+                        label: type.name,
+                        value: type.name,
+                      })) || []),
+                    ]}
+                  />
+                )}
 
                 <PrimaryButton
                   variant="secondary"

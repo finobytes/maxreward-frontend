@@ -8,10 +8,8 @@ import ComponentCard from "../../../components/common/ComponentCard";
 import Label from "../../../components/form/Label";
 import Input from "../../../components/form/input/InputField";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
-import Select from "../../../components/form/Select";
 import { memberSchema } from "../../../schemas/memberSchema";
 import { useGetMemberByReferralQuery } from "../../../redux/features/admin/memberManagement/memberManagementApi";
-import { useGetAllBusinessTypesQuery } from "../../../redux/features/admin/businessType/businessTypeApi";
 
 const MemberRegistration = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -36,13 +34,6 @@ const MemberRegistration = () => {
   } = useGetMemberByReferralQuery(debouncedReferral, {
     skip: !debouncedReferral || debouncedReferral.length < 3,
   });
-
-  // Fetch business type list
-  const {
-    data: businessTypes,
-    isLoading: isBusinessTypeLoading,
-    isError: isBusinessTypeError,
-  } = useGetAllBusinessTypesQuery();
 
   // React Hook Form setup
   const {
@@ -127,7 +118,7 @@ const MemberRegistration = () => {
               />
             </div>
 
-            <div>
+            {/* <div>
               <Label htmlFor="businessType">
                 Business Type (<span className="text-red-500">*</span>)
               </Label>
@@ -156,7 +147,7 @@ const MemberRegistration = () => {
                   placeholder="Select Business Type"
                 />
               )}
-            </div>
+            </div> */}
           </div>
         </ComponentCard>
 
