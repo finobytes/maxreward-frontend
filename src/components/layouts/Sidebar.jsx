@@ -19,6 +19,8 @@ import {
   UserCircle2,
   UserCog,
   Users,
+  Briefcase,
+  Building,
 } from "lucide-react";
 import { useSidebar } from "../../context/SidebarContext";
 import { logo, MaxReward } from "../../assets/assets";
@@ -100,6 +102,21 @@ const Sidebar = () => {
           { name: "Tree Performance", path: "/admin/reports/tree-performance" },
           { name: "Redemption History", path: "/admin/reports/redemption" },
         ],
+      },
+      {
+        name: "Business Type",
+        icon: <Briefcase />,
+        path: "/admin/business-type",
+      },
+      {
+        name: "Company Info",
+        icon: <Building />,
+        path: "/admin/company-info",
+      },
+      {
+        name: "Denomination",
+        icon: <DollarSign />,
+        path: "/admin/denomination",
       },
       { name: "Profile", icon: <UserCircle2 />, path: "/admin/profile" },
       { name: "Logout", icon: <LogOut />, path: "/login" },

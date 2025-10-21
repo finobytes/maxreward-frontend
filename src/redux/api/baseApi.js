@@ -10,6 +10,12 @@ export const baseApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Member", "Merchant", "MerchantStaff", "AdminStaff"],
+  tagTypes: [
+    "Member",
+    "Merchant",
+    "MerchantStaff",
+    "AdminStaff",
+    "BusinessType",
+  ],
   endpoints: () => ({}),
 });

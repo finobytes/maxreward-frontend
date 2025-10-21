@@ -20,6 +20,9 @@ import StaffUpdate from "../pages/admin/staffManage/StaffUpdate";
 import CreateStaff from "../pages/admin/staffManage/CreateStaff";
 import AllMerchant from "../pages/admin/merchant/AllMerchant";
 import MemberUpdate from "../pages/admin/memberMange/MemberUpdate";
+import BusinessType from "../pages/admin/BusinessType/BusinessType";
+import CompanyInfo from "../pages/admin/CompanyInfo/CompanyInfo";
+import Denomination from "../pages/admin/Denomination/Denomination";
 
 export const adminRoutes = [
   {
@@ -105,6 +108,18 @@ export const adminRoutes = [
   {
     path: "reports/redemption",
     element: <Redemption />,
+  },
+  {
+    path: "business-type",
+    element: <BusinessType />,
+  },
+  {
+    path: "company-info",
+    element: <CompanyInfo />,
+  },
+  {
+    path: "denomination",
+    element: <Denomination />,
   },
   {
     path: "profile",
