@@ -16,6 +16,7 @@ export const baseApi = createApi({
     "MerchantStaff",
     "AdminStaff",
     "BusinessType",
+    "CompanyInfo",
   ],
   endpoints: () => ({}),
 });
