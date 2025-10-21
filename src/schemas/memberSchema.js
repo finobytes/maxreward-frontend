@@ -25,6 +25,10 @@ export const memberSchema = z.object({
     .string({ required_error: "Password is required" })
     .min(6, "Password must be at least 6 characters"),
 
+  businessType: z
+    .string({ required_error: "Business Type is required" })
+    .nonempty("Business Type is required"),
+
   referralCode: z
     .string({ required_error: "Referral Code is required" })
     .nonempty("Referral Code is required"),

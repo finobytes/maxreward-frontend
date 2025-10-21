@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { EyeIcon, EyeOffIcon, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import ComponentCard from "../../../components/common/ComponentCard";
 import Label from "../../../components/form/Label";
 import Input from "../../../components/form/input/InputField";
-import Dropzone from "../../../components/form/form-elements/Dropzone";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
 import Select from "../../../components/form/Select";
 import { memberSchema } from "../../../schemas/memberSchema";
 import { useGetMemberByReferralQuery } from "../../../redux/features/admin/memberManagement/memberManagementApi";
+import { useGetAllBusinessTypesQuery } from "../../../redux/features/admin/businessType/businessTypeApi";
 
 const MemberRegistration = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -33,10 +33,16 @@ const MemberRegistration = () => {
     data: memberData,
     isFetching,
     isError,
-    error,
   } = useGetMemberByReferralQuery(debouncedReferral, {
     skip: !debouncedReferral || debouncedReferral.length < 3,
   });
+
+  // Fetch business type list
+  const {
+    data: businessTypes,
+    isLoading: isBusinessTypeLoading,
+    isError: isBusinessTypeError,
+  } = useGetAllBusinessTypesQuery();
 
   // React Hook Form setup
   const {
@@ -54,6 +60,7 @@ const MemberRegistration = () => {
       email: "",
       password: "",
       referralCode: "",
+      businessType: "",
     },
   });
 
@@ -118,6 +125,37 @@ const MemberRegistration = () => {
                 error={!!errors.email}
                 hint={errors.email?.message}
               />
+            </div>
+
+            <div>
+              <Label htmlFor="businessType">
+                Business Type (<span className="text-red-500">*</span>)
+              </Label>
+
+              {isBusinessTypeLoading ? (
+                <div className="animate-pulse space-y-2">
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                </div>
+              ) : isBusinessTypeError ? (
+                <p className="text-red-500 text-sm">
+                  Failed to load business types
+                </p>
+              ) : (
+                <Select
+                  id="businessType"
+                  {...register("businessType")}
+                  error={!!errors.businessType}
+                  success={!errors.businessType}
+                  options={
+                    businessTypes?.data?.business_types?.map((type) => ({
+                      value: type.id,
+                      label: type.name,
+                    })) || []
+                  }
+                  placeholder="Select Business Type"
+                />
+              )}
             </div>
           </div>
         </ComponentCard>
