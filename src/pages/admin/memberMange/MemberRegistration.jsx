@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { EyeIcon, EyeOffIcon, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import ComponentCard from "../../../components/common/ComponentCard";
 import Label from "../../../components/form/Label";
 import Input from "../../../components/form/input/InputField";
-import Dropzone from "../../../components/form/form-elements/Dropzone";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
-import Select from "../../../components/form/Select";
 import { memberSchema } from "../../../schemas/memberSchema";
 import { useGetMemberByReferralQuery } from "../../../redux/features/admin/memberManagement/memberManagementApi";
 
@@ -33,7 +31,6 @@ const MemberRegistration = () => {
     data: memberData,
     isFetching,
     isError,
-    error,
   } = useGetMemberByReferralQuery(debouncedReferral, {
     skip: !debouncedReferral || debouncedReferral.length < 3,
   });
@@ -54,6 +51,7 @@ const MemberRegistration = () => {
       email: "",
       password: "",
       referralCode: "",
+      businessType: "",
     },
   });
 
@@ -107,53 +105,6 @@ const MemberRegistration = () => {
               />
             </div>
 
-            {/* Gender */}
-            <div>
-              <Label htmlFor="gender">Gender</Label>
-              <Select
-                id="gender"
-                name="gender"
-                placeholder="Select Gender"
-                options={[
-                  { value: "male", label: "Male" },
-                  { value: "female", label: "Female" },
-                  { value: "other", label: "Other" },
-                ]}
-                {...register("gender")}
-              />
-              {errors.gender && (
-                <p className="text-xs text-error-500 mt-1.5">
-                  {errors.gender.message}
-                </p>
-              )}
-            </div>
-
-            {/* Address */}
-            <div>
-              <Label htmlFor="address">Full Address</Label>
-              <Input
-                type="text"
-                id="address"
-                placeholder="Enter Full Address"
-                {...register("address")}
-                error={!!errors.address}
-                hint={errors.address?.message}
-              />
-            </div>
-
-            {/* City */}
-            <div>
-              <Label htmlFor="city">City</Label>
-              <Input
-                type="text"
-                id="city"
-                placeholder="Enter City"
-                {...register("city")}
-                error={!!errors.city}
-                hint={errors.city?.message}
-              />
-            </div>
-
             {/* Email */}
             <div>
               <Label htmlFor="email">Email Address</Label>
@@ -167,48 +118,36 @@ const MemberRegistration = () => {
               />
             </div>
 
-            {/* Password */}
-            <div>
-              <Label>
-                Password (<span className="text-red-500">*</span>)
+            {/* <div>
+              <Label htmlFor="businessType">
+                Business Type (<span className="text-red-500">*</span>)
               </Label>
-              <div className="relative">
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
-                  {...register("password")}
-                  error={!!errors.password}
-                  hint={errors.password?.message}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"
-                >
-                  {showPassword ? <EyeIcon /> : <EyeOffIcon />}
-                </button>
-              </div>
-            </div>
-          </div>
 
-          {/* Dropzones */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            <div>
-              <Label>Profile Picture</Label>
-              <Dropzone
-                onFilesChange={setProfilePic}
-                multiple={false}
-                maxFiles={1}
-              />
-            </div>
-            <div>
-              <Label>National ID / Passport</Label>
-              <Dropzone
-                onFilesChange={setPassportFiles}
-                multiple={true}
-                maxFiles={2}
-              />
-            </div>
+              {isBusinessTypeLoading ? (
+                <div className="animate-pulse space-y-2">
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                </div>
+              ) : isBusinessTypeError ? (
+                <p className="text-red-500 text-sm">
+                  Failed to load business types
+                </p>
+              ) : (
+                <Select
+                  id="businessType"
+                  {...register("businessType")}
+                  error={!!errors.businessType}
+                  success={!errors.businessType}
+                  options={
+                    businessTypes?.data?.business_types?.map((type) => ({
+                      value: type.id,
+                      label: type.name,
+                    })) || []
+                  }
+                  placeholder="Select Business Type"
+                />
+              )}
+            </div> */}
           </div>
         </ComponentCard>
 

@@ -7,7 +7,6 @@ import VoucherPurchase from "../pages/admin/reports/VoucherPurchase";
 import MemberManage from "../pages/admin/memberMange/MemberManage";
 import StaffManage from "../pages/admin/staffManage/StaffManage";
 import PendingMerchant from "../pages/admin/merchant/PendingMerchant";
-import ActiveMerchant from "../pages/admin/merchant/ActiveMerchant";
 import Income from "../pages/admin/Accounts/Income";
 import Expense from "../pages/admin/Accounts/Expense";
 import Transaction from "../pages/admin/reports/Transaction";
@@ -19,6 +18,11 @@ import MerchantEdit from "../pages/admin/merchant/MerchantEdit";
 import StaffDetails from "../pages/admin/staffManage/StaffDetails";
 import StaffUpdate from "../pages/admin/staffManage/StaffUpdate";
 import CreateStaff from "../pages/admin/staffManage/CreateStaff";
+import AllMerchant from "../pages/admin/merchant/AllMerchant";
+import MemberUpdate from "../pages/admin/memberMange/MemberUpdate";
+import BusinessType from "../pages/admin/BusinessType/BusinessType";
+import CompanyInfo from "../pages/admin/CompanyInfo/CompanyInfo";
+import Denomination from "../pages/admin/Denomination/Denomination";
 
 export const adminRoutes = [
   {
@@ -34,8 +38,12 @@ export const adminRoutes = [
     element: <MemberRegistration />,
   },
   {
-    path: "member-manage/:id",
+    path: "member-manage/details/:id",
     element: <MemberDetails />,
+  },
+  {
+    path: "member-manage/edit/:id",
+    element: <MemberUpdate />,
   },
   {
     path: "staff-manage",
@@ -66,8 +74,8 @@ export const adminRoutes = [
     element: <MerchantEdit />,
   },
   {
-    path: "merchant/active-merchant",
-    element: <ActiveMerchant />,
+    path: "merchant/all-merchant",
+    element: <AllMerchant />,
   },
   {
     path: "merchant/merchant-registration",
@@ -100,6 +108,18 @@ export const adminRoutes = [
   {
     path: "reports/redemption",
     element: <Redemption />,
+  },
+  {
+    path: "business-type",
+    element: <BusinessType />,
+  },
+  {
+    path: "company-info",
+    element: <CompanyInfo />,
+  },
+  {
+    path: "denomination",
+    element: <Denomination />,
   },
   {
     path: "profile",

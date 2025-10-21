@@ -16,10 +16,13 @@ export const useMembers = () => {
   };
 
   // RTK Query: data is { members, meta } from transformResponse
-  const { data, isLoading, isError, refetch } = useGetMembersQuery(params, {
-    // keep previous data while fetching new pages for better UX
-    refetchOnMountOrArgChange: false,
-  });
+  const { data, isLoading, isFetching, isError, refetch } = useGetMembersQuery(
+    params,
+    {
+      refetchOnMountOrArgChange: true, // auto refetch on param change
+      keepPreviousData: true, // keep old data while loading new
+    }
+  );
 
   return {
     members: data?.members || [],
@@ -30,7 +33,7 @@ export const useMembers = () => {
       per_page: perPage,
     },
     isLoading,
-
+    isFetching,
     isError,
     refetch,
   };

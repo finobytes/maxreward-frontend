@@ -97,10 +97,7 @@ const PurchaseVoucher = () => {
   return (
     <div>
       <PageBreadcrumb
-        items={[
-          { label: "Home", to: "/" },
-          { label: "Voucher Purchase Management" },
-        ]}
+        items={[{ label: "Home", to: "/" }, { label: "Voucher Purchase" }]}
       />
 
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white p-4">

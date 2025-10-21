@@ -56,7 +56,7 @@ const VoucherForm = () => {
         items={[
           { label: "Home", to: "/" },
           { label: "Voucher Purchase", to: "/member/purchase-voucher" },
-          { label: "Voucher Form" },
+          { label: "Voucher Purchase Form" },
         ]}
       />
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -65,13 +65,13 @@ const VoucherForm = () => {
             {/* Voucher Information */}
             <div>
               <div>
-                <p className="text-sm font-medium mb-2">Denomination</p>
+                <p className="font-semibold mb-7">Denomination</p>
                 {[
                   { label: "RM 10", key: "RM10" },
                   { label: "RM 100", key: "RM100" },
                   { label: "RM 1,000", key: "RM1000" },
                 ].map((item) => (
-                  <div key={item.key} className="flex items-center gap-3 mb-2">
+                  <div key={item.key} className="flex items-center gap-3 mb-6">
                     <input
                       type="radio"
                       id={item.key}
@@ -90,7 +90,7 @@ const VoucherForm = () => {
                       >
                         <Minus size={14} />
                       </button>
-                      <span className="w-8 text-center">
+                      <span className="w-8 text-center text-gray-400">
                         {counts[item.key]}
                       </span>
                       <button
@@ -104,7 +104,7 @@ const VoucherForm = () => {
                 ))}
               </div>
               <div>
-                <p className="text-sm font-medium mb-2">Payment Method</p>
+                <p className="text-sm font-medium mb-4">Payment Method</p>
                 <div className="flex items-center gap-6">
                   {["Online", "Manual"].map((method) => (
                     <label
@@ -123,7 +123,7 @@ const VoucherForm = () => {
                   ))}
                 </div>
               </div>
-              <div>
+              <div className="mt-6">
                 <Label className="text-sm font-medium mb-2 block">
                   Voucher Type
                 </Label>
@@ -138,7 +138,7 @@ const VoucherForm = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <div>
+              <div className="mt-6">
                 <Label className="text-sm font-medium mb-2 block">
                   Equivalent Points
                 </Label>
@@ -155,7 +155,7 @@ const VoucherForm = () => {
               <h3 className="font-semibold text-gray-800 mb-4">
                 Bank Information
               </h3>
-              <div className="space-y-3">
+              <div className="space-y-5">
                 <div>
                   <Label>Bank Name</Label>
                   <Input placeholder="Enter Bank Name" />

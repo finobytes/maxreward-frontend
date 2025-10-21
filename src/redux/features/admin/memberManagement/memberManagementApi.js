@@ -75,6 +75,18 @@ export const memberApi = baseApi.injectEndpoints({
         };
       },
     }),
+
+    updateMember: builder.mutation({
+      query: ({ id, formData }) => ({
+        url: `/members/${id}`,
+        method: "PATCH",
+        body: formData,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: "Member", id },
+        { type: "Member", id: "LIST" },
+      ],
+    }),
   }),
 });
 
@@ -85,4 +97,5 @@ export const {
   useGetMemberByReferralQuery,
   useGetGeneralMembersQuery,
   useGetCorporateMembersQuery,
+  useUpdateMemberMutation,
 } = memberApi;

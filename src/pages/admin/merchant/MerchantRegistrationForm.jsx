@@ -12,10 +12,17 @@ import PrimaryButton from "@/components/ui/PrimaryButton";
 import Dropzone from "@/components/form/form-elements/Dropzone";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
+import { useGetAllBusinessTypesQuery } from "@/redux/features/admin/businessType/businessTypeApi";
+import { Loader2 } from "lucide-react";
 
 const MerchantRegistrationForm = () => {
   const [createMerchant, { isLoading }] = useCreateMerchantMutation();
   const navigate = useNavigate();
+  const {
+    data: businessTypes,
+    isLoading: isBusinessTypeLoading,
+    isError: isBusinessTypeError,
+  } = useGetAllBusinessTypesQuery();
 
   const {
     register,
@@ -51,7 +58,7 @@ const MerchantRegistrationForm = () => {
       <PageBreadcrumb
         items={[
           { label: "Home", to: "/" },
-          { label: "Merchant", to: "/admin/merchant/active-merchant" },
+          { label: "Pending Merchant", to: "/admin/merchant/pending-merchant" },
           { label: "Merchant Registration" },
         ]}
       />
@@ -76,14 +83,29 @@ const MerchantRegistrationForm = () => {
 
               <div>
                 <Label>Business Type</Label>
-                <Select
-                  {...register("business_type")}
-                  options={[
-                    { value: "Retail", label: "Retail" },
-                    { value: "Service", label: "Service" },
-                    { value: "Super Shop", label: "Super Shop" },
-                  ]}
-                />
+
+                {isBusinessTypeLoading ? (
+                  <div className="animate-pulse space-y-2">
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                  </div>
+                ) : isBusinessTypeError ? (
+                  <p className="text-red-500 text-sm">
+                    Failed to load business types
+                  </p>
+                ) : (
+                  <Select
+                    {...register("business_type")}
+                    options={
+                      businessTypes?.data?.business_types?.map((type) => ({
+                        value: type.id,
+                        label: type.name,
+                      })) || []
+                    }
+                    placeholder="Select Business Type"
+                  />
+                )}
+
                 {errors.business_type && (
                   <p className="text-red-500 text-xs mt-1">
                     {errors.business_type.message}

@@ -59,7 +59,7 @@ const MerchantEdit = () => {
       await updateMerchant({ id, ...payload }).unwrap();
 
       toast.success("Merchant updated successfully!");
-      navigate("/admin/merchant/active-merchant");
+      navigate("/admin/merchant/all-merchant");
     } catch (err) {
       console.error("Update Error:", err);
       toast.error("Failed to update merchant!");
@@ -99,7 +99,7 @@ const MerchantEdit = () => {
       <PageBreadcrumb
         items={[
           { label: "Home", to: "/" },
-          { label: "Merchant", to: "/admin/merchant/active-merchant" },
+          { label: "Merchant", to: "/admin/merchant/all-merchant" },
           { label: "Edit Merchant" },
         ]}
       />
