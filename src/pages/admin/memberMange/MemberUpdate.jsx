@@ -178,6 +178,7 @@ const MemberUpdate = () => {
                 value={referralInput}
                 onChange={(e) => setReferralInput(e.target.value)}
                 placeholder="Enter referral code"
+                readOnly
               />
 
               <div>

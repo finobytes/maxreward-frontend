@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import SearchInput from "../../../components/form/form-elements/SearchInput";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
@@ -19,7 +18,6 @@ import {
   setPerPage,
 } from "../../../redux/features/admin/merchantManagement/merchantManagementSlice";
 import { toast } from "sonner";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -38,7 +36,7 @@ const PendingMerchant = () => {
   const perPage = 10;
   const [selected, setSelected] = useState([]);
 
-  // Mount এ global filters ঠিক করে দাও
+  // Mount global filters
   useEffect(() => {
     dispatch(setStatus("pending"));
     dispatch(setPage(1));

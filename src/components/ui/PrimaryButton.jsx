@@ -7,7 +7,7 @@ const VARIANTS = {
   secondary: "bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-400",
   danger: "bg-red-600 text-white hover:bg-red-500 focus:ring-red-600",
   success: "bg-green-600 text-white hover:bg-green-500 focus:ring-green-600",
-  warning: "bg-yellow-500 text-white hover:bg-yellow-400 focus:ring-yellow-500",
+  warning: "bg-yellow-500 text-black hover:bg-yellow-400 focus:ring-yellow-500",
   accent: "bg-purple-600 text-white hover:bg-purple-500 focus:ring-purple-600",
 };
 

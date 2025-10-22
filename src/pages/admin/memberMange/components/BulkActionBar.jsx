@@ -13,21 +13,11 @@ const BulkActionBar = ({
   return (
     <div className="mt-4 flex flex-wrap items-center gap-2 bg-gray-50 p-3 rounded-md border">
       <p className="text-sm text-gray-700">{selectedCount} selected</p>
-
-      <PrimaryButton variant="success" size="sm" onClick={onSetActive}>
-        Set Active
-      </PrimaryButton>
-
       <PrimaryButton variant="danger" size="sm" onClick={onSetBlocked}>
         Set Blocked
       </PrimaryButton>
-
       <PrimaryButton variant="warning" size="sm" onClick={onSetSuspended}>
         Set Suspended
-      </PrimaryButton>
-
-      <PrimaryButton variant="danger" size="sm" onClick={onDelete}>
-        Delete Selected
       </PrimaryButton>
     </div>
   );

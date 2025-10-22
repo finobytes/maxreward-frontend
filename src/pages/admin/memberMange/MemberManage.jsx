@@ -25,6 +25,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { toast } from "sonner";
+import BulkActionBar from "./components/BulkActionBar";
 
 const useDebounced = (value, delay = 400) => {
   const [v, setV] = useState(value);
@@ -36,6 +38,7 @@ const useDebounced = (value, delay = 400) => {
 };
 
 const MemberManage = () => {
+  const [selected, setSelected] = useState([]);
   const dispatch = useDispatch();
   const { search, status, page, perPage, memberType } = useSelector(
     (s) => s.memberManagement
@@ -53,20 +56,34 @@ const MemberManage = () => {
   const handlePageChange = (p) => dispatch(setPage(p));
   const handlePerPageChange = (n) => dispatch(setPerPage(n));
 
+  const toggleSelectAll = (checked) => {
+    if (checked) {
+      setSelected(members.map((m) => m.id));
+    } else {
+      setSelected([]);
+    }
+  };
+
+  const toggleSelect = (id) => {
+    setSelected((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  const bulkUpdateStatus = (newStatus) => {
+    toast(`Bulk update to ${newStatus} (not implemented yet)`);
+  };
+
+  const bulkDelete = () => {
+    toast("Bulk delete (not implemented yet)");
+  };
+
   return (
     <div>
       <PageBreadcrumb
         items={[{ label: "Home", to: "/" }, { label: "Member Management" }]}
       />
-
-      <div className="rounded-xl border bg-white p-4 relative">
-        {/* Overlay spinner */}
-        {isFetching && !isLoading && (
-          <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-sm flex items-center justify-center rounded-xl">
-            <Loader className="w-6 h-6 animate-spin text-gray-500" />
-          </div>
-        )}
-
+      <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <SearchInput
             value={localSearch}
@@ -120,7 +137,24 @@ const MemberManage = () => {
           </div>
         </div>
 
-        <div className="mt-4 overflow-x-auto">
+        {/* Bulk Actions */}
+        {selected.length > 0 && (
+          <BulkActionBar
+            selectedCount={selected.length}
+            onSetActive={() => bulkUpdateStatus("Active")}
+            onSetBlocked={() => bulkUpdateStatus("Blocked")}
+            onSetSuspended={() => bulkUpdateStatus("Suspended")}
+            onDelete={bulkDelete}
+          />
+        )}
+
+        <div className="mt-4 relative overflow-x-auto w-full">
+          {isFetching && !isLoading && (
+            <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-sm flex items-center justify-center rounded-xl">
+              <Loader className="w-6 h-6 animate-spin text-gray-500" />
+            </div>
+          )}
+
           {isLoading ? (
             <MerchantStaffSkeleton rows={8} cols={8} />
           ) : isError ? (
@@ -135,8 +169,15 @@ const MemberManage = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="p-4">
-                    <input type="checkbox" className="w-4 h-4 rounded" />
+                  <TableHead>
+                    <input
+                      type="checkbox"
+                      checked={
+                        members.length > 0 && selected.length === members.length
+                      }
+                      onChange={(e) => toggleSelectAll(e.target.checked)}
+                      className="w-4 h-4 rounded"
+                    />
                   </TableHead>
                   <TableHead>Member ID</TableHead>
                   <TableHead>Full Name</TableHead>
@@ -152,7 +193,12 @@ const MemberManage = () => {
                 {members.map((m) => (
                   <TableRow key={m.id}>
                     <TableCell>
-                      <input type="checkbox" className="w-4 h-4 rounded" />
+                      <input
+                        type="checkbox"
+                        checked={selected.includes(m.id)}
+                        onChange={() => toggleSelect(m.id)}
+                        className="w-4 h-4 rounded"
+                      />
                     </TableCell>
                     <TableCell>{m.user_name}</TableCell>
                     <TableCell>{m.name}</TableCell>
@@ -179,9 +225,14 @@ const MemberManage = () => {
                         >
                           <PencilLine size={16} />
                         </Link>
-                        <button className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200">
-                          <Trash2Icon size={16} />
-                        </button>
+                        <div className="flex gap-1.5">
+                          <button className="px-2 rounded-md bg-red-600 text-white hover:bg-red-500 focus:ring-red-600">
+                            Block
+                          </button>
+                          <button className="px-2 rounded-md bg-yellow-500 text-black hover:bg-yellow-400 focus:ring-yellow-500">
+                            Suspend
+                          </button>
+                        </div>
                       </div>
                     </TableCell>
                   </TableRow>
