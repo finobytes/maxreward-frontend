@@ -1,7 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { merchantSchema } from "@/schemas/merchantSchema";
 import { useCreateMerchantMutation } from "@/redux/features/admin/merchantManagement/merchantManagementApi";
 import PageBreadcrumb from "@/components/common/PageBreadcrumb";
 import ComponentCard from "@/components/common/ComponentCard";
@@ -13,7 +12,7 @@ import Dropzone from "@/components/form/form-elements/Dropzone";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
 import { useGetAllBusinessTypesQuery } from "@/redux/features/admin/businessType/businessTypeApi";
-import { Loader2 } from "lucide-react";
+import { merchantSchema } from "../../../schemas/merchantSchema";
 
 const MerchantRegistrationForm = () => {
   const [createMerchant, { isLoading }] = useCreateMerchantMutation();
@@ -32,7 +31,7 @@ const MerchantRegistrationForm = () => {
   } = useForm({
     resolver: zodResolver(merchantSchema),
     defaultValues: {
-      status: "pending",
+      status: "approved",
     },
   });
 
@@ -42,14 +41,21 @@ const MerchantRegistrationForm = () => {
       delete payload.confirm_password;
 
       const response = await createMerchant(payload).unwrap();
-      console.log("Merchant Created:", response);
 
       toast.success("Merchant created successfully!");
       reset();
       navigate("/admin/merchant/pending-merchant");
     } catch (err) {
       console.error("Create Error:", err);
-      toast.error("Failed to create merchant!");
+
+      if (err?.data?.errors) {
+        const errors = err.data.errors;
+        Object.entries(errors).forEach(([field, messages]) => {
+          toast.error(`${field}: ${messages.join(", ")}`);
+        });
+      } else {
+        toast.error("Failed to create merchant!");
+      }
     }
   };
 
@@ -129,7 +135,7 @@ const MerchantRegistrationForm = () => {
                 />
               </div>
 
-              <div>
+              {/* <div>
                 <Label>Status</Label>
                 <Select
                   {...register("status")}
@@ -139,7 +145,7 @@ const MerchantRegistrationForm = () => {
                     { value: "rejected", label: "Rejected" },
                   ]}
                 />
-              </div>
+              </div> */}
 
               <div>
                 <Label>License Number</Label>
@@ -194,6 +200,11 @@ const MerchantRegistrationForm = () => {
               <div>
                 <Label>Phone</Label>
                 <Input {...register("phone")} placeholder="Phone Number" />
+                {errors.phone && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.phone.message}
+                  </p>
+                )}
               </div>
               <div>
                 <Label>Gender</Label>
@@ -229,6 +240,11 @@ const MerchantRegistrationForm = () => {
                   {...register("merchant_password")}
                   placeholder="Password"
                 />
+                {errors.merchant_password && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.merchant_password.message}
+                  </p>
+                )}
               </div>
               <div>
                 <Label>Confirm Password</Label>

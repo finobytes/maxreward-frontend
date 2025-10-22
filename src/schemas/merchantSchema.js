@@ -12,12 +12,21 @@ export const merchantSchema = z
     account_holder_name: z.string().min(1, "Account holder name required"),
     account_number: z.string().min(6, "Account number required"),
     owner_name: z.string().min(1, "Owner name required"),
-    phone: z.string().min(11, "Phone must be at least 11 digits"),
+    phone: z
+      .string()
+      .regex(
+        /^(?:\+?8801[3-9]\d{8}|01[3-9]\d{8}|\+?601[0-9]\d{7,8}|601[0-9]\d{7,8})$/,
+        "Phone number must be Bangladeshi or Malaysian"
+      ),
     gender: z.string().min(1, "Gender required"),
     address: z.string().min(3, "Address required"),
     email: z.string().email("Invalid email address"),
-    merchant_password: z.string().min(6, "Password must be 6+ characters"),
-    confirm_password: z.string().min(6, "Confirm your password"),
+    merchant_password: z
+      .string()
+      .min(8, "Password must be at least 8 characters"),
+    confirm_password: z
+      .string()
+      .min(8, "Confirm password must be at least 8 characters"),
   })
   .refine((data) => data.merchant_password === data.confirm_password, {
     message: "Passwords do not match",

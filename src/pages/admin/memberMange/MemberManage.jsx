@@ -26,7 +26,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
-import BulkActionBar from "./components/BulkActionBar";
+import BulkActionBar from "../../../components/table/BulkActionBar";
 
 const useDebounced = (value, delay = 400) => {
   const [v, setV] = useState(value);
@@ -142,10 +142,24 @@ const MemberManage = () => {
         {selected.length > 0 && (
           <BulkActionBar
             selectedCount={selected.length}
-            onSetActive={() => bulkUpdateStatus("Active")}
-            onSetBlocked={() => bulkUpdateStatus("Blocked")}
-            onSetSuspended={() => bulkUpdateStatus("Suspended")}
-            onDelete={bulkDelete}
+            actions={[
+              // {
+              //   label: "Activate",
+              //   variant: "success",
+              //   onClick: () => bulkUpdateStatus("active"),
+              // },
+              {
+                label: "Block",
+                variant: "danger",
+                onClick: () => bulkUpdateStatus("blocked"),
+              },
+              {
+                label: "Suspend",
+                variant: "warning",
+                onClick: () => bulkUpdateStatus("suspended"),
+              },
+              // { label: "Delete", variant: "danger", onClick: bulkDelete },
+            ]}
           />
         )}
 
@@ -227,10 +241,10 @@ const MemberManage = () => {
                           <PencilLine size={16} />
                         </Link>
                         <div className="flex gap-1.5">
-                          <button className="px-2 rounded-md bg-red-600 text-white hover:bg-red-500 focus:ring-red-600">
+                          <button className="px-2 rounded-md bg-red-100 text-red-700 hover:bg-red-200 ">
                             Block
                           </button>
-                          <button className="px-2 rounded-md bg-yellow-500 text-black hover:bg-yellow-400 focus:ring-yellow-500">
+                          <button className="px-2 rounded-md bg-yellow-100 text-gray-700 hover:bg-yellow-200">
                             Suspend
                           </button>
                         </div>

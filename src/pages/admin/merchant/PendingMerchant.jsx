@@ -5,7 +5,6 @@ import PrimaryButton from "../../../components/ui/PrimaryButton";
 import { Eye, Plus } from "lucide-react";
 import StatusBadge from "../../../components/table/StatusBadge";
 import Pagination from "../../../components/table/Pagination";
-import BulkActionBar from "./components/BulkActionBar";
 
 import {
   useGetMerchantsQuery,
@@ -27,6 +26,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSkeleton";
+import BulkActionBar from "../../../components/table/BulkActionBar";
 
 const PendingMerchant = () => {
   const dispatch = useDispatch();
@@ -147,6 +147,7 @@ const PendingMerchant = () => {
               onClick={() => {
                 setSearch("");
                 refetch();
+                setSelected("");
               }}
             >
               Clear
@@ -158,19 +159,33 @@ const PendingMerchant = () => {
         {selected.length > 0 && (
           <BulkActionBar
             selectedCount={selected.length}
-            onSetActive={() => bulkUpdateStatus("Active")}
-            onSetBlocked={() => bulkUpdateStatus("Blocked")}
-            onSetSuspended={() => bulkUpdateStatus("Suspended")}
-            onDelete={bulkDelete}
+            actions={[
+              // {
+              //   label: "Activate",
+              //   variant: "success",
+              //   onClick: () => bulkUpdateStatus("active"),
+              // },
+              {
+                label: "Approve",
+                variant: "success",
+                onClick: () => bulkUpdateStatus("Approve"),
+              },
+              {
+                label: "Reject",
+                variant: "danger",
+                onClick: () => bulkUpdateStatus("Reject"),
+              },
+              // { label: "Delete", variant: "danger", onClick: bulkDelete },
+            ]}
           />
         )}
 
         {/* Table */}
         <div className="mt-4 relative overflow-x-auto">
-          <Table className="w-full min-w-[1000px] text-sm text-center text-gray-500">
+          <Table className="w-full table-auto border-collapse">
             <TableHeader className="text-xs text-gray-700 uppercase bg-gray-50">
               <TableRow>
-                <TableHead className="p-4">
+                <TableHead>
                   <input
                     type="checkbox"
                     checked={
@@ -181,15 +196,15 @@ const PendingMerchant = () => {
                     className="w-4 h-4 rounded"
                   />
                 </TableHead>
-                <TableHead className="py-3">Merchant ID</TableHead>
-                <TableHead className="py-3">Business Name</TableHead>
-                <TableHead className="py-3">Business Type</TableHead>
-                <TableHead className="py-3">Owner Name</TableHead>
-                <TableHead className="py-3">Phone</TableHead>
-                <TableHead className="py-3">Email</TableHead>
-                <TableHead className="py-3">Status</TableHead>
-                <TableHead className="py-3">Created At</TableHead>
-                <TableHead className="py-3">Action</TableHead>
+                <TableHead>Merchant ID</TableHead>
+                <TableHead>Business Name</TableHead>
+                <TableHead>Business Type</TableHead>
+                <TableHead>Owner Name</TableHead>
+                <TableHead>Phone</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Created At</TableHead>
+                <TableHead>Action</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -214,7 +229,7 @@ const PendingMerchant = () => {
                     key={merchant.id}
                     className="bg-white border-b hover:bg-gray-50 transition"
                   >
-                    <TableCell className="p-4">
+                    <TableCell>
                       <input
                         type="checkbox"
                         checked={selected.includes(merchant.id)}
@@ -222,24 +237,16 @@ const PendingMerchant = () => {
                         className="w-4 h-4 rounded"
                       />
                     </TableCell>
-                    <TableCell className="py-4 font-medium text-gray-700">
-                      {merchant.unique_number}
-                    </TableCell>
-                    <TableCell className="py-4">
-                      {merchant.business_name}
-                    </TableCell>
-                    <TableCell className="py-4">
-                      {merchant.business_type}
-                    </TableCell>
-                    <TableCell className="py-4">
-                      {merchant.owner_name}
-                    </TableCell>
-                    <TableCell className="py-4">{merchant.phone}</TableCell>
-                    <TableCell className="py-4">{merchant.email}</TableCell>
-                    <TableCell className="py-4">
+                    <TableCell>{merchant.unique_number}</TableCell>
+                    <TableCell>{merchant.business_name}</TableCell>
+                    <TableCell>{merchant.business_type}</TableCell>
+                    <TableCell>{merchant.owner_name}</TableCell>
+                    <TableCell>{merchant.phone}</TableCell>
+                    <TableCell>{merchant.email}</TableCell>
+                    <TableCell>
                       <StatusBadge status={merchant.status} />
                     </TableCell>
-                    <TableCell className="py-4">
+                    <TableCell>
                       {new Date(merchant.created_at).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="py-4 flex gap-2 justify-center">

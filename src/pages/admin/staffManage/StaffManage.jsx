@@ -19,7 +19,7 @@ import { toast } from "sonner";
 import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSkeleton";
 import { useAdminStaff } from "../../../redux/features/admin/adminStaff/useAdminStaff";
 import { useDeleteAdminStaffMutation } from "../../../redux/features/admin/adminStaff/adminStaffApi";
-import BulkActionBar from "./components/BulkActionBar";
+import BulkActionBar from "../../../components/table/BulkActionBar";
 
 const StaffManage = () => {
   const {
@@ -117,8 +117,18 @@ const StaffManage = () => {
         {selected.length > 0 && (
           <BulkActionBar
             selectedCount={selected.length}
-            onSetActive={() => bulkUpdateStatus("Active")}
-            onSetInactive={() => bulkUpdateStatus("Inactive")}
+            actions={[
+              {
+                label: "Set Active",
+                variant: "success",
+                onClick: () => bulkUpdateStatus("active"),
+              },
+              {
+                label: "Set Inactive",
+                variant: "warning",
+                onClick: () => bulkUpdateStatus("inactive"),
+              },
+            ]}
           />
         )}
         {/* Table Section */}

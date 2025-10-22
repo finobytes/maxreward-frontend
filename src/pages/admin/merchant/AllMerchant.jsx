@@ -4,10 +4,7 @@ import SearchInput from "@/components/form/form-elements/SearchInput";
 import PrimaryButton from "@/components/ui/PrimaryButton";
 import { Eye, Loader, PencilLine, Trash2Icon } from "lucide-react";
 import DropdownSelect from "@/components/ui/dropdown/DropdownSelect";
-import StatusBadge from "@/components/table/StatusBadge";
 import Pagination from "@/components/table/Pagination";
-import BulkActionBar from "./components/BulkActionBar";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useMerchantManagement } from "../../../redux/features/admin/merchantManagement/useMerchantManagement";
 import { Link } from "react-router";
 import { useDeleteMerchantMutation } from "../../../redux/features/admin/merchantManagement/merchantManagementApi";
@@ -23,6 +20,7 @@ import {
 } from "@/components/ui/table";
 import { memberQR, qr } from "../../../assets/assets";
 import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSkeleton";
+import BulkActionBar from "../../../components/table/BulkActionBar";
 
 const AllMerchant = () => {
   const {
@@ -152,10 +150,24 @@ const AllMerchant = () => {
           {selected.length > 0 && (
             <BulkActionBar
               selectedCount={selected.length}
-              onSetActive={() => bulkUpdateStatus("Active")}
-              onSetBlocked={() => bulkUpdateStatus("Blocked")}
-              onSetSuspended={() => bulkUpdateStatus("Suspended")}
-              onDelete={bulkDelete}
+              actions={[
+                // {
+                //   label: "Activate",
+                //   variant: "success",
+                //   onClick: () => bulkUpdateStatus("active"),
+                // },
+                {
+                  label: "Approve",
+                  variant: "success",
+                  onClick: () => bulkUpdateStatus("blocked"),
+                },
+                {
+                  label: "Suspend",
+                  variant: "warning",
+                  onClick: () => bulkUpdateStatus("suspended"),
+                },
+                { label: "Delete", variant: "danger", onClick: bulkDelete },
+              ]}
             />
           )}
           {/* Table */}
