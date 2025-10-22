@@ -79,6 +79,10 @@ const Sidebar = () => {
             path: "/admin/merchant/pending-merchant",
           },
           { name: "All Merchant", path: "/admin/merchant/all-merchant" },
+          {
+            name: "Business Type",
+            path: "/admin/merchant/business-type",
+          },
         ],
       },
       {
@@ -102,11 +106,6 @@ const Sidebar = () => {
           { name: "Tree Performance", path: "/admin/reports/tree-performance" },
           { name: "Redemption History", path: "/admin/reports/redemption" },
         ],
-      },
-      {
-        name: "Business Type",
-        icon: <Briefcase />,
-        path: "/admin/business-type",
       },
       {
         name: "Company Info",

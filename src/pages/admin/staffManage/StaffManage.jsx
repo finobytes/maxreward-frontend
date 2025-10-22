@@ -275,6 +275,13 @@ const StaffManage = () => {
                             <Trash2Icon size={16} />
                           )}
                         </button> */}
+
+                        <button className="px-2 rounded-md bg-red-100 text-red-700 hover:bg-red-200 ">
+                          Block
+                        </button>
+                        <button className="px-2 rounded-md bg-yellow-100 text-gray-700 hover:bg-yellow-200">
+                          Suspend
+                        </button>
                       </div>
                     </TableCell>
                   </TableRow>

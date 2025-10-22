@@ -20,9 +20,9 @@ import StaffUpdate from "../pages/admin/staffManage/StaffUpdate";
 import CreateStaff from "../pages/admin/staffManage/CreateStaff";
 import AllMerchant from "../pages/admin/merchant/AllMerchant";
 import MemberUpdate from "../pages/admin/memberMange/MemberUpdate";
-import BusinessType from "../pages/admin/BusinessType/BusinessType";
 import CompanyInfo from "../pages/admin/CompanyInfo/CompanyInfo";
 import Denomination from "../pages/admin/Denomination/Denomination";
+import BusinessType from "../pages/admin/merchant/BusinessType";
 
 export const adminRoutes = [
   {
@@ -110,7 +110,7 @@ export const adminRoutes = [
     element: <Redemption />,
   },
   {
-    path: "business-type",
+    path: "merchant/business-type",
     element: <BusinessType />,
   },
   {

@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/table";
 import { toast } from "sonner";
 import BulkActionBar from "../../../components/table/BulkActionBar";
+import { memberQR } from "../../../assets/assets";
 
 const useDebounced = (value, delay = 400) => {
   const [v, setV] = useState(value);
@@ -198,9 +199,10 @@ const MemberManage = () => {
                   <TableHead>Full Name</TableHead>
                   <TableHead>Phone</TableHead>
                   <TableHead>Total Referrals</TableHead>
-                  <TableHead>Points</TableHead>
+                  <TableHead>Available Points</TableHead>
                   <TableHead>Lifetime Purchase</TableHead>
                   <TableHead>Date Registered</TableHead>
+                  <TableHead>QR</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -215,7 +217,9 @@ const MemberManage = () => {
                         className="w-4 h-4 rounded"
                       />
                     </TableCell>
-                    <TableCell>{m.user_name}</TableCell>
+                    <TableCell className="whitespace-normal break-words">
+                      {m.user_name}
+                    </TableCell>
                     <TableCell>{m.name}</TableCell>
                     <TableCell>{m.phone}</TableCell>
                     <TableCell>{m.wallet?.total_referrals ?? "N/A"}</TableCell>
@@ -227,6 +231,13 @@ const MemberManage = () => {
                       {new Date(m.created_at).toLocaleDateString()}
                     </TableCell>
                     <TableCell>
+                      <img
+                        src={memberQR}
+                        alt="QR Code"
+                        className="w-12 h-12 object-contain"
+                      />
+                    </TableCell>
+                    <TableCell className="whitespace-normal break-words">
                       <div className="flex gap-2">
                         <Link
                           to={`/admin/member-manage/details/${m.id}`}
@@ -240,14 +251,12 @@ const MemberManage = () => {
                         >
                           <PencilLine size={16} />
                         </Link>
-                        <div className="flex gap-1.5">
-                          <button className="px-2 rounded-md bg-red-100 text-red-700 hover:bg-red-200 ">
-                            Block
-                          </button>
-                          <button className="px-2 rounded-md bg-yellow-100 text-gray-700 hover:bg-yellow-200">
-                            Suspend
-                          </button>
-                        </div>
+                        <button className="px-2 rounded-md bg-red-100 text-red-700 hover:bg-red-200 ">
+                          Block
+                        </button>
+                        <button className="px-2 rounded-md bg-yellow-100 text-gray-700 hover:bg-yellow-200">
+                          Suspend
+                        </button>
                       </div>
                     </TableCell>
                   </TableRow>
