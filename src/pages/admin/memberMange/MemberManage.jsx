@@ -71,7 +71,7 @@ const MemberManage = () => {
   };
 
   const bulkUpdateStatus = (newStatus) => {
-    toast(`Bulk update to ${newStatus} (not implemented yet)`);
+    toast.warning(`Bulk update to ${newStatus} (not implemented yet)`);
   };
 
   const bulkDelete = () => {
@@ -130,6 +130,7 @@ const MemberManage = () => {
               onClick={() => {
                 dispatch(resetFilters());
                 setLocalSearch("");
+                setSelected("");
               }}
             >
               Clear
