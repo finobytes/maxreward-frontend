@@ -100,6 +100,7 @@ const StaffManage = () => {
               onClick={() => {
                 resetFilters();
                 setSelected("");
+                setSearch("");
               }}
             >
               Clear
@@ -255,7 +256,7 @@ const StaffManage = () => {
                       )}
                     </TableCell>
                     <TableCell>
-                      <div className="flex gap-2 justify-center">
+                      <div className="py-2 flex gap-2 justify-center">
                         <Link
                           to={`/admin/staff-manage/details/${staff.id}`}
                           className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500"

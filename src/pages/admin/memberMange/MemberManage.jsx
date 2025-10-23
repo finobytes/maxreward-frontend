@@ -203,7 +203,7 @@ const MemberManage = () => {
                   <TableHead>Lifetime Purchase</TableHead>
                   <TableHead>Date Registered</TableHead>
                   <TableHead>QR</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead className="">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -217,10 +217,10 @@ const MemberManage = () => {
                         className="w-4 h-4 rounded"
                       />
                     </TableCell>
+                    <TableCell>{m.id}</TableCell>
                     <TableCell className="whitespace-normal break-words">
-                      {m.user_name}
+                      {m.name}
                     </TableCell>
-                    <TableCell>{m.name}</TableCell>
                     <TableCell>{m.phone}</TableCell>
                     <TableCell>{m.wallet?.total_referrals ?? "N/A"}</TableCell>
                     <TableCell>{m.wallet?.available_points ?? "N/A"}</TableCell>

@@ -18,9 +18,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { memberQR, qr } from "../../../assets/assets";
+import { memberQR } from "../../../assets/assets";
 import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSkeleton";
 import BulkActionBar from "../../../components/table/BulkActionBar";
+import StatusBadge from "../../../components/table/StatusBadge";
 
 const AllMerchant = () => {
   const {
@@ -137,7 +138,10 @@ const AllMerchant = () => {
               <PrimaryButton
                 variant="secondary"
                 size="md"
-                onClick={clearFilters}
+                onClick={() => {
+                  clearFilters();
+                  setSelected("");
+                }}
               >
                 Clear
               </PrimaryButton>
@@ -158,7 +162,7 @@ const AllMerchant = () => {
               {
                 label: "Approve",
                 variant: "success",
-                onClick: () => bulkUpdateStatus("blocked"),
+                onClick: () => bulkUpdateStatus("approve"),
               },
               {
                 label: "Suspend",
@@ -197,13 +201,17 @@ const AllMerchant = () => {
                 <TableHead className="hidden md:table-cell">
                   Phone Number
                 </TableHead>
+                <TableHead className="hidden md:table-cell">
+                  Email Address
+                </TableHead>
                 <TableHead className="hidden lg:table-cell">
                   Reward Budget
                 </TableHead>
-                <TableHead className="hidden md:table-cell">
-                  Lifetime Purchase
-                </TableHead>
                 <TableHead>Registration Date</TableHead>
+                <TableHead className="hidden md:table-cell">
+                  Available Points
+                </TableHead>
+                <TableHead className="hidden md:table-cell">Status</TableHead>
                 <TableHead>QR</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -239,33 +247,35 @@ const AllMerchant = () => {
                         className="w-4 h-4 rounded"
                       />
                     </TableCell>
-                    <TableCell className="whitespace-normal break-words">
-                      {m?.id}
-                    </TableCell>
+                    <TableCell>{m?.id}</TableCell>
                     {/* Name + Avatar */}
-                    <TableCell>
-                      {/* <div className="flex items-center gap-3"> */}
-                      {/* <img
+                    <TableCell className="whitespace-normal break-words">
+                      {m?.business_name}
+                      {/* <div className="flex items-center gap-3">
+                        <img
                           src={userImage}
                           alt="user"
                           className="w-10 h-10 rounded-full border"
-                        /> */}
-                      <div>
-                        <div className="font-medium text-gray-900">
-                          {m?.business_name}
+                        />
+                        <div>
+                          <div className="font-medium text-gray-900"></div>
                         </div>
-                      </div>
-                      {/* </div> */}
+                      </div> */}
                     </TableCell>
 
-                    <TableCell>{m?.merchant_created_by}</TableCell>
+                    <TableCell>
+                      {m?.authorized_person || <span>N/A</span>}
+                    </TableCell>
                     <TableCell>{m?.phone ?? "N/A"}</TableCell>
+                    <TableCell>{m?.email ?? "N/A"}</TableCell>
                     <TableCell>{m?.reward_budget ?? "N/A"}</TableCell>
                     <TableCell>
-                      {m?.wallet?.lifetime_purchase_amount ?? "N/A"}
-                    </TableCell>
-                    <TableCell>
                       {new Date(m?.created_at).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>{m?.wallet?.total_points ?? "N/A"}</TableCell>
+
+                    <TableCell>
+                      <StatusBadge status={m.status} />
                     </TableCell>
                     <TableCell>
                       <img
