@@ -164,7 +164,7 @@ const MemberManage = () => {
           />
         )}
 
-        <div className="mt-4 relative overflow-x-auto w-full">
+        <div className="mt-4 relative overflow-x-auto w-full custom-scrollbar ">
           {isFetching && !isLoading && (
             <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-sm flex items-center justify-center rounded-xl">
               <Loader className="w-6 h-6 animate-spin text-gray-500" />
