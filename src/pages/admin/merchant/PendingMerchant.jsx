@@ -67,7 +67,7 @@ const PendingMerchant = () => {
 
   const handleApprove = async (id) => {
     try {
-      await updateMerchant({ id, status: "active" }).unwrap();
+      await updateMerchant({ id, status: "approved" }).unwrap();
       toast.success("Merchant approved successfully ");
       refetch();
     } catch (error) {
