@@ -16,7 +16,7 @@ import Dropzone from "@/components/form/form-elements/Dropzone";
 import { toast } from "sonner";
 import { useNavigate, useParams } from "react-router";
 
-const MerchantEdit = () => {
+const PendingMerchantDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -59,7 +59,7 @@ const MerchantEdit = () => {
       await updateMerchant({ id, ...payload }).unwrap();
 
       toast.success("Merchant updated successfully!");
-      navigate("/admin/merchant/all-merchant");
+      //   navigate("/admin/merchant/all-merchant");
     } catch (err) {
       console.error("Update Error:", err);
       toast.error("Failed to update merchant!");
@@ -99,80 +99,52 @@ const MerchantEdit = () => {
       <PageBreadcrumb
         items={[
           { label: "Home", to: "/" },
-          { label: "Merchant", to: "/admin/merchant/all-merchant" },
-          { label: "Edit Merchant" },
+          { label: "Pending Merchant", to: "/admin/merchant/pending-merchant" },
+          { label: "Merchant Application Form" },
         ]}
       />
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/* Member Information */}
-        <ComponentCard title="Member Information">
+        {/* Business Information */}
+        <ComponentCard title="Business Information">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:col-span-2">
               <div>
-                <Label>Business Name</Label>
+                <Label>Company Name</Label>
                 <Input
-                  {...register("business_name")}
+                  value={merchantData?.business_name}
                   placeholder="Business name"
-                />
-                {errors.business_name && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.business_name.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <Label>Business Type</Label>
-                <Select
-                  {...register("business_type")}
-                  options={[
-                    { value: "Retail", label: "Retail" },
-                    { value: "Service", label: "Service" },
-                    { value: "Super Shop", label: "Super Shop" },
-                  ]}
-                />
-                {errors.business_type && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.business_type.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <Label>Business Description</Label>
-                <Input
-                  {...register("business_description")}
-                  placeholder="Business Description"
+                  readOnly
                 />
               </div>
-
               <div>
                 <Label>Company Address</Label>
                 <Input
-                  {...register("company_address")}
+                  value={merchantData?.company_address}
                   placeholder="Company Address"
+                  readOnly
                 />
               </div>
 
               <div>
-                <Label>Status</Label>
-                <Select
-                  {...register("status")}
-                  options={[
-                    { value: "pending", label: "Pending" },
-                    { value: "approved", label: "Approved" },
-                    { value: "rejected", label: "Rejected" },
-                  ]}
-                />
+                <Label>State</Label>
+                <Input placeholder="N/A" readOnly />
               </div>
-
               <div>
-                <Label>License Number</Label>
+                <Label>Product / Service</Label>
                 <Input
-                  {...register("license_number")}
-                  placeholder="License Number"
+                  value={merchantData?.business_type}
+                  placeholder="N/A"
+                  readOnly
                 />
+              </div>
+              <div>
+                <Label>Annual Sales Turnover</Label>
+                <Input placeholder="N/A" readOnly />
+              </div>
+              <div>
+                <Label>Reward Budget (%)</Label>
+                <Input placeholder="N/A" readOnly />
               </div>
             </div>
 
@@ -183,68 +155,38 @@ const MerchantEdit = () => {
           </div>
         </ComponentCard>
 
-        {/* Bank Information */}
+        {/* Authorized Person Information */}
         <div className="mt-6">
-          <ComponentCard title="Bank Information">
+          <ComponentCard title="Authorized Person Information">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <Label>Bank Name</Label>
-                <Input {...register("bank_name")} placeholder="Bank Name" />
-              </div>
-              <div>
-                <Label>Account Holder Name</Label>
-                <Input
-                  {...register("account_holder_name")}
-                  placeholder="Account Holder Name"
-                />
-              </div>
-              <div>
-                <Label>Account Number / IBAN</Label>
-                <Input
-                  {...register("account_number")}
-                  placeholder="Account Number"
-                />
-              </div>
-            </div>
-          </ComponentCard>
-        </div>
-
-        {/* Owner Information */}
-        <div className="mt-6">
-          <ComponentCard title="Owner Information">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div>
-                <Label>Owner Name</Label>
-                <Input {...register("owner_name")} placeholder="Owner Name" />
+                <Label>Authorized Person Name</Label>
+                <Input placeholder="N/A" readOnly />
               </div>
               <div>
                 <Label>Phone</Label>
-                <Input {...register("phone")} placeholder="Phone Number" />
+                <Input placeholder="N/A" />
               </div>
               <div>
-                <Label>Gender</Label>
-                <Select
-                  {...register("gender")}
-                  options={[
-                    { value: "male", label: "Male" },
-                    { value: "female", label: "Female" },
-                    { value: "others", label: "Others" },
-                  ]}
-                />
-              </div>
-              <div>
-                <Label>Address</Label>
-                <Input {...register("address")} placeholder="Full Address" />
-              </div>
-              <div>
-                <Label>Email</Label>
-                <Input {...register("email")} placeholder="Email" />
+                <Label>Email Address</Label>
+                <Input placeholder="N/A" />
               </div>
             </div>
 
             <div className="mt-8 flex gap-4">
-              <PrimaryButton type="submit" disabled={isLoading}>
-                {isLoading ? "Updating..." : "Update Merchant"}
+              <PrimaryButton
+                variant="success"
+                type="submit"
+                disabled={isLoading}
+              >
+                {isLoading ? "Approving..." : "Approve"}
+              </PrimaryButton>
+              <PrimaryButton
+                variant="danger"
+                type="submit"
+                disabled={isLoading}
+              >
+                {isLoading ? "Rejecting..." : "Reject"}
               </PrimaryButton>
               <PrimaryButton
                 variant="secondary"
@@ -261,4 +203,4 @@ const MerchantEdit = () => {
   );
 };
 
-export default MerchantEdit;
+export default PendingMerchantDetails;

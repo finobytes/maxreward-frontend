@@ -25,6 +25,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { toast } from "sonner";
+import BulkActionBar from "../../../components/table/BulkActionBar";
+import { memberQR } from "../../../assets/assets";
 
 const useDebounced = (value, delay = 400) => {
   const [v, setV] = useState(value);
@@ -36,6 +39,7 @@ const useDebounced = (value, delay = 400) => {
 };
 
 const MemberManage = () => {
+  const [selected, setSelected] = useState([]);
   const dispatch = useDispatch();
   const { search, status, page, perPage, memberType } = useSelector(
     (s) => s.memberManagement
@@ -53,20 +57,34 @@ const MemberManage = () => {
   const handlePageChange = (p) => dispatch(setPage(p));
   const handlePerPageChange = (n) => dispatch(setPerPage(n));
 
+  const toggleSelectAll = (checked) => {
+    if (checked) {
+      setSelected(members.map((m) => m.id));
+    } else {
+      setSelected([]);
+    }
+  };
+
+  const toggleSelect = (id) => {
+    setSelected((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  const bulkUpdateStatus = (newStatus) => {
+    toast.warning(`Bulk update to ${newStatus} (not implemented yet)`);
+  };
+
+  const bulkDelete = () => {
+    toast("Bulk delete (not implemented yet)");
+  };
+
   return (
     <div>
       <PageBreadcrumb
         items={[{ label: "Home", to: "/" }, { label: "Member Management" }]}
       />
-
-      <div className="rounded-xl border bg-white p-4 relative">
-        {/* Overlay spinner */}
-        {isFetching && !isLoading && (
-          <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-sm flex items-center justify-center rounded-xl">
-            <Loader className="w-6 h-6 animate-spin text-gray-500" />
-          </div>
-        )}
-
+      <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <SearchInput
             value={localSearch}
@@ -113,6 +131,7 @@ const MemberManage = () => {
               onClick={() => {
                 dispatch(resetFilters());
                 setLocalSearch("");
+                setSelected("");
               }}
             >
               Clear
@@ -120,7 +139,38 @@ const MemberManage = () => {
           </div>
         </div>
 
-        <div className="mt-4 overflow-x-auto">
+        {/* Bulk Actions */}
+        {selected.length > 0 && (
+          <BulkActionBar
+            selectedCount={selected.length}
+            actions={[
+              // {
+              //   label: "Activate",
+              //   variant: "success",
+              //   onClick: () => bulkUpdateStatus("active"),
+              // },
+              {
+                label: "Block",
+                variant: "danger",
+                onClick: () => bulkUpdateStatus("blocked"),
+              },
+              {
+                label: "Suspend",
+                variant: "warning",
+                onClick: () => bulkUpdateStatus("suspended"),
+              },
+              // { label: "Delete", variant: "danger", onClick: bulkDelete },
+            ]}
+          />
+        )}
+
+        <div className="mt-4 relative overflow-x-auto w-full custom-scrollbar ">
+          {isFetching && !isLoading && (
+            <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-sm flex items-center justify-center rounded-xl">
+              <Loader className="w-6 h-6 animate-spin text-gray-500" />
+            </div>
+          )}
+
           {isLoading ? (
             <MerchantStaffSkeleton rows={8} cols={8} />
           ) : isError ? (
@@ -135,27 +185,42 @@ const MemberManage = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="p-4">
-                    <input type="checkbox" className="w-4 h-4 rounded" />
+                  <TableHead>
+                    <input
+                      type="checkbox"
+                      checked={
+                        members.length > 0 && selected.length === members.length
+                      }
+                      onChange={(e) => toggleSelectAll(e.target.checked)}
+                      className="w-4 h-4 rounded"
+                    />
                   </TableHead>
                   <TableHead>Member ID</TableHead>
                   <TableHead>Full Name</TableHead>
-                  <TableHead>Phone</TableHead>
+                  <TableHead>Phone Number</TableHead>
                   <TableHead>Total Referrals</TableHead>
-                  <TableHead>Points</TableHead>
+                  <TableHead>Available Points</TableHead>
                   <TableHead>Lifetime Purchase</TableHead>
                   <TableHead>Date Registered</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead>QR</TableHead>
+                  <TableHead className="">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {members.map((m) => (
                   <TableRow key={m.id}>
                     <TableCell>
-                      <input type="checkbox" className="w-4 h-4 rounded" />
+                      <input
+                        type="checkbox"
+                        checked={selected.includes(m.id)}
+                        onChange={() => toggleSelect(m.id)}
+                        className="w-4 h-4 rounded"
+                      />
                     </TableCell>
-                    <TableCell>{m.user_name}</TableCell>
-                    <TableCell>{m.name}</TableCell>
+                    <TableCell>{m.id}</TableCell>
+                    <TableCell className="whitespace-normal break-words">
+                      {m.name}
+                    </TableCell>
                     <TableCell>{m.phone}</TableCell>
                     <TableCell>{m.wallet?.total_referrals ?? "N/A"}</TableCell>
                     <TableCell>{m.wallet?.available_points ?? "N/A"}</TableCell>
@@ -166,6 +231,13 @@ const MemberManage = () => {
                       {new Date(m.created_at).toLocaleDateString()}
                     </TableCell>
                     <TableCell>
+                      <img
+                        src={memberQR}
+                        alt="QR Code"
+                        className="w-12 h-12 object-contain"
+                      />
+                    </TableCell>
+                    <TableCell className="whitespace-normal break-words">
                       <div className="flex gap-2">
                         <Link
                           to={`/admin/member-manage/details/${m.id}`}
@@ -179,8 +251,11 @@ const MemberManage = () => {
                         >
                           <PencilLine size={16} />
                         </Link>
-                        <button className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200">
-                          <Trash2Icon size={16} />
+                        <button className="px-2 rounded-md bg-red-100 text-red-700 hover:bg-red-200 ">
+                          Block
+                        </button>
+                        <button className="px-2 rounded-md bg-yellow-100 text-gray-700 hover:bg-yellow-200">
+                          Suspend
                         </button>
                       </div>
                     </TableCell>

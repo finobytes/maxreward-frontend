@@ -32,6 +32,7 @@ import { toast } from "sonner";
 const othersItems = [];
 
 const Sidebar = () => {
+  const [activeMainIndex, setActiveMainIndex] = useState(null);
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const location = useLocation();
 
@@ -79,6 +80,10 @@ const Sidebar = () => {
             path: "/admin/merchant/pending-merchant",
           },
           { name: "All Merchant", path: "/admin/merchant/all-merchant" },
+          {
+            name: "Business Type",
+            path: "/admin/merchant/business-type",
+          },
         ],
       },
       {
@@ -102,11 +107,6 @@ const Sidebar = () => {
           { name: "Tree Performance", path: "/admin/reports/tree-performance" },
           { name: "Redemption History", path: "/admin/reports/redemption" },
         ],
-      },
-      {
-        name: "Business Type",
-        icon: <Briefcase />,
-        path: "/admin/business-type",
       },
       {
         name: "Company Info",
@@ -237,11 +237,30 @@ const Sidebar = () => {
       { name: "Logout", icon: <LogOut /> },
     ],
   };
-  const items = useMemo(() => NAV_CONFIG[role]);
+  const items = useMemo(() => NAV_CONFIG[role] || [], [role]);
   const isActive = useCallback(
     (path) => location.pathname === path,
     [location.pathname]
   );
+  // restore active menu based on URL (on reload or route change)
+  useEffect(() => {
+    let found = false;
+    items.forEach((nav, index) => {
+      if (nav.subItems) {
+        nav.subItems.forEach((subItem) => {
+          if (isActive(subItem.path)) {
+            setActiveMainIndex(index); // submenu  parent active
+            found = true;
+          }
+        });
+      } else if (isActive(nav.path)) {
+        setActiveMainIndex(index); // normal menu active
+        found = true;
+      }
+    });
+
+    if (!found) setActiveMainIndex(null);
+  }, [location.pathname, items, isActive]);
 
   useEffect(() => {
     let submenuMatched = false;
@@ -295,9 +314,12 @@ const Sidebar = () => {
         <li key={nav.name}>
           {nav.subItems ? (
             <button
-              onClick={() => handleSubmenuToggle(index, menuType)}
+              onClick={() => {
+                handleSubmenuToggle(index, menuType);
+                setActiveMainIndex(index); // temporary active main menu
+              }}
               className={`menu-item group ${
-                openSubmenu?.type === menuType && openSubmenu?.index === index
+                activeMainIndex === index
                   ? "menu-item-active"
                   : "menu-item-inactive"
               } cursor-pointer ${
@@ -307,8 +329,8 @@ const Sidebar = () => {
               }`}
             >
               <span
-                className={`menu-item-icon-size  ${
-                  openSubmenu?.type === menuType && openSubmenu?.index === index
+                className={`menu-item-icon-size ${
+                  activeMainIndex === index
                     ? "menu-item-icon-active"
                     : "menu-item-icon-inactive"
                 }`}
@@ -316,23 +338,23 @@ const Sidebar = () => {
                 {nav.icon}
               </span>
               {(isExpanded || isHovered || isMobileOpen) && (
-                <span className="menu-item-text">{nav.name}</span>
-              )}
-              {(isExpanded || isHovered || isMobileOpen) && (
-                <ChevronDownIcon
-                  className={`ml-auto w-4  h-4 transition-transform duration-200 ${
-                    openSubmenu?.type === menuType &&
-                    openSubmenu?.index === index
-                      ? "rotate-180 text-white"
-                      : ""
-                  }`}
-                />
+                <>
+                  <span className="menu-item-text">{nav.name}</span>
+                  <ChevronDownIcon
+                    className={`ml-auto w-4 h-4 transition-transform duration-200 ${
+                      openSubmenu?.type === menuType &&
+                      openSubmenu?.index === index
+                        ? "rotate-180 text-white"
+                        : ""
+                    }`}
+                  />
+                </>
               )}
             </button>
           ) : nav.name === "Logout" ? (
             <button
               onClick={handleLogout}
-              className={`menu-item group menu-item-inactive w-full text-left`}
+              className="menu-item group menu-item-inactive w-full text-left"
             >
               <span className="menu-item-icon-size menu-item-icon-inactive">
                 {nav.icon}
@@ -347,8 +369,11 @@ const Sidebar = () => {
             nav.path && (
               <Link
                 to={nav.path}
+                onClick={() => setActiveMainIndex(index)} // temporary active
                 className={`menu-item group ${
-                  isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
+                  activeMainIndex === index
+                    ? "menu-item-active"
+                    : "menu-item-inactive"
                 }`}
               >
                 <span
@@ -366,6 +391,7 @@ const Sidebar = () => {
               </Link>
             )
           )}
+
           {nav.subItems && (isExpanded || isHovered || isMobileOpen) && (
             <div
               ref={(el) => {
@@ -384,6 +410,7 @@ const Sidebar = () => {
                   <li key={subItem.name}>
                     <Link
                       to={subItem.path}
+                      onClick={() => setActiveMainIndex(index)} // parent active on submenu click
                       className={`menu-dropdown-item ${
                         isActive(subItem.path)
                           ? "menu-dropdown-item-active"
@@ -404,16 +431,11 @@ const Sidebar = () => {
 
   return (
     <aside
-      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
-        ${
-          isExpanded || isMobileOpen
-            ? "w-[240px]"
-            : isHovered
-            ? "w-[240px]"
-            : "w-[74px]"
-        }
-        ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
-        lg:translate-x-0`}
+      className={`fixed top-0 left-0 h-screen z-50 bg-white border-r border-gray-200 
+  transition-all duration-300 ease-in-out flex flex-col px-5
+  ${isExpanded || isHovered ? "w-[240px]" : "w-[74px]"}
+  ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
+  lg:translate-x-0`}
       onMouseEnter={() => !isExpanded && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

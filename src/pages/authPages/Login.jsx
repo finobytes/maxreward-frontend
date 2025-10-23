@@ -150,7 +150,7 @@ const Login = () => {
             disabled={isLoading}
             className="flex justify-center items-center gap-2 w-full bg-[#FF5A29] text-white py-2 rounded-md font-semibold hover:bg-[#FF5A29]/80 transition disabled:opacity-70"
           >
-            {isLoading && <Spinner />} {/* ✅ Spinner when loading */}
+            {isLoading && <Spinner />} {/* Spinner when loading */}
             {isLoading ? "Logging in..." : "Log In"}
           </button>
         </form>

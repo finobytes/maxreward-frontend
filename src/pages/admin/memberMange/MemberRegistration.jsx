@@ -12,7 +12,6 @@ import { memberSchema } from "../../../schemas/memberSchema";
 import { useGetMemberByReferralQuery } from "../../../redux/features/admin/memberManagement/memberManagementApi";
 
 const MemberRegistration = () => {
-  const [showPassword, setShowPassword] = useState(false);
   const [profilePic, setProfilePic] = useState([]);
   const [passportFiles, setPassportFiles] = useState([]);
   const [referralInput, setReferralInput] = useState("");

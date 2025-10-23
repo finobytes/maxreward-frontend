@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSkeleton";
 import { useAdminStaff } from "../../../redux/features/admin/adminStaff/useAdminStaff";
 import { useDeleteAdminStaffMutation } from "../../../redux/features/admin/adminStaff/adminStaffApi";
+import BulkActionBar from "../../../components/table/BulkActionBar";
 
 const StaffManage = () => {
   const {
@@ -36,10 +37,22 @@ const StaffManage = () => {
   const [selected, setSelected] = useState([]);
   const [deletingId, setDeletingId] = useState(null);
 
+  const toggleSelectAll = (checked) => {
+    if (checked) {
+      setSelected(staffs.map((staff) => staff.id));
+    } else {
+      setSelected([]);
+    }
+  };
+
   const toggleSelect = (id) => {
     setSelected((prev) =>
       prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
     );
+  };
+
+  const bulkUpdateStatus = (newStatus) => {
+    toast.warning(`Bulk update to ${newStatus} (not implemented yet)`);
   };
 
   const handleDelete = async (id) => {
@@ -64,7 +77,7 @@ const StaffManage = () => {
         {/* Header + Filters */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <SearchInput
-            placeholder="Search staff..."
+            placeholder="Search by name, phone, email, designation ..."
             value={debouncedSearch}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -77,10 +90,19 @@ const StaffManage = () => {
                 { label: "All", value: "" },
                 { label: "Active", value: "active" },
                 { label: "Inactive", value: "inactive" },
+                { label: "Suspend", value: "suspend" },
               ]}
             />
 
-            <PrimaryButton variant="secondary" size="md" onClick={resetFilters}>
+            <PrimaryButton
+              variant="secondary"
+              size="md"
+              onClick={() => {
+                resetFilters();
+                setSelected("");
+                setSearch("");
+              }}
+            >
               Clear
             </PrimaryButton>
 
@@ -93,7 +115,29 @@ const StaffManage = () => {
             </PrimaryButton>
           </div>
         </div>
-
+        {/* Bulk Actions */}
+        {selected.length > 0 && (
+          <BulkActionBar
+            selectedCount={selected.length}
+            actions={[
+              {
+                label: "Active",
+                variant: "success",
+                onClick: () => bulkUpdateStatus("active"),
+              },
+              {
+                label: "Inactive",
+                variant: "warning",
+                onClick: () => bulkUpdateStatus("inactive"),
+              },
+              {
+                label: "Suspend",
+                variant: "danger",
+                onClick: () => bulkUpdateStatus("inactive"),
+              },
+            ]}
+          />
+        )}
         {/* Table Section */}
         <div className="mt-4 relative overflow-x-auto w-full">
           {/* Overlay spinner when fetching new data */}
@@ -106,7 +150,14 @@ const StaffManage = () => {
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[40px]">
-                  <input type="checkbox" className="w-4 h-4 rounded" />
+                  <input
+                    checked={
+                      staffs.length > 0 && selected.length === staffs.length
+                    }
+                    onChange={(e) => toggleSelectAll(e.target.checked)}
+                    type="checkbox"
+                    className="w-4 h-4 rounded"
+                  />
                 </TableHead>
                 <TableHead className="text-gray-700 font-medium">
                   Staff ID
@@ -132,7 +183,7 @@ const StaffManage = () => {
                 <TableHead className="text-gray-700 font-medium">
                   Join Date
                 </TableHead>
-                <TableHead className="text-gray-700 font-medium text-center">
+                <TableHead className="text-gray-700 font-medium">
                   Action
                 </TableHead>
               </TableRow>
@@ -205,7 +256,7 @@ const StaffManage = () => {
                       )}
                     </TableCell>
                     <TableCell>
-                      <div className="flex gap-2 justify-center">
+                      <div className="py-2 flex gap-2 justify-center">
                         <Link
                           to={`/admin/staff-manage/details/${staff.id}`}
                           className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500"
@@ -220,7 +271,7 @@ const StaffManage = () => {
                           <PencilLine size={16} />
                         </Link>
 
-                        <button
+                        {/* <button
                           onClick={() => handleDelete(staff.id)}
                           disabled={deletingId === staff.id}
                           className="p-2 rounded-md bg-red-100 hover:bg-red-200 text-red-500 flex items-center gap-1"
@@ -230,7 +281,7 @@ const StaffManage = () => {
                           ) : (
                             <Trash2Icon size={16} />
                           )}
-                        </button>
+                        </button> */}
                       </div>
                     </TableCell>
                   </TableRow>

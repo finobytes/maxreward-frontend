@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import SearchInput from "../../../components/form/form-elements/SearchInput";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
 import { Eye, Plus } from "lucide-react";
 import StatusBadge from "../../../components/table/StatusBadge";
 import Pagination from "../../../components/table/Pagination";
-import BulkActionBar from "./components/BulkActionBar";
 
 import {
   useGetMerchantsQuery,
@@ -19,7 +17,6 @@ import {
   setPerPage,
 } from "../../../redux/features/admin/merchantManagement/merchantManagementSlice";
 import { toast } from "sonner";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -29,6 +26,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSkeleton";
+import BulkActionBar from "../../../components/table/BulkActionBar";
+import { Link } from "react-router";
 
 const PendingMerchant = () => {
   const dispatch = useDispatch();
@@ -38,7 +37,7 @@ const PendingMerchant = () => {
   const perPage = 10;
   const [selected, setSelected] = useState([]);
 
-  // Mount এ global filters ঠিক করে দাও
+  // Mount global filters
   useEffect(() => {
     dispatch(setStatus("pending"));
     dispatch(setPage(1));
@@ -68,7 +67,7 @@ const PendingMerchant = () => {
 
   const handleApprove = async (id) => {
     try {
-      await updateMerchant({ id, status: "active" }).unwrap();
+      await updateMerchant({ id, status: "approved" }).unwrap();
       toast.success("Merchant approved successfully ");
       refetch();
     } catch (error) {
@@ -149,6 +148,7 @@ const PendingMerchant = () => {
               onClick={() => {
                 setSearch("");
                 refetch();
+                setSelected("");
               }}
             >
               Clear
@@ -160,19 +160,33 @@ const PendingMerchant = () => {
         {selected.length > 0 && (
           <BulkActionBar
             selectedCount={selected.length}
-            onSetActive={() => bulkUpdateStatus("Active")}
-            onSetBlocked={() => bulkUpdateStatus("Blocked")}
-            onSetSuspended={() => bulkUpdateStatus("Suspended")}
-            onDelete={bulkDelete}
+            actions={[
+              // {
+              //   label: "Activate",
+              //   variant: "success",
+              //   onClick: () => bulkUpdateStatus("active"),
+              // },
+              {
+                label: "Approve",
+                variant: "success",
+                onClick: () => bulkUpdateStatus("Approve"),
+              },
+              {
+                label: "Reject",
+                variant: "danger",
+                onClick: () => bulkUpdateStatus("Reject"),
+              },
+              // { label: "Delete", variant: "danger", onClick: bulkDelete },
+            ]}
           />
         )}
 
         {/* Table */}
         <div className="mt-4 relative overflow-x-auto">
-          <Table className="w-full min-w-[1000px] text-sm text-center text-gray-500">
+          <Table className="w-full table-auto border-collapse">
             <TableHeader className="text-xs text-gray-700 uppercase bg-gray-50">
               <TableRow>
-                <TableHead className="p-4">
+                <TableHead>
                   <input
                     type="checkbox"
                     checked={
@@ -183,15 +197,15 @@ const PendingMerchant = () => {
                     className="w-4 h-4 rounded"
                   />
                 </TableHead>
-                <TableHead className="py-3">Merchant ID</TableHead>
-                <TableHead className="py-3">Business Name</TableHead>
-                <TableHead className="py-3">Business Type</TableHead>
-                <TableHead className="py-3">Owner Name</TableHead>
-                <TableHead className="py-3">Phone</TableHead>
-                <TableHead className="py-3">Email</TableHead>
-                <TableHead className="py-3">Status</TableHead>
-                <TableHead className="py-3">Created At</TableHead>
-                <TableHead className="py-3">Action</TableHead>
+                <TableHead>Application ID</TableHead>
+                <TableHead>Merchant ID</TableHead>
+                <TableHead>Company Name</TableHead>
+                <TableHead>Authorized Person</TableHead>
+                <TableHead>Phone Number</TableHead>
+                <TableHead>Email Address</TableHead>
+                <TableHead>Reward Budget</TableHead>
+                <TableHead>Application Date</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -213,42 +227,50 @@ const PendingMerchant = () => {
               ) : (
                 merchants.map((merchant) => (
                   <TableRow
-                    key={merchant.id}
+                    key={merchant?.id}
                     className="bg-white border-b hover:bg-gray-50 transition"
                   >
-                    <TableCell className="p-4">
+                    <TableCell>
                       <input
                         type="checkbox"
-                        checked={selected.includes(merchant.id)}
-                        onChange={() => toggleSelect(merchant.id)}
+                        checked={selected.includes(merchant?.id)}
+                        onChange={() => toggleSelect(merchant?.id)}
                         className="w-4 h-4 rounded"
                       />
                     </TableCell>
-                    <TableCell className="py-4 font-medium text-gray-700">
-                      {merchant.unique_number}
+                    <TableCell>
+                      {merchant?.application_id || (
+                        <span className="text-gray-500">N/A</span>
+                      )}
                     </TableCell>
-                    <TableCell className="py-4">
-                      {merchant.business_name}
+                    <TableCell>{merchant?.id}</TableCell>
+                    <TableCell>{merchant?.business_name}</TableCell>
+                    <TableCell>
+                      {merchant?.authorized_person || (
+                        <span className="text-gray-500">N/A</span>
+                      )}
                     </TableCell>
-                    <TableCell className="py-4">
-                      {merchant.business_type}
+                    <TableCell>{merchant?.phone}</TableCell>
+                    <TableCell>{merchant?.email}</TableCell>
+                    <TableCell>
+                      {merchant?.reward_budget || (
+                        <span className="text-gray-500">N/A</span>
+                      )}
                     </TableCell>
-                    <TableCell className="py-4">
-                      {merchant.owner_name}
-                    </TableCell>
-                    <TableCell className="py-4">{merchant.phone}</TableCell>
-                    <TableCell className="py-4">{merchant.email}</TableCell>
-                    <TableCell className="py-4">
-                      <StatusBadge status={merchant.status} />
-                    </TableCell>
-                    <TableCell className="py-4">
+                    <TableCell>
                       {new Date(merchant.created_at).toLocaleDateString()}
                     </TableCell>
-                    <TableCell className="py-4 flex gap-2 justify-center">
+                    <TableCell className="py-4 flex gap-2">
+                      <Link
+                        to={`/admin/pending-merchant/details/${merchant?.id}`}
+                        className="p-2 rounded-md bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
+                      >
+                        <Eye size={16} />
+                      </Link>
                       <button
                         onClick={() => handleApprove(merchant.id)}
                         disabled={isUpdating}
-                        className="p-2 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-500 disabled:opacity-50"
+                        className="px-2 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-500 disabled:opacity-50"
                       >
                         Approve
                       </button>
@@ -256,7 +278,7 @@ const PendingMerchant = () => {
                       <button
                         onClick={() => handleReject(merchant.id)}
                         disabled={isUpdating}
-                        className="p-2 rounded-md bg-red-100 hover:bg-red-200 text-red-500 disabled:opacity-50"
+                        className="px-2 rounded-md bg-red-100 hover:bg-red-200 text-red-500 disabled:opacity-50"
                       >
                         Reject
                       </button>

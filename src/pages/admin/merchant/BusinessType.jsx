@@ -151,7 +151,6 @@ const BusinessType = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="p-4">#</TableHead>
                   <TableHead>ID</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Created At</TableHead>
@@ -159,9 +158,8 @@ const BusinessType = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {businessTypes?.data?.map((b, i) => (
+                {businessTypes?.data?.map((b) => (
                   <TableRow key={b.id}>
-                    <TableCell>{i + 1}</TableCell>
                     <TableCell>{b.id}</TableCell>
                     <TableCell className="capitalize">{b.name}</TableCell>
                     <TableCell>
