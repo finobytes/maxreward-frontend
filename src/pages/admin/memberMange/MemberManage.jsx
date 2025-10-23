@@ -197,7 +197,7 @@ const MemberManage = () => {
                   </TableHead>
                   <TableHead>Member ID</TableHead>
                   <TableHead>Full Name</TableHead>
-                  <TableHead>Phone</TableHead>
+                  <TableHead>Phone Number</TableHead>
                   <TableHead>Total Referrals</TableHead>
                   <TableHead>Available Points</TableHead>
                   <TableHead>Lifetime Purchase</TableHead>

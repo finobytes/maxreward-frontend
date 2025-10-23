@@ -23,6 +23,8 @@ import MemberUpdate from "../pages/admin/memberMange/MemberUpdate";
 import CompanyInfo from "../pages/admin/CompanyInfo/CompanyInfo";
 import Denomination from "../pages/admin/Denomination/Denomination";
 import BusinessType from "../pages/admin/merchant/BusinessType";
+import path from "path";
+import PendingMerchantDetails from "../pages/admin/merchant/PendingMerchantDetails";
 
 export const adminRoutes = [
   {
@@ -64,6 +66,10 @@ export const adminRoutes = [
   {
     path: "merchant/pending-merchant",
     element: <PendingMerchant />,
+  },
+  {
+    path: "pending-merchant/details/:id",
+    element: <PendingMerchantDetails />,
   },
   {
     path: "merchant/details/:id",

@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/table";
 import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSkeleton";
 import BulkActionBar from "../../../components/table/BulkActionBar";
+import { Link } from "react-router";
 
 const PendingMerchant = () => {
   const dispatch = useDispatch();
@@ -196,15 +197,15 @@ const PendingMerchant = () => {
                     className="w-4 h-4 rounded"
                   />
                 </TableHead>
+                <TableHead>Application ID</TableHead>
                 <TableHead>Merchant ID</TableHead>
-                <TableHead>Business Name</TableHead>
-                <TableHead>Business Type</TableHead>
-                <TableHead>Owner Name</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Created At</TableHead>
-                <TableHead>Action</TableHead>
+                <TableHead>Company Name</TableHead>
+                <TableHead>Authorized Person</TableHead>
+                <TableHead>Phone Number</TableHead>
+                <TableHead>Email Address</TableHead>
+                <TableHead>Reward Budget</TableHead>
+                <TableHead>Application Date</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -226,34 +227,50 @@ const PendingMerchant = () => {
               ) : (
                 merchants.map((merchant) => (
                   <TableRow
-                    key={merchant.id}
+                    key={merchant?.id}
                     className="bg-white border-b hover:bg-gray-50 transition"
                   >
                     <TableCell>
                       <input
                         type="checkbox"
-                        checked={selected.includes(merchant.id)}
-                        onChange={() => toggleSelect(merchant.id)}
+                        checked={selected.includes(merchant?.id)}
+                        onChange={() => toggleSelect(merchant?.id)}
                         className="w-4 h-4 rounded"
                       />
                     </TableCell>
-                    <TableCell>{merchant.unique_number}</TableCell>
-                    <TableCell>{merchant.business_name}</TableCell>
-                    <TableCell>{merchant.business_type}</TableCell>
-                    <TableCell>{merchant.owner_name}</TableCell>
-                    <TableCell>{merchant.phone}</TableCell>
-                    <TableCell>{merchant.email}</TableCell>
                     <TableCell>
-                      <StatusBadge status={merchant.status} />
+                      {merchant?.application_id || (
+                        <span className="text-gray-500">N/A</span>
+                      )}
+                    </TableCell>
+                    <TableCell>{merchant?.id}</TableCell>
+                    <TableCell>{merchant?.business_name}</TableCell>
+                    <TableCell>
+                      {merchant?.authorized_person || (
+                        <span className="text-gray-500">N/A</span>
+                      )}
+                    </TableCell>
+                    <TableCell>{merchant?.phone}</TableCell>
+                    <TableCell>{merchant?.email}</TableCell>
+                    <TableCell>
+                      {merchant?.reward_budget || (
+                        <span className="text-gray-500">N/A</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       {new Date(merchant.created_at).toLocaleDateString()}
                     </TableCell>
-                    <TableCell className="py-4 flex gap-2 justify-center">
+                    <TableCell className="py-4 flex gap-2">
+                      <Link
+                        to={`/admin/pending-merchant/details/${merchant?.id}`}
+                        className="p-2 rounded-md bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
+                      >
+                        <Eye size={16} />
+                      </Link>
                       <button
                         onClick={() => handleApprove(merchant.id)}
                         disabled={isUpdating}
-                        className="p-2 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-500 disabled:opacity-50"
+                        className="px-2 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-500 disabled:opacity-50"
                       >
                         Approve
                       </button>
@@ -261,7 +278,7 @@ const PendingMerchant = () => {
                       <button
                         onClick={() => handleReject(merchant.id)}
                         disabled={isUpdating}
-                        className="p-2 rounded-md bg-red-100 hover:bg-red-200 text-red-500 disabled:opacity-50"
+                        className="px-2 rounded-md bg-red-100 hover:bg-red-200 text-red-500 disabled:opacity-50"
                       >
                         Reject
                       </button>

@@ -18,7 +18,7 @@ import {
   useUpdateAdminStaffMutation,
 } from "../../../redux/features/admin/adminStaff/adminStaffApi";
 
-// ✅ Zod Schema (same as Create but password optional)
+// Zod Schema (same as Create but password optional)
 const adminStaffUpdateSchema = z.object({
   name: z.string().min(2, "Full name is required"),
   phone: z.string().min(8, "Phone number must be at least 8 digits"),
@@ -31,7 +31,7 @@ const adminStaffUpdateSchema = z.object({
   designation: z.string().min(2, "Designation is required"),
   address: z.string().min(3, "Address is required"),
   gender: z.enum(["male", "female", "others"]),
-  status: z.enum(["active", "inactive"]),
+  status: z.enum(["active", "inactive", "suspend"]),
 });
 
 const StaffUpdate = () => {
@@ -243,6 +243,7 @@ const StaffUpdate = () => {
                 options={[
                   { value: "active", label: "Active" },
                   { value: "inactive", label: "Inactive" },
+                  { value: "suspend", label: "Suspend" },
                 ]}
               />
             </div>

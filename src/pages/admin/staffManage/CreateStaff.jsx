@@ -74,7 +74,7 @@ const CreateAdminStaff = () => {
         toast.error(res?.message || "Failed to create admin staff");
       }
     } catch (err) {
-      console.error("❌ Create Failed:", err);
+      console.error(" Create Failed:", err);
       const validationErrors = err?.data?.errors;
       if (validationErrors) {
         Object.entries(validationErrors).forEach(([field, messages]) =>
@@ -198,6 +198,7 @@ const CreateAdminStaff = () => {
                 options={[
                   { value: "active", label: "Active" },
                   { value: "inactive", label: "Inactive" },
+                  { value: "suspend", label: "Suspend" },
                 ]}
               />
             </div>
@@ -210,7 +211,7 @@ const CreateAdminStaff = () => {
               <Dropzone />
             </div>
             <div>
-              <Label>National ID</Label>
+              <Label>National Registration Identity Card (NRIC)</Label>
               <Dropzone />
             </div>
           </div>

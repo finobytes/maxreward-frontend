@@ -90,6 +90,7 @@ const StaffManage = () => {
                 { label: "All", value: "" },
                 { label: "Active", value: "active" },
                 { label: "Inactive", value: "inactive" },
+                { label: "Suspend", value: "suspend" },
               ]}
             />
 
@@ -119,13 +120,18 @@ const StaffManage = () => {
             selectedCount={selected.length}
             actions={[
               {
-                label: "Set Active",
+                label: "Active",
                 variant: "success",
                 onClick: () => bulkUpdateStatus("active"),
               },
               {
-                label: "Set Inactive",
+                label: "Inactive",
                 variant: "warning",
+                onClick: () => bulkUpdateStatus("inactive"),
+              },
+              {
+                label: "Suspend",
+                variant: "danger",
                 onClick: () => bulkUpdateStatus("inactive"),
               },
             ]}
@@ -275,13 +281,6 @@ const StaffManage = () => {
                             <Trash2Icon size={16} />
                           )}
                         </button> */}
-
-                        <button className="px-2 rounded-md bg-red-100 text-red-700 hover:bg-red-200 ">
-                          Block
-                        </button>
-                        <button className="px-2 rounded-md bg-yellow-100 text-gray-700 hover:bg-yellow-200">
-                          Suspend
-                        </button>
                       </div>
                     </TableCell>
                   </TableRow>
