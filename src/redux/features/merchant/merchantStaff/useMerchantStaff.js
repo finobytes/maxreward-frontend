@@ -28,7 +28,7 @@ export const useMerchantStaff = () => {
 
   const { data, isLoading, isFetching, refetch } = useGetAllStaffsQuery();
 
-  // ✅ Filter & Sort locally
+  // Filter & Sort locally
   const filteredStaffs = useMemo(() => {
     if (!data?.staffs) return [];
 
@@ -65,7 +65,7 @@ export const useMerchantStaff = () => {
     return staffs;
   }, [data, search, status, sortBy, sortOrder]);
 
-  // ✅ Handle pagination locally
+  // Handle pagination locally
   const paginatedStaffs = useMemo(() => {
     const start = (currentPage - 1) * perPage;
     return filteredStaffs.slice(start, start + perPage);
@@ -94,5 +94,6 @@ export const useMerchantStaff = () => {
       setPerPage: (val) => dispatch(setPerPage(val)),
       resetFilters: () => dispatch(resetFilters()),
     },
+    debouncedSearch,
   };
 };

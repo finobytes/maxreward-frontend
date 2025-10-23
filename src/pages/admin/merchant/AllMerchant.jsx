@@ -38,6 +38,7 @@ const AllMerchant = () => {
     isError,
     refetch,
     filters,
+    debouncedSearch,
     actions: {
       setPage,
       setPerPage,
@@ -96,7 +97,7 @@ const AllMerchant = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <SearchInput
-            value={filters.search}
+            value={debouncedSearch}
             onChange={(e) => setDebouncedSearch(e.target.value)}
             placeholder="Search merchant..."
           />
