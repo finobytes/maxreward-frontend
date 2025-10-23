@@ -96,14 +96,6 @@ export default function UserDropdown({ user, role }) {
           <UserCircle className="w-4.5 h-4.5" />
           Profile
         </Link>
-
-        <Link
-          to="#settings"
-          className="flex items-center gap-3 px-3 py-2 mt-3 text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 "
-        >
-          <Settings className="w-4.5 h-4.5" />
-          Settings
-        </Link>
         <button
           onClick={handleLogout}
           className="flex items-center gap-3 px-3 py-2 mt-3 text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 "
