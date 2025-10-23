@@ -77,7 +77,7 @@ const StaffManage = () => {
         {/* Header + Filters */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <SearchInput
-            placeholder="Search staff..."
+            placeholder="Search by name, phone, email, designation ..."
             value={debouncedSearch}
             onChange={(e) => setSearch(e.target.value)}
           />

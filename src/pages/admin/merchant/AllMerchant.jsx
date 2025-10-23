@@ -99,7 +99,7 @@ const AllMerchant = () => {
           <SearchInput
             value={debouncedSearch}
             onChange={(e) => setDebouncedSearch(e.target.value)}
-            placeholder="Search merchant..."
+            placeholder="Search by name, email, phone..."
           />
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
