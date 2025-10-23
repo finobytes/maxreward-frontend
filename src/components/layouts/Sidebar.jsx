@@ -236,7 +236,7 @@ const Sidebar = () => {
       { name: "Logout", icon: <LogOut /> },
     ],
   };
-  const items = useMemo(() => NAV_CONFIG[role]);
+  const items = useMemo(() => NAV_CONFIG[role] || [], [role]);
   const isActive = useCallback(
     (path) => location.pathname === path,
     [location.pathname]
@@ -403,16 +403,11 @@ const Sidebar = () => {
 
   return (
     <aside
-      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
-        ${
-          isExpanded || isMobileOpen
-            ? "w-[240px]"
-            : isHovered
-            ? "w-[240px]"
-            : "w-[74px]"
-        }
-        ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
-        lg:translate-x-0`}
+      className={`fixed top-0 left-0 h-screen z-50 bg-white border-r border-gray-200 
+  transition-all duration-300 ease-in-out flex flex-col px-5
+  ${isExpanded || isHovered ? "w-[240px]" : "w-[74px]"}
+  ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
+  lg:translate-x-0`}
       onMouseEnter={() => !isExpanded && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

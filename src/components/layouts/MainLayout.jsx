@@ -17,10 +17,9 @@ const LayoutContent = () => {
       <Backdrop />
 
       <div
-        className={`transition-all duration-300 ease-in-out ${
-          isMobileOpen ? "w-full ml-0" : `lg:ml-[${sidebarWidth}]`
-        } flex-1`}
+        className="transition-all duration-300 ease-in-out flex-1"
         style={{
+          marginLeft: isMobileOpen ? "0px" : sidebarWidth,
           width: isMobileOpen ? "100%" : `calc(100% - ${sidebarWidth})`,
         }}
       >
