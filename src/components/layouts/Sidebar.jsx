@@ -32,6 +32,7 @@ import { toast } from "sonner";
 const othersItems = [];
 
 const Sidebar = () => {
+  const [activeMainIndex, setActiveMainIndex] = useState(null);
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const location = useLocation();
 
@@ -241,6 +242,25 @@ const Sidebar = () => {
     (path) => location.pathname === path,
     [location.pathname]
   );
+  // restore active menu based on URL (on reload or route change)
+  useEffect(() => {
+    let found = false;
+    items.forEach((nav, index) => {
+      if (nav.subItems) {
+        nav.subItems.forEach((subItem) => {
+          if (isActive(subItem.path)) {
+            setActiveMainIndex(index); // submenu  parent active
+            found = true;
+          }
+        });
+      } else if (isActive(nav.path)) {
+        setActiveMainIndex(index); // normal menu active
+        found = true;
+      }
+    });
+
+    if (!found) setActiveMainIndex(null);
+  }, [location.pathname, items, isActive]);
 
   useEffect(() => {
     let submenuMatched = false;
@@ -294,9 +314,12 @@ const Sidebar = () => {
         <li key={nav.name}>
           {nav.subItems ? (
             <button
-              onClick={() => handleSubmenuToggle(index, menuType)}
+              onClick={() => {
+                handleSubmenuToggle(index, menuType);
+                setActiveMainIndex(index); // temporary active main menu
+              }}
               className={`menu-item group ${
-                openSubmenu?.type === menuType && openSubmenu?.index === index
+                activeMainIndex === index
                   ? "menu-item-active"
                   : "menu-item-inactive"
               } cursor-pointer ${
@@ -306,8 +329,8 @@ const Sidebar = () => {
               }`}
             >
               <span
-                className={`menu-item-icon-size  ${
-                  openSubmenu?.type === menuType && openSubmenu?.index === index
+                className={`menu-item-icon-size ${
+                  activeMainIndex === index
                     ? "menu-item-icon-active"
                     : "menu-item-icon-inactive"
                 }`}
@@ -315,23 +338,23 @@ const Sidebar = () => {
                 {nav.icon}
               </span>
               {(isExpanded || isHovered || isMobileOpen) && (
-                <span className="menu-item-text">{nav.name}</span>
-              )}
-              {(isExpanded || isHovered || isMobileOpen) && (
-                <ChevronDownIcon
-                  className={`ml-auto w-4  h-4 transition-transform duration-200 ${
-                    openSubmenu?.type === menuType &&
-                    openSubmenu?.index === index
-                      ? "rotate-180 text-white"
-                      : ""
-                  }`}
-                />
+                <>
+                  <span className="menu-item-text">{nav.name}</span>
+                  <ChevronDownIcon
+                    className={`ml-auto w-4 h-4 transition-transform duration-200 ${
+                      openSubmenu?.type === menuType &&
+                      openSubmenu?.index === index
+                        ? "rotate-180 text-white"
+                        : ""
+                    }`}
+                  />
+                </>
               )}
             </button>
           ) : nav.name === "Logout" ? (
             <button
               onClick={handleLogout}
-              className={`menu-item group menu-item-inactive w-full text-left`}
+              className="menu-item group menu-item-inactive w-full text-left"
             >
               <span className="menu-item-icon-size menu-item-icon-inactive">
                 {nav.icon}
@@ -346,8 +369,11 @@ const Sidebar = () => {
             nav.path && (
               <Link
                 to={nav.path}
+                onClick={() => setActiveMainIndex(index)} // temporary active
                 className={`menu-item group ${
-                  isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
+                  activeMainIndex === index
+                    ? "menu-item-active"
+                    : "menu-item-inactive"
                 }`}
               >
                 <span
@@ -365,6 +391,7 @@ const Sidebar = () => {
               </Link>
             )
           )}
+
           {nav.subItems && (isExpanded || isHovered || isMobileOpen) && (
             <div
               ref={(el) => {
@@ -383,6 +410,7 @@ const Sidebar = () => {
                   <li key={subItem.name}>
                     <Link
                       to={subItem.path}
+                      onClick={() => setActiveMainIndex(index)} // parent active on submenu click
                       className={`menu-dropdown-item ${
                         isActive(subItem.path)
                           ? "menu-dropdown-item-active"
