@@ -23,8 +23,8 @@ import MemberUpdate from "../pages/admin/memberMange/MemberUpdate";
 import CompanyInfo from "../pages/admin/CompanyInfo/CompanyInfo";
 import Denomination from "../pages/admin/Denomination/Denomination";
 import BusinessType from "../pages/admin/merchant/BusinessType";
-import path from "path";
 import PendingMerchantDetails from "../pages/admin/merchant/PendingMerchantDetails";
+import Settings from "../pages/admin/Settings/Settings";
 
 export const adminRoutes = [
   {
@@ -126,6 +126,10 @@ export const adminRoutes = [
   {
     path: "denomination",
     element: <Denomination />,
+  },
+  {
+    path: "settings",
+    element: <Settings />,
   },
   {
     path: "profile",

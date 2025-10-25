@@ -21,6 +21,7 @@ import {
   Users,
   Briefcase,
   Building,
+  Settings,
 } from "lucide-react";
 import { useSidebar } from "../../context/SidebarContext";
 import { logo, MaxReward } from "../../assets/assets";
@@ -117,6 +118,11 @@ const Sidebar = () => {
         name: "Denomination",
         icon: <DollarSign />,
         path: "/admin/denomination",
+      },
+      {
+        name: "Settings",
+        icon: <Settings />,
+        path: "/admin/settings",
       },
       { name: "Profile", icon: <UserCircle2 />, path: "/admin/profile" },
       { name: "Logout", icon: <LogOut />, path: "/login" },
