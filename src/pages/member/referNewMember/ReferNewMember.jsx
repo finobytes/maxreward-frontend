@@ -96,17 +96,14 @@ const ReferNewMember = () => {
           <div className="max-w-full overflow-x-auto">
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <h3 className="text-lg font-semibold text-gray-800">
-                My Referred Member List
-              </h3>
+              {/* Search */}
+              <SearchInput
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search here..."
+              />
 
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
-                {/* Search */}
-                <SearchInput
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search here..."
-                />
                 {/* Add Member Button */}
                 <PrimaryButton
                   variant="primary"

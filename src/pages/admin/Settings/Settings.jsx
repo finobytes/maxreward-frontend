@@ -31,10 +31,8 @@ const SettingsPage = () => {
   const { data, isFetching, isError, error, refetch } =
     useGetCurrentSettingsQuery();
 
-  const [
-    createOrUpdate,
-    { isLoading: isSubmitting, isSuccess, error: submitError },
-  ] = useCreateOrUpdateMutation();
+  const [createOrUpdate, { isLoading: isSubmitting, error: submitError }] =
+    useCreateOrUpdateMutation();
 
   // react-hook-form
   const {
@@ -73,7 +71,7 @@ const SettingsPage = () => {
       await createOrUpdate(payload).unwrap();
       toast.success("Settings updated successfully!");
       refetch();
-    } catch (e) {
+    } catch {
       toast.error(
         submitError?.data?.message ||
           "Failed to update settings. Please try again."
