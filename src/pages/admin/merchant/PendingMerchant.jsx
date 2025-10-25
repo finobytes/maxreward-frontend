@@ -129,7 +129,7 @@ const PendingMerchant = () => {
           <SearchInput
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name, email, phone..."
+            placeholder="Search by company, email, phone..."
           />
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
