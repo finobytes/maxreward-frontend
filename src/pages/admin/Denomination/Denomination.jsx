@@ -244,7 +244,7 @@ const Denomination = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, value: e.target.value })
                 }
-                className="mt-1 w-full border rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 w-full border rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-orange-500"
                 placeholder="Enter denomination value"
                 required
               />

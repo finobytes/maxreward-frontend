@@ -25,6 +25,8 @@ import Denomination from "../pages/admin/Denomination/Denomination";
 import BusinessType from "../pages/admin/merchant/BusinessType";
 import PendingMerchantDetails from "../pages/admin/merchant/PendingMerchantDetails";
 import Settings from "../pages/admin/Settings/Settings";
+import Notification from "../pages/admin/Notification/Notification";
+import NotificationDetails from "../pages/admin/Notification/NotificationDetails";
 
 export const adminRoutes = [
   {
@@ -126,6 +128,14 @@ export const adminRoutes = [
   {
     path: "denomination",
     element: <Denomination />,
+  },
+  {
+    path: "notification",
+    element: <Notification />,
+  },
+  {
+    path: "/admin/notification/:id",
+    element: <NotificationDetails />,
   },
   {
     path: "settings",

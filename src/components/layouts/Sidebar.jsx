@@ -22,6 +22,7 @@ import {
   Briefcase,
   Building,
   Settings,
+  Bell,
 } from "lucide-react";
 import { useSidebar } from "../../context/SidebarContext";
 import { logo, MaxReward } from "../../assets/assets";
@@ -118,6 +119,11 @@ const Sidebar = () => {
         name: "Denomination",
         icon: <DollarSign />,
         path: "/admin/denomination",
+      },
+      {
+        name: "Notification",
+        icon: <Bell />,
+        path: "/admin/notification",
       },
       {
         name: "Settings",
