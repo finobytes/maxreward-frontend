@@ -71,6 +71,8 @@ const NotificationDropdown = () => {
   const handleClick = () => {
     toggleDropdown();
     setNotifying(false);
+
+    markAllAsRead();
   };
   return (
     <div className="relative">
