@@ -8,24 +8,19 @@ import {
   useGetCurrentSettingsQuery,
   useCreateOrUpdateMutation,
 } from "../../../redux/features/admin/settings/settingsApi";
+import { toast } from "sonner";
 
-// Simple inline alert component
-const Alert = ({ type = "info", children }) => {
-  const bg =
-    type === "error"
-      ? "bg-red-100 text-red-800"
-      : type === "success"
-      ? "bg-green-100 text-green-800"
-      : "bg-blue-100 text-blue-800";
-  return <div className={`${bg} px-3 py-2 rounded-md`}>{children}</div>;
-};
+// Skeleton Loader
+const SkeletonField = () => (
+  <div className="animate-pulse space-y-2">
+    <div className="h-4 w-24 bg-gray-300 rounded"></div>
+    <div className="h-9 w-full bg-gray-200 rounded"></div>
+  </div>
+);
 
 // zod schema for validation
 const schema = z.object({
-  rm_points: z
-    .number({ invalid_type_error: "Required" })
-    .int()
-    .min(0, "Must be >= 0"),
+  rm_points: z.number({ invalid_type_error: "Required" }).int().min(0),
   pp_points: z.number().int().min(0),
   rp_points: z.number().int().min(0),
   cp_points: z.number().int().min(0),
@@ -35,17 +30,18 @@ const schema = z.object({
 const SettingsPage = () => {
   const { data, isFetching, isError, error, refetch } =
     useGetCurrentSettingsQuery();
+
   const [
     createOrUpdate,
     { isLoading: isSubmitting, isSuccess, error: submitError },
   ] = useCreateOrUpdateMutation();
 
-  // react-hook-form; numbers default to 0
+  // react-hook-form
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isDirty },
+    formState: { errors },
   } = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -71,27 +67,28 @@ const SettingsPage = () => {
   }, [data, reset]);
 
   const onSubmit = async (values) => {
-    // values are numbers already
-    const payload = {
-      setting_attribute: {
-        rm_points: Number(values.rm_points),
-        pp_points: Number(values.pp_points),
-        rp_points: Number(values.rp_points),
-        cp_points: Number(values.cp_points),
-        cr_points: Number(values.cr_points),
-      },
-    };
+    const payload = { setting_attribute: values };
 
     try {
       await createOrUpdate(payload).unwrap();
-      // success handled by isSuccess (or we can show toast)
-      // refetch to sync with server
+      toast.success("Settings updated successfully!");
       refetch();
     } catch (e) {
-      // errors surfaced via submitError
-      console.error("Update failed", e);
+      toast.error(
+        submitError?.data?.message ||
+          "Failed to update settings. Please try again."
+      );
     }
   };
+
+  // Toasts for errors (load phase)
+  useEffect(() => {
+    if (isError) {
+      toast.error(
+        error?.data?.message || "Failed to load settings. Try refreshing."
+      );
+    }
+  }, [isError, error]);
 
   return (
     <div className="space-y-6">
@@ -99,151 +96,78 @@ const SettingsPage = () => {
         items={[{ label: "Home", to: "/" }, { label: "Settings" }]}
       />
 
-      <ComponentCard title="Setting attributes">
-        <div className="space-y-4">
-          {isFetching && <Alert>Loading current settings…</Alert>}
-          {isError && (
-            <Alert type="error">
-              Failed to load settings. {error?.error || ""}
-            </Alert>
-          )}
-          {isSuccess && (
-            <Alert type="success">Settings saved successfully.</Alert>
-          )}
-          {submitError && (
-            <Alert type="error">
-              Save failed.{" "}
-              {(submitError?.data && submitError.data.message) ||
-                submitError?.error ||
-                ""}
-            </Alert>
-          )}
-
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="grid grid-cols-1 md:grid-cols-2 gap-4"
-          >
-            {/* rm_points */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                RM Points
-              </label>
-              <input
-                type="number"
-                step="1"
-                {...register("rm_points", { valueAsNumber: true })}
-                className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-300"
-              />
-              {errors.rm_points && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.rm_points.message}
-                </p>
-              )}
+      <ComponentCard title="Setting Attributes">
+        <div className="space-y-6">
+          {/* Skeleton Loader */}
+          {isFetching ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <SkeletonField key={i} />
+              ))}
             </div>
+          ) : (
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="grid grid-cols-1 md:grid-cols-2 gap-4"
+            >
+              {[
+                { name: "rm_points", label: "RM Points" },
+                { name: "pp_points", label: "PP Points" },
+                { name: "rp_points", label: "RP Points" },
+                { name: "cp_points", label: "CP Points" },
+                { name: "cr_points", label: "CR Points" },
+              ].map((field) => (
+                <div key={field.name}>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {field.label}
+                  </label>
+                  <input
+                    type="number"
+                    step="1"
+                    {...register(field.name, { valueAsNumber: true })}
+                    className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                  />
+                  {errors[field.name] && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors[field.name].message}
+                    </p>
+                  )}
+                </div>
+              ))}
 
-            {/* pp_points */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                PP Points
-              </label>
-              <input
-                type="number"
-                step="1"
-                {...register("pp_points", { valueAsNumber: true })}
-                className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-300"
-              />
-              {errors.pp_points && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.pp_points.message}
-                </p>
-              )}
-            </div>
+              {/* Actions */}
+              <div className="md:col-span-2 flex items-center gap-3 pt-2">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="inline-flex items-center px-4 py-2 bg-brand-600 text-white rounded-md shadow-sm hover:bg-orange-600 disabled:opacity-60"
+                >
+                  {isSubmitting ? "Saving..." : "Save Settings"}
+                </button>
 
-            {/* rp_points */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                RP Points
-              </label>
-              <input
-                type="number"
-                step="1"
-                {...register("rp_points", { valueAsNumber: true })}
-                className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-300"
-              />
-              {errors.rp_points && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.rp_points.message}
-                </p>
-              )}
-            </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    reset();
+                    refetch();
+                    toast.info("Reset to last saved values");
+                  }}
+                  className="px-4 py-2 border rounded-md"
+                >
+                  Reset
+                </button>
 
-            {/* cp_points */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                CP Points
-              </label>
-              <input
-                type="number"
-                step="1"
-                {...register("cp_points", { valueAsNumber: true })}
-                className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-300"
-              />
-              {errors.cp_points && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.cp_points.message}
-                </p>
-              )}
-            </div>
-
-            {/* cr_points */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                CR Points
-              </label>
-              <input
-                type="number"
-                step="1"
-                {...register("cr_points", { valueAsNumber: true })}
-                className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-300"
-              />
-              {errors.cr_points && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.cr_points.message}
-                </p>
-              )}
-            </div>
-
-            {/* actions */}
-            <div className="md:col-span-2 flex items-center gap-3 pt-2">
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="inline-flex items-center px-4 py-2 bg-brand-600 text-white rounded-md shadow-sm hover:bg-brand-700 disabled:opacity-60"
-              >
-                {isSubmitting ? "Saving..." : "Save Settings"}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  reset();
-                  refetch();
-                }}
-                className="px-4 py-2 border rounded-md"
-              >
-                Reset
-              </button>
-
-              <div className="ml-auto text-sm text-gray-500">
-                Last update:{" "}
-                <span className="font-medium">
-                  {data?.updated_at
-                    ? new Date(data.updated_at).toLocaleString()
-                    : "—"}
-                </span>
+                <div className="ml-auto text-sm text-gray-500">
+                  Last update:{" "}
+                  <span className="font-medium">
+                    {data?.updated_at
+                      ? new Date(data.updated_at).toLocaleString()
+                      : "—"}
+                  </span>
+                </div>
               </div>
-            </div>
-          </form>
+            </form>
+          )}
         </div>
       </ComponentCard>
     </div>
