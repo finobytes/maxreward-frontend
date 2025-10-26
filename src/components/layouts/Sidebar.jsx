@@ -243,7 +243,7 @@ const Sidebar = () => {
       {
         icon: <ShieldCheck />,
         name: "Data Privacy Policy",
-        path: "/member/terms-and-condition",
+        path: "/member/data-privacy-policy",
       },
 
       { name: "Logout", icon: <LogOut /> },

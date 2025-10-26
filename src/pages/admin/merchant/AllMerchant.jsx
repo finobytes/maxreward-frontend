@@ -299,9 +299,9 @@ const AllMerchant = () => {
                         >
                           <PencilLine size={16} />
                         </Link>
-                        <button className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200">
+                        {/* <button className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200">
                           <Trash2Icon size={16} />
-                        </button>
+                        </button> */}
                       </div>
                     </TableCell>
                   </TableRow>
