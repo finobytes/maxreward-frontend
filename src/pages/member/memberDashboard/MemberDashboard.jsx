@@ -1,8 +1,6 @@
 import React from "react";
 import {
-  bag,
   card,
-  clock,
   dollar,
   hand,
   purchase,
