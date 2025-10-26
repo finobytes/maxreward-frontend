@@ -36,6 +36,11 @@ import merchant1 from "./images/merchant/mrechant1.png";
 import merchant2 from "./images/merchant/merchant2.png";
 import merchant3 from "./images/merchant/merchant3.png";
 import memberQR from "./images/qr.svg";
+import card from "./images/card.png";
+import hand from "./icons/hand.svg";
+import userCommunity from "./icons/user-community.svg";
+import purchase from "./icons/purchase.svg";
+import star from "./icons/star.svg";
 
 export {
   loginBanner,
@@ -76,4 +81,9 @@ export {
   merchant2,
   merchant3,
   memberQR,
+  card,
+  hand,
+  userCommunity,
+  purchase,
+  star,
 };
