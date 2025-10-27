@@ -48,12 +48,12 @@ const MerchantRegistrationForm = () => {
         }
       });
 
-      //  File append করো
+      //  File append
       if (businessLogo) {
         formData.append("business_logo", businessLogo);
       }
 
-      //  confirm_password পাঠানোর দরকার নেই
+      //  confirm_password
       formData.delete("confirm_password");
 
       const response = await createMerchant(formData).unwrap();

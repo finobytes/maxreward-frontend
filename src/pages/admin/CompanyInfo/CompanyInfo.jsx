@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,6 +17,8 @@ import {
 import { Loader } from "lucide-react";
 
 const CompanyInfo = () => {
+  const [logoFile, setLogoFile] = useState(null);
+
   const { data: company, isFetching, isError } = useGetCompanyDetailsQuery();
   const { data: crPointsData } = useGetCrPointsQuery();
   const [updateCompany, { isLoading: isUpdating }] =
@@ -47,7 +49,16 @@ const CompanyInfo = () => {
   // Update company info
   const onSubmit = async (data) => {
     try {
-      await updateCompany(data).unwrap();
+      const formData = new FormData();
+      formData.append("name", data.name);
+      formData.append("address", data.address);
+      formData.append("phone", data.phone);
+      formData.append("email", data.email);
+      if (logoFile) {
+        formData.append("logo", logoFile);
+      }
+
+      await updateCompany(formData).unwrap();
       toast.success("Company info updated successfully!");
     } catch (err) {
       toast.error("Failed to update company info!");
@@ -121,7 +132,8 @@ const CompanyInfo = () => {
 
             <div className="md:col-span-1">
               <Label>Company Logo</Label>
-              <Dropzone />
+              <Dropzone onFilesChange={(files) => setLogoFile(files[0])} />
+
               {/* {company?.logo && (
                 <img
                   src={company.logo}
