@@ -10,8 +10,6 @@ const ProtectedRoute = ({ children, role }) => {
   const dispatch = useDispatch();
   const { user, isAuthenticated } = useSelector((state) => state.auth);
 
-  console.log("ProtectedRoute user:", user);
-
   // /me API hit
   const { data, isLoading, isError, error } = useVerifyMeQuery(user?.role, {
     skip: !isAuthenticated || !user?.role,
