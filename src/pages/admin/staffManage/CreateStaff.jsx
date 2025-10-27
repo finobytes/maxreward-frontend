@@ -11,13 +11,19 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router";
 import { z } from "zod";
 import { useCreateAdminStaffMutation } from "../../../redux/features/admin/adminStaff/adminStaffApi";
+import { useState } from "react";
 
 // Schema Validation (Zod)
 const adminStaffSchema = z.object({
   name: z.string().min(2, "Full name is required"),
-  phone: z.string().min(8, "Phone number must be at least 8 digits"),
+  phone: z
+    .string()
+    .regex(
+      /^(?:\+?8801[3-9]\d{8}|01[3-9]\d{8}|\+?601[0-9]\d{7,8}|601[0-9]\d{7,8})$/,
+      "Phone number must be Bangladeshi or Malaysian"
+    ),
   email: z.string().email("Enter a valid email"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
   designation: z.string().min(2, "Designation is required"),
   address: z.string().min(3, "Address is required"),
   gender: z.enum(["male", "female", "others"]),
@@ -25,6 +31,9 @@ const adminStaffSchema = z.object({
 });
 
 const CreateAdminStaff = () => {
+  const [profilePicture, setProfilePicture] = useState(null);
+  const [nationalIdCard, setNationalIdCard] = useState([]);
+
   const navigate = useNavigate();
   const [createAdminStaff, { isLoading }] = useCreateAdminStaffMutation();
 
@@ -47,24 +56,31 @@ const CreateAdminStaff = () => {
     },
   });
 
-  // ✅ Form Submit
+  // Form Submit
   const onSubmit = async (formData) => {
     try {
-      const payload = {
-        user_name: `A${Date.now()}`, // unique ID
-        name: formData.name,
-        phone: formData.phone,
-        email: formData.email,
-        password: formData.password,
-        address: formData.address,
-        designation: formData.designation,
-        gender: formData.gender,
-        status: formData.status,
-      };
+      const formDataToSend = new FormData();
+      formDataToSend.append("user_name", `A${Date.now()}`);
+      formDataToSend.append("name", formData.name);
+      formDataToSend.append("phone", formData.phone);
+      formDataToSend.append("email", formData.email);
+      formDataToSend.append("password", formData.password);
+      formDataToSend.append("designation", formData.designation);
+      formDataToSend.append("address", formData.address);
+      formDataToSend.append("gender", formData.gender);
+      formDataToSend.append("status", formData.status);
 
-      console.log("Submitting payload:", payload);
+      // add all file
+      if (profilePicture) {
+        formDataToSend.append("profile_picture", profilePicture);
+      }
+      if (nationalIdCard.length > 0) {
+        nationalIdCard.forEach((file, index) => {
+          formDataToSend.append(`national_id_card[${index}]`, file);
+        });
+      }
 
-      const res = await createAdminStaff(payload).unwrap();
+      const res = await createAdminStaff(formDataToSend).unwrap();
 
       if (res?.success) {
         toast.success(res?.message || "Admin staff created successfully!");
@@ -74,7 +90,7 @@ const CreateAdminStaff = () => {
         toast.error(res?.message || "Failed to create admin staff");
       }
     } catch (err) {
-      console.error(" Create Failed:", err);
+      console.error("Create Failed:", err);
       const validationErrors = err?.data?.errors;
       if (validationErrors) {
         Object.entries(validationErrors).forEach(([field, messages]) =>
@@ -208,11 +224,18 @@ const CreateAdminStaff = () => {
           <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div>
               <Label>Profile Picture</Label>
-              <Dropzone />
+              <Dropzone
+                multiple={false}
+                onFilesChange={(files) => setProfilePicture(files[0])}
+              />
             </div>
             <div>
-              <Label>National Registration Identity Card (NRIC)</Label>
-              <Dropzone />
+              <Label>Identity Card (IC)</Label>
+              <Dropzone
+                multiple={true}
+                maxFiles={2}
+                onFilesChange={(files) => setNationalIdCard(files)}
+              />
             </div>
           </div>
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -21,11 +21,16 @@ import {
 // Zod Schema (same as Create but password optional)
 const adminStaffUpdateSchema = z.object({
   name: z.string().min(2, "Full name is required"),
-  phone: z.string().min(8, "Phone number must be at least 8 digits"),
+  phone: z
+    .string()
+    .regex(
+      /^(?:\+?8801[3-9]\d{8}|01[3-9]\d{8}|\+?601[0-9]\d{7,8}|601[0-9]\d{7,8})$/,
+      "Phone number must be Bangladeshi or Malaysian"
+    ),
   email: z.string().email("Enter a valid email"),
   password: z
     .string()
-    .min(6, "Password must be at least 6 characters")
+    .min(8, "Password must be at least 8 characters")
     .optional()
     .or(z.literal("")),
   designation: z.string().min(2, "Designation is required"),
@@ -35,6 +40,11 @@ const adminStaffUpdateSchema = z.object({
 });
 
 const StaffUpdate = () => {
+  const [profilePicture, setProfilePicture] = useState(null);
+  const [nationalIdCard, setNationalIdCard] = useState([]);
+  const [existingProfile, setExistingProfile] = useState([]);
+  const [existingNid, setExistingNid] = useState([]);
+
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -77,19 +87,41 @@ const StaffUpdate = () => {
         gender: d.gender || "male",
         status: d.status || "active",
       });
+      if (d.profile_picture) {
+        setExistingProfile([d.profile_picture]);
+      }
+      if (d.national_id_card && Array.isArray(d.national_id_card)) {
+        setExistingNid(d.national_id_card);
+      }
     }
   }, [staffData, reset]);
 
   // ✅ Submit handler
   const onSubmit = async (formData) => {
     try {
-      // omit empty password
-      const payload = {
-        ...formData,
-        ...(formData.password ? {} : { password: undefined }),
-      };
+      const formDataToSend = new FormData();
+      formDataToSend.append("name", formData.name);
+      formDataToSend.append("phone", formData.phone);
+      formDataToSend.append("email", formData.email);
+      formDataToSend.append("designation", formData.designation);
+      formDataToSend.append("address", formData.address);
+      formDataToSend.append("gender", formData.gender);
+      formDataToSend.append("status", formData.status);
+      if (formData.password) {
+        formDataToSend.append("password", formData.password);
+      }
 
-      const res = await updateAdminStaff({ id, data: payload }).unwrap();
+      if (profilePicture) {
+        formDataToSend.append("profile_picture", profilePicture);
+      }
+
+      if (nationalIdCard.length > 0) {
+        nationalIdCard.forEach((file, index) => {
+          formDataToSend.append(`national_id_card[${index}]`, file);
+        });
+      }
+
+      const res = await updateAdminStaff({ id, data: formDataToSend }).unwrap();
 
       if (res?.success) {
         toast.success(res?.message || "Admin staff updated successfully!");
@@ -99,14 +131,7 @@ const StaffUpdate = () => {
       }
     } catch (err) {
       console.error("Update Failed:", err);
-      const validationErrors = err?.data?.errors;
-      if (validationErrors) {
-        Object.entries(validationErrors).forEach(([field, messages]) =>
-          toast.error(`${field}: ${messages.join(", ")}`)
-        );
-      } else {
-        toast.error(err?.data?.message || "Something went wrong!");
-      }
+      toast.error(err?.data?.message || "Something went wrong!");
     }
   };
 
@@ -253,11 +278,19 @@ const StaffUpdate = () => {
           <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div>
               <Label>Profile Picture</Label>
-              <Dropzone />
+              <Dropzone
+                onFilesChange={(files) => setProfilePicture(files[0])}
+                initialFiles={existingProfile}
+              />
             </div>
             <div>
               <Label>National ID</Label>
-              <Dropzone />
+              <Dropzone
+                multiple={true}
+                maxFiles={2}
+                onFilesChange={(files) => setNationalIdCard(files)}
+                initialFiles={existingNid}
+              />
             </div>
           </div>
 

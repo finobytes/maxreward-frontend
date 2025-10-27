@@ -13,7 +13,7 @@ const LayoutContent = () => {
   const sidebarWidth = isExpanded || isHovered ? "240px" : "74px";
 
   const layoutStyle = isMobile
-    ? { marginLeft: 0, width: "100%" } // ✅ মোবাইলে সবসময় ফুল উইডথ
+    ? { marginLeft: 0, width: "100%" }
     : {
         marginLeft: isMobileOpen ? "0px" : sidebarWidth,
         width: isMobileOpen ? "100%" : `calc(100% - ${sidebarWidth})`,

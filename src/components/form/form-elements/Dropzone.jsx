@@ -2,8 +2,24 @@ import { useDropzone } from "react-dropzone";
 import { useState, useEffect } from "react";
 import { upload } from "../../../assets/assets";
 
-const Dropzone = ({ onFilesChange, multiple = false, maxFiles = 1 }) => {
+const Dropzone = ({
+  onFilesChange,
+  multiple = false,
+  maxFiles = 1,
+  initialFiles = [],
+}) => {
   const [files, setFiles] = useState([]);
+
+  useEffect(() => {
+    if (initialFiles.length > 0) {
+      const formatted = initialFiles.map((url) => ({
+        name: url.split("/").pop(),
+        preview: url,
+        existing: true, // flag that it's from server
+      }));
+      setFiles(formatted);
+    }
+  }, [initialFiles]);
 
   const onDrop = (acceptedFiles) => {
     const newFiles = acceptedFiles.map((file) =>
