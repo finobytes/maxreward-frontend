@@ -20,6 +20,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useGetDenominationQuery } from "../../../redux/features/admin/denomination/denominationApi";
 
 const Denomination = () => {
   const [data, setData] = useState([]);
@@ -31,6 +32,10 @@ const Denomination = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
+
+  const { data: denominations } = useGetDenominationQuery();
+
+  console.log("denomination data -------->", denominations);
 
   // Dummy Data (initial)
   useEffect(() => {
