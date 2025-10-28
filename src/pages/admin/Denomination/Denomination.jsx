@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react";
+// src/pages/admin/denomination/Denomination.jsx
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { PencilLine, Trash2Icon, Plus, Loader } from "lucide-react";
 import SearchInput from "../../../components/form/form-elements/SearchInput";
 import DropdownSelect from "../../../components/ui/dropdown/DropdownSelect";
@@ -14,105 +16,75 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useDenomination } from "../../../redux/features/admin/denomination/useDenomination";
+import {
+  setSearch,
+  setPage,
+  setPerPage,
+  resetFilters,
+} from "../../../redux/features/admin/denomination/denominationSlice";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useGetDenominationQuery } from "../../../redux/features/admin/denomination/denominationApi";
+
+// debounce hook
+const useDebounced = (value, delay = 400) => {
+  const [v, setV] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setV(value), delay);
+    return () => clearTimeout(t);
+  }, [value, delay]);
+  return v;
+};
 
 const Denomination = () => {
-  const [data, setData] = useState([]);
-  const [filtered, setFiltered] = useState([]);
-  const [localSearch, setLocalSearch] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [editId, setEditId] = useState(null);
-  const [formData, setFormData] = useState({ title: "", value: "" });
+  const dispatch = useDispatch();
+  const { search, page, per_page } = useSelector((s) => s.denomination);
+  const [localSearch, setLocalSearch] = useState(search || "");
+  const debouncedSearch = useDebounced(localSearch, 450);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
 
-  const { data: denominations } = useGetDenominationQuery();
-
-  console.log("denomination data -------->", denominations);
-
-  // Dummy Data (initial)
   useEffect(() => {
-    setIsLoading(true);
-    setTimeout(() => {
-      const dummy = [
-        { id: 1, title: "RM 500", value: "500", created_at: "2024-10-01" },
-        { id: 2, title: "RM 1000", value: "1000", created_at: "2024-10-03" },
-        { id: 3, title: "RM 2000", value: "2000", created_at: "2024-10-04" },
-      ];
-      setData(dummy);
-      setFiltered(dummy);
-      setIsLoading(false);
-    }, 600);
-  }, []);
+    dispatch(setSearch(debouncedSearch));
+  }, [debouncedSearch, dispatch]);
 
-  // Search
-  useEffect(() => {
-    const filteredData = data.filter((item) =>
-      item.title.toLowerCase().includes(localSearch.toLowerCase())
-    );
-    setFiltered(filteredData);
-    setCurrentPage(1);
-  }, [localSearch, data]);
+  const {
+    data: denominations,
+    pagination: meta,
+    isLoading,
+    isFetching,
+    isError,
+    formData,
+    editId,
+    actions: {
+      setFormData,
+      handleSubmit,
+      handleEdit,
+      handleDelete,
+      resetFilters: resetAllFilters,
+    },
+  } = useDenomination();
 
-  // Pagination logic
-  const totalPages = Math.ceil(filtered.length / perPage);
-  const startIdx = (currentPage - 1) * perPage;
-  const paginatedData = filtered.slice(startIdx, startIdx + perPage);
+  const handlePageChange = (p) => dispatch(setPage(p));
+  const handlePerPageChange = (n) => dispatch(setPerPage(n));
 
-  // Handlers
   const openCreateModal = () => {
-    setEditId(null);
     setFormData({ title: "", value: "" });
     setIsModalOpen(true);
   };
 
   const openEditModal = (item) => {
-    setEditId(item.id);
-    setFormData({ title: item.title, value: item.value });
+    handleEdit(item);
     setIsModalOpen(true);
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this denomination?")) {
-      setData(data.filter((item) => item.id !== id));
-    }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (editId) {
-      // Update
-      const updated = data.map((item) =>
-        item.id === editId
-          ? { ...item, title: formData.title, value: formData.value }
-          : item
-      );
-      setData(updated);
-    } else {
-      // Create
-      const newItem = {
-        id: Date.now(),
-        title: formData.title,
-        value: formData.value,
-        created_at: new Date().toISOString(),
-      };
-      setData([newItem, ...data]);
-    }
+  const onSubmit = async (e) => {
+    await handleSubmit(e);
     setIsModalOpen(false);
-  };
-
-  const handlePageChange = (page) => setCurrentPage(page);
-  const handlePerPageChange = (num) => setPerPage(num);
-  const resetAllFilters = () => {
-    setLocalSearch("");
-    setFiltered(data);
   };
 
   return (
@@ -122,7 +94,7 @@ const Denomination = () => {
       />
 
       <div className="rounded-xl border bg-white p-4 relative">
-        {isLoading && (
+        {isFetching && !isLoading && (
           <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-sm flex items-center justify-center rounded-xl">
             <Loader className="w-6 h-6 animate-spin text-gray-500" />
           </div>
@@ -142,7 +114,7 @@ const Denomination = () => {
             </PrimaryButton>
 
             <DropdownSelect
-              value={perPage}
+              value={per_page}
               onChange={(val) => handlePerPageChange(Number(val))}
               options={[
                 { label: "10", value: 10 },
@@ -151,7 +123,13 @@ const Denomination = () => {
               ]}
             />
 
-            <PrimaryButton variant="secondary" onClick={resetAllFilters}>
+            <PrimaryButton
+              variant="secondary"
+              onClick={() => {
+                dispatch(resetAllFilters());
+                setLocalSearch("");
+              }}
+            >
               Clear
             </PrimaryButton>
           </div>
@@ -161,7 +139,11 @@ const Denomination = () => {
         <div className="mt-4 overflow-x-auto">
           {isLoading ? (
             <MerchantStaffSkeleton rows={8} cols={3} />
-          ) : paginatedData.length === 0 ? (
+          ) : isError ? (
+            <div className="p-6 text-center text-red-500">
+              Failed to load denominations.
+            </div>
+          ) : !denominations?.data?.length ? (
             <div className="p-6 text-center text-gray-500">
               No denominations found.
             </div>
@@ -177,24 +159,24 @@ const Denomination = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginatedData.map((b) => (
-                  <TableRow key={b.id}>
-                    <TableCell>{b.id}</TableCell>
-                    <TableCell className="capitalize">{b.title}</TableCell>
-                    <TableCell>{b.value}</TableCell>
+                {denominations?.data?.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell>{item.id}</TableCell>
+                    <TableCell>{item.title}</TableCell>
+                    <TableCell>{item.value}</TableCell>
                     <TableCell>
-                      {new Date(b.created_at).toLocaleDateString()}
+                      {new Date(item.created_at).toLocaleDateString()}
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
                         <button
-                          onClick={() => openEditModal(b)}
+                          onClick={() => openEditModal(item)}
                           className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200"
                         >
                           <PencilLine size={16} />
                         </button>
                         <button
-                          onClick={() => handleDelete(b.id)}
+                          onClick={() => handleDelete(item.id)}
                           className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200"
                         >
                           <Trash2Icon size={16} />
@@ -208,16 +190,16 @@ const Denomination = () => {
           )}
         </div>
 
-        {filtered.length > perPage && (
+        {meta && (
           <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
+            currentPage={meta.current_page}
+            totalPages={meta.last_page}
             onPageChange={handlePageChange}
           />
         )}
       </div>
 
-      {/* Modal for Create / Edit */}
+      {/* Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent>
           <DialogHeader>
@@ -226,7 +208,7 @@ const Denomination = () => {
             </DialogTitle>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-4 mt-3">
+          <form onSubmit={onSubmit} className="space-y-4 mt-3">
             <div>
               <label className="text-sm font-medium text-gray-700">Title</label>
               <input
