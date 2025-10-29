@@ -29,6 +29,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import BulkActionBar from "../../../components/table/BulkActionBar";
 
 // debounce hook
 const useDebounced = (value, delay = 400) => {
@@ -87,6 +88,28 @@ const Denomination = () => {
     setIsModalOpen(false);
   };
 
+  const [selected, setSelected] = useState([]);
+
+  const toggleSelectAll = (checked) => {
+    if (checked) {
+      setSelected(denominations?.data?.map((m) => m.id));
+    } else {
+      setSelected([]);
+    }
+  };
+  const toggleSelect = (id) => {
+    setSelected((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+  // Bulk actions (placeholder)
+  const bulkUpdateStatus = (newStatus) => {
+    console.log("Bulk update status to:", newStatus);
+  };
+  const bulkDelete = () => {
+    console.log("Bulk delete selected merchants:", selected);
+  };
+
   return (
     <div>
       <PageBreadcrumb
@@ -128,13 +151,26 @@ const Denomination = () => {
               onClick={() => {
                 dispatch(resetAllFilters());
                 setLocalSearch("");
+                setSelected([]);
               }}
             >
               Clear
             </PrimaryButton>
           </div>
         </div>
-
+        {/* Bulk Actions */}
+        {selected.length > 0 && (
+          <BulkActionBar
+            selectedCount={selected.length}
+            actions={[
+              {
+                label: "Delete",
+                variant: "danger",
+                onClick: () => bulkUpdateStatus("delete"),
+              },
+            ]}
+          />
+        )}
         {/* Table */}
         <div className="mt-4 overflow-x-auto">
           {isLoading ? (
@@ -151,6 +187,17 @@ const Denomination = () => {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>
+                    <input
+                      type="checkbox"
+                      checked={
+                        denominations?.data?.length > 0 &&
+                        selected.length === denominations?.data?.length
+                      }
+                      onChange={(e) => toggleSelectAll(e.target.checked)}
+                      className="w-4 h-4 rounded"
+                    />
+                  </TableHead>
                   <TableHead>ID</TableHead>
                   <TableHead>Title</TableHead>
                   <TableHead>Value</TableHead>
@@ -161,6 +208,14 @@ const Denomination = () => {
               <TableBody>
                 {denominations?.data?.map((item) => (
                   <TableRow key={item.id}>
+                    <TableCell>
+                      <input
+                        type="checkbox"
+                        checked={selected.includes(item.id)}
+                        onChange={() => toggleSelect(item.id)}
+                        className="w-4 h-4 rounded"
+                      />
+                    </TableCell>
                     <TableCell>{item.id}</TableCell>
                     <TableCell>{item.title}</TableCell>
                     <TableCell>{item.value}</TableCell>
