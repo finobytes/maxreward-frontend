@@ -166,11 +166,15 @@ const AllMerchant = () => {
                 onClick: () => bulkUpdateStatus("approve"),
               },
               {
-                label: "Suspend",
+                label: "Pending",
                 variant: "warning",
-                onClick: () => bulkUpdateStatus("suspended"),
+                onClick: () => bulkUpdateStatus("pending"),
               },
-              { label: "Delete", variant: "danger", onClick: bulkDelete },
+              {
+                label: "Rejected",
+                variant: "danger",
+                onClick: () => bulkUpdateStatus("rejected"),
+              },
             ]}
           />
         )}
