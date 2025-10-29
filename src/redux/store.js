@@ -6,6 +6,7 @@ import merchantStaffReducer from "./features/merchant/merchantStaff/merchantStaf
 import adminStaffReducer from "./features/admin/adminStaff/adminStaffSlice";
 import businessTypeReducer from "./features/admin/businessType/businessTypeSlice";
 import denominationReducer from "./features/admin/denomination/denominationSlice";
+import voucherReducer from "./features/member/voucherPurchase/voucherSlice";
 import { baseApi } from "./api/baseApi";
 
 export const store = configureStore({
@@ -17,6 +18,7 @@ export const store = configureStore({
     adminStaff: adminStaffReducer,
     businessType: businessTypeReducer,
     denomination: denominationReducer,
+    voucher: voucherReducer,
     [baseApi.reducerPath]: baseApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>

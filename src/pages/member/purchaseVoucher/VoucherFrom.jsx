@@ -20,13 +20,13 @@ import Dropzone from "../../../components/form/form-elements/Dropzone";
 const VoucherForm = () => {
   const [denomination, setDenomination] = useState("RM10");
   const [paymentMethod, setPaymentMethod] = useState("Manual");
-  const [counts, setCounts] = useState({ RM10: 2, RM100: 2, RM1000: 2 });
+  const [counts, setCounts] = useState({ RM10: 1, RM100: 1, RM1000: 1 });
   const [file, setFile] = useState(null);
 
   const handleCountChange = (key, type) => {
     setCounts((prev) => ({
       ...prev,
-      [key]: type === "inc" ? prev[key] + 1 : prev[key] > 0 ? prev[key] - 1 : 0,
+      [key]: type === "inc" ? prev[key] + 1 : prev[key] > 1 ? prev[key] - 1 : 1,
     }));
   };
 
@@ -61,7 +61,7 @@ const VoucherForm = () => {
       />
       <form onSubmit={handleSubmit(onSubmit)}>
         <ComponentCard title="Voucher Information">
-          <div className=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-3 lg:gap-4">
+          <div className=" grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Voucher Information */}
             <div>
               <div>
@@ -132,13 +132,12 @@ const VoucherForm = () => {
                     <SelectValue placeholder="Select Voucher Type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="gift">Gift Voucher</SelectItem>
-                    <SelectItem value="discount">Discount Voucher</SelectItem>
-                    <SelectItem value="reward">Reward Voucher</SelectItem>
+                    <SelectItem value="max">Max</SelectItem>
+                    <SelectItem value="refer">Refer</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="mt-6">
+              <div className="mt-6 max-w-[350px]">
                 <Label className="text-sm font-medium mb-2 block">
                   Equivalent Points
                 </Label>
@@ -151,41 +150,45 @@ const VoucherForm = () => {
             </div>
 
             {/* Bank Information */}
-            <div>
-              <h3 className="font-semibold text-gray-800 mb-4">
-                Bank Information
-              </h3>
-              <div className="space-y-5">
-                <div>
-                  <Label>Bank Name</Label>
-                  <Input placeholder="Enter Bank Name" />
-                </div>
-                <div>
-                  <Label>Account Holder Name</Label>
-                  <Input placeholder="Enter Account Holder Name" />
-                </div>
-                <div>
-                  <Label>Account Number / IBAN</Label>
-                  <Input placeholder="Enter Account Number / IBAN" />
-                </div>
-                <div>
-                  <Label>Swift Code</Label>
-                  <Input placeholder="Enter Swift Code" />
-                </div>
-                <div>
-                  <Label>Routing Number</Label>
-                  <Input placeholder="Enter Routing Number" />
+            {paymentMethod === "Online" && (
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-4">
+                  Bank Information
+                </h3>
+                <div className="space-y-5">
+                  <div>
+                    <Label>Bank Name</Label>
+                    <Input placeholder="Enter Bank Name" />
+                  </div>
+                  <div>
+                    <Label>Account Holder Name</Label>
+                    <Input placeholder="Enter Account Holder Name" />
+                  </div>
+                  <div>
+                    <Label>Account Number / IBAN</Label>
+                    <Input placeholder="Enter Account Number / IBAN" />
+                  </div>
+                  <div>
+                    <Label>Swift Code</Label>
+                    <Input placeholder="Enter Swift Code" />
+                  </div>
+                  <div>
+                    <Label>Routing Number</Label>
+                    <Input placeholder="Enter Routing Number" />
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Payment Proof */}
-            <div>
-              <Label htmlFor="email">Payment Proof</Label>
-              <div className="mt-4">
-                <Dropzone />
+            {paymentMethod === "Manual" && (
+              <div>
+                <Label htmlFor="email">Payment Proof</Label>
+                <div className="mt-4">
+                  <Dropzone />
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </ComponentCard>
 
