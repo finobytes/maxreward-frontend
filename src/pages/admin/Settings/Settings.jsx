@@ -18,7 +18,7 @@ const SkeletonField = () => (
   </div>
 );
 
-// ✅ Schema matching backend fields
+// Schema matching backend fields
 const schema = z.object({
   rm_points: z.number().int().min(0, "RM Points required"),
   pp_points: z.number().int().min(0, "PP Points required"),
@@ -36,7 +36,6 @@ const SettingsPage = () => {
   const [createOrUpdate, { isLoading: isSubmitting, error: submitError }] =
     useCreateOrUpdateMutation();
 
-  // react-hook-form
   const {
     register,
     handleSubmit,
@@ -55,10 +54,10 @@ const SettingsPage = () => {
     },
   });
 
-  // ✅ Populate form from backend response
+  // Populate form when data arrives
   useEffect(() => {
-    if (data?.settings?.maxreward) {
-      const s = data.settings.maxreward;
+    if (data?.setting_attribute?.maxreward) {
+      const s = data.setting_attribute.maxreward;
       reset({
         rm_points: Number(s.rm_points ?? 0),
         pp_points: Number(s.pp_points ?? 0),
@@ -71,7 +70,7 @@ const SettingsPage = () => {
     }
   }, [data, reset]);
 
-  // ✅ Submit handler
+  // Submit handler
   const onSubmit = async (values) => {
     const payload = {
       settings: {
@@ -91,7 +90,7 @@ const SettingsPage = () => {
     }
   };
 
-  // Error toast for loading
+  // Error toast
   useEffect(() => {
     if (isError) {
       toast.error(
@@ -108,7 +107,6 @@ const SettingsPage = () => {
 
       <ComponentCard title="MaxReward Settings">
         <div className="space-y-6">
-          {/* Loading Skeleton */}
           {isFetching ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {Array.from({ length: 7 }).map((_, i) => (
@@ -147,7 +145,6 @@ const SettingsPage = () => {
                 </div>
               ))}
 
-              {/* Actions */}
               <div className="md:col-span-2 flex items-center gap-3 pt-2">
                 <button
                   type="submit"
