@@ -226,7 +226,7 @@ const CreateAdminStaff = () => {
               <Label>Profile Picture</Label>
               <Dropzone
                 multiple={false}
-                onFilesChange={(files) => setProfilePicture(files[0])}
+                onFilesChange={(file) => setProfilePicture(file ?? null)}
               />
             </div>
             <div>
