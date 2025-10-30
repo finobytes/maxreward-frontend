@@ -13,7 +13,7 @@ export const companyInfoApi = baseApi.injectEndpoints({
     updateCompanyInfo: builder.mutation({
       query: (body) => ({
         url: `/admin/company/update`,
-        method: "PUT",
+        method: "POST",
         body,
       }),
       invalidatesTags: ["CompanyInfo"],

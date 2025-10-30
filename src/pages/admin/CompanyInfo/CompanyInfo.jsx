@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { zodResolver } from "@hookform/resolvers/zod";
 import PageBreadcrumb from "@/components/common/PageBreadcrumb";
 import ComponentCard from "@/components/common/ComponentCard";
 import Label from "@/components/form/Label";
 import Input from "@/components/form/input/InputField";
 import PrimaryButton from "@/components/ui/PrimaryButton";
-import Dropzone from "@/components/form/form-elements/Dropzone";
 import {
   useGetCompanyDetailsQuery,
   useUpdateCompanyInfoMutation,
@@ -33,7 +31,7 @@ const CompanyInfo = () => {
     formState: { errors },
   } = useForm();
 
-  // Load data into form
+  // Load company details
   useEffect(() => {
     if (company) {
       reset({
@@ -41,32 +39,33 @@ const CompanyInfo = () => {
         address: company.address,
         phone: company.phone,
         email: company.email,
-        logo: company.logo,
       });
     }
   }, [company, reset]);
 
-  // Update company info
+  // Handle form submission
   const onSubmit = async (data) => {
     try {
       const formData = new FormData();
       formData.append("name", data.name);
-      formData.append("address", data.address);
-      formData.append("phone", data.phone);
-      formData.append("email", data.email);
+      if (data.address) formData.append("address", data.address);
+      if (data.phone) formData.append("phone", data.phone);
+      if (data.email) formData.append("email", data.email);
       if (logoFile) {
         formData.append("logo", logoFile);
       }
 
+      console.log([...formData.entries()]); // Debugging
+
       await updateCompany(formData).unwrap();
       toast.success("Company info updated successfully!");
     } catch (err) {
-      toast.error("Failed to update company info!");
-      console.error(err);
+      toast.error("❌ Failed to update company info!");
+      console.error("Upload error:", err);
     }
   };
 
-  // Adjust CR Points
+  // Handle CR Points adjustment
   const handleCrAdjustment = async (type) => {
     const amount = prompt(`Enter amount to ${type}:`);
     if (!amount) return;
@@ -108,9 +107,10 @@ const CompanyInfo = () => {
         items={[{ label: "Home", to: "/" }, { label: "Company Information" }]}
       />
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
         <ComponentCard title="Company Details">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Text Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:col-span-2">
               <div>
                 <Label>Company Name</Label>
@@ -130,17 +130,23 @@ const CompanyInfo = () => {
               </div>
             </div>
 
+            {/* File Upload */}
             <div className="md:col-span-1">
               <Label>Company Logo</Label>
-              <Dropzone onFilesChange={(files) => setLogoFile(files[0])} />
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setLogoFile(e.target.files[0])}
+                className="block w-full border border-gray-300 rounded-md p-2 text-sm file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-brand-500 file:text-white file:text-sm hover:file:bg-brand-600"
+              />
 
-              {/* {company?.logo && (
+              {company?.logo && (
                 <img
                   src={company.logo}
                   alt="Company Logo"
                   className="mt-3 w-24 h-24 object-cover rounded border"
                 />
-              )} */}
+              )}
             </div>
           </div>
 

@@ -10,12 +10,13 @@ const Dropzone = ({
 }) => {
   const [files, setFiles] = useState([]);
 
+  // existing files handle (from server)
   useEffect(() => {
     if (initialFiles.length > 0) {
       const formatted = initialFiles.map((url) => ({
         name: url.split("/").pop(),
         preview: url,
-        existing: true, // flag that it's from server
+        existing: true,
       }));
       setFiles(formatted);
     }
@@ -27,15 +28,20 @@ const Dropzone = ({
         preview: URL.createObjectURL(file),
       })
     );
+
     let updatedFiles;
     if (multiple) {
       updatedFiles = [...files, ...newFiles].slice(0, maxFiles);
     } else {
-      updatedFiles = newFiles;
+      updatedFiles = [newFiles[0]]; // single file mode
     }
 
     setFiles(updatedFiles);
-    onFilesChange && onFilesChange(updatedFiles);
+
+    // callback — auto handle single/multiple
+    if (onFilesChange) {
+      onFilesChange(multiple ? updatedFiles : updatedFiles[0]);
+    }
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -50,6 +56,7 @@ const Dropzone = ({
     },
   });
 
+  // revoke blob URLs when unmounted
   useEffect(() => {
     return () => files.forEach((file) => URL.revokeObjectURL(file.preview));
   }, [files]);
@@ -68,14 +75,12 @@ const Dropzone = ({
         >
           <input {...getInputProps()} />
           <div className="dz-message flex flex-col items-center">
-            {/* Icon */}
             <div className="mb-[22px] flex justify-center items-center bg-brand-500 rounded-full p-1">
               <div className="rounded-full bg-white w-12 h-12 p-2">
                 <img className="" src={upload} alt="upload icon" />
               </div>
               <p className="text-white px-5">Drop here to attach or upload</p>
             </div>
-            {/* Text */}
             <span className="font-medium underline text-theme-sm text-brand-500">
               Browse File
             </span>
@@ -84,11 +89,11 @@ const Dropzone = ({
         </div>
       </div>
 
-      {/* Preview */}
+      {/* Preview Section */}
       {files.length > 0 && (
         <div className="mt-3 grid grid-cols-2 gap-3">
-          {files.map((file) => (
-            <div key={file.name} className="relative">
+          {files.map((file, idx) => (
+            <div key={idx} className="relative">
               <img
                 src={file.preview}
                 alt={file.name}
