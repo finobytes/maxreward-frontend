@@ -27,6 +27,7 @@ import PendingMerchantDetails from "../pages/admin/merchant/PendingMerchantDetai
 import Settings from "../pages/admin/Settings/Settings";
 import Notification from "../pages/admin/Notification/Notification";
 import NotificationDetails from "../pages/admin/Notification/NotificationDetails";
+import VoucherManage from "../pages/admin/VoucherManage/VoucherManage";
 
 export const adminRoutes = [
   {
@@ -88,6 +89,10 @@ export const adminRoutes = [
   {
     path: "merchant/merchant-registration",
     element: <MerchantRegistrationForm />,
+  },
+  {
+    path: "voucher-manage",
+    element: <VoucherManage />,
   },
   {
     path: "accounts/income",

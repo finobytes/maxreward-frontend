@@ -18,6 +18,7 @@ import {
   Building,
   Settings,
   Bell,
+  TicketCheck,
 } from "lucide-react";
 
 export const NAV_CONFIG = {
@@ -39,6 +40,11 @@ export const NAV_CONFIG = {
           path: "/admin/merchant/business-type",
         },
       ],
+    },
+    {
+      name: "Voucher Manage",
+      icon: <TicketCheck />,
+      path: "/admin/voucher-manage",
     },
     {
       name: "Accounts",
