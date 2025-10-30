@@ -18,13 +18,15 @@ const SkeletonField = () => (
   </div>
 );
 
-// zod schema for validation
+// ✅ Schema matching backend fields
 const schema = z.object({
-  rm_points: z.number({ invalid_type_error: "Required" }).int().min(0),
-  pp_points: z.number().int().min(0),
-  rp_points: z.number().int().min(0),
-  cp_points: z.number().int().min(0),
-  cr_points: z.number().int().min(0),
+  rm_points: z.number().int().min(0, "RM Points required"),
+  pp_points: z.number().int().min(0, "PP Points required"),
+  rp_points: z.number().int().min(0, "RP Points required"),
+  cp_points: z.number().int().min(0, "CP Points required"),
+  cr_points: z.number().int().min(0, "CR Points required"),
+  max_level: z.number().int().min(0, "Max level required"),
+  deductable_points: z.number().int().min(0, "Deductible points required"),
 });
 
 const SettingsPage = () => {
@@ -48,24 +50,34 @@ const SettingsPage = () => {
       rp_points: 0,
       cp_points: 0,
       cr_points: 0,
+      max_level: 0,
+      deductable_points: 0,
     },
   });
 
-  // populate form when data arrives
+  // ✅ Populate form from backend response
   useEffect(() => {
-    if (data?.setting_attribute) {
+    if (data?.settings?.maxreward) {
+      const s = data.settings.maxreward;
       reset({
-        rm_points: Number(data.setting_attribute.rm_points ?? 0),
-        pp_points: Number(data.setting_attribute.pp_points ?? 0),
-        rp_points: Number(data.setting_attribute.rp_points ?? 0),
-        cp_points: Number(data.setting_attribute.cp_points ?? 0),
-        cr_points: Number(data.setting_attribute.cr_points ?? 0),
+        rm_points: Number(s.rm_points ?? 0),
+        pp_points: Number(s.pp_points ?? 0),
+        rp_points: Number(s.rp_points ?? 0),
+        cp_points: Number(s.cp_points ?? 0),
+        cr_points: Number(s.cr_points ?? 0),
+        max_level: Number(s.max_level ?? 0),
+        deductable_points: Number(s.deductable_points ?? 0),
       });
     }
   }, [data, reset]);
 
+  // ✅ Submit handler
   const onSubmit = async (values) => {
-    const payload = { setting_attribute: values };
+    const payload = {
+      settings: {
+        maxreward: values,
+      },
+    };
 
     try {
       await createOrUpdate(payload).unwrap();
@@ -79,7 +91,7 @@ const SettingsPage = () => {
     }
   };
 
-  // Toasts for errors (load phase)
+  // Error toast for loading
   useEffect(() => {
     if (isError) {
       toast.error(
@@ -94,12 +106,12 @@ const SettingsPage = () => {
         items={[{ label: "Home", to: "/" }, { label: "Settings" }]}
       />
 
-      <ComponentCard title="Setting Attributes">
+      <ComponentCard title="MaxReward Settings">
         <div className="space-y-6">
-          {/* Skeleton Loader */}
+          {/* Loading Skeleton */}
           {isFetching ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {Array.from({ length: 5 }).map((_, i) => (
+              {Array.from({ length: 7 }).map((_, i) => (
                 <SkeletonField key={i} />
               ))}
             </div>
@@ -114,6 +126,8 @@ const SettingsPage = () => {
                 { name: "rp_points", label: "RP Points" },
                 { name: "cp_points", label: "CP Points" },
                 { name: "cr_points", label: "CR Points" },
+                { name: "max_level", label: "Max Level" },
+                { name: "deductable_points", label: "Deductible Points" },
               ].map((field) => (
                 <div key={field.name}>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
