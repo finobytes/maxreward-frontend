@@ -13,8 +13,14 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router";
 import { useGetAllBusinessTypesQuery } from "@/redux/features/admin/businessType/businessTypeApi";
 import { merchantSchema } from "../../../schemas/merchantSchema";
+import { useSelector } from "react-redux";
 
 const MerchantRegistrationForm = () => {
+  const { user } = useSelector((state) => state.auth);
+  const role = user?.role;
+
+  console.log(role);
+
   const [businessLogo, setBusinessLogo] = useState(null);
 
   const [createMerchant, { isLoading }] = useCreateMerchantMutation();
@@ -39,6 +45,7 @@ const MerchantRegistrationForm = () => {
 
   const onSubmit = async (data) => {
     try {
+      data.merchant_created_by = role === "admin" ? "admin" : "general_member";
       const formData = new FormData();
 
       //  Append all text fields

@@ -20,7 +20,7 @@ const MerchantProfileCard = ({ merchant }) => {
         {/* User Profile Image */}
         <div className="w-full">
           <img
-            src={userProfile}
+            src={merchant?.business_logo || userProfile}
             className="rounded-full object-cover w-24 h-24 relative -top-12 left-6"
             alt="user profile"
           />
@@ -35,16 +35,14 @@ const MerchantProfileCard = ({ merchant }) => {
       </div>
       <div className=" block 2xl:flex gap-4 2xl:justify-between relative -top-8">
         <div className="ml-2">
-          <h3 className="text-xl font-semibold">
-            {merchant.account_holder_name}
-          </h3>
+          <h3 className="text-xl font-semibold">{merchant?.business_name}</h3>
           <p className="text-sm mt-2 text-gray-400 font-medium">
-            {merchant.company_address}
+            {merchant?.company_address}
           </p>
           <div className="flex gap-4 mt-1">
             <div className="flex gap-1">
               <img src={locationIcon} alt="icon" />
-              <span className="text-sm text-gray-400">{merchant.address}</span>
+              <span className="text-sm text-gray-400">{merchant?.address}</span>
             </div>
           </div>
         </div>
