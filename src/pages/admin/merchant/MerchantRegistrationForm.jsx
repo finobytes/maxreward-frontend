@@ -172,7 +172,9 @@ const MerchantRegistrationForm = () => {
 
             <div className="md:col-span-1">
               <Label>Upload Company Logo</Label>
-              <Dropzone onFilesChange={(files) => setBusinessLogo(files[0])} />
+              <Dropzone
+                onFilesChange={(file) => setBusinessLogo(file ?? null)}
+              />
             </div>
           </div>
         </ComponentCard>
