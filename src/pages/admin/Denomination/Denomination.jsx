@@ -30,6 +30,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import BulkActionBar from "../../../components/table/BulkActionBar";
+import { toast } from "sonner";
 
 // debounce hook
 const useDebounced = (value, delay = 400) => {
@@ -104,7 +105,7 @@ const Denomination = () => {
   };
   // Bulk actions (placeholder)
   const bulkUpdateStatus = (newStatus) => {
-    console.log("Bulk update status to:", newStatus);
+    toast.warning(`Bulk update to ${newStatus} (not implemented yet)`);
   };
 
   return (

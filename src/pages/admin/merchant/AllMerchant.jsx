@@ -22,6 +22,7 @@ import { memberQR } from "../../../assets/assets";
 import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSkeleton";
 import BulkActionBar from "../../../components/table/BulkActionBar";
 import StatusBadge from "../../../components/table/StatusBadge";
+import { toast } from "sonner";
 
 const AllMerchant = () => {
   const {
@@ -81,10 +82,7 @@ const AllMerchant = () => {
 
   // Bulk actions (placeholder)
   const bulkUpdateStatus = (newStatus) => {
-    console.log("Bulk update status to:", newStatus);
-  };
-  const bulkDelete = () => {
-    console.log("Bulk delete selected merchants:", selected);
+    toast.warning(`Bulk update to ${newStatus} (not implemented yet)`);
   };
 
   return (

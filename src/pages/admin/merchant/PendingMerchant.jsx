@@ -110,11 +110,7 @@ const PendingMerchant = () => {
   };
 
   const bulkUpdateStatus = (newStatus) => {
-    toast(`Bulk update to ${newStatus} (not implemented yet)`, { icon: "ℹ️" });
-  };
-
-  const bulkDelete = () => {
-    toast("Bulk delete (not implemented yet)", { icon: "🗑️" });
+    toast.warning(`Bulk update to ${newStatus} (not implemented yet)`);
   };
 
   return (

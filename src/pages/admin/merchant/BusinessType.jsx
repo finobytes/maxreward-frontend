@@ -30,6 +30,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import BulkActionBar from "../../../components/table/BulkActionBar";
+import { toast } from "sonner";
 
 const useDebounced = (value, delay = 400) => {
   const [v, setV] = useState(value);
@@ -104,10 +105,7 @@ const BusinessType = () => {
   };
   // Bulk actions (placeholder)
   const bulkUpdateStatus = (newStatus) => {
-    console.log("Bulk update status to:", newStatus);
-  };
-  const bulkDelete = () => {
-    console.log("Bulk delete selected merchants:", selected);
+    toast.warning(`Bulk update to ${newStatus} (not implemented yet)`);
   };
 
   return (
