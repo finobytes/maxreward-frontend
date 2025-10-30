@@ -15,6 +15,8 @@ import { DateRangePicker } from "../../../components/shared/DateRangePicker";
 import Pagination from "../../../components/table/Pagination";
 import StatusBadge from "../../../components/table/StatusBadge";
 import { useGetReferredMembersQuery } from "../../../redux/features/member/referNewMember/referNewMemberApi";
+import { toast } from "sonner";
+import BulkActionBar from "../../../components/table/BulkActionBar";
 
 const ReferredMemberList = () => {
   const [search, setSearch] = useState("");
@@ -87,8 +89,9 @@ const ReferredMemberList = () => {
     );
   };
   // Bulk actions (placeholder)
+  // Bulk actions (placeholder)
   const bulkUpdateStatus = (newStatus) => {
-    console.log("Bulk update status to:", newStatus);
+    toast.warning(`Bulk update to ${newStatus} (not implemented yet)`);
   };
 
   if (isLoading) return <p>Loading...</p>;
@@ -114,8 +117,9 @@ const ReferredMemberList = () => {
               onChange={setStatusFilter}
               options={[
                 { label: "All", value: "All" },
-                { label: "Active", value: "Active" },
-                { label: "Inactive", value: "Inactive" },
+                { label: "Active", value: "active" },
+                { label: "Inactive", value: "inactive" },
+                { label: "Suspend", value: "suspend" },
               ]}
             />
             <PrimaryButton
@@ -124,13 +128,36 @@ const ReferredMemberList = () => {
               onClick={() => {
                 setSearch("");
                 setStatusFilter("All");
+                setSelected([]);
               }}
             >
               Clear
             </PrimaryButton>
           </div>
         </div>
-
+        {/* Bulk Actions */}
+        {selected.length > 0 && (
+          <BulkActionBar
+            selectedCount={selected.length}
+            actions={[
+              {
+                label: "Active",
+                variant: "success",
+                onClick: () => bulkUpdateStatus("active"),
+              },
+              {
+                label: "Inactive",
+                variant: "warning",
+                onClick: () => bulkUpdateStatus("inactive"),
+              },
+              {
+                label: "Suspend",
+                variant: "danger",
+                onClick: () => bulkUpdateStatus("suspend"),
+              },
+            ]}
+          />
+        )}
         <div className="mt-4 overflow-x-auto">
           <Table>
             <TableHeader>
@@ -166,7 +193,7 @@ const ReferredMemberList = () => {
                       className="w-4 h-4 rounded"
                     />
                   </TableCell>
-                  <TableCell>{member.memberId}</TableCell>
+                  <TableCell>{member.id}</TableCell>
                   <TableCell>{member.fullName}</TableCell>
                   <TableCell>{member.phone}</TableCell>
                   <TableCell>{member.created}</TableCell>
