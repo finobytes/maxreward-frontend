@@ -106,9 +106,6 @@ const Denomination = () => {
   const bulkUpdateStatus = (newStatus) => {
     console.log("Bulk update status to:", newStatus);
   };
-  const bulkDelete = () => {
-    console.log("Bulk delete selected merchants:", selected);
-  };
 
   return (
     <div>

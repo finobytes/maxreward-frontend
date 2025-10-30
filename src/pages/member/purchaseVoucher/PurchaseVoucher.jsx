@@ -15,7 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import BulkActionBar from "../referNewMember/components/BulkActionBar";
 import { DateRangePicker } from "../../../components/shared/DateRangePicker";
 
 // ✅ Dummy voucher data
@@ -145,15 +144,6 @@ const PurchaseVoucher = () => {
           </div>
 
           {/* Bulk Actions Bar */}
-          {selected.length > 0 && (
-            <BulkActionBar
-              selectedCount={selected.length}
-              onSetActive={() => bulkUpdateStatus("Completed")}
-              onSetBlocked={() => bulkUpdateStatus("Failed")}
-              onSetSuspended={() => bulkUpdateStatus("Pending")}
-              onDelete={bulkDelete}
-            />
-          )}
 
           {/* ✅ Complete Table */}
           <div className="mt-4 relative overflow-x-auto w-full">

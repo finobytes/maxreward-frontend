@@ -7,6 +7,7 @@ import adminStaffReducer from "./features/admin/adminStaff/adminStaffSlice";
 import businessTypeReducer from "./features/admin/businessType/businessTypeSlice";
 import denominationReducer from "./features/admin/denomination/denominationSlice";
 import voucherReducer from "./features/member/voucherPurchase/voucherSlice";
+import referNewMemberReducer from "./features/member/referNewMember/referNewMemberSlice";
 import { baseApi } from "./api/baseApi";
 
 export const store = configureStore({
@@ -19,6 +20,7 @@ export const store = configureStore({
     businessType: businessTypeReducer,
     denomination: denominationReducer,
     voucher: voucherReducer,
+    referNewMember: referNewMemberReducer,
     [baseApi.reducerPath]: baseApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
