@@ -140,6 +140,7 @@ const PurchaseVoucher = () => {
               actions={[
                 {
                   label: "Export",
+                  icon: "export",
                   variant: "success",
                   onClick: () => bulkUpdateStatus("export"),
                 },
