@@ -70,11 +70,11 @@ export const merchantManagementApi = baseApi.injectEndpoints({
       invalidatesTags: [{ type: "Merchant", id: "LIST" }],
     }),
 
-    // PATCH — Update merchant by ID
+    // POST — Update merchant by ID
     updateMerchant: builder.mutation({
       query: ({ id, ...updatedData }) => ({
         url: `/merchants/${id}`,
-        method: "PATCH",
+        method: "POST",
         body: updatedData,
       }),
       invalidatesTags: (result, error, { id }) => [
