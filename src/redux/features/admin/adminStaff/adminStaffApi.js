@@ -56,7 +56,7 @@ export const adminStaffApi = baseApi.injectEndpoints({
     updateAdminStaff: builder.mutation({
       query: ({ id, data }) => ({
         url: `/admin-staffs/${id}`,
-        method: "PATCH",
+        method: "POST",
         body: data,
       }),
       invalidatesTags: (result, error, { id }) => [
