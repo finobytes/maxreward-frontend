@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { useGetAllDenominationsQuery } from "../../admin/denomination/denominationApi";
 import { useGetCurrentSettingsQuery } from "../../admin/settings/settingsApi";
 import { useCreateVoucherMutation } from "./voucherApi";
+import { useNavigate } from "react-router";
 import {
   setDenomination,
   setQuantity,
@@ -16,6 +17,7 @@ import {
 } from "./voucherSlice";
 
 export const useVoucher = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const state = useSelector((s) => s.voucher);
   const { data: denomData, isLoading: denomLoading } =
@@ -48,6 +50,7 @@ export const useVoucher = () => {
       if (res?.success) {
         toast.success(res.message || "Voucher created successfully!");
         dispatch(resetVoucher());
+        navigate("/member/purchase-voucher");
       } else {
         toast.error(res.message || "Failed to create voucher");
       }

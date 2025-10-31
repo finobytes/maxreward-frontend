@@ -12,6 +12,15 @@ export const voucherApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Voucher"],
     }),
+
+    getVouchers: builder.query({
+      query: () => ({
+        url: "/member/vouchers",
+        method: "GET",
+      }),
+      providesTags: ["Voucher"],
+      transformResponse: (response) => response?.data?.vouchers || [],
+    }),
   }),
 });
 

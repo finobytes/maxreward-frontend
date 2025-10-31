@@ -13,6 +13,7 @@ import Label from "../../../components/form/Label";
 import Input from "../../../components/form/input/InputField";
 import Dropzone from "../../../components/form/form-elements/Dropzone";
 import { useVoucher } from "./../../../redux/features/member/voucherPurchase/useVoucher";
+import VoucherFromSkeleton from "../../../components/skeleton/VoucherFromSkeleton";
 
 const VoucherForm = () => {
   const {
@@ -38,7 +39,7 @@ const VoucherForm = () => {
   };
 
   if (denomLoading) {
-    return <p>Loading denominations...</p>;
+    return <VoucherFromSkeleton />;
   }
 
   return (
@@ -55,7 +56,7 @@ const VoucherForm = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Voucher Information */}
           <div>
-            {/* 🔸 Dynamic Denomination Section */}
+            {/* Dynamic Denomination Section */}
             <div>
               <p className="font-semibold mb-6">Denomination</p>
               {denominations.map((item) => {
@@ -104,7 +105,7 @@ const VoucherForm = () => {
               })}
             </div>
 
-            {/* 🔸 Payment Method */}
+            {/* Payment Method */}
             <div>
               <p className="text-sm font-medium mb-4">Payment Method</p>
               <div className="flex items-center gap-6">
@@ -126,7 +127,7 @@ const VoucherForm = () => {
               </div>
             </div>
 
-            {/* 🔸 Voucher Type */}
+            {/* Voucher Type */}
             <div className="mt-6">
               <Label className="text-sm font-medium mb-2 block">
                 Voucher Type
@@ -142,13 +143,13 @@ const VoucherForm = () => {
               </Select>
             </div>
 
-            {/* 🔸 Equivalent Points */}
+            {/* Equivalent Points */}
             <div className="mt-6 max-w-[350px]">
               <Label className="text-sm font-medium mb-2 block">
                 Equivalent Points
               </Label>
               <Input
-                disabled
+                readOnly
                 value={totalAmount}
                 placeholder="Points / Price"
                 className="bg-gray-100"
@@ -185,7 +186,7 @@ const VoucherForm = () => {
               </div>
             </div>
           )}
-          {/* 🔸 Manual Payment Upload */}
+          {/* Manual Payment Upload */}
           {paymentMethod === "manual" && (
             <div>
               <Label htmlFor="paymentProof">Payment Proof</Label>
@@ -197,7 +198,7 @@ const VoucherForm = () => {
         </div>
       </ComponentCard>
 
-      {/* 🔸 Buttons */}
+      {/* Buttons */}
       <div className="mt-8">
         <ComponentCard title="Referral Information">
           <div className="mt-8 flex gap-4">

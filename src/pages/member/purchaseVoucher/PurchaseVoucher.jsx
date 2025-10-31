@@ -16,43 +16,40 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { DateRangePicker } from "../../../components/shared/DateRangePicker";
-
-// ✅ Dummy voucher data
-const dummyVouchers = Array.from({ length: 30 }).map((_, i) => ({
-  id: i + 1,
-  voucherId: `VID-${1000 + i}`,
-  type: ["Max Voucher", "Refer Voucher"][Math.floor(Math.random() * 2)],
-  denomination: [10, 20, 50, 100][Math.floor(Math.random() * 4)],
-  quantity: Math.floor(Math.random() * 5) + 1,
-  totalAmount: Math.floor(Math.random() * 1000) + 100,
-  points: Math.floor(Math.random() * 5000),
-  paymentMethod: ["Online", "Manual"][Math.floor(Math.random() * 2)],
-  status: ["Completed", "Pending", "Failed"][Math.floor(Math.random() * 3)],
-  created: `Oct ${Math.floor(Math.random() * 28) + 1}, 2024`,
-}));
+import { useGetVouchersQuery } from "../../../redux/features/member/voucherPurchase/voucherApi";
+import { toast } from "sonner";
+import BulkActionBar from "../../../components/table/BulkActionBar";
 
 const PurchaseVoucher = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [selected, setSelected] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [vouchers, setVouchers] = useState(dummyVouchers);
   const [dateRange, setDateRange] = useState({
     from: undefined,
     to: undefined,
   });
+
+  // ✅ Fetch vouchers from API
+  const { data: vouchers = [], isLoading, isError } = useGetVouchersQuery();
 
   const rowsPerPage = 10;
 
   // ✅ Filter logic
   const filteredData = useMemo(() => {
     return vouchers.filter((v) => {
+      const type = v.voucher_type?.toLowerCase() || "";
+      const payment = v.payment_method?.toLowerCase() || "";
       const matchesSearch =
-        v.voucherId.toLowerCase().includes(search.toLowerCase()) ||
-        v.type.toLowerCase().includes(search.toLowerCase()) ||
-        v.paymentMethod.toLowerCase().includes(search.toLowerCase());
+        type.includes(search.toLowerCase()) ||
+        payment.includes(search.toLowerCase()) ||
+        v.id.toString().includes(search);
+
       const matchesStatus =
-        statusFilter === "All" ? true : v.status === statusFilter;
+        statusFilter === "All"
+          ? true
+          : v.status?.toLowerCase() === statusFilter.toLowerCase();
+
       return matchesSearch && matchesStatus;
     });
   }, [search, statusFilter, vouchers]);
@@ -63,7 +60,6 @@ const PurchaseVoucher = () => {
     currentPage * rowsPerPage
   );
 
-  // ✅ Selection logic
   const toggleSelectAll = (checked) => {
     if (checked) {
       setSelected(paginatedData.map((v) => v.id));
@@ -77,21 +73,17 @@ const PurchaseVoucher = () => {
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
-
-  // ✅ Bulk Actions
+  // Bulk actions (placeholder)
   const bulkUpdateStatus = (newStatus) => {
-    setVouchers((prev) =>
-      prev.map((v) =>
-        selected.includes(v.id) ? { ...v, status: newStatus } : v
-      )
-    );
-    setSelected([]);
+    toast.warning(`Bulk update to ${newStatus} (not implemented yet)`);
   };
+  if (isLoading) {
+    return <div className="p-4">Loading vouchers...</div>;
+  }
 
-  const bulkDelete = () => {
-    setVouchers((prev) => prev.filter((v) => !selected.includes(v.id)));
-    setSelected([]);
-  };
+  if (isError) {
+    return <div className="p-4 text-red-500">Failed to load vouchers.</div>;
+  }
 
   return (
     <div>
@@ -106,14 +98,14 @@ const PurchaseVoucher = () => {
             <SearchInput
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search here..."
+              placeholder="Search by ID"
             />
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
-              <DateRangePicker
+              {/* <DateRangePicker
                 value={dateRange}
                 onChange={(range) => setDateRange(range)}
-              />
+              /> */}
               <PrimaryButton variant="primary" size="md" to="/member/add">
                 <Plus size={18} />
                 Add Voucher
@@ -124,9 +116,9 @@ const PurchaseVoucher = () => {
                   onChange={setStatusFilter}
                   options={[
                     { label: "All", value: "All" },
-                    { label: "Completed", value: "Completed" },
                     { label: "Pending", value: "Pending" },
-                    { label: "Failed", value: "Failed" },
+                    { label: "Approved", value: "Approved" },
+                    { label: "Rejected", value: "Rejected" },
                   ]}
                 />
                 <PrimaryButton
@@ -135,6 +127,7 @@ const PurchaseVoucher = () => {
                   onClick={() => {
                     setSearch("");
                     setStatusFilter("All");
+                    setSelected([]);
                   }}
                 >
                   Clear
@@ -142,10 +135,21 @@ const PurchaseVoucher = () => {
               </div>
             </div>
           </div>
-
-          {/* Bulk Actions Bar */}
-
-          {/* ✅ Complete Table */}
+          {/* Bulk Actions */}
+          {selected.length > 0 && (
+            <BulkActionBar
+              selectedCount={selected.length}
+              actions={[
+                {
+                  label: "Export",
+                  icon: "export",
+                  variant: "success",
+                  onClick: () => bulkUpdateStatus("export"),
+                },
+              ]}
+            />
+          )}
+          {/* ✅ Table */}
           <div className="mt-4 relative overflow-x-auto w-full">
             <Table className="w-full table-auto border-collapse">
               <TableHeader>
@@ -161,15 +165,14 @@ const PurchaseVoucher = () => {
                       className="w-4 h-4 rounded"
                     />
                   </TableHead>
-                  <TableHead>Voucher ID</TableHead>
+                  <TableHead>ID</TableHead>
                   <TableHead>Type</TableHead>
                   <TableHead>Denomination</TableHead>
                   <TableHead>Quantity</TableHead>
                   <TableHead>Total Amount</TableHead>
-                  <TableHead>Points</TableHead>
                   <TableHead>Payment Method</TableHead>
-                  <TableHead>Created Date</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Created Date</TableHead>
                   <TableHead className="text-center">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -185,23 +188,27 @@ const PurchaseVoucher = () => {
                         className="w-4 h-4 rounded"
                       />
                     </TableCell>
-                    <TableCell>{v.voucherId}</TableCell>
+                    <TableCell>{v.id}</TableCell>
                     <TableCell>
-                      <StatusBadge status={v.type}>{v.type}</StatusBadge>
+                      <StatusBadge status={v.voucher_type}>
+                        {v.voucher_type}
+                      </StatusBadge>
                     </TableCell>
-                    <TableCell>${v.denomination}</TableCell>
+                    <TableCell>{v?.denomination?.title}</TableCell>
                     <TableCell>{v.quantity}</TableCell>
-                    <TableCell>${v.totalAmount}</TableCell>
-                    <TableCell>{v.points}</TableCell>
-                    <TableCell>{v.paymentMethod}</TableCell>
-                    <TableCell>{v.created}</TableCell>
-                    <TableCell className="text-center">
-                      <StatusBadge status={v.status} />
+                    <TableCell>RM {v.total_amount}</TableCell>
+                    <TableCell>{v.payment_method}</TableCell>
+                    <TableCell>
+                      <StatusBadge status={v.status}>{v.status}</StatusBadge>
                     </TableCell>
                     <TableCell>
+                      {new Date(v.created_at).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell className="text-center">
                       <div className="flex flex-col justify-center items-center">
                         <Link
-                          to={``}
+                          // to={`/member/voucher/${v.id}`}
+                          to="#"
                           className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500"
                         >
                           <Eye size={20} />
@@ -212,6 +219,12 @@ const PurchaseVoucher = () => {
                 ))}
               </TableBody>
             </Table>
+
+            {paginatedData.length === 0 && (
+              <div className="p-6 text-center text-gray-500">
+                No vouchers found.
+              </div>
+            )}
 
             <Pagination
               currentPage={currentPage}
