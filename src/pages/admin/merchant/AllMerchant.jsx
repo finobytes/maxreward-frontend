@@ -51,6 +51,13 @@ const AllMerchant = () => {
   } = useMerchantManagement();
 
   const [deleteMerchant] = useDeleteMerchantMutation();
+  const [selected, setSelected] = useState([]);
+
+  const handleClear = () => {
+    clearFilters();
+    setDebouncedSearch(""); // Local search input ও reset
+    setSelected([]);
+  };
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure to delete this merchant?")) {
@@ -63,8 +70,6 @@ const AllMerchant = () => {
 
   const currentPage = pagination?.currentPage || 1;
   const totalPages = pagination?.lastPage || 1;
-
-  const [selected, setSelected] = useState([]);
 
   const toggleSelectAll = (checked) => {
     if (checked) {
@@ -137,10 +142,7 @@ const AllMerchant = () => {
               <PrimaryButton
                 variant="secondary"
                 size="md"
-                onClick={() => {
-                  clearFilters();
-                  setSelected("");
-                }}
+                onClick={handleClear}
               >
                 Clear
               </PrimaryButton>
