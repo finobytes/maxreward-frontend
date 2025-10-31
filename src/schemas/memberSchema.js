@@ -7,8 +7,11 @@ export const memberSchema = z.object({
     .max(100, "Full name must not exceed 100 characters"),
 
   phoneNumber: z
-    .string({ required_error: "Phone Number is required" })
-    .regex(/^[0-9]{10,15}$/, "Phone number must be 10–15 digits"),
+    .string()
+    .regex(
+      /^(?:\+?8801[3-9]\d{8}|01[3-9]\d{8}|\+?601[0-9]\d{7,8}|601[0-9]\d{7,8})$/,
+      "Phone number must be Bangladeshi or Malaysian"
+    ),
 
   gender: z
     .union([z.enum(["male", "female", "other"]), z.literal("")])

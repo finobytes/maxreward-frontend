@@ -236,7 +236,7 @@ const MerchantRegistrationForm = () => {
                   options={[
                     { value: "male", label: "Male" },
                     { value: "female", label: "Female" },
-                    { value: "other", label: "Other" },
+                    { value: "others", label: "Others" },
                   ]}
                 />
               </div>

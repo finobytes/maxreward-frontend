@@ -80,6 +80,25 @@ const VoucherPurchase = () => {
     }
   };
 
+  const [selected, setSelected] = useState([]);
+
+  const toggleSelectAll = (checked) => {
+    if (checked) {
+      setSelected(paginatedData?.map((m) => m.id));
+    } else {
+      setSelected([]);
+    }
+  };
+  const toggleSelect = (id) => {
+    setSelected((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+  // Bulk actions (placeholder)
+  const bulkUpdateStatus = (newStatus) => {
+    toast.warning(`Bulk update to ${newStatus} (not implemented yet)`);
+  };
+
   return (
     <div>
       <PageBreadcrumb
@@ -102,6 +121,19 @@ const VoucherPurchase = () => {
             />
           </div>
 
+          {/* Bulk Actions */}
+          {selected.length > 0 && (
+            <BulkActionBar
+              selectedCount={selected.length}
+              actions={[
+                {
+                  label: "Approve",
+                  variant: "success",
+                  onClick: () => bulkUpdateStatus("approve"),
+                },
+              ]}
+            />
+          )}
           <div className="mt-4 relative overflow-x-auto w-full custom-scrollbar">
             {isLoading ? (
               <MerchantStaffSkeleton rows={8} cols={9} />
@@ -117,6 +149,17 @@ const VoucherPurchase = () => {
               <Table className="w-full table-auto border-collapse">
                 <TableHeader>
                   <TableRow>
+                    <TableHead>
+                      <input
+                        type="checkbox"
+                        checked={
+                          paginatedData?.length > 0 &&
+                          selected.length === paginatedData?.length
+                        }
+                        onChange={(e) => toggleSelectAll(e.target.checked)}
+                        className="w-4 h-4 rounded"
+                      />
+                    </TableHead>
                     <TableHead>ID</TableHead>
                     <TableHead>Type</TableHead>
                     <TableHead>Denomination</TableHead>
@@ -135,6 +178,14 @@ const VoucherPurchase = () => {
                       key={v.id}
                       className="hover:bg-gray-50 transition"
                     >
+                      <TableCell>
+                        <input
+                          type="checkbox"
+                          checked={selected.includes(v.id)}
+                          onChange={() => toggleSelect(v.id)}
+                          className="w-4 h-4 rounded"
+                        />
+                      </TableCell>
                       <TableCell>{v.id}</TableCell>
                       <TableCell>
                         <StatusBadge status={v.voucher_type}>
