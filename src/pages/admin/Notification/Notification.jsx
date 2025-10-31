@@ -48,7 +48,7 @@ const Notification = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <div className="flex gap-2">
+          {/* <div className="flex gap-2">
             <PrimaryButton onClick={() => setFilter("all")}>All</PrimaryButton>
             <PrimaryButton onClick={() => setFilter("unread")}>
               Unread ({unreadCount})
@@ -56,7 +56,7 @@ const Notification = () => {
             <PrimaryButton onClick={() => setFilter("read")}>
               Read
             </PrimaryButton>
-          </div>
+          </div> */}
         </div>
 
         {isLoading || isFetching ? (

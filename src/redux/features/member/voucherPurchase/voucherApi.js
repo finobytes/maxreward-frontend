@@ -1,4 +1,4 @@
-// src/redux/features/member/voucher/voucherApi.js
+// src/redux/features/member/voucherPurchase/voucherApi.js
 import { baseApi } from "../../../api/baseApi";
 
 export const voucherApi = baseApi.injectEndpoints({
@@ -13,6 +13,7 @@ export const voucherApi = baseApi.injectEndpoints({
       invalidatesTags: ["Voucher"],
     }),
 
+    // GET VOUCHERS
     getVouchers: builder.query({
       query: () => ({
         url: "/member/vouchers",
@@ -21,7 +22,21 @@ export const voucherApi = baseApi.injectEndpoints({
       providesTags: ["Voucher"],
       transformResponse: (response) => response?.data?.vouchers || [],
     }),
+
+    // ✅ APPROVE VOUCHER (Admin)
+    approveVoucher: builder.mutation({
+      query: (voucherId) => ({
+        url: `/admin/vouchers/${voucherId}/approve`,
+        method: "POST",
+        body: {}, // empty body
+      }),
+      invalidatesTags: ["Voucher"],
+    }),
   }),
 });
 
-export const { useCreateVoucherMutation, useGetVouchersQuery } = voucherApi;
+export const {
+  useCreateVoucherMutation,
+  useGetVouchersQuery,
+  useApproveVoucherMutation, // ✅ export this
+} = voucherApi;
