@@ -1,24 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router";
+import React from "react";
+import { useParams } from "react-router";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
-import { dummyNotifications } from "../../../constant/notifications";
 import ComponentCard from "../../../components/common/ComponentCard";
+import { useGetNotificationByIdQuery } from "../../../redux/features/admin/notification/notificationApi";
 
 const NotificationDetails = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
-  const [notification, setNotification] = useState(null);
+  const { data: notification, isLoading } = useGetNotificationByIdQuery(id);
 
-  useEffect(() => {
-    const found = dummyNotifications.find((n) => n.id === Number(id));
-    if (found) {
-      setNotification({ ...found, status: "read", is_read: true });
-    } else {
-      navigate("/admin/notification");
-    }
-  }, [id, navigate]);
-
-  if (!notification) return null;
+  if (isLoading) return <p className="p-4">Loading...</p>;
+  if (!notification) return <p className="p-4 text-gray-500">Not found.</p>;
 
   return (
     <div>

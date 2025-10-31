@@ -1,57 +1,39 @@
 import React, { useState } from "react";
-import { CheckCircle2, Circle } from "lucide-react";
+import { CheckCircle2, Circle, Loader } from "lucide-react";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
 import ComponentCard from "../../../components/common/ComponentCard";
-import { dummyNotifications } from "../../../constant/notifications";
 import SearchInput from "../../../components/form/form-elements/SearchInput";
 import { Link } from "react-router";
 import { cn } from "../../../lib/utils";
+import {
+  useGetAllNotificationsQuery,
+  useMarkNotificationAsReadMutation,
+} from "../../../redux/features/admin/notification/notificationApi";
 
 const Notification = () => {
-  const [notifications, setNotifications] = useState(dummyNotifications);
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
 
-  const filteredNotifications = notifications.filter((n) => {
-    const matchFilter = filter === "all" ? true : n.status === filter;
-    const matchSearch = n.title.toLowerCase().includes(search.toLowerCase());
-    return matchFilter && matchSearch;
+  const { data, isLoading, isFetching } = useGetAllNotificationsQuery({
+    page,
+    search,
+    status: filter === "all" ? "" : filter,
   });
 
-  const markAsRead = (id) => {
-    setNotifications((prev) =>
-      prev.map((n) =>
-        n.id === id
-          ? {
-              ...n,
-              status: "read",
-              is_read: true,
-              is_count_read: true,
-              read_at: new Date().toISOString(),
-            }
-          : n
-      )
-    );
-  };
+  const [markAsRead] = useMarkNotificationAsReadMutation();
 
-  const markAsUnread = (id) => {
-    setNotifications((prev) =>
-      prev.map((n) =>
-        n.id === id
-          ? {
-              ...n,
-              status: "unread",
-              is_read: false,
-              is_count_read: false,
-              read_at: null,
-            }
-          : n
-      )
-    );
-  };
+  const notifications = data?.notifications || [];
+  const unreadCount = data?.statistics?.total_unread || 0;
 
-  const unreadCount = notifications.filter((n) => n.status === "unread").length;
+  const handleMarkAsRead = async (id) => {
+    try {
+      await markAsRead(id);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -77,13 +59,17 @@ const Notification = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg divide-y divide-gray-100">
-          {filteredNotifications.length === 0 ? (
-            <div className="p-6 text-center text-gray-500">
-              No notifications found.
-            </div>
-          ) : (
-            filteredNotifications.map((n) => (
+        {isLoading || isFetching ? (
+          <div className="p-6 text-center text-gray-500 flex items-center justify-center gap-2">
+            <Loader className="w-4 h-4 animate-spin" /> Loading notifications...
+          </div>
+        ) : notifications.length === 0 ? (
+          <div className="p-6 text-center text-gray-500">
+            No notifications found.
+          </div>
+        ) : (
+          <div className="bg-white rounded-lg divide-y divide-gray-100">
+            {notifications.map((n) => (
               <div
                 key={n.id}
                 className={cn(
@@ -94,7 +80,7 @@ const Notification = () => {
                 <Link
                   to={`/admin/notification/${n.id}`}
                   className="flex items-start gap-3 flex-1"
-                  onClick={n.status === "unread" && markAsRead}
+                  onClick={() => handleMarkAsRead(n.id)}
                 >
                   {n.status === "unread" ? (
                     <Circle className="text-blue-500 w-4 h-4 mt-1" />
@@ -109,28 +95,10 @@ const Notification = () => {
                     </div>
                   </div>
                 </Link>
-
-                <div className="flex gap-2">
-                  {n.status === "unread" ? (
-                    <button
-                      onClick={() => markAsRead(n.id)}
-                      className="text-sm text-blue-600 hover:underline"
-                    >
-                      Mark as Read
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => markAsUnread(n.id)}
-                      className="text-sm text-gray-500 hover:underline"
-                    >
-                      Mark as Unread
-                    </button>
-                  )}
-                </div>
               </div>
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </ComponentCard>
     </div>
   );
