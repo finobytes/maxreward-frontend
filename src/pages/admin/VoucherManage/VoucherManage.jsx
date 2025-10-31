@@ -110,14 +110,14 @@ const VoucherManage = () => {
             />
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
-              <DateRangePicker
+              {/* <DateRangePicker
                 value={dateRange}
                 onChange={(range) => setDateRange(range)}
-              />
-              <PrimaryButton variant="primary" size="md" to="/member/add">
+              /> */}
+              {/* <PrimaryButton variant="primary" size="md" to="/member/add">
                 <Plus size={18} />
                 Add Voucher
-              </PrimaryButton>
+              </PrimaryButton> */}
               <div className="flex items-center gap-4">
                 <DropdownSelect
                   value={statusFilter}
