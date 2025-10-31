@@ -1,33 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 
-import {
-  ChartArea,
-  ChartLine,
-  ChevronDownIcon,
-  CircleUserRound,
-  DollarSign,
-  FileUser,
-  LayoutDashboard,
-  List,
-  LogOut,
-  QrCode,
-  ScrollText,
-  ShieldCheck,
-  ShoppingBag,
-  ShoppingCart,
-  UserCircle2,
-  UserCog,
-  Users,
-  Briefcase,
-  Building,
-} from "lucide-react";
+import { ChevronDownIcon } from "lucide-react";
 import { useSidebar } from "../../context/SidebarContext";
 import { logo, MaxReward } from "../../assets/assets";
 import { useDispatch, useSelector } from "react-redux";
 import { logout as logoutAction } from "../../redux/features/auth/authSlice";
 import { useLogoutMutation } from "../../redux/features/auth/authApi";
 import { toast } from "sonner";
+import { NAV_CONFIG } from "../../config/navConfig";
 
 const othersItems = [];
 
@@ -66,177 +47,6 @@ const Sidebar = () => {
   const { user } = useSelector((state) => state.auth);
   const role = user?.role;
 
-  const NAV_CONFIG = {
-    admin: [
-      { icon: <LayoutDashboard />, name: "Dashboard", path: "/admin" },
-      { name: "Member Manage", icon: <Users />, path: "/admin/member-manage" },
-      { name: "Staff Manage", icon: <UserCog />, path: "/admin/staff-manage" },
-      {
-        name: "Merchant Manage",
-        icon: <ShoppingBag />,
-        subItems: [
-          {
-            name: "Pending Merchant",
-            path: "/admin/merchant/pending-merchant",
-          },
-          { name: "All Merchant", path: "/admin/merchant/all-merchant" },
-          {
-            name: "Business Type",
-            path: "/admin/merchant/business-type",
-          },
-        ],
-      },
-      {
-        name: "Accounts",
-        icon: <ChartArea />,
-        subItems: [
-          { name: "Income", path: "/admin/accounts/income" },
-          { name: "Expense", path: "/admin/accounts/expense" },
-        ],
-      },
-      {
-        name: "Reports",
-        icon: <ChartLine />,
-        subItems: [
-          { name: "Transaction", path: "/admin/reports/transaction" },
-          { name: "Voucher Purchase", path: "/admin/reports/voucher-purchase" },
-          {
-            name: "Member Points Report",
-            path: "/admin/reports/member-points-report",
-          },
-          { name: "Tree Performance", path: "/admin/reports/tree-performance" },
-          { name: "Redemption History", path: "/admin/reports/redemption" },
-        ],
-      },
-      {
-        name: "Company Info",
-        icon: <Building />,
-        path: "/admin/company-info",
-      },
-      {
-        name: "Denomination",
-        icon: <DollarSign />,
-        path: "/admin/denomination",
-      },
-      { name: "Profile", icon: <UserCircle2 />, path: "/admin/profile" },
-      { name: "Logout", icon: <LogOut />, path: "/login" },
-    ],
-    merchant: [
-      { icon: <LayoutDashboard />, name: "Dashboard", path: "/merchant" },
-      {
-        icon: <Users />,
-        name: "Member Registration",
-        path: "/merchant/member-registration",
-      },
-      {
-        icon: <Users />,
-        name: "Merchant Staff",
-        path: "/merchant/merchant-staff",
-      },
-      {
-        icon: <ChartArea />,
-        name: "Transactions",
-        subItems: [
-          {
-            name: "Pending Approval",
-            path: "/merchant/transactions/pending-approval",
-          },
-          {
-            name: "Approved Transactions",
-            path: "/merchant/transactions/approved-transactions",
-          },
-        ],
-      },
-      {
-        icon: <ShoppingBag />,
-        name: "Redeem Mall",
-        path: "/merchant/redeem-mall",
-      },
-      {
-        icon: <ChartArea />,
-        name: "Voucher Purchase",
-        path: "/merchant/voucher-purchase",
-      },
-      {
-        icon: <ChartLine />,
-        name: "Reports",
-        subItems: [
-          {
-            name: "Member Transactions",
-            path: "/merchant/reports/member-transactions",
-          },
-          {
-            name: "Voucher Purchase",
-            path: "/merchant/reports/voucher-purchase",
-          },
-          {
-            name: "Redeem Transactions",
-            path: "/merchant/reports/redeem-mall-transactions",
-          },
-        ],
-      },
-      { icon: <CircleUserRound />, name: "Profile", path: "/merchant/profile" },
-
-      { name: "Logout", icon: <LogOut />, path: "/login" },
-    ],
-    member: [
-      { icon: <LayoutDashboard />, name: "Dashboard", path: "/member" },
-      {
-        icon: <Users />,
-        name: "Refer New Member",
-        path: "/member/referred-member",
-      },
-      {
-        icon: <QrCode />,
-        name: "Show QR Code",
-        path: "/member/show-qr-code",
-      },
-      {
-        icon: <ChartArea />,
-        name: "Point Statement",
-        path: "/member/point-statement",
-      },
-      {
-        icon: <ShoppingBag />,
-        name: "Max Redeem Mall",
-        path: "/member/max-redeem-mall",
-      },
-      {
-        icon: <DollarSign />,
-        name: "Purchase Voucher",
-        path: "/member/purchase-voucher",
-      },
-      {
-        icon: <ShoppingCart />,
-        name: "Shop With Merchant",
-        path: "/member/shop-with-merchant",
-      },
-      {
-        icon: <List />,
-        name: "Referred Member List",
-        path: "/member/referred-member-list",
-      },
-      { icon: <UserCog />, name: "Community", path: "/member/community" },
-      {
-        icon: <FileUser />,
-        name: "Merchant Application",
-        path: "/member/merchant-application",
-      },
-      { icon: <CircleUserRound />, name: "Profile", path: "/member/profile" },
-      {
-        icon: <ScrollText />,
-        name: "Terms & Condition",
-        path: "/member/terms-and-condition",
-      },
-      {
-        icon: <ShieldCheck />,
-        name: "Data Privacy Policy",
-        path: "/member/terms-and-condition",
-      },
-
-      { name: "Logout", icon: <LogOut /> },
-    ],
-  };
   const items = useMemo(() => NAV_CONFIG[role] || [], [role]);
   const isActive = useCallback(
     (path) => location.pathname === path,
@@ -431,11 +241,17 @@ const Sidebar = () => {
 
   return (
     <aside
-      className={`fixed top-0 left-0 h-screen z-50 bg-white border-r border-gray-200 
-  transition-all duration-300 ease-in-out flex flex-col px-5
-  ${isExpanded || isHovered ? "w-[240px]" : "w-[74px]"}
-  ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
-  lg:translate-x-0`}
+      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
+        ${
+          isExpanded || isMobileOpen
+            ? "w-[240px]"
+            : isHovered
+            ? "w-[240px]"
+            : "w-[74px]"
+        } 
+        ${
+          isMobileOpen ? "translate-x-0" : "-translate-x-full"
+        } lg:translate-x-0`}
       onMouseEnter={() => !isExpanded && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

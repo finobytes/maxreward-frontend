@@ -23,8 +23,12 @@ import MemberUpdate from "../pages/admin/memberMange/MemberUpdate";
 import CompanyInfo from "../pages/admin/CompanyInfo/CompanyInfo";
 import Denomination from "../pages/admin/Denomination/Denomination";
 import BusinessType from "../pages/admin/merchant/BusinessType";
-import path from "path";
 import PendingMerchantDetails from "../pages/admin/merchant/PendingMerchantDetails";
+import Settings from "../pages/admin/Settings/Settings";
+import Notification from "../pages/admin/Notification/Notification";
+import NotificationDetails from "../pages/admin/Notification/NotificationDetails";
+import VoucherManage from "../pages/admin/VoucherManage/VoucherManage";
+import WhatsAppLog from "../pages/admin/reports/WhatsAppLog";
 
 export const adminRoutes = [
   {
@@ -88,6 +92,10 @@ export const adminRoutes = [
     element: <MerchantRegistrationForm />,
   },
   {
+    path: "voucher-manage",
+    element: <VoucherManage />,
+  },
+  {
     path: "accounts/income",
     element: <Income />,
   },
@@ -98,6 +106,10 @@ export const adminRoutes = [
   {
     path: "reports/transaction",
     element: <Transaction />,
+  },
+  {
+    path: "reports/whatsapp-log",
+    element: <WhatsAppLog />,
   },
   {
     path: "reports/voucher-purchase",
@@ -126,6 +138,18 @@ export const adminRoutes = [
   {
     path: "denomination",
     element: <Denomination />,
+  },
+  {
+    path: "notification",
+    element: <Notification />,
+  },
+  {
+    path: "/admin/notification/:id",
+    element: <NotificationDetails />,
+  },
+  {
+    path: "settings",
+    element: <Settings />,
   },
   {
     path: "profile",

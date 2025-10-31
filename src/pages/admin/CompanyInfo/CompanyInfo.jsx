@@ -1,7 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { zodResolver } from "@hookform/resolvers/zod";
 import PageBreadcrumb from "@/components/common/PageBreadcrumb";
 import ComponentCard from "@/components/common/ComponentCard";
 import Label from "@/components/form/Label";
@@ -17,6 +16,8 @@ import {
 import { Loader } from "lucide-react";
 
 const CompanyInfo = () => {
+  const [logoFile, setLogoFile] = useState(null);
+
   const { data: company, isFetching, isError } = useGetCompanyDetailsQuery();
   const { data: crPointsData } = useGetCrPointsQuery();
   const [updateCompany, { isLoading: isUpdating }] =
@@ -39,7 +40,6 @@ const CompanyInfo = () => {
         address: company.address,
         phone: company.phone,
         email: company.email,
-        logo: company.logo,
       });
     }
   }, [company, reset]);
@@ -47,10 +47,19 @@ const CompanyInfo = () => {
   // Update company info
   const onSubmit = async (data) => {
     try {
-      await updateCompany(data).unwrap();
-      toast.success("Company info updated successfully!");
+      const formData = new FormData();
+      formData.append("name", data.name);
+      formData.append("address", data.address);
+      formData.append("phone", data.phone);
+      formData.append("email", data.email);
+      if (logoFile instanceof File) {
+        formData.append("logo", logoFile);
+      }
+
+      await updateCompany(formData).unwrap();
+      toast.success("✅ Company info updated successfully!");
     } catch (err) {
-      toast.error("Failed to update company info!");
+      toast.error("❌ Failed to update company info!");
       console.error(err);
     }
   };
@@ -99,8 +108,8 @@ const CompanyInfo = () => {
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <ComponentCard title="Company Details">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:col-span-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-6">
               <div>
                 <Label>Company Name</Label>
                 <Input {...register("name")} placeholder="Company name" />
@@ -121,14 +130,12 @@ const CompanyInfo = () => {
 
             <div className="md:col-span-1">
               <Label>Company Logo</Label>
-              <Dropzone />
-              {/* {company?.logo && (
-                <img
-                  src={company.logo}
-                  alt="Company Logo"
-                  className="mt-3 w-24 h-24 object-cover rounded border"
-                />
-              )} */}
+              <Dropzone
+                multiple={false}
+                maxFiles={1}
+                initialFiles={company?.logo ? [company.logo] : []}
+                onFilesChange={(file) => setLogoFile(file ?? null)}
+              />
             </div>
           </div>
 

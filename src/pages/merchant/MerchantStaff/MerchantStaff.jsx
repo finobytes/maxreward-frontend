@@ -61,23 +61,19 @@ const MerchantStaff = () => {
   return (
     <div className="space-y-6">
       <PageBreadcrumb
-        items={[{ label: "Home", to: "/" }, { label: "Merchant Staff" }]}
+        items={[{ label: "Home", to: "/" }, { label: "Merchant Staff List" }]}
       />
 
       <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
         {/* Header + Filters */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <h3 className="text-lg font-semibold text-gray-800">
-            Merchant Staff List
-          </h3>
+          <SearchInput
+            placeholder="Search staff..."
+            value={search}
+            onChange={(e) => setDebouncedSearch(e.target.value)}
+          />
 
           <div className="flex flex-col sm:flex-row gap-3 items-center">
-            <SearchInput
-              placeholder="Search staff..."
-              value={search}
-              onChange={(e) => setDebouncedSearch(e.target.value)}
-            />
-
             <DropdownSelect
               value={status}
               onChange={setStatus}

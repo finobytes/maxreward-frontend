@@ -8,7 +8,10 @@ export const merchantStaffSchema = z.object({
 
   phone: z
     .string()
-    .regex(/^(\+?\d{10,15})$/, { message: "Enter a valid phone number" }),
+    .regex(
+      /^(?:\+?8801[3-9]\d{8}|01[3-9]\d{8}|\+?601[0-46-9]\d{7,8}|601[0-46-9]\d{7,8})$/,
+      "Phone number must be Bangladeshi or Malaysian"
+    ),
 
   email: z
     .string()

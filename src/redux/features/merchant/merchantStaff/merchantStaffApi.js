@@ -55,7 +55,7 @@ export const merchantStaffApi = baseApi.injectEndpoints({
     updateStaff: builder.mutation({
       query: ({ id, ...updatedData }) => ({
         url: `/staffs/${id}`,
-        method: "PATCH",
+        method: "POST",
         body: updatedData,
       }),
       invalidatesTags: (result, error, { id }) => [

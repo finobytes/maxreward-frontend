@@ -12,7 +12,6 @@ import { Spinner } from "@/components/ui/spinner.jsx";
 export default function UserDropdown({ user, role }) {
   const [isOpen, setIsOpen] = useState(false);
   const [logoutApi, { isLoading }] = useLogoutMutation();
-  console.log("UserDropdown user:", user);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();

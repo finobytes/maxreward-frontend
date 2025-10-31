@@ -89,7 +89,7 @@ const MemberManage = () => {
           <SearchInput
             value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
-            placeholder="Search by name, phone, username..."
+            placeholder="Search by name, phone"
           />
 
           <div className="flex flex-wrap items-center gap-3">

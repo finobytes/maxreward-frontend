@@ -46,7 +46,7 @@ export const baseQueryWithReauth = async (args, api, extraOptions) => {
       //  retry again old request
       result = await rawBaseQuery(args, api, extraOptions);
     } else {
-      console.error("❌ Refresh token failed, logging out...");
+      console.error("Refresh token failed, logging out...");
       api.dispatch(logout());
     }
   }

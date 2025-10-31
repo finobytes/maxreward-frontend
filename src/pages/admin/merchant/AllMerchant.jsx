@@ -22,6 +22,7 @@ import { memberQR } from "../../../assets/assets";
 import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSkeleton";
 import BulkActionBar from "../../../components/table/BulkActionBar";
 import StatusBadge from "../../../components/table/StatusBadge";
+import { toast } from "sonner";
 
 const AllMerchant = () => {
   const {
@@ -50,6 +51,13 @@ const AllMerchant = () => {
   } = useMerchantManagement();
 
   const [deleteMerchant] = useDeleteMerchantMutation();
+  const [selected, setSelected] = useState([]);
+
+  const handleClear = () => {
+    clearFilters();
+    setDebouncedSearch(""); // Local search input ও reset
+    setSelected([]);
+  };
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure to delete this merchant?")) {
@@ -62,8 +70,6 @@ const AllMerchant = () => {
 
   const currentPage = pagination?.currentPage || 1;
   const totalPages = pagination?.lastPage || 1;
-
-  const [selected, setSelected] = useState([]);
 
   const toggleSelectAll = (checked) => {
     if (checked) {
@@ -81,10 +87,7 @@ const AllMerchant = () => {
 
   // Bulk actions (placeholder)
   const bulkUpdateStatus = (newStatus) => {
-    console.log("Bulk update status to:", newStatus);
-  };
-  const bulkDelete = () => {
-    console.log("Bulk delete selected merchants:", selected);
+    toast.warning(`Bulk update to ${newStatus} (not implemented yet)`);
   };
 
   return (
@@ -99,7 +102,7 @@ const AllMerchant = () => {
           <SearchInput
             value={debouncedSearch}
             onChange={(e) => setDebouncedSearch(e.target.value)}
-            placeholder="Search by name, email, phone..."
+            placeholder="Search by company, email, phone..."
           />
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
@@ -139,10 +142,7 @@ const AllMerchant = () => {
               <PrimaryButton
                 variant="secondary"
                 size="md"
-                onClick={() => {
-                  clearFilters();
-                  setSelected("");
-                }}
+                onClick={handleClear}
               >
                 Clear
               </PrimaryButton>
@@ -166,11 +166,15 @@ const AllMerchant = () => {
                 onClick: () => bulkUpdateStatus("approve"),
               },
               {
-                label: "Suspend",
+                label: "Pending",
                 variant: "warning",
-                onClick: () => bulkUpdateStatus("suspended"),
+                onClick: () => bulkUpdateStatus("pending"),
               },
-              { label: "Delete", variant: "danger", onClick: bulkDelete },
+              {
+                label: "Rejected",
+                variant: "danger",
+                onClick: () => bulkUpdateStatus("rejected"),
+              },
             ]}
           />
         )}
@@ -299,9 +303,9 @@ const AllMerchant = () => {
                         >
                           <PencilLine size={16} />
                         </Link>
-                        <button className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200">
+                        {/* <button className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200">
                           <Trash2Icon size={16} />
-                        </button>
+                        </button> */}
                       </div>
                     </TableCell>
                   </TableRow>

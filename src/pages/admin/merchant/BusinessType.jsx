@@ -29,6 +29,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import BulkActionBar from "../../../components/table/BulkActionBar";
+import { toast } from "sonner";
 
 const useDebounced = (value, delay = 400) => {
   const [v, setV] = useState(value);
@@ -87,6 +89,25 @@ const BusinessType = () => {
     setIsModalOpen(false);
   };
   console.log(businessTypes.data);
+  const [selected, setSelected] = useState([]);
+
+  const toggleSelectAll = (checked) => {
+    if (checked) {
+      setSelected(businessTypes?.data?.map((m) => m.id));
+    } else {
+      setSelected([]);
+    }
+  };
+  const toggleSelect = (id) => {
+    setSelected((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+  // Bulk actions (placeholder)
+  const bulkUpdateStatus = (newStatus) => {
+    toast.warning(`Bulk update to ${newStatus} (not implemented yet)`);
+  };
+
   return (
     <div>
       <PageBreadcrumb
@@ -128,13 +149,26 @@ const BusinessType = () => {
               onClick={() => {
                 dispatch(resetAllFilters());
                 setLocalSearch("");
+                setSelected([]);
               }}
             >
               Clear
             </PrimaryButton>
           </div>
         </div>
-
+        {/* Bulk Actions */}
+        {selected.length > 0 && (
+          <BulkActionBar
+            selectedCount={selected.length}
+            actions={[
+              {
+                label: "Delete",
+                variant: "danger",
+                onClick: () => bulkUpdateStatus("delete"),
+              },
+            ]}
+          />
+        )}
         {/* Table */}
         <div className="mt-4 overflow-x-auto">
           {isLoading ? (
@@ -151,6 +185,17 @@ const BusinessType = () => {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>
+                    <input
+                      type="checkbox"
+                      checked={
+                        businessTypes?.data?.length > 0 &&
+                        selected.length === businessTypes?.data?.length
+                      }
+                      onChange={(e) => toggleSelectAll(e.target.checked)}
+                      className="w-4 h-4 rounded"
+                    />
+                  </TableHead>
                   <TableHead>ID</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Created At</TableHead>
@@ -160,6 +205,14 @@ const BusinessType = () => {
               <TableBody>
                 {businessTypes?.data?.map((b) => (
                   <TableRow key={b.id}>
+                    <TableCell>
+                      <input
+                        type="checkbox"
+                        checked={selected.includes(b.id)}
+                        onChange={() => toggleSelect(b.id)}
+                        className="w-4 h-4 rounded"
+                      />
+                    </TableCell>
                     <TableCell>{b.id}</TableCell>
                     <TableCell className="capitalize">{b.name}</TableCell>
                     <TableCell>

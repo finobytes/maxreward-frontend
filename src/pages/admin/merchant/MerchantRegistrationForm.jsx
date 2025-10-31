@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCreateMerchantMutation } from "@/redux/features/admin/merchantManagement/merchantManagementApi";
@@ -13,8 +13,16 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router";
 import { useGetAllBusinessTypesQuery } from "@/redux/features/admin/businessType/businessTypeApi";
 import { merchantSchema } from "../../../schemas/merchantSchema";
+import { useSelector } from "react-redux";
 
 const MerchantRegistrationForm = () => {
+  const { user } = useSelector((state) => state.auth);
+  const role = user?.role;
+
+  console.log(role);
+
+  const [businessLogo, setBusinessLogo] = useState(null);
+
   const [createMerchant, { isLoading }] = useCreateMerchantMutation();
   const navigate = useNavigate();
   const {
@@ -37,20 +45,33 @@ const MerchantRegistrationForm = () => {
 
   const onSubmit = async (data) => {
     try {
-      const payload = { ...data };
-      delete payload.confirm_password;
+      data.merchant_created_by = role === "admin" ? "admin" : "general_member";
+      const formData = new FormData();
 
-      const response = await createMerchant(payload).unwrap();
+      //  Append all text fields
+      Object.keys(data).forEach((key) => {
+        if (data[key] !== undefined && data[key] !== null) {
+          formData.append(key, data[key]);
+        }
+      });
+
+      //  File append
+      if (businessLogo) {
+        formData.append("business_logo", businessLogo);
+      }
+
+      //  confirm_password
+      formData.delete("confirm_password");
+
+      const response = await createMerchant(formData).unwrap();
 
       toast.success("Merchant created successfully!");
       reset();
       navigate("/admin/merchant/pending-merchant");
     } catch (err) {
       console.error("Create Error:", err);
-
       if (err?.data?.errors) {
-        const errors = err.data.errors;
-        Object.entries(errors).forEach(([field, messages]) => {
+        Object.entries(err.data.errors).forEach(([field, messages]) => {
           toast.error(`${field}: ${messages.join(", ")}`);
         });
       } else {
@@ -158,7 +179,9 @@ const MerchantRegistrationForm = () => {
 
             <div className="md:col-span-1">
               <Label>Upload Company Logo</Label>
-              <Dropzone />
+              <Dropzone
+                onFilesChange={(file) => setBusinessLogo(file ?? null)}
+              />
             </div>
           </div>
         </ComponentCard>
@@ -213,7 +236,7 @@ const MerchantRegistrationForm = () => {
                   options={[
                     { value: "male", label: "Male" },
                     { value: "female", label: "Female" },
-                    { value: "other", label: "Other" },
+                    { value: "others", label: "Others" },
                   ]}
                 />
               </div>

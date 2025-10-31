@@ -17,13 +17,18 @@ export const useMerchantManagement = () => {
 
   const [debouncedSearch, setDebouncedSearch] = useState(search);
 
-  // Debounce search for 600ms
+  // Debounce search input
   useEffect(() => {
     const handler = setTimeout(() => {
       dispatch(setSearch(debouncedSearch));
     }, 600);
     return () => clearTimeout(handler);
   }, [debouncedSearch, dispatch]);
+
+  // Sync redux search → local input
+  useEffect(() => {
+    setDebouncedSearch(search);
+  }, [search]);
 
   const { data, isFetching, isLoading, isError, refetch } =
     useGetMerchantsQuery({
@@ -36,6 +41,7 @@ export const useMerchantManagement = () => {
 
   const merchants = data?.merchants ?? [];
   const pagination = data?.pagination ?? {};
+
   const clearFilters = () => {
     dispatch(setStatus(""));
     dispatch(setBusinessType(""));
@@ -53,6 +59,7 @@ export const useMerchantManagement = () => {
     isError,
     refetch,
     filters: { page, perPage, status, businessType, search },
+    debouncedSearch,
     actions: {
       setPage: (val) => dispatch(setPage(val)),
       setPerPage: (val) => dispatch(setPerPage(val)),
