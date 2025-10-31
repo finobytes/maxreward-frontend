@@ -28,6 +28,7 @@ import Settings from "../pages/admin/Settings/Settings";
 import Notification from "../pages/admin/Notification/Notification";
 import NotificationDetails from "../pages/admin/Notification/NotificationDetails";
 import VoucherManage from "../pages/admin/VoucherManage/VoucherManage";
+import WhatsAppLog from "../pages/admin/reports/WhatsAppLog";
 
 export const adminRoutes = [
   {
@@ -105,6 +106,10 @@ export const adminRoutes = [
   {
     path: "reports/transaction",
     element: <Transaction />,
+  },
+  {
+    path: "reports/whatsapp-log",
+    element: <WhatsAppLog />,
   },
   {
     path: "reports/voucher-purchase",

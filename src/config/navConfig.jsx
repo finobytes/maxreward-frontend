@@ -59,6 +59,7 @@ export const NAV_CONFIG = {
       icon: <ChartLine />,
       subItems: [
         { name: "Transaction", path: "/admin/reports/transaction" },
+        { name: "WhatsApp Log", path: "/admin/reports/whatsapp-log" },
         { name: "Voucher Purchase", path: "/admin/reports/voucher-purchase" },
         {
           name: "Member Points Report",
