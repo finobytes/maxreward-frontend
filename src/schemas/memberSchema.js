@@ -9,10 +9,9 @@ export const memberSchema = z.object({
   phoneNumber: z
     .string()
     .regex(
-      /^(?:\+?8801[3-9]\d{8}|01[3-9]\d{8}|\+?601[0-9]\d{7,8}|601[0-9]\d{7,8})$/,
+      /^(?:\+?8801[3-9]\d{8}|01[3-9]\d{8}|\+?601[0-46-9]\d{7,8}|601[0-46-9]\d{7,8})$/,
       "Phone number must be Bangladeshi or Malaysian"
     ),
-
   gender: z
     .union([z.enum(["male", "female", "other"]), z.literal("")])
     .optional(),
