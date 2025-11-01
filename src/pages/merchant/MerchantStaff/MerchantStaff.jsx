@@ -184,7 +184,7 @@ const MerchantStaff = () => {
                           <PencilLine size={16} />
                         </Link>
 
-                        <button
+                        {/* <button
                           onClick={() => handleDelete(staff.id)}
                           disabled={deletingId === staff.id}
                           className="p-2 rounded-md bg-red-100 hover:bg-red-200 text-red-500 flex items-center gap-1"
@@ -194,7 +194,7 @@ const MerchantStaff = () => {
                           ) : (
                             <Trash2Icon size={16} />
                           )}
-                        </button>
+                        </button> */}
                       </div>
                     </TableCell>
                   </TableRow>

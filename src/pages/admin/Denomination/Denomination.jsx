@@ -228,12 +228,12 @@ const Denomination = () => {
                         >
                           <PencilLine size={16} />
                         </button>
-                        <button
+                        {/* <button
                           onClick={() => handleDelete(item.id)}
                           className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200"
                         >
                           <Trash2Icon size={16} />
-                        </button>
+                        </button> */}
                       </div>
                     </TableCell>
                   </TableRow>
