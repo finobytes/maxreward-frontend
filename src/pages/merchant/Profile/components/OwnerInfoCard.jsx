@@ -49,11 +49,11 @@ const OwnerInfoCard = ({ userInfo }) => {
             </div>
           </div>
         </div>
-        <div className="">
+        {/* <div className="">
           <PrimaryButton type="button" variant="primary" size="md">
             Login to Merchant Account
           </PrimaryButton>
-        </div>
+        </div> */}
       </ComponentCard>
     </div>
   );
