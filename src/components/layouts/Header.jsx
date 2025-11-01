@@ -38,7 +38,7 @@ const Header = () => {
     };
 
   return (
-    <header className="sticky top-0 flex w-full bg-white border-b border-gray-200 z-99999 ">
+    <header className="sticky top-0 flex w-full bg-white border-b border-gray-200 z-50 ">
       <div className="flex flex-col items-center justify-between grow lg:flex-row lg:px-6">
         <div className="flex items-center justify-between w-full gap-2 px-3 py-3 ">
           <button
