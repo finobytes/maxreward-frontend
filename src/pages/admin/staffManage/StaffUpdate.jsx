@@ -87,11 +87,21 @@ const StaffUpdate = () => {
         gender: d.gender || "male",
         status: d.status || "active",
       });
+
       if (d.profile_picture) {
         setExistingProfile([d.profile_picture]);
       }
-      if (d.national_id_card && Array.isArray(d.national_id_card)) {
-        setExistingNid(d.national_id_card);
+
+      // NID card preview here
+      if (d.national_id_card) {
+        const nidFiles = [];
+        if (d.national_id_card.front?.url) {
+          nidFiles.push(d.national_id_card.front.url);
+        }
+        if (d.national_id_card.back?.url) {
+          nidFiles.push(d.national_id_card.back.url);
+        }
+        setExistingNid(nidFiles);
       }
     }
   }, [staffData, reset]);
