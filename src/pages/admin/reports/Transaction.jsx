@@ -15,7 +15,7 @@ import { useGetAllTransactionsQuery } from "../../../redux/features/admin/report
 import { toast } from "sonner";
 import BulkActionBar from "../../../components/table/BulkActionBar";
 
-// 🔁 debounce hook
+// debounce hook
 const useDebounced = (value, delay = 400) => {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
@@ -38,7 +38,7 @@ const Transaction = () => {
 
   const transactions = data?.transactions || [];
   const pagination = data?.pagination || {};
-  const stats = data?.statistics || {};
+  // const stats = data?.statistics || {};
 
   const [selected, setSelected] = useState([]);
 
@@ -72,7 +72,7 @@ const Transaction = () => {
           </div>
         )}
 
-        {/* 🔍 Search */}
+        {/* Search */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
           <SearchInput
             value={search}
@@ -81,7 +81,7 @@ const Transaction = () => {
           />
         </div>
 
-        {/* 📊 Stats Summary */}
+        {/* Stats Summary */}
         {/* {stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 text-sm text-gray-700">
             <div className="p-3 rounded-lg border bg-gray-50">
@@ -116,7 +116,7 @@ const Transaction = () => {
             ]}
           />
         )}
-        {/* 🧾 Table */}
+        {/* Table */}
         <div className="overflow-x-auto">
           {isLoading ? (
             <div className="p-6 text-center text-gray-500">
@@ -145,13 +145,13 @@ const Transaction = () => {
                       className="w-4 h-4 rounded"
                     />
                   </TableHead>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Member</TableHead>
+                  <TableHead>Transaction ID</TableHead>
+                  <TableHead>Merchant Name</TableHead>
                   <TableHead>Transaction Type</TableHead>
-                  <TableHead>Points Type</TableHead>
-                  <TableHead>Points</TableHead>
-                  <TableHead>Reason</TableHead>
-                  <TableHead>Date</TableHead>
+                  <TableHead>Buyer Name</TableHead>
+                  <TableHead>Total Amount</TableHead>
+                  <TableHead>Transaction Date</TableHead>
+                  <TableHead>Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -166,33 +166,14 @@ const Transaction = () => {
                       />
                     </TableCell>
                     <TableCell>{tx.id}</TableCell>
-                    <TableCell>
-                      {tx.member ? (
-                        <div>
-                          <p className="font-medium">{tx.member.name}</p>
-                          <p className="text-xs text-gray-500">
-                            {tx.member.phone}
-                          </p>
-                        </div>
-                      ) : (
-                        "—"
-                      )}
-                    </TableCell>
+                    <TableCell>{tx?.merchant_name || "N/A"}</TableCell>
                     <TableCell>{tx.transaction_type?.toUpperCase()}</TableCell>
-                    <TableCell
-                      className={`capitalize ${
-                        tx.points_type === "credited"
-                          ? "text-green-600"
-                          : "text-red-600"
-                      }`}
-                    >
-                      {tx.points_type}
-                    </TableCell>
+                    <TableCell>{tx?.buyer_name || "N/A"}</TableCell>
                     <TableCell>{tx.transaction_points}</TableCell>
-                    <TableCell>{tx.transaction_reason}</TableCell>
                     <TableCell>
                       {new Date(tx.created_at).toLocaleDateString("en-GB")}
                     </TableCell>
+                    <TableCell>{tx?.status || "N/A"}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -200,7 +181,7 @@ const Transaction = () => {
           )}
         </div>
 
-        {/* 🔢 Pagination */}
+        {/* Pagination */}
         {pagination.totalPages > 1 && (
           <Pagination
             currentPage={pagination.currentPage}

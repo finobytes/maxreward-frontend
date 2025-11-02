@@ -112,10 +112,6 @@ export const adminRoutes = [
     element: <WhatsAppLog />,
   },
   {
-    path: "reports/voucher-purchase",
-    element: <VoucherPurchase />,
-  },
-  {
     path: "reports/member-points-report",
     element: <MemberPointsReport />,
   },

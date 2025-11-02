@@ -18,7 +18,7 @@ import {
 import { useGetVouchersQuery } from "../../../redux/features/member/voucherPurchase/voucherApi";
 import { toast } from "sonner";
 import BulkActionBar from "../../../components/table/BulkActionBar";
-import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSkeleton"; // ✅ same skeleton reused
+import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSkeleton"; // same skeleton reused
 
 const PurchaseVoucher = () => {
   const [search, setSearch] = useState("");
@@ -26,7 +26,7 @@ const PurchaseVoucher = () => {
   const [selected, setSelected] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // ✅ Fetch vouchers
+  // Fetch vouchers
   const {
     data: vouchers = [],
     isLoading,
@@ -36,7 +36,7 @@ const PurchaseVoucher = () => {
 
   const rowsPerPage = 10;
 
-  // ✅ Filter logic
+  // Filter logic
   const filteredData = useMemo(() => {
     return vouchers.filter((v) => {
       const type = v.voucher_type?.toLowerCase() || "";
@@ -86,7 +86,7 @@ const PurchaseVoucher = () => {
       />
 
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white p-4 shadow-sm relative">
-        {/* ✅ Overlay loader like MemberManage */}
+        {/* Overlay loader like MemberManage */}
         {isFetching && !isLoading && (
           <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-sm flex items-center justify-center rounded-xl">
             <Loader className="w-6 h-6 animate-spin text-gray-500" />
@@ -133,7 +133,7 @@ const PurchaseVoucher = () => {
             </div>
           </div>
 
-          {/* ✅ Bulk Actions */}
+          {/* Bulk Actions */}
           {selected.length > 0 && (
             <BulkActionBar
               selectedCount={selected.length}
@@ -148,10 +148,10 @@ const PurchaseVoucher = () => {
             />
           )}
 
-          {/* ✅ Table & States */}
+          {/* Table & States */}
           <div className="mt-4 relative overflow-x-auto w-full custom-scrollbar">
             {isLoading ? (
-              <MerchantStaffSkeleton rows={8} cols={9} /> // ✅ Skeleton placeholder
+              <MerchantStaffSkeleton rows={8} cols={9} /> // Skeleton placeholder
             ) : isError ? (
               <div className="p-6 text-center text-red-500">
                 Failed to load vouchers.
@@ -175,14 +175,15 @@ const PurchaseVoucher = () => {
                         className="w-4 h-4 rounded"
                       />
                     </TableHead>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Type</TableHead>
+                    <TableHead>Voucher ID</TableHead>
+                    <TableHead>Voucher Type</TableHead>
                     <TableHead>Denomination</TableHead>
                     <TableHead>Quantity</TableHead>
                     <TableHead>Total Amount</TableHead>
+                    <TableHead>Points</TableHead>
                     <TableHead>Payment Method</TableHead>
-                    <TableHead>Status</TableHead>
                     <TableHead>Created Date</TableHead>
+                    <TableHead>Status</TableHead>
                     <TableHead className="text-center">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -204,18 +205,19 @@ const PurchaseVoucher = () => {
                       <TableCell>{v.id}</TableCell>
                       <TableCell>
                         <StatusBadge status={v.voucher_type}>
-                          {v.voucher_type}
+                          {v.voucher_type} voucher
                         </StatusBadge>
                       </TableCell>
                       <TableCell>{v?.denomination?.title}</TableCell>
                       <TableCell>{v.quantity}</TableCell>
                       <TableCell>RM {v.total_amount}</TableCell>
+                      <TableCell>{v?.points || "N/A"}</TableCell>
                       <TableCell>{v.payment_method}</TableCell>
                       <TableCell>
-                        <StatusBadge status={v.status}>{v.status}</StatusBadge>
+                        {new Date(v.created_at).toLocaleDateString()}
                       </TableCell>
                       <TableCell>
-                        {new Date(v.created_at).toLocaleDateString()}
+                        <StatusBadge status={v.status}>{v.status}</StatusBadge>
                       </TableCell>
                       <TableCell className="text-center">
                         <div className="flex justify-center items-center">

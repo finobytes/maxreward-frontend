@@ -135,8 +135,14 @@ const SettingsPage = () => {
                     type="number"
                     step="1"
                     {...register(field.name, { valueAsNumber: true })}
-                    className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                    readOnly={field.name === "max_level"}
+                    className={`w-full rounded-md border px-3 py-2 focus:outline-none ${
+                      field.name === "max_level"
+                        ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+                        : "focus:ring-2 focus:ring-indigo-300"
+                    }`}
                   />
+
                   {errors[field.name] && (
                     <p className="mt-1 text-sm text-red-600">
                       {errors[field.name].message}

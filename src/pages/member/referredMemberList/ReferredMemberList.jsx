@@ -17,6 +17,8 @@ import StatusBadge from "../../../components/table/StatusBadge";
 import { useGetReferredMembersQuery } from "../../../redux/features/member/referNewMember/referNewMemberApi";
 import { toast } from "sonner";
 import BulkActionBar from "../../../components/table/BulkActionBar";
+import { Link } from "react-router";
+import { Eye } from "lucide-react";
 
 const ReferredMemberList = () => {
   const [search, setSearch] = useState("");
@@ -29,7 +31,7 @@ const ReferredMemberList = () => {
   const rowsPerPage = 10;
 
   const { data, isLoading, isError } = useGetReferredMembersQuery();
-
+  const referredMember = data?.data?.data;
   const members = useMemo(() => {
     if (!data?.data?.data) return [];
     return data.data.data.map((item) => {
@@ -175,15 +177,18 @@ const ReferredMemberList = () => {
                 </TableHead>
                 <TableHead>Member ID</TableHead>
                 <TableHead>Full Name</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Join Date</TableHead>
+                <TableHead>Phone Number</TableHead>
+                <TableHead>Registration Date</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="text-center">Points</TableHead>
-                <TableHead className="text-center">Purchases</TableHead>
+                <TableHead className="text-center">Available Points</TableHead>
+                <TableHead className="text-center">
+                  Lifetime Purchases
+                </TableHead>
+                <TableHead className="text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginatedData.map((member) => (
+              {referredMember.map((member) => (
                 <TableRow key={member.id}>
                   <TableCell>
                     <input
@@ -194,17 +199,30 @@ const ReferredMemberList = () => {
                     />
                   </TableCell>
                   <TableCell>{member.id}</TableCell>
-                  <TableCell>{member.fullName}</TableCell>
-                  <TableCell>{member.phone}</TableCell>
-                  <TableCell>{member.created}</TableCell>
+                  <TableCell>{member?.child_member?.name}</TableCell>
+                  <TableCell>{member?.child_member?.phone}</TableCell>
                   <TableCell>
-                    <StatusBadge status={member.status} />
+                    {new Date(member?.created_at).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={member?.child_member?.status} />
                   </TableCell>
                   <TableCell className="text-center">
-                    {member.availablePoints}
+                    {member?.child_member?.wallet?.available_points}
                   </TableCell>
                   <TableCell className="text-center">
-                    {member.lifetimePurchases}
+                    {member?.child_member?.wallet?.lifetime_purchase || "N/A"}
+                  </TableCell>
+
+                  <TableCell className="text-center">
+                    <div className="flex justify-center items-center">
+                      <Link
+                        to="#"
+                        className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500"
+                      >
+                        <Eye size={18} />
+                      </Link>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

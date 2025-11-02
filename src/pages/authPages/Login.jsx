@@ -52,8 +52,23 @@ const Login = () => {
           : "/member"
       );
     } catch (err) {
-      toast.error("Invalid username or password");
-      console.error(" Login failed:", err);
+      console.error("Login failed:", err);
+
+      // error handling
+      if (
+        err?.status === "FETCH_ERROR" ||
+        err?.error?.includes("Failed to fetch")
+      ) {
+        toast.error(
+          "Unable to connect to server. Please check your internet or try again later."
+        );
+      } else if (err?.status === 401 || err?.status === 400) {
+        toast.error("Invalid username or password.");
+      } else if (err?.status === 500) {
+        toast.error("Server error. Please try again later.");
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
     }
   };
 
