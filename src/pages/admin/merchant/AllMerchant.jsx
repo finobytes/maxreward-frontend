@@ -252,7 +252,11 @@ const AllMerchant = () => {
                         className="w-4 h-4 rounded"
                       />
                     </TableCell>
-                    <TableCell>{m?.id}</TableCell>
+                    <TableCell>
+                      {/* {m?.staffs.find((staff) => staff?.type === "merchant")} */}
+                      {m?.staffs?.find((staff) => staff?.type === "merchant")
+                        ?.user_name || "N/A"}
+                    </TableCell>
                     {/* Name + Avatar */}
                     <TableCell className="whitespace-normal break-words">
                       {m?.business_name}

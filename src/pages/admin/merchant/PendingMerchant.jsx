@@ -239,7 +239,11 @@ const PendingMerchant = () => {
                         <span className="text-gray-500">N/A</span>
                       )}
                     </TableCell>
-                    <TableCell>{merchant?.id}</TableCell>
+                    <TableCell>
+                      {merchant?.staffs?.find(
+                        (staff) => staff?.type === "merchant"
+                      )?.user_name || "N/A"}
+                    </TableCell>
                     <TableCell>{merchant?.business_name}</TableCell>
                     <TableCell>
                       {merchant?.authorized_person || (
