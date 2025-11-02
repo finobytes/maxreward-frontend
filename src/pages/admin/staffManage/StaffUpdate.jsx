@@ -36,7 +36,7 @@ const adminStaffUpdateSchema = z.object({
   designation: z.string().min(2, "Designation is required"),
   address: z.string().min(3, "Address is required"),
   gender: z.enum(["male", "female", "others"]),
-  status: z.enum(["active", "inactive", "suspend"]),
+  status: z.enum(["active", "inactive"]),
 });
 
 const StaffUpdate = () => {
@@ -48,12 +48,12 @@ const StaffUpdate = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // ✅ API hooks
+  // API hooks
   const { data: staffData, isLoading: isFetching } =
     useGetSingleAdminStaffQuery(id);
   const [updateAdminStaff, { isLoading }] = useUpdateAdminStaffMutation();
 
-  // ✅ React Hook Form
+  // React Hook Form
   const {
     register,
     handleSubmit,
@@ -73,7 +73,7 @@ const StaffUpdate = () => {
     },
   });
 
-  // ✅ Prefill form when data arrives
+  // Prefill form when data arrives
   useEffect(() => {
     if (staffData?.data) {
       const d = staffData.data;
@@ -96,7 +96,7 @@ const StaffUpdate = () => {
     }
   }, [staffData, reset]);
 
-  // ✅ Submit handler
+  // Submit handler
   const onSubmit = async (formData) => {
     try {
       const formDataToSend = new FormData();
@@ -135,7 +135,7 @@ const StaffUpdate = () => {
     }
   };
 
-  // ✅ Skeleton while fetching
+  // Skeleton while fetching
   if (isFetching) {
     return (
       <div className="p-6 space-y-4">
@@ -159,7 +159,7 @@ const StaffUpdate = () => {
     );
   }
 
-  // ✅ Main Form UI
+  // Main Form UI
   return (
     <div>
       <PageBreadcrumb
@@ -268,7 +268,6 @@ const StaffUpdate = () => {
                 options={[
                   { value: "active", label: "Active" },
                   { value: "inactive", label: "Inactive" },
-                  { value: "suspend", label: "Suspend" },
                 ]}
               />
             </div>

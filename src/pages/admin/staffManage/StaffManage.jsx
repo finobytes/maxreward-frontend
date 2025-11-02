@@ -54,19 +54,6 @@ const StaffManage = () => {
   const bulkUpdateStatus = (newStatus) => {
     toast.warning(`Bulk update to ${newStatus} (not implemented yet)`);
   };
-
-  const handleDelete = async (id) => {
-    setDeletingId(id);
-    try {
-      await deleteStaff(id).unwrap();
-      toast.success("Staff deleted successfully!");
-    } catch (err) {
-      toast.error(err?.data?.message || "Failed to delete staff");
-    } finally {
-      setDeletingId(null);
-    }
-  };
-
   return (
     <div className="space-y-6">
       <PageBreadcrumb
@@ -83,6 +70,13 @@ const StaffManage = () => {
           />
 
           <div className="flex flex-col sm:flex-row gap-3 items-center">
+            <PrimaryButton
+              variant="primary"
+              size="md"
+              to="/admin/staff-manage/create"
+            >
+              <Plus size={18} /> Add New Staff
+            </PrimaryButton>
             <DropdownSelect
               value={status}
               onChange={(val) => setStatus(val)}
@@ -90,7 +84,6 @@ const StaffManage = () => {
                 { label: "All", value: "" },
                 { label: "Active", value: "active" },
                 { label: "Inactive", value: "inactive" },
-                { label: "Suspend", value: "suspend" },
               ]}
             />
 
@@ -104,14 +97,6 @@ const StaffManage = () => {
               }}
             >
               Clear
-            </PrimaryButton>
-
-            <PrimaryButton
-              variant="primary"
-              size="md"
-              to="/admin/staff-manage/create"
-            >
-              <Plus size={18} /> Add New Staff
             </PrimaryButton>
           </div>
         </div>
@@ -128,11 +113,6 @@ const StaffManage = () => {
               {
                 label: "Inactive",
                 variant: "warning",
-                onClick: () => bulkUpdateStatus("inactive"),
-              },
-              {
-                label: "Suspend",
-                variant: "danger",
                 onClick: () => bulkUpdateStatus("inactive"),
               },
             ]}

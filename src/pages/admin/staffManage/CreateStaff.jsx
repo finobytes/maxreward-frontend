@@ -214,7 +214,6 @@ const CreateAdminStaff = () => {
                 options={[
                   { value: "active", label: "Active" },
                   { value: "inactive", label: "Inactive" },
-                  { value: "suspend", label: "Suspend" },
                 ]}
               />
             </div>
