@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import BulkActionBar from "../../../components/table/BulkActionBar";
 import { useGetAllWhatsAppLogsQuery } from "../../../redux/features/admin/reports/WhatsAppLog/whatsappLogApi";
 
-// 🔁 Debounce Hook
+// Debounce Hook
 const useDebounced = (value, delay = 400) => {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
@@ -73,7 +73,7 @@ const WhatsAppLog = () => {
           </div>
         )}
 
-        {/* 🔍 Search Bar */}
+        {/* Search Bar */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
           <SearchInput
             value={search}
@@ -82,7 +82,7 @@ const WhatsAppLog = () => {
           />
         </div>
 
-        {/* 🧰 Bulk Actions */}
+        {/* Bulk Actions */}
         {selected.length > 0 && (
           <BulkActionBar
             selectedCount={selected.length}
@@ -97,7 +97,7 @@ const WhatsAppLog = () => {
           />
         )}
 
-        {/* 🧾 Table */}
+        {/* Table */}
         <div className="overflow-x-auto">
           {isLoading ? (
             <div className="p-6 text-center text-gray-500">
@@ -159,9 +159,9 @@ const WhatsAppLog = () => {
                     >
                       {log.status}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="">
                       {log.sent_by_member ? (
-                        <div>
+                        <div className="space-y-2">
                           <p className="font-medium">
                             {log.sent_by_member.name || "—"}
                           </p>
@@ -175,7 +175,7 @@ const WhatsAppLog = () => {
                     </TableCell>
                     <TableCell>
                       {log.member ? (
-                        <div>
+                        <div className="space-y-2">
                           <p className="font-medium">
                             {log.member.name || "—"}
                           </p>
@@ -199,7 +199,7 @@ const WhatsAppLog = () => {
           )}
         </div>
 
-        {/* 🔢 Pagination */}
+        {/* Pagination */}
         {pagination.totalPages > 1 && (
           <Pagination
             currentPage={pagination.currentPage}
