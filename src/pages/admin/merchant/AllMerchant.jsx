@@ -253,7 +253,6 @@ const AllMerchant = () => {
                       />
                     </TableCell>
                     <TableCell>
-                      {/* {m?.staffs.find((staff) => staff?.type === "merchant")} */}
                       {m?.staffs?.find((staff) => staff?.type === "merchant")
                         ?.user_name || "N/A"}
                     </TableCell>

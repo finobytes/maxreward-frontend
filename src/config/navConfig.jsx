@@ -60,13 +60,12 @@ export const NAV_CONFIG = {
       subItems: [
         { name: "Transaction", path: "/admin/reports/transaction" },
         { name: "WhatsApp Log", path: "/admin/reports/whatsapp-log" },
-        { name: "Voucher Purchase", path: "/admin/reports/voucher-purchase" },
         {
-          name: "Member Points Report",
+          name: "Point Statement",
           path: "/admin/reports/member-points-report",
         },
         { name: "Tree Performance", path: "/admin/reports/tree-performance" },
-        { name: "Redemption History", path: "/admin/reports/redemption" },
+        { name: "Redeem Mall Transaction", path: "/admin/reports/redemption" },
       ],
     },
     {

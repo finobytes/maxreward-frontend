@@ -1,12 +1,9 @@
 import React, { useMemo, useState } from "react";
 import SearchInput from "../../../components/form/form-elements/SearchInput";
-import PrimaryButton from "../../../components/ui/PrimaryButton";
-import DropdownSelect from "../../../components/ui/dropdown/DropdownSelect";
 import StatusBadge from "../../../components/table/StatusBadge";
-import { Eye, Plus, Loader } from "lucide-react";
+import { Loader } from "lucide-react";
 import Pagination from "../../../components/table/Pagination";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
-import { Link } from "react-router";
 import {
   Table,
   TableBody,
@@ -15,18 +12,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useGetVouchersQuery } from "../../../redux/features/member/voucherPurchase/voucherApi";
+import {
+  useGetVouchersQuery,
+  useApproveVoucherMutation,
+} from "../../../redux/features/member/voucherPurchase/voucherApi";
 import { toast } from "sonner";
 import BulkActionBar from "../../../components/table/BulkActionBar";
-import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSkeleton"; // ✅ same skeleton reused
+import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSkeleton";
 
 const VoucherManage = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
-  const [selected, setSelected] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [approvingId, setApprovingId] = useState(null); // local approving ID
 
-  // ✅ Fetch vouchers
   const {
     data: vouchers = [],
     isLoading,
@@ -34,9 +33,10 @@ const VoucherManage = () => {
     isError,
   } = useGetVouchersQuery();
 
+  const [approveVoucher] = useApproveVoucherMutation(); // no need to destructure isLoading
+
   const rowsPerPage = 10;
 
-  // ✅ Filter logic
   const filteredData = useMemo(() => {
     return vouchers.filter((v) => {
       const type = v.voucher_type?.toLowerCase() || "";
@@ -61,20 +61,37 @@ const VoucherManage = () => {
     currentPage * rowsPerPage
   );
 
+  const handleApprove = async (id) => {
+    setApprovingId(id); // only this row loading
+    try {
+      const res = await approveVoucher(id).unwrap();
+      if (res?.success) {
+        toast.success(res?.message || "Voucher approved successfully!");
+      } else {
+        toast.error("Approval failed.");
+      }
+    } catch (err) {
+      toast.error(err?.data?.message || "Something went wrong!");
+    } finally {
+      setApprovingId(null); // reset after done
+    }
+  };
+
+  const [selected, setSelected] = useState([]);
+
   const toggleSelectAll = (checked) => {
     if (checked) {
-      setSelected(paginatedData.map((v) => v.id));
+      setSelected(paginatedData?.map((m) => m.id));
     } else {
       setSelected([]);
     }
   };
-
   const toggleSelect = (id) => {
     setSelected((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
-
+  // Bulk actions (placeholder)
   const bulkUpdateStatus = (newStatus) => {
     toast.warning(`Bulk update to ${newStatus} (not implemented yet)`);
   };
@@ -86,7 +103,6 @@ const VoucherManage = () => {
       />
 
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white p-4 shadow-sm relative">
-        {/* ✅ Overlay loader like MemberManage */}
         {isFetching && !isLoading && (
           <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-sm flex items-center justify-center rounded-xl">
             <Loader className="w-6 h-6 animate-spin text-gray-500" />
@@ -94,64 +110,30 @@ const VoucherManage = () => {
         )}
 
         <div className="max-w-full overflow-x-auto">
-          {/* Header Section */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <SearchInput
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by ID, type, payment"
+              placeholder="Search by ID"
             />
-
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
-              <PrimaryButton variant="primary" size="md" to="/member/add">
-                <Plus size={18} />
-                Add Voucher
-              </PrimaryButton>
-              <div className="flex items-center gap-4">
-                <DropdownSelect
-                  value={statusFilter}
-                  onChange={setStatusFilter}
-                  options={[
-                    { label: "All", value: "All" },
-                    { label: "Pending", value: "Pending" },
-                    { label: "Approved", value: "Approved" },
-                    { label: "Rejected", value: "Rejected" },
-                  ]}
-                />
-                <PrimaryButton
-                  variant="secondary"
-                  size="md"
-                  onClick={() => {
-                    setSearch("");
-                    setStatusFilter("All");
-                    setSelected([]);
-                  }}
-                >
-                  Clear
-                </PrimaryButton>
-              </div>
-            </div>
           </div>
 
-          {/* ✅ Bulk Actions */}
+          {/* Bulk Actions */}
           {selected.length > 0 && (
             <BulkActionBar
               selectedCount={selected.length}
               actions={[
                 {
-                  label: "Export",
-                  icon: "export",
+                  label: "Approve",
                   variant: "success",
-                  onClick: () => bulkUpdateStatus("export"),
+                  onClick: () => bulkUpdateStatus("approve"),
                 },
               ]}
             />
           )}
-
-          {/* ✅ Table & States */}
           <div className="mt-4 relative overflow-x-auto w-full custom-scrollbar">
             {isLoading ? (
-              <MerchantStaffSkeleton rows={8} cols={9} /> // ✅ Skeleton placeholder
+              <MerchantStaffSkeleton rows={8} cols={9} />
             ) : isError ? (
               <div className="p-6 text-center text-red-500">
                 Failed to load vouchers.
@@ -164,25 +146,26 @@ const VoucherManage = () => {
               <Table className="w-full table-auto border-collapse">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[40px]">
+                    <TableHead>
                       <input
                         type="checkbox"
                         checked={
-                          paginatedData.length > 0 &&
-                          selected.length === paginatedData.length
+                          paginatedData?.length > 0 &&
+                          selected.length === paginatedData?.length
                         }
                         onChange={(e) => toggleSelectAll(e.target.checked)}
                         className="w-4 h-4 rounded"
                       />
                     </TableHead>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Type</TableHead>
+                    <TableHead>Voucher ID</TableHead>
+                    <TableHead>Voucher Type</TableHead>
+                    <TableHead>Purchased By</TableHead>
                     <TableHead>Denomination</TableHead>
                     <TableHead>Quantity</TableHead>
-                    <TableHead>Total Amount</TableHead>
+                    <TableHead>Total Points</TableHead>
+                    <TableHead>Purchase Date</TableHead>
                     <TableHead>Payment Method</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Created Date</TableHead>
                     <TableHead className="text-center">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -204,34 +187,39 @@ const VoucherManage = () => {
                       <TableCell>{v.id}</TableCell>
                       <TableCell>
                         <StatusBadge status={v.voucher_type}>
-                          {v.voucher_type}
+                          {v.voucher_type} voucher
                         </StatusBadge>
                       </TableCell>
+                      <TableCell>{v?.purchase_by || "N/A"}</TableCell>
                       <TableCell>{v?.denomination?.title}</TableCell>
                       <TableCell>{v.quantity}</TableCell>
                       <TableCell>RM {v.total_amount}</TableCell>
+                      <TableCell>
+                        {new Date(v.created_at).toLocaleDateString()}
+                      </TableCell>
                       <TableCell>{v.payment_method}</TableCell>
                       <TableCell>
                         <StatusBadge status={v.status}>{v.status}</StatusBadge>
                       </TableCell>
-                      <TableCell>
-                        {new Date(v.created_at).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell className="py-4 flex gap-2">
-                        <Link
-                          to="#"
-                          className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500"
-                        >
-                          <Eye size={18} />
-                        </Link>
+                      <TableCell className="py-4 flex gap-2 justify-center">
+                        {v.status === "success" && (
+                          <button
+                            disabled
+                            className="px-3 py-1.5 rounded-md bg-gray-200 hover:bg-gray-e00 text-gray-600 disabled:opacity-50"
+                          >
+                            Approved
+                          </button>
+                        )}
 
-                        <button
-                          // onClick={() => handleApprove(merchant.id)}
-                          // disabled={isUpdating}
-                          className="px-2 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-500 disabled:opacity-50"
-                        >
-                          Approve
-                        </button>
+                        {v.status !== "success" && (
+                          <button
+                            onClick={() => handleApprove(v.id)}
+                            disabled={approvingId === v.id}
+                            className="px-3 py-1.5 rounded-md bg-green-100 hover:bg-green-200 text-green-600 disabled:opacity-50"
+                          >
+                            {approvingId === v.id ? "Approving..." : "Approve"}
+                          </button>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}

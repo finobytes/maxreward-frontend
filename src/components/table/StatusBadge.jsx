@@ -3,6 +3,7 @@ import React from "react";
 const StatusBadge = ({ status, children }) => {
   const styles = {
     active: "bg-green-100 text-green-700",
+    success: "bg-green-100 text-green-700",
     approved: "bg-green-100 text-green-700",
     inactive: "bg-red-100 text-red-700",
     Blocked: "bg-red-100 text-red-700",
