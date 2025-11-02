@@ -205,7 +205,7 @@ const PurchaseVoucher = () => {
                       <TableCell>{v.id}</TableCell>
                       <TableCell>
                         <StatusBadge status={v.voucher_type}>
-                          {v.voucher_type}
+                          {v.voucher_type} voucher
                         </StatusBadge>
                       </TableCell>
                       <TableCell>{v?.denomination?.title}</TableCell>
