@@ -106,7 +106,7 @@ const ReferNewMember = () => {
             </div>
           </div>
         </ComponentCard>
-        <ComponentCard>
+        <ComponentCard className="mt-6" title="Referral Information">
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
@@ -145,9 +145,9 @@ const ReferNewMember = () => {
             <PrimaryButton
               variant="secondary"
               type="button"
-              to="/member/referred-member"
+              onClick={() => reset()}
             >
-              Back
+              Reset
             </PrimaryButton>
           </div>
         </ComponentCard>
