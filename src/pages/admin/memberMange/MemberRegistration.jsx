@@ -97,7 +97,7 @@ const MemberRegistration = () => {
           payload.member_id = memberData.id;
         } else {
           toast.error("Invalid referral — member not found!");
-          return; // stop submit
+          return;
         }
       } else {
         // non-admin should never send member_id

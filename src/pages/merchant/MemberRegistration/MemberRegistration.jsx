@@ -129,15 +129,27 @@ const MemberRegistration = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <Label>Referral Code</Label>
-                <Input disabled value={data?.referral_code || ""} readOnly />
+                <Input
+                  disabled
+                  value={data?.merchant?.corporate_member?.referral_code || ""}
+                  readOnly
+                />
               </div>
               <div>
                 <Label>Referred By</Label>
-                <Input disabled value={data?.name || ""} readOnly />
+                <Input
+                  disabled
+                  value={data?.merchant?.corporate_member?.name || ""}
+                  readOnly
+                />
               </div>
               <div>
                 <Label>Referral Status</Label>
-                <Input disabled value={data?.status || ""} readOnly />
+                <Input
+                  disabled
+                  value={data?.merchant?.corporate_member?.status || ""}
+                  readOnly
+                />
               </div>
             </div>
           )}
