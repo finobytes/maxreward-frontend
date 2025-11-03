@@ -13,8 +13,9 @@ import PrimaryButton from "../../../components/ui/PrimaryButton";
 import { useReferNewMember } from "../../../redux/features/member/referNewMember/useReferNewMember";
 import { useGetMemberByReferralQuery } from "../../../redux/features/admin/memberManagement/memberManagementApi";
 import ReferSuccessDialog from "../../member/referNewMember/components/ReferSuccessDialog";
-// src/schemas/referNewMember.schema.js
 import { z } from "zod";
+import SkeletonField from "../../../components/skeleton/SkeletonField";
+import { useSelector } from "react-redux";
 
 const referNewMemberSchema = z.object({
   fullName: z
@@ -40,10 +41,10 @@ const MemberRegistration = () => {
   const [debouncedReferral, setDebouncedReferral] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [response, setResponse] = useState(null);
-
+  const { user } = useSelector((state) => state.auth);
   const { handleRefer, loading, resetState } = useReferNewMember();
 
-  // ✅ Debounce referral input
+  // Debounce referral input
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedReferral(referralInput.trim());
@@ -51,7 +52,7 @@ const MemberRegistration = () => {
     return () => clearTimeout(timer);
   }, [referralInput]);
 
-  // ✅ Fetch member info by referral code
+  // Fetch member info by referral code
   const {
     data: memberData,
     isFetching,
@@ -60,11 +61,12 @@ const MemberRegistration = () => {
     skip: !debouncedReferral || debouncedReferral.length < 3,
   });
 
-  // ✅ Form setup
+  // Form setup
   const {
     register,
     handleSubmit,
     reset,
+    resetField,
     setError,
     formState: { errors },
   } = useForm({
@@ -78,14 +80,28 @@ const MemberRegistration = () => {
       referralCode: "",
     },
   });
+  useEffect(() => {
+    if (isError || !debouncedReferral) {
+      // clear cached referral data
+      resetField("referralCode");
+    }
+  }, [isError, debouncedReferral]);
 
-  // ✅ On form submit
+  // On form submit
   const onSubmit = async (formData) => {
     try {
       const payload = { ...formData };
 
-      if (memberData && memberData.id) {
-        payload.member_id = memberData.id;
+      if (user?.role === "admin") {
+        if (memberData && memberData.id && !isError) {
+          payload.member_id = memberData.id;
+        } else {
+          toast.error("Invalid referral — member not found!");
+          return; // stop submit
+        }
+      } else {
+        // non-admin should never send member_id
+        delete payload.member_id;
       }
 
       const res = await handleRefer(payload);
@@ -100,7 +116,7 @@ const MemberRegistration = () => {
       const message = err?.data?.message || "Failed to refer member";
 
       if (backendErrors) {
-        // ✅ Laravel field mapping fix
+        // Laravel field mapping fix
         Object.entries(backendErrors).forEach(([field, messages]) => {
           const fieldName =
             field === "phone"
@@ -115,7 +131,7 @@ const MemberRegistration = () => {
           });
         });
 
-        // ✅ Show the first validation message in toast
+        // Show the first validation message in toast
         const firstError = Object.values(backendErrors)[0][0];
         toast.error(firstError);
       } else {
@@ -202,19 +218,24 @@ const MemberRegistration = () => {
                     Type at least 3 characters...
                   </p>
                 )}
+                {isError && (
+                  <p className="text-xs text-red-500 mt-1">
+                    Invalid referral — please check the code.
+                  </p>
+                )}
               </div>
 
               {/* Referred By */}
               <div>
                 <Label htmlFor="referredBy">Referred By</Label>
                 {isFetching ? (
-                  <div className="flex items-center gap-2 text-gray-500">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Fetching...</span>
-                  </div>
+                  <>
+                    <SkeletonField />
+                  </>
                 ) : (
                   <Input
                     id="referredBy"
+                    disabled
                     readOnly
                     value={
                       isError ? "Referral Not Found" : memberData?.name || ""
@@ -226,11 +247,16 @@ const MemberRegistration = () => {
               {/* Referral Status */}
               <div>
                 <Label htmlFor="referralStatus">Referral Status</Label>
-                <Input
-                  id="referralStatus"
-                  readOnly
-                  value={isError ? "Invalid" : memberData?.status || ""}
-                />
+                {isFetching ? (
+                  <SkeletonField />
+                ) : (
+                  <Input
+                    id="referralStatus"
+                    disabled
+                    readOnly
+                    value={isError ? "Invalid" : memberData?.status || ""}
+                  />
+                )}
               </div>
             </div>
 
