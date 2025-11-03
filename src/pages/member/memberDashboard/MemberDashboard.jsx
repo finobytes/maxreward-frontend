@@ -9,68 +9,91 @@ import {
   users,
 } from "../../../assets/assets";
 import DashboardCard from "./components/DashboardCard";
+import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
+import { Star } from "lucide-react";
+import MemberDashboardSkeleton from "../../../components/skeleton/MemberDashboardSkeleton";
 
 const MemberDashboard = () => {
+  const { data, isLoading, isFetching, isError } = useVerifyMeQuery();
+
+  // ✅ Show skeleton while loading
+  if (isLoading || isFetching) return <MemberDashboardSkeleton />;
+
+  if (isError || !data) {
+    return (
+      <div className="p-6 text-center text-red-500 font-medium">
+        Failed to load dashboard data.
+      </div>
+    );
+  }
+
+  const wallet = data?.wallet || {};
+  const unlockedLevel = wallet.unlocked_level || 0;
+  const starCount = Math.min(unlockedLevel, 5);
+
+  const starDisplay = (
+    <div className="flex gap-1 mt-1">
+      {[...Array(5)].map((_, i) => (
+        <Star
+          key={i}
+          size={18}
+          className={
+            i < starCount ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
+          }
+        />
+      ))}
+    </div>
+  );
+
+  // ✅ Keep static chartData until backend provides data
   const cardsData = [
     {
       icon: dollar,
       title: "Available Points",
-      value: "12,432",
-      changeText: "+0.892",
-      changeColor: "text-green-500",
-      subtitle: "Increased",
-      chartColor: "#8B5CF6", //  green
+      value: wallet.available_points ?? "12,432",
+      subtitle: "Current Balance",
+      chartColor: "#8B5CF6",
       chartData: [10, 14, 12, 18, 16, 20, 17],
     },
     {
       icon: hand,
       title: "On Hold Points",
-      value: "12,432",
-      changeText: "+0.892",
-      changeColor: "text-green-500",
-      subtitle: "Increased",
-      chartColor: "#10B981", // orange
+      value: wallet.onhold_points ?? "8,221",
+      subtitle: "Pending Rewards",
+      chartColor: "#10B981",
       chartData: [8, 10, 9, 13, 11, 15, 14],
     },
     {
       icon: users,
       title: "Referral Points",
-      value: "12,432",
-      changeText: "+0.892",
-      changeColor: "text-green-500",
-      subtitle: "Increased",
-      chartColor: "#8B5CF6", // purple
+      value: wallet.total_rp ?? "4,876",
+      subtitle: "Earned from Referrals",
+      chartColor: "#F59E0B",
       chartData: [5, 7, 9, 12, 11, 9, 10],
     },
     {
       icon: userCommunity,
       title: "Community Members",
-      value: "45",
-      changeText: "+0.892",
-      changeColor: "text-green-500",
-      subtitle: "Increased",
-      chartColor: "#3B82F6", // blue
+      value: wallet.total_referrals ?? "45",
+      subtitle: "Your Active Members",
+      chartColor: "#3B82F6",
       chartData: [6, 8, 7, 9, 8, 10, 9],
     },
     {
       icon: purchase,
-      title: "LifeTime purchase",
-      value: "45",
-      changeText: "+0.892",
-      changeColor: "text-green-500",
-      subtitle: "Increased",
-      chartColor: "#EC4899", // pink
+      title: "Lifetime Purchase",
+      value: wallet.total_pp ?? "2,341",
+      subtitle: "All-time Purchase Points",
+      chartColor: "#EC4899",
       chartData: [6, 8, 7, 9, 8, 10, 9],
     },
     {
       icon: star,
       title: "Star Level",
-      value: "12,432",
-      changeText: "+0.892",
-      changeColor: "text-green-500",
-      subtitle: "Increased",
-      chartColor: "#10B981", // orange
-      chartData: [8, 10, 9, 13, 11, 15, 14],
+      value: unlockedLevel,
+      subtitle: starDisplay,
+      chartColor: "#FFD700",
+      chartData: [1, 2, 3, 4, 5, unlockedLevel],
     },
   ];
 
@@ -79,8 +102,9 @@ const MemberDashboard = () => {
       <h1 className="text-xl font-semibold text-gray-600 pb-4">Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <img src={card} />
+          <img src={card} alt="Membership Card" className="rounded-xl w-full" />
         </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {cardsData.map((card, index) => (
             <DashboardCard key={index} {...card} />
