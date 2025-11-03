@@ -55,11 +55,7 @@ const ReferNewMember = () => {
   return (
     <div>
       <PageBreadcrumb
-        items={[
-          { label: "Home", to: "/" },
-          { label: "Refer New Member", to: "/member/referred-member" },
-          { label: "Refer New Member" },
-        ]}
+        items={[{ label: "Home", to: "/" }, { label: "Refer New Member" }]}
       />
 
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -110,30 +106,30 @@ const ReferNewMember = () => {
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <Label>Name</Label>
-                <SkeletonField />
-              </div>
-              <div>
                 <Label>Referral Code</Label>
                 <SkeletonField />
               </div>
               <div>
-                <Label>Status</Label>
+                <Label>Referred By</Label>
+                <SkeletonField />
+              </div>
+              <div>
+                <Label>Referral Status</Label>
                 <SkeletonField />
               </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <Label>Name</Label>
-                <Input disabled value={user?.name || ""} readOnly />
-              </div>
-              <div>
                 <Label>Referral Code</Label>
                 <Input disabled value={user?.referral_code || ""} readOnly />
               </div>
               <div>
-                <Label>Status</Label>
+                <Label>Referred By</Label>
+                <Input disabled value={user?.name || ""} readOnly />
+              </div>
+              <div>
+                <Label>Referral Status</Label>
                 <Input disabled value={user?.status || ""} readOnly />
               </div>
             </div>
