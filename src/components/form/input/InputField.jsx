@@ -22,7 +22,7 @@ const Input = React.forwardRef(
     let inputClasses = `h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 ${className}`;
 
     if (disabled) {
-      inputClasses += ` text-gray-500 border-gray-300 opacity-40 bg-gray-100 cursor-not-allowed`;
+      inputClasses += ` bg-gray-100 text-gray-500 cursor-not-allowed`;
     } else if (error) {
       inputClasses += ` border-error-500 focus:border-error-300 focus:ring-error-500/20`;
     } else if (success) {
