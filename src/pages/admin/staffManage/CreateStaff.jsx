@@ -12,6 +12,7 @@ import { useNavigate } from "react-router";
 import { z } from "zod";
 import { useCreateAdminStaffMutation } from "../../../redux/features/admin/adminStaff/adminStaffApi";
 import { useState } from "react";
+import { nidPlaceholder, profilePlaceholder } from "../../../assets/assets";
 
 // Schema Validation (Zod)
 const adminStaffSchema = z.object({
@@ -59,6 +60,26 @@ const CreateAdminStaff = () => {
   // Form Submit
   const onSubmit = async (formData) => {
     try {
+      // File validations before sending
+      if (!profilePicture) {
+        toast.error("Profile Picture is required");
+        return;
+      }
+
+      if (!nationalIdCard || nationalIdCard.length === 0) {
+        toast.error("Please upload your Identity Card images");
+        return;
+      }
+
+      // Must have exactly 2 files for Identity Card
+      if (nationalIdCard.length !== 2) {
+        toast.error(
+          "You must upload both front and back of your Identity Card"
+        );
+        return;
+      }
+
+      // Prepare FormData
       const formDataToSend = new FormData();
       formDataToSend.append("user_name", `A${Date.now()}`);
       formDataToSend.append("name", formData.name);
@@ -70,16 +91,17 @@ const CreateAdminStaff = () => {
       formDataToSend.append("gender", formData.gender);
       formDataToSend.append("status", formData.status);
 
-      // add all file
+      // Append profile picture
       if (profilePicture) {
         formDataToSend.append("profile_picture", profilePicture);
       }
-      if (nationalIdCard.length > 0) {
-        nationalIdCard.forEach((file, index) => {
-          formDataToSend.append(`national_id_card[${index}]`, file);
-        });
-      }
 
+      // Append both identity card images
+      nationalIdCard.forEach((file, index) => {
+        formDataToSend.append(`national_id_card[${index}]`, file);
+      });
+
+      // Submit to API
       const res = await createAdminStaff(formDataToSend).unwrap();
 
       if (res?.success) {
@@ -219,20 +241,33 @@ const CreateAdminStaff = () => {
             </div>
           </div>
 
-          {/* Optional File Uploads */}
+          {/* File Uploads */}
           <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Profile Picture */}
             <div>
               <Label>Profile Picture</Label>
               <Dropzone
                 multiple={false}
+                maxFileSizeMB={5}
+                required
+                validationMessage="Profile picture is required"
+                placeholderImage={profilePlaceholder}
                 onFilesChange={(file) => setProfilePicture(file ?? null)}
               />
             </div>
+
+            {/* Identity Card */}
             <div>
               <Label>Identity Card (IC)</Label>
               <Dropzone
                 multiple={true}
                 maxFiles={2}
+                required
+                requiredCount={2}
+                countValidationMessage="You must upload both front and back of your ID card"
+                validationMessage="Identity card images required"
+                placeholderImage={nidPlaceholder}
+                maxFileSizeMB={5}
                 onFilesChange={(files) => setNationalIdCard(files)}
               />
             </div>

@@ -2,17 +2,24 @@ import { useDropzone } from "react-dropzone";
 import { useState, useEffect } from "react";
 import { upload } from "../../../assets/assets";
 import { X } from "lucide-react";
+import { toast } from "sonner";
 
 const Dropzone = ({
   onFilesChange,
   multiple = false,
   maxFiles = 1,
   initialFiles = [],
+  maxFileSizeMB = 5,
+  placeholderImage = null,
+  required = false,
+  requiredCount = null, // ✅ new prop
+  validationMessage = "This field is required",
+  countValidationMessage = null, // ✅ optional custom message
 }) => {
   const [files, setFiles] = useState([]);
   const [hasNewFile, setHasNewFile] = useState(false);
 
-  // ✅ Load existing image from server only once (when editing)
+  // Load existing image (for edit)
   useEffect(() => {
     if (initialFiles.length > 0 && !hasNewFile) {
       const formatted = initialFiles.map((url) => ({
@@ -24,26 +31,42 @@ const Dropzone = ({
     }
   }, [initialFiles, hasNewFile]);
 
-  // ✅ Handle new file drop
+  // Handle drop
   const onDrop = (acceptedFiles) => {
-    const newFiles = acceptedFiles.map((file) =>
-      Object.assign(file, {
-        preview: URL.createObjectURL(file),
-      })
+    // ✅ File size validation
+    const validFiles = acceptedFiles.filter((file) => {
+      if (file.size > maxFileSizeMB * 1024 * 1024) {
+        toast.error(`"${file.name}" exceeds ${maxFileSizeMB}MB limit`);
+        return false;
+      }
+      return true;
+    });
+
+    const newFiles = validFiles.map((file) =>
+      Object.assign(file, { preview: URL.createObjectURL(file) })
     );
 
-    // শুধুমাত্র single file এর ক্ষেত্রে পুরনো preview clear করে দেই
     const updatedFiles = multiple
       ? [...files, ...newFiles].slice(0, maxFiles)
       : [newFiles[0]];
 
-    setFiles(updatedFiles);
-    setHasNewFile(true); // mark that user uploaded a new file
-
-    // inform parent
-    if (onFilesChange) {
-      onFilesChange(multiple ? updatedFiles : updatedFiles[0]);
+    // ✅ File count validation (drop-time check)
+    if (
+      (requiredCount || maxFiles) &&
+      updatedFiles.length < (requiredCount || maxFiles)
+    ) {
+      toast.error(
+        countValidationMessage ||
+          `You must upload ${requiredCount || maxFiles} file${
+            (requiredCount || maxFiles) > 1 ? "s" : ""
+          } (e.g., front and back)`
+      );
     }
+
+    setFiles(updatedFiles);
+    setHasNewFile(true);
+
+    onFilesChange && onFilesChange(multiple ? updatedFiles : updatedFiles[0]);
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -53,13 +76,13 @@ const Dropzone = ({
     accept: { "image/*": [] },
   });
 
-  // ✅ Clean up URLs
+  // Cleanup previews
   useEffect(() => {
     return () =>
       files.forEach((f) => !f.existing && URL.revokeObjectURL(f.preview));
   }, [files]);
 
-  // ✅ Remove selected file
+  // Remove file
   const handleRemove = (index) => {
     const updated = files.filter((_, i) => i !== index);
     setFiles(updated);
@@ -90,12 +113,16 @@ const Dropzone = ({
           <span className="font-medium underline text-theme-sm text-brand-500">
             Browse File
           </span>
-          <span className="text-gray-400 text-xs mt-2">Max size: 10MB</span>
+          <span className="text-gray-400 text-xs mt-2">
+            {`Max ${maxFiles} file${
+              maxFiles > 1 ? "s" : ""
+            }, up to ${maxFileSizeMB}MB each`}
+          </span>
         </div>
       </div>
 
-      {/* ✅ Preview Section */}
-      {files.length > 0 && (
+      {/* Preview Section */}
+      {files.length > 0 ? (
         <div className="mt-3 grid grid-cols-2 gap-3">
           {files.map((file, idx) => (
             <div
@@ -120,7 +147,32 @@ const Dropzone = ({
             </div>
           ))}
         </div>
+      ) : (
+        placeholderImage && (
+          <div className="mt-3 flex flex-col items-center">
+            <img
+              src={placeholderImage}
+              alt="placeholder"
+              className="h-32 w-32 object-cover rounded-lg border"
+            />
+            {required && (
+              <p className="text-red-500 text-xs mt-1">
+                {validationMessage + ` (${countValidationMessage})`}
+              </p>
+            )}
+          </div>
+        )
       )}
+
+      {/* File count error (render-time check) */}
+      {required &&
+        (requiredCount || maxFiles) &&
+        files.length < (requiredCount || maxFiles) && (
+          <p className="text-red-500 text-xs mt-1">
+            {countValidationMessage ||
+              `Please upload all ${requiredCount || maxFiles} required files.`}
+          </p>
+        )}
     </>
   );
 };

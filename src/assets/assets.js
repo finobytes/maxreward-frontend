@@ -41,6 +41,8 @@ import hand from "./icons/hand.svg";
 import userCommunity from "./icons/user-community.svg";
 import purchase from "./icons/purchase.svg";
 import star from "./icons/star.svg";
+import profilePlaceholder from "./images/user/profileplaceholder.jpg";
+import nidPlaceholder from "./images/user/nid.jpg";
 
 export {
   loginBanner,
@@ -86,4 +88,6 @@ export {
   userCommunity,
   purchase,
   star,
+  profilePlaceholder,
+  nidPlaceholder,
 };
