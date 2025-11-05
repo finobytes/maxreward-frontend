@@ -293,7 +293,7 @@ const StaffUpdate = () => {
               />
             </div>
             <div>
-              <Label>National ID</Label>
+              <Label>Identity (MyKad / Driving license)</Label>
               <Dropzone
                 multiple={true}
                 maxFiles={2}

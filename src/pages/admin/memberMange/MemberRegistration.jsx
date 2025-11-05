@@ -202,11 +202,12 @@ const MemberRegistration = () => {
               {/* Referral Code */}
               <div>
                 <Label htmlFor="referralCode">
-                  Referral Code (<span className="text-red-500">*</span>)
+                  Referral Code / Phone Number (
+                  <span className="text-red-500">*</span>)
                 </Label>
                 <Input
                   id="referralCode"
-                  placeholder="Enter referral code"
+                  placeholder="Enter referral code / Phone Number"
                   {...register("referralCode")}
                   value={referralInput}
                   onChange={(e) => setReferralInput(e.target.value)}
@@ -220,7 +221,7 @@ const MemberRegistration = () => {
                 )}
                 {isError && (
                   <p className="text-xs text-red-500 mt-1">
-                    Invalid referral — please check the code.
+                    Invalid referral — please check the code or phone number.
                   </p>
                 )}
               </div>

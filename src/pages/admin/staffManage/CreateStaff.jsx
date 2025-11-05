@@ -258,7 +258,7 @@ const CreateAdminStaff = () => {
 
             {/* Identity Card */}
             <div>
-              <Label>Identity Card (IC)</Label>
+              <Label>Identity (MyKad / Driving license)</Label>
               <Dropzone
                 multiple={true}
                 maxFiles={2}

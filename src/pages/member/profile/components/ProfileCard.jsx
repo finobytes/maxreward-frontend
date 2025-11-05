@@ -19,7 +19,7 @@ import {
 const ProfileCard = ({ userInfo }) => {
   const walletInfo = userInfo?.wallet || {};
 
-  // ⭐ Star level logic (min 0, max 5)
+  // Star level logic (min 0, max 5)
   const unlockedLevel = walletInfo.unlocked_level || 0;
   const starCount = Math.min(unlockedLevel, 5);
   const starLabel = starCount === 1 ? "1 Star" : `${starCount} Stars`;
@@ -142,7 +142,7 @@ const ProfileCard = ({ userInfo }) => {
               color="rose"
             />
 
-            {/* ⭐ Star Level Box */}
+            {/* Star Level Box */}
             <div className="flex flex-col items-start gap-1 px-4 py-3 bg-orange-50 border border-orange-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
               <div className="flex items-center gap-2">
                 <Star className="w-5 h-5 text-orange-600" />
@@ -164,7 +164,7 @@ const ProfileCard = ({ userInfo }) => {
   );
 };
 
-// ✅ Reusable InfoBox Component
+// Reusable InfoBox Component
 const InfoBox = ({ icon, label, value, color }) => {
   return (
     <div
