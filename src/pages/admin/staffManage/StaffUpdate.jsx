@@ -109,24 +109,41 @@ const StaffUpdate = () => {
   // Submit handler
   const onSubmit = async (formData) => {
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append("name", formData.name);
-      formDataToSend.append("phone", formData.phone);
-      formDataToSend.append("email", formData.email);
-      formDataToSend.append("designation", formData.designation);
-      formDataToSend.append("address", formData.address);
-      formDataToSend.append("gender", formData.gender);
-      formDataToSend.append("status", formData.status);
-      if (formData.password) {
-        formDataToSend.append("password", formData.password);
+      // ✅ PROFILE PICTURE VALIDATION (Only if no existing and no new upload)
+      if (!existingProfile.length && !profilePicture) {
+        toast.error("Profile Picture is required");
+        return;
       }
 
-      if (profilePicture) {
+      // ✅ NID VALIDATION
+      const newNidFiles = nationalIdCard.filter((f) => f instanceof File);
+
+      if (!existingNid.length && newNidFiles.length === 0) {
+        toast.error("Please upload Identity Card (Front & Back)");
+        return;
+      }
+
+      if (newNidFiles.length > 0 && newNidFiles.length !== 2) {
+        toast.error("You must upload both front and back of Identity Card");
+        return;
+      }
+
+      // ✅ Prepare FormData
+      const formDataToSend = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value !== "" && value !== undefined) {
+          formDataToSend.append(key, value);
+        }
+      });
+
+      // ✅ If profile changed → send file
+      if (profilePicture instanceof File) {
         formDataToSend.append("profile_picture", profilePicture);
       }
 
-      if (nationalIdCard.length > 0) {
-        nationalIdCard.forEach((file, index) => {
+      // ✅ If NID changed → send 2 files
+      if (newNidFiles.length === 2) {
+        newNidFiles.forEach((file, index) => {
           formDataToSend.append(`national_id_card[${index}]`, file);
         });
       }
@@ -140,8 +157,15 @@ const StaffUpdate = () => {
         toast.error(res?.message || "Failed to update admin staff");
       }
     } catch (err) {
-      console.error("Update Failed:", err);
-      toast.error(err?.data?.message || "Something went wrong!");
+      console.error(err);
+      const validationErrors = err?.data?.errors;
+      if (validationErrors) {
+        Object.entries(validationErrors).forEach(([field, messages]) =>
+          toast.error(`${field}: ${messages.join(", ")}`)
+        );
+      } else {
+        toast.error(err?.data?.message || "Something went wrong!");
+      }
     }
   };
 
@@ -288,17 +312,26 @@ const StaffUpdate = () => {
             <div>
               <Label>Profile Picture</Label>
               <Dropzone
-                onFilesChange={(files) => setProfilePicture(files[0])}
+                multiple={false}
                 initialFiles={existingProfile}
+                onFilesChange={(file) => {
+                  setExistingProfile([]); // ✅ remove old image preview
+                  setProfilePicture(file ?? null);
+                }}
               />
             </div>
+
             <div>
               <Label>Identity (MyKad / Driving license)</Label>
               <Dropzone
                 multiple={true}
                 maxFiles={2}
-                onFilesChange={(files) => setNationalIdCard(files)}
+                requiredCount={2}
                 initialFiles={existingNid}
+                onFilesChange={(files) => {
+                  setExistingNid([]); // ✅ remove old previews
+                  setNationalIdCard(files); // keep both Files
+                }}
               />
             </div>
           </div>
