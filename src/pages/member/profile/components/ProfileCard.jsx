@@ -17,132 +17,166 @@ import {
 } from "lucide-react";
 
 const ProfileCard = ({ userInfo }) => {
-  const walletInfo = userInfo?.wallet;
-  console.log(walletInfo);
+  const walletInfo = userInfo?.wallet || {};
+
+  // ⭐ Star level logic: min 0, max 5
+  const unlockedLevel = walletInfo.unlocked_level || 0;
+  const starCount = Math.min(unlockedLevel, 5);
+
+  const renderStars = () => (
+    <div className="flex gap-1 mt-1">
+      {[...Array(5)].map((_, i) => (
+        <Star
+          key={i}
+          size={18}
+          className={
+            i < starCount ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
+          }
+        />
+      ))}
+    </div>
+  );
+
   return (
-    <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pt-4 sm:px-2 sm:pt-6 lg:px-4 shadow-md">
+    <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pt-4 sm:px-2 sm:pt-6 lg:px-4 shadow-md hover:shadow-lg transition-all duration-300">
+      {/* Cover */}
       <div className="w-full relative">
-        {/* User Cover IMAGE */}
         <img
           src={profileCover}
-          className="w-full xl:h-[9rem] lg:h-[9rem] md:h-[7rem] sm:h-[7rem] h-[5rem] rounded-sm"
+          className="w-full xl:h-[9rem] lg:h-[9rem] md:h-[7rem] sm:h-[7rem] h-[5rem] object-cover rounded-sm"
           alt="Profile cover"
         />
 
-        {/* User Profile Image */}
+        {/* Profile Image */}
         <div className="w-full">
           <img
             src={userProfile}
-            className="rounded-full object-cover w-24 h-24 relative -top-12 left-6"
+            className="rounded-full object-cover w-24 h-24 relative -top-12 left-6 border-4 border-white shadow-md"
             alt="user profile"
           />
 
+          {/* Status Badge */}
           <div className="absolute top-3 right-3">
-            <div className="bg-white border-2 border-gray-300 flex items-center gap-2 px-2 py-0.5 rounded-xl">
-              <img className="w-10 h-10" src={profile} alt="icon" />
-              <span className="text-gray-700">{userInfo?.status}</span>
+            <div className="bg-white border border-gray-300 flex items-center gap-2 px-2 py-1 rounded-xl shadow-sm">
+              <img className="w-8 h-8" src={profile} alt="icon" />
+              <span
+                className={`text-sm font-medium capitalize ${
+                  userInfo?.status === "active"
+                    ? "text-green-600"
+                    : "text-gray-500"
+                }`}
+              >
+                {userInfo?.status}
+              </span>
             </div>
           </div>
         </div>
       </div>
-      <div className=" block 2xl:flex gap-4 2xl:justify-between relative -top-8">
+
+      {/* User Info */}
+      <div className="block 2xl:flex gap-4 2xl:justify-between relative -top-8">
         <div className="ml-2">
-          <h3 className="text-xl font-semibold">{userInfo?.name}</h3>
-          <p className="text-sm mt-2 text-gray-400 font-medium">
-            {userInfo?.designation}
+          <h3 className="text-xl font-semibold text-gray-800">
+            {userInfo?.name}
+          </h3>
+          <p className="text-sm mt-1 text-gray-500 font-medium">
+            {userInfo?.email ?? "Member"}
           </p>
-          <div className="flex gap-4 mt-1">
-            <div className="flex gap-1">
-              <img src={locationIcon} alt="icon" />
-              <span className="text-sm text-gray-400">{userInfo?.address}</span>
-            </div>
+
+          <div className="flex gap-3 mt-1 items-center">
+            <img src={locationIcon} alt="icon" className="w-4 h-4" />
+            <span className="text-sm text-gray-400">
+              {userInfo?.address ?? "N/A"}
+            </span>
           </div>
+
           {/* Wallet Info Section */}
-          <div className="mt-6 flex flex-wrap gap-3 sm:gap-4">
-            {/* Each info box */}
-            <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg shadow-sm hover:shadow-md transition">
-              <Coins className="w-5 h-5 text-blue-600" />
-              <p className="text-sm font-medium text-gray-700">
-                Available:
-                <span className="ml-1 text-blue-700 font-semibold">
-                  {walletInfo?.available_points ?? 0}
-                </span>
-              </p>
-            </div>
+          <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {/* Available Points */}
+            <InfoBox
+              icon={<Coins className="w-5 h-5 text-blue-600" />}
+              label="Available Points"
+              value={walletInfo.available_points ?? 0}
+              color="blue"
+            />
 
-            <div className="flex items-center gap-2 px-4 py-2 bg-yellow-50 border border-yellow-200 rounded-lg shadow-sm hover:shadow-md transition">
-              <Lock className="w-5 h-5 text-yellow-600" />
-              <p className="text-sm font-medium text-gray-700">
-                On Hold:
-                <span className="ml-1 text-yellow-700 font-semibold">
-                  {walletInfo?.onhold_points ?? 0}
-                </span>
-              </p>
-            </div>
+            {/* Referral Points */}
+            <InfoBox
+              icon={<Trophy className="w-5 h-5 text-teal-600" />}
+              label="Referral Points"
+              value={walletInfo.total_rp ?? 0}
+              color="teal"
+            />
 
-            <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 border border-emerald-200 rounded-lg shadow-sm hover:shadow-md transition">
-              <Award className="w-5 h-5 text-emerald-600" />
-              <p className="text-sm font-medium text-gray-700">
-                Total CP:
-                <span className="ml-1 text-emerald-700 font-semibold">
-                  {walletInfo?.total_cp ?? 0}
-                </span>
-              </p>
-            </div>
+            {/* On Hold Points */}
+            <InfoBox
+              icon={<Lock className="w-5 h-5 text-amber-600" />}
+              label="On Hold Points"
+              value={walletInfo.onhold_points ?? 0}
+              color="amber"
+            />
 
-            <div className="flex items-center gap-2 px-4 py-2 bg-purple-50 border border-purple-200 rounded-lg shadow-sm hover:shadow-md transition">
-              <Medal className="w-5 h-5 text-purple-600" />
-              <p className="text-sm font-medium text-gray-700">
-                Total PP:
-                <span className="ml-1 text-purple-700 font-semibold">
-                  {walletInfo?.total_pp ?? 0}
-                </span>
-              </p>
-            </div>
+            {/* Community Points */}
+            <InfoBox
+              icon={<Award className="w-5 h-5 text-emerald-600" />}
+              label="Community Points"
+              value={walletInfo.total_cp ?? 0}
+              color="emerald"
+            />
 
-            <div className="flex items-center gap-2 px-4 py-2 bg-indigo-50 border border-indigo-200 rounded-lg shadow-sm hover:shadow-md transition">
-              <Star className="w-5 h-5 text-indigo-600" />
-              <p className="text-sm font-medium text-gray-700">
-                Total Points:
-                <span className="ml-1 text-indigo-700 font-semibold">
-                  {walletInfo?.total_points ?? 0}
-                </span>
-              </p>
-            </div>
+            {/* Personal Points */}
+            <InfoBox
+              icon={<Medal className="w-5 h-5 text-purple-600" />}
+              label="Personal Points"
+              value={walletInfo.total_pp ?? 0}
+              color="purple"
+            />
 
-            <div className="flex items-center gap-2 px-4 py-2 bg-rose-50 border border-rose-200 rounded-lg shadow-sm hover:shadow-md transition">
-              <Users className="w-5 h-5 text-rose-600" />
-              <p className="text-sm font-medium text-gray-700">
-                Referrals:
-                <span className="ml-1 text-rose-700 font-semibold">
-                  {walletInfo?.total_referrals ?? 0}
-                </span>
-              </p>
-            </div>
+            {/* Total Points */}
+            <InfoBox
+              icon={<ShieldCheck className="w-5 h-5 text-indigo-600" />}
+              label="Total Points"
+              value={walletInfo.total_points ?? 0}
+              color="indigo"
+            />
 
-            <div className="flex items-center gap-2 px-4 py-2 bg-teal-50 border border-teal-200 rounded-lg shadow-sm hover:shadow-md transition">
-              <Trophy className="w-5 h-5 text-teal-600" />
-              <p className="text-sm font-medium text-gray-700">
-                Total RP:
-                <span className="ml-1 text-teal-700 font-semibold">
-                  {walletInfo?.total_rp ?? 0}
-                </span>
-              </p>
-            </div>
+            {/* Total Referrals */}
+            <InfoBox
+              icon={<Users className="w-5 h-5 text-rose-600" />}
+              label="Total Referrals"
+              value={walletInfo.total_referrals ?? 0}
+              color="rose"
+            />
 
-            <div className="flex items-center gap-2 px-4 py-2 bg-orange-50 border border-orange-200 rounded-lg shadow-sm hover:shadow-md transition">
-              <ShieldCheck className="w-5 h-5 text-orange-600" />
-              <p className="text-sm font-medium text-gray-700">
-                Level:
-                <span className="ml-1 text-orange-700 font-semibold">
-                  {walletInfo?.unlocked_level ?? 0}
-                </span>
-              </p>
+            {/* Star Level */}
+            <div className="flex flex-col items-start gap-1 px-4 py-3 bg-orange-50 border border-orange-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
+              <div className="flex items-center gap-2">
+                <Star className="w-5 h-5 text-orange-600" />
+                <p className="text-sm font-medium text-gray-700">Star Level</p>
+              </div>
+              <div className="ml-7">{renderStars()}</div>
             </div>
           </div>
         </div>
       </div>
     </section>
+  );
+};
+
+// ✅ Reusable InfoBox Component (more visual, hoverable, elegant)
+const InfoBox = ({ icon, label, value, color }) => {
+  return (
+    <div
+      className={`flex items-center gap-3 px-4 py-3 bg-${color}-50 border border-${color}-200 rounded-lg shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300`}
+    >
+      <div className="p-2 bg-white rounded-full border border-gray-100 shadow-sm">
+        {icon}
+      </div>
+      <div>
+        <p className="text-xs text-gray-500">{label}</p>
+        <p className={`text-sm font-semibold text-${color}-700`}>{value}</p>
+      </div>
+    </div>
   );
 };
 
