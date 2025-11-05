@@ -91,7 +91,7 @@ const ProfileCard = ({ userInfo }) => {
           </div>
 
           {/* Wallet Info Section */}
-          <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-3">
             {/* Available Points */}
             <InfoBox
               icon={<Coins className="w-5 h-5 text-blue-600" />}
