@@ -16,7 +16,7 @@ import MemberDashboardSkeleton from "../../../components/skeleton/MemberDashboar
 const MemberDashboard = () => {
   const { data, isLoading, isFetching, isError } = useVerifyMeQuery();
 
-  // ✅ Show skeleton while loading
+  // Show skeleton while loading
   if (isLoading || isFetching) return <MemberDashboardSkeleton />;
 
   if (isError || !data) {
@@ -29,8 +29,14 @@ const MemberDashboard = () => {
 
   const wallet = data?.wallet || {};
   const unlockedLevel = wallet.unlocked_level || 0;
+
+  // Limit stars between 0–5
   const starCount = Math.min(unlockedLevel, 5);
 
+  // Text label (1 Star / 2 Stars / etc.)
+  const starLabel = starCount === 1 ? "1 Star" : `${starCount} Stars`;
+
+  // Star icons display
   const starDisplay = (
     <div className="flex gap-1 mt-1">
       {[...Array(5)].map((_, i) => (
@@ -45,7 +51,7 @@ const MemberDashboard = () => {
     </div>
   );
 
-  // ✅ Keep static chartData until backend provides data
+  // Dashboard cards
   const cardsData = [
     {
       icon: dollar,
@@ -90,10 +96,10 @@ const MemberDashboard = () => {
     {
       icon: star,
       title: "Star Level",
-      value: unlockedLevel,
-      subtitle: starDisplay,
+      value: starLabel, // "1 Star" / "2 Stars" / etc.
+      subtitle: starDisplay, // Star icons
       chartColor: "#FFD700",
-      chartData: [1, 2, 3, 4, 5, unlockedLevel],
+      chartData: [1, 2, 3, 4, 5, starCount],
     },
   ];
 
@@ -102,7 +108,11 @@ const MemberDashboard = () => {
       <h1 className="text-xl font-semibold text-gray-600 pb-4">Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <img src={card} alt="Membership Card" className="rounded-xl w-full" />
+          <img
+            src={card}
+            alt="Membership Card"
+            className="rounded-xl w-full shadow-lg"
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

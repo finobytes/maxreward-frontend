@@ -19,9 +19,10 @@ import {
 const ProfileCard = ({ userInfo }) => {
   const walletInfo = userInfo?.wallet || {};
 
-  // Star level logic: min 0, max 5
+  // ⭐ Star level logic (min 0, max 5)
   const unlockedLevel = walletInfo.unlocked_level || 0;
   const starCount = Math.min(unlockedLevel, 5);
+  const starLabel = starCount === 1 ? "1 Star" : `${starCount} Stars`;
 
   const renderStars = () => (
     <div className="flex gap-1 mt-1">
@@ -92,7 +93,6 @@ const ProfileCard = ({ userInfo }) => {
 
           {/* Wallet Info Section */}
           <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-3">
-            {/* Available Points */}
             <InfoBox
               icon={<Coins className="w-5 h-5 text-blue-600" />}
               label="Available Points"
@@ -100,7 +100,6 @@ const ProfileCard = ({ userInfo }) => {
               color="blue"
             />
 
-            {/* Referral Points */}
             <InfoBox
               icon={<Trophy className="w-5 h-5 text-teal-600" />}
               label="Referral Points"
@@ -108,7 +107,6 @@ const ProfileCard = ({ userInfo }) => {
               color="teal"
             />
 
-            {/* On Hold Points */}
             <InfoBox
               icon={<Lock className="w-5 h-5 text-amber-600" />}
               label="On Hold Points"
@@ -116,7 +114,6 @@ const ProfileCard = ({ userInfo }) => {
               color="amber"
             />
 
-            {/* Community Points */}
             <InfoBox
               icon={<Award className="w-5 h-5 text-emerald-600" />}
               label="Community Points"
@@ -124,7 +121,6 @@ const ProfileCard = ({ userInfo }) => {
               color="emerald"
             />
 
-            {/* Personal Points */}
             <InfoBox
               icon={<Medal className="w-5 h-5 text-purple-600" />}
               label="Personal Points"
@@ -132,7 +128,6 @@ const ProfileCard = ({ userInfo }) => {
               color="purple"
             />
 
-            {/* Total Points */}
             <InfoBox
               icon={<ShieldCheck className="w-5 h-5 text-indigo-600" />}
               label="Total Points"
@@ -140,7 +135,6 @@ const ProfileCard = ({ userInfo }) => {
               color="indigo"
             />
 
-            {/* Total Referrals */}
             <InfoBox
               icon={<Users className="w-5 h-5 text-rose-600" />}
               label="Total Referrals"
@@ -148,14 +142,20 @@ const ProfileCard = ({ userInfo }) => {
               color="rose"
             />
 
-            {/* Star Level */}
+            {/* ⭐ Star Level Box */}
             <div className="flex flex-col items-start gap-1 px-4 py-3 bg-orange-50 border border-orange-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
               <div className="flex items-center gap-2">
                 <Star className="w-5 h-5 text-orange-600" />
                 <p className="text-sm font-medium text-gray-700">Star Level</p>
               </div>
+
+              {/* Star Icons */}
               <div className="ml-7">{renderStars()}</div>
-              {/* {renderStars.count} Star //like 5 star */}
+
+              {/* Dynamic Text Label */}
+              <p className="ml-7 text-sm font-semibold text-orange-700">
+                {starLabel}
+              </p>
             </div>
           </div>
         </div>
@@ -164,7 +164,7 @@ const ProfileCard = ({ userInfo }) => {
   );
 };
 
-// ✅ Reusable InfoBox Component (more visual, hoverable, elegant)
+// ✅ Reusable InfoBox Component
 const InfoBox = ({ icon, label, value, color }) => {
   return (
     <div
