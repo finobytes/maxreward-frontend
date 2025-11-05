@@ -12,13 +12,17 @@ import { useReferNewMember } from "../../../redux/features/member/referNewMember
 import { referNewMemberSchema } from "../../../schemas/referNewMember.schema";
 import { useState } from "react";
 import ReferSuccessDialog from "./components/ReferSuccessDialog";
-import Select from "@/components/form/Select";
+import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
+import SkeletonField from "../../../components/skeleton/SkeletonField";
 
 const ReferNewMember = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [response, setResponse] = useState(null);
   const { handleRefer, loading, success, error, resetState } =
     useReferNewMember();
+
+  const { data, isLoading } = useVerifyMeQuery();
+  const user = data || {};
 
   const {
     register,
@@ -51,15 +55,11 @@ const ReferNewMember = () => {
   return (
     <div>
       <PageBreadcrumb
-        items={[
-          { label: "Home", to: "/" },
-          { label: "Refer New Member", to: "/member/referred-member" },
-          { label: "Refer New Member" },
-        ]}
+        items={[{ label: "Home", to: "/" }, { label: "Refer New Member" }]}
       />
 
-      <ComponentCard title="Member Information">
-        <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <ComponentCard title="Member Information">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Full Name */}
             <div>
@@ -100,34 +100,40 @@ const ReferNewMember = () => {
                 hint={errors.email?.message}
               />
             </div>
-
-            {/* Gender */}
-
-            <div>
-              <Label>Gender</Label>
-              <Select
-                {...register("gender")}
-                options={[
-                  { value: "male", label: "Male" },
-                  { value: "female", label: "Female" },
-                  { value: "others", label: "Others" },
-                ]}
-              />
-            </div>
-
-            {/* Address */}
-            <div>
-              <Label htmlFor="address">Address</Label>
-              <Input
-                id="address"
-                placeholder="Enter address (optional)"
-                {...register("address")}
-                error={!!errors.address}
-                hint={errors.address?.message}
-              />
-            </div>
           </div>
-
+        </ComponentCard>
+        <ComponentCard className="mt-6" title="Referral Information">
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <Label>Referral Code</Label>
+                <SkeletonField />
+              </div>
+              <div>
+                <Label>Referred By</Label>
+                <SkeletonField />
+              </div>
+              <div>
+                <Label>Referral Status</Label>
+                <SkeletonField />
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <Label>Referral Code</Label>
+                <Input disabled value={user?.referral_code || ""} readOnly />
+              </div>
+              <div>
+                <Label>Referred By</Label>
+                <Input disabled value={user?.name || ""} readOnly />
+              </div>
+              <div>
+                <Label>Referral Status</Label>
+                <Input disabled value={user?.status || ""} readOnly />
+              </div>
+            </div>
+          )}
           <div className="mt-8 flex gap-4">
             <PrimaryButton type="submit" disabled={loading}>
               {loading ? "Submitting..." : "Submit & Send Invite"}
@@ -135,13 +141,13 @@ const ReferNewMember = () => {
             <PrimaryButton
               variant="secondary"
               type="button"
-              to="/member/referred-member"
+              onClick={() => reset()}
             >
-              Back
+              Reset
             </PrimaryButton>
           </div>
-        </form>
-      </ComponentCard>
+        </ComponentCard>
+      </form>
       <ReferSuccessDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}

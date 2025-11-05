@@ -41,15 +41,17 @@ export const NAV_CONFIG = {
         },
       ],
     },
-    {
-      name: "Voucher Manage",
-      icon: <TicketCheck />,
-      path: "/admin/voucher-manage",
-    },
+    // {
+    //   name: "Voucher Manage",
+    //   icon: <TicketCheck />,
+    //   path: "/admin/voucher-manage",
+    // },
     {
       name: "Accounts",
       icon: <ChartArea />,
       subItems: [
+        { name: "Voucher", path: "/admin/voucher-manage" },
+        { name: "Company Info", path: "/admin/company-info" },
         { name: "Income", path: "/admin/accounts/income" },
         { name: "Expense", path: "/admin/accounts/expense" },
       ],
@@ -68,11 +70,11 @@ export const NAV_CONFIG = {
         { name: "Redeem Mall Transaction", path: "/admin/reports/redemption" },
       ],
     },
-    {
-      name: "Company Info",
-      icon: <Building />,
-      path: "/admin/company-info",
-    },
+    // {
+    //   name: "Company Info",
+    //   icon: <Building />,
+    //   path: "/admin/company-info",
+    // },
     {
       name: "Denomination",
       icon: <DollarSign />,

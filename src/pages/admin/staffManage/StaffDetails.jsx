@@ -9,6 +9,7 @@ import StaffTabContent from "./components/StaffTabContent";
 import StaffProfile from "./components/StaffProfile";
 import StaffInfo from "./components/StaffInfo";
 import { useGetSingleAdminStaffQuery } from "../../../redux/features/admin/adminStaff/adminStaffApi";
+import StaffDocuments from "./components/StaffDocuments";
 
 const tabs = [
   { name: "Activity", icon: UsersRound, key: "activity" },
@@ -20,8 +21,6 @@ const StaffDetails = () => {
   const [currentTab, setCurrentTab] = useState("activity");
 
   const { data: staff, isLoading, isError } = useGetSingleAdminStaffQuery(id);
-
-  console.log("Fetched staff:", staff?.data);
 
   return (
     <div>
@@ -53,6 +52,9 @@ const StaffDetails = () => {
 
             <div className="">
               <StaffInfo staff={staff?.data} />
+            </div>
+            <div>
+              <StaffDocuments staff={staff?.data} />
             </div>
           </div>
 

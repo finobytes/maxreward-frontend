@@ -2,17 +2,24 @@ import { useDropzone } from "react-dropzone";
 import { useState, useEffect } from "react";
 import { upload } from "../../../assets/assets";
 import { X } from "lucide-react";
+import { toast } from "sonner";
 
 const Dropzone = ({
   onFilesChange,
   multiple = false,
   maxFiles = 1,
   initialFiles = [],
+  maxFileSizeMB = 5,
+  placeholderImage = null,
+  required = false,
+  requiredCount = null,
+  validationMessage = "This field is required",
+  countValidationMessage = null,
 }) => {
   const [files, setFiles] = useState([]);
   const [hasNewFile, setHasNewFile] = useState(false);
 
-  // ✅ Load existing image from server only once (when editing)
+  // Load existing image (for edit)
   useEffect(() => {
     if (initialFiles.length > 0 && !hasNewFile) {
       const formatted = initialFiles.map((url) => ({
@@ -24,26 +31,40 @@ const Dropzone = ({
     }
   }, [initialFiles, hasNewFile]);
 
-  // ✅ Handle new file drop
+  // Handle file drop
   const onDrop = (acceptedFiles) => {
-    const newFiles = acceptedFiles.map((file) =>
-      Object.assign(file, {
-        preview: URL.createObjectURL(file),
-      })
+    const validFiles = acceptedFiles.filter((file) => {
+      if (file.size > maxFileSizeMB * 1024 * 1024) {
+        toast.error(`"${file.name}" exceeds ${maxFileSizeMB}MB limit`);
+        return false;
+      }
+      return true;
+    });
+
+    const newFiles = validFiles.map((file) =>
+      Object.assign(file, { preview: URL.createObjectURL(file) })
     );
 
-    // শুধুমাত্র single file এর ক্ষেত্রে পুরনো preview clear করে দেই
     const updatedFiles = multiple
       ? [...files, ...newFiles].slice(0, maxFiles)
       : [newFiles[0]];
 
-    setFiles(updatedFiles);
-    setHasNewFile(true); // mark that user uploaded a new file
-
-    // inform parent
-    if (onFilesChange) {
-      onFilesChange(multiple ? updatedFiles : updatedFiles[0]);
+    if (
+      (requiredCount || maxFiles) &&
+      updatedFiles.length < (requiredCount || maxFiles)
+    ) {
+      toast.error(
+        countValidationMessage ||
+          `You must upload ${requiredCount || maxFiles} file${
+            (requiredCount || maxFiles) > 1 ? "s" : ""
+          }`
+      );
     }
+
+    setFiles(updatedFiles);
+    setHasNewFile(true);
+
+    onFilesChange && onFilesChange(multiple ? updatedFiles : updatedFiles[0]);
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -53,13 +74,13 @@ const Dropzone = ({
     accept: { "image/*": [] },
   });
 
-  // ✅ Clean up URLs
+  // Cleanup previews
   useEffect(() => {
     return () =>
       files.forEach((f) => !f.existing && URL.revokeObjectURL(f.preview));
   }, [files]);
 
-  // ✅ Remove selected file
+  // Remove file
   const handleRemove = (index) => {
     const updated = files.filter((_, i) => i !== index);
     setFiles(updated);
@@ -72,29 +93,58 @@ const Dropzone = ({
       {/* Upload Area */}
       <div
         {...getRootProps()}
-        className={`transition border-2 border-dashed rounded-xl cursor-pointer p-7 lg:p-10
-          ${
-            isDragActive
-              ? "border-brand-500 bg-gray-100"
-              : "border-gray-300 bg-gray-50 hover:border-brand-400"
-          }`}
+        className={`transition border-2 border-dashed rounded-xl cursor-pointer p-6 flex flex-col items-center justify-center
+    ${
+      isDragActive
+        ? "border-brand-500 bg-gray-100"
+        : "border-gray-300 bg-gray-50 hover:border-brand-400"
+    }`}
       >
         <input {...getInputProps()} />
-        <div className="flex flex-col items-center">
-          <div className="mb-3 flex justify-center items-center bg-brand-500 rounded-full p-1">
-            <div className="rounded-full bg-white w-12 h-12 p-2">
-              <img src={upload} alt="upload icon" />
-            </div>
-            <p className="text-white px-5">Drop or click to upload</p>
-          </div>
-          <span className="font-medium underline text-theme-sm text-brand-500">
-            Browse File
-          </span>
-          <span className="text-gray-400 text-xs mt-2">Max size: 10MB</span>
-        </div>
+
+        {files.length === 0 ? (
+          <>
+            {placeholderImage && (
+              <img
+                src={placeholderImage}
+                alt="placeholder"
+                className="h-28 w-28 object-cover rounded-lg border mb-3"
+              />
+            )}
+            <p className="text-gray-500 text-sm mb-1">
+              Drop or click to upload
+            </p>
+            <span className="font-medium underline text-sm text-brand-500">
+              Browse File
+            </span>
+            <span className="text-gray-400 text-xs mt-2">
+              {`Max ${maxFiles} file${
+                maxFiles > 1 ? "s" : ""
+              }, up to ${maxFileSizeMB}MB each`}
+            </span>
+          </>
+        ) : (
+          <>
+            {/* ✅ Only show Add More when multiple is true & not reached limit */}
+            {multiple && files.length < maxFiles ? (
+              <div className="flex flex-col items-center">
+                <img
+                  src={upload}
+                  alt="upload icon"
+                  className="h-10 w-10 opacity-80"
+                />
+                <p className="font-medium underline text-sm text-brand-500 mt-1">
+                  Add More
+                </p>
+              </div>
+            ) : (
+              <p className="text-gray-400 text-sm">Files Uploaded</p>
+            )}
+          </>
+        )}
       </div>
 
-      {/* ✅ Preview Section */}
+      {/* Preview Section */}
       {files.length > 0 && (
         <div className="mt-3 grid grid-cols-2 gap-3">
           {files.map((file, idx) => (
@@ -114,12 +164,20 @@ const Dropzone = ({
               >
                 <X className="w-4 h-4" />
               </button>
-              <p className="mt-1 text-xs text-gray-600 truncate text-center px-1">
+              <p className="text-xs text-gray-600 text-center truncate px-1 mt-1">
                 {file.name}
               </p>
             </div>
           ))}
         </div>
+      )}
+
+      {/* Validation message */}
+      {required && files.length < (requiredCount || maxFiles) && (
+        <p className="text-red-500 text-xs mt-1">
+          {countValidationMessage ||
+            `Please upload all ${requiredCount || maxFiles} required files.`}
+        </p>
       )}
     </>
   );

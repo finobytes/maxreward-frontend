@@ -28,7 +28,7 @@ const OwnerInfoCard = ({ userInfo }) => {
   return (
     <div className="">
       {/* Info List */}
-      <ComponentCard title="Owner Information">
+      <ComponentCard title="Personal Information">
         <div className="flow-root">
           <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
@@ -50,9 +50,25 @@ const OwnerInfoCard = ({ userInfo }) => {
           </div>
         </div>
         <div className="py-4">
-          <PrimaryButton type="button" variant="primary" size="md">
-            Login to Merchant Account
-          </PrimaryButton>
+          {userInfo?.member_type === "general" ? (
+            <PrimaryButton
+              type="button"
+              variant="primary"
+              size="md"
+              to="/member/merchant-application"
+            >
+              Apply For Merchant
+            </PrimaryButton>
+          ) : (
+            <PrimaryButton
+              type="button"
+              variant="primary"
+              size="md"
+              to="/member/merchant-application"
+            >
+              Login To Merchant
+            </PrimaryButton>
+          )}
         </div>
       </ComponentCard>
     </div>

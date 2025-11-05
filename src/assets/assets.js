@@ -41,6 +41,10 @@ import hand from "./icons/hand.svg";
 import userCommunity from "./icons/user-community.svg";
 import purchase from "./icons/purchase.svg";
 import star from "./icons/star.svg";
+import profilePlaceholder from "./images/user/profile-placeholder.png";
+import nidPlaceholder from "./images/user/nid.jpg";
+import companyLogoPlaceholder from "./images/company-logo-placeholder.jpg";
+import paymentProofPlaceholder from "./images/payment-proof.png";
 
 export {
   loginBanner,
@@ -86,4 +90,8 @@ export {
   userCommunity,
   purchase,
   star,
+  profilePlaceholder,
+  nidPlaceholder,
+  companyLogoPlaceholder,
+  paymentProofPlaceholder,
 };
