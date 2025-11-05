@@ -109,13 +109,13 @@ const StaffUpdate = () => {
   // Submit handler
   const onSubmit = async (formData) => {
     try {
-      // ✅ PROFILE PICTURE VALIDATION (Only if no existing and no new upload)
+      // PROFILE PICTURE VALIDATION (Only if no existing and no new upload)
       if (!existingProfile.length && !profilePicture) {
         toast.error("Profile Picture is required");
         return;
       }
 
-      // ✅ NID VALIDATION
+      // NID VALIDATION
       const newNidFiles = nationalIdCard.filter((f) => f instanceof File);
 
       if (!existingNid.length && newNidFiles.length === 0) {
@@ -128,7 +128,7 @@ const StaffUpdate = () => {
         return;
       }
 
-      // ✅ Prepare FormData
+      // Prepare FormData
       const formDataToSend = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
         if (value !== "" && value !== undefined) {
@@ -136,12 +136,12 @@ const StaffUpdate = () => {
         }
       });
 
-      // ✅ If profile changed → send file
+      // If profile changed → send file
       if (profilePicture instanceof File) {
         formDataToSend.append("profile_picture", profilePicture);
       }
 
-      // ✅ If NID changed → send 2 files
+      // If NID changed → send 2 files
       if (newNidFiles.length === 2) {
         newNidFiles.forEach((file, index) => {
           formDataToSend.append(`national_id_card[${index}]`, file);
@@ -315,7 +315,7 @@ const StaffUpdate = () => {
                 multiple={false}
                 initialFiles={existingProfile}
                 onFilesChange={(file) => {
-                  setExistingProfile([]); // ✅ remove old image preview
+                  setExistingProfile([]); // remove old image preview
                   setProfilePicture(file ?? null);
                 }}
               />
@@ -329,7 +329,7 @@ const StaffUpdate = () => {
                 requiredCount={2}
                 initialFiles={existingNid}
                 onFilesChange={(files) => {
-                  setExistingNid([]); // ✅ remove old previews
+                  setExistingNid([]); // remove old previews
                   setNationalIdCard(files); // keep both Files
                 }}
               />
