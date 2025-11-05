@@ -50,14 +50,25 @@ const OwnerInfoCard = ({ userInfo }) => {
           </div>
         </div>
         <div className="py-4">
-          <PrimaryButton
-            type="button"
-            variant="primary"
-            size="md"
-            to="/member/merchant-application"
-          >
-            Apply For Merchant
-          </PrimaryButton>
+          {userInfo?.member_type === "general" ? (
+            <PrimaryButton
+              type="button"
+              variant="primary"
+              size="md"
+              to="/member/merchant-application"
+            >
+              Apply For Merchant
+            </PrimaryButton>
+          ) : (
+            <PrimaryButton
+              type="button"
+              variant="primary"
+              size="md"
+              to="/member/merchant-application"
+            >
+              Login To Merchant
+            </PrimaryButton>
+          )}
         </div>
       </ComponentCard>
     </div>
