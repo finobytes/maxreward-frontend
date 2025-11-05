@@ -19,7 +19,7 @@ import {
 const ProfileCard = ({ userInfo }) => {
   const walletInfo = userInfo?.wallet || {};
 
-  // ⭐ Star level logic: min 0, max 5
+  // Star level logic: min 0, max 5
   const unlockedLevel = walletInfo.unlocked_level || 0;
   const starCount = Math.min(unlockedLevel, 5);
 
@@ -155,6 +155,7 @@ const ProfileCard = ({ userInfo }) => {
                 <p className="text-sm font-medium text-gray-700">Star Level</p>
               </div>
               <div className="ml-7">{renderStars()}</div>
+              {/* {renderStars.count} Star //like 5 star */}
             </div>
           </div>
         </div>
@@ -173,8 +174,8 @@ const InfoBox = ({ icon, label, value, color }) => {
         {icon}
       </div>
       <div>
-        <p className="text-xs text-gray-500">{label}</p>
-        <p className={`text-sm font-semibold text-${color}-700`}>{value}</p>
+        <p className="text-sm text-gray-700 font-medium">{label}</p>
+        <p className={`text-lg font-semibold text-${color}-700`}>{value}</p>
       </div>
     </div>
   );
