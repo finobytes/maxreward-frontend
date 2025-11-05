@@ -41,15 +41,16 @@ export const NAV_CONFIG = {
         },
       ],
     },
-    {
-      name: "Voucher Manage",
-      icon: <TicketCheck />,
-      path: "/admin/voucher-manage",
-    },
+    // {
+    //   name: "Voucher Manage",
+    //   icon: <TicketCheck />,
+    //   path: "/admin/voucher-manage",
+    // },
     {
       name: "Accounts",
       icon: <ChartArea />,
       subItems: [
+        { name: "Voucher", path: "/admin/voucher-manage" },
         { name: "Income", path: "/admin/accounts/income" },
         { name: "Expense", path: "/admin/accounts/expense" },
       ],

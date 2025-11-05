@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import SearchInput from "../../../components/form/form-elements/SearchInput";
 import StatusBadge from "../../../components/table/StatusBadge";
-import { Loader } from "lucide-react";
+import { Eye, Loader } from "lucide-react";
 import Pagination from "../../../components/table/Pagination";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import {
@@ -19,6 +19,7 @@ import {
 import { toast } from "sonner";
 import BulkActionBar from "../../../components/table/BulkActionBar";
 import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSkeleton";
+import { Link } from "react-router";
 
 const VoucherManage = () => {
   const [search, setSearch] = useState("");
@@ -166,7 +167,7 @@ const VoucherManage = () => {
                     <TableHead>Purchase Date</TableHead>
                     <TableHead>Payment Method</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead className="text-center">Actions</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
 
@@ -201,7 +202,7 @@ const VoucherManage = () => {
                       <TableCell>
                         <StatusBadge status={v.status}>{v.status}</StatusBadge>
                       </TableCell>
-                      <TableCell className="py-4 flex gap-2 justify-center">
+                      {/* <TableCell className="py-4 flex gap-2 justify-center">
                         {v.status === "success" && (
                           <button
                             disabled
@@ -220,6 +221,42 @@ const VoucherManage = () => {
                             {approvingId === v.id ? "Approving..." : "Approve"}
                           </button>
                         )}
+                      </TableCell> */}
+
+                      <TableCell className="py-4 flex gap-2">
+                        <>
+                          {v.status === "success" && (
+                            <button
+                              disabled
+                              className="px-[7px] py-1.5 rounded-md bg-gray-200 hover:bg-gray-e00 text-gray-600 disabled:opacity-50"
+                            >
+                              Approved
+                            </button>
+                          )}
+
+                          {v.status !== "success" && (
+                            <button
+                              onClick={() => handleApprove(v.id)}
+                              disabled={approvingId === v.id}
+                              className="px-3 py-1.5 rounded-md bg-green-100 hover:bg-green-200 text-green-600 disabled:opacity-50"
+                            >
+                              {approvingId === v.id
+                                ? "Approving..."
+                                : "Approve"}
+                            </button>
+                          )}
+                        </>
+
+                        <button className="px-2 rounded-md bg-red-100 hover:bg-red-200 text-red-500 disabled:opacity-50">
+                          Reject
+                        </button>
+
+                        <Link
+                          to=""
+                          className="p-2 rounded-md bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
+                        >
+                          <Eye size={16} />
+                        </Link>
                       </TableCell>
                     </TableRow>
                   ))}
