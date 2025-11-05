@@ -44,6 +44,7 @@ import star from "./icons/star.svg";
 import profilePlaceholder from "./images/user/profile-placeholder.png";
 import nidPlaceholder from "./images/user/nid.jpg";
 import companyLogoPlaceholder from "./images/company-logo-placeholder.jpg";
+import paymentProofPlaceholder from "./images/payment-proof.png";
 
 export {
   loginBanner,
@@ -92,4 +93,5 @@ export {
   profilePlaceholder,
   nidPlaceholder,
   companyLogoPlaceholder,
+  paymentProofPlaceholder,
 };
