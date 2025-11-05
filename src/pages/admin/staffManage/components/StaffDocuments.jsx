@@ -12,7 +12,7 @@ const StaffDocuments = ({ staff }) => {
 
       {/* Documents Section */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 p-4">
-        {/* NID Front */}
+        {/* IC Front */}
         {nidFront && (
           <div className="text-center">
             <p className="text-sm font-medium text-gray-600 mb-2">
@@ -26,7 +26,7 @@ const StaffDocuments = ({ staff }) => {
           </div>
         )}
 
-        {/* NID Back */}
+        {/* IC Back */}
         {nidBack && (
           <div className="text-center">
             <p className="text-sm font-medium text-gray-600 mb-2">

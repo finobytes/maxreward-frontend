@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { merchantEditSchema } from "@/schemas/merchantEditSchema";
@@ -15,8 +15,11 @@ import PrimaryButton from "@/components/ui/PrimaryButton";
 import Dropzone from "@/components/form/form-elements/Dropzone";
 import { toast } from "sonner";
 import { useNavigate, useParams } from "react-router";
+import { companyLogoPlaceholder } from "../../../assets/assets";
 
 const MerchantEdit = () => {
+  const [businessLogo, setBusinessLogo] = useState(null);
+
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -54,6 +57,9 @@ const MerchantEdit = () => {
 
       if (!payload.merchant_password) {
         delete payload.merchant_password;
+      }
+      if (businessLogo) {
+        register("business_logo", businessLogo);
       }
 
       await updateMerchant({ id, ...payload }).unwrap();
@@ -105,15 +111,15 @@ const MerchantEdit = () => {
       />
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/* Member Information */}
-        <ComponentCard title="Member Information">
+        {/* Business Information */}
+        <ComponentCard title="Business Information">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:col-span-2">
               <div>
-                <Label>Business Name</Label>
+                <Label>Company Name</Label>
                 <Input
                   {...register("business_name")}
-                  placeholder="Business name"
+                  placeholder="Company name"
                 />
                 {errors.business_name && (
                   <p className="text-red-500 text-xs mt-1">
@@ -121,9 +127,19 @@ const MerchantEdit = () => {
                   </p>
                 )}
               </div>
-
               <div>
-                <Label>Business Type</Label>
+                <Label>Company Address</Label>
+                <Input
+                  {...register("company_address")}
+                  placeholder="Company Address"
+                />
+              </div>
+              <div>
+                <Label>State</Label>
+                <Input {...register("state")} placeholder="State" />
+              </div>
+              <div>
+                <Label>Product/Service</Label>
                 <Select
                   {...register("business_type")}
                   options={[
@@ -140,105 +156,55 @@ const MerchantEdit = () => {
               </div>
 
               <div>
-                <Label>Business Description</Label>
+                <Label>Annual Sales Turnover</Label>
                 <Input
-                  {...register("business_description")}
-                  placeholder="Business Description"
+                  {...register("annual_sales_turnover")}
+                  placeholder="Annual Sales Turnover"
                 />
               </div>
-
               <div>
-                <Label>Company Address</Label>
+                <Label>Reward Budget (%)</Label>
                 <Input
-                  {...register("company_address")}
-                  placeholder="Company Address"
-                />
-              </div>
-
-              <div>
-                <Label>Status</Label>
-                <Select
-                  {...register("status")}
-                  options={[
-                    { value: "pending", label: "Pending" },
-                    { value: "approved", label: "Approved" },
-                    { value: "rejected", label: "Rejected" },
-                  ]}
-                />
-              </div>
-
-              <div>
-                <Label>License Number</Label>
-                <Input
-                  {...register("license_number")}
-                  placeholder="License Number"
+                  {...register("reward_budget")}
+                  placeholder="Reward Budget (%)"
                 />
               </div>
             </div>
 
             <div className="md:col-span-1">
               <Label>Upload Company Logo</Label>
-              <Dropzone />
+              <Dropzone
+                multiple={false}
+                maxFileSizeMB={5}
+                required
+                validationMessage="Company logo is required"
+                placeholderImage={companyLogoPlaceholder}
+                onFilesChange={(file) => setBusinessLogo(file ?? null)}
+              />
             </div>
           </div>
         </ComponentCard>
 
-        {/* Bank Information */}
+        {/* Authorized Person Information */}
         <div className="mt-6">
-          <ComponentCard title="Bank Information">
+          <ComponentCard title="Authorized Person Information">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <Label>Bank Name</Label>
-                <Input {...register("bank_name")} placeholder="Bank Name" />
-              </div>
-              <div>
-                <Label>Account Holder Name</Label>
+                <Label>Authorized Person Name</Label>
                 <Input
-                  {...register("account_holder_name")}
-                  placeholder="Account Holder Name"
+                  {...register("authorized_person_name")}
+                  placeholder="Authorized Person Name"
                 />
               </div>
               <div>
-                <Label>Account Number / IBAN</Label>
-                <Input
-                  {...register("account_number")}
-                  placeholder="Account Number"
-                />
-              </div>
-            </div>
-          </ComponentCard>
-        </div>
-
-        {/* Owner Information */}
-        <div className="mt-6">
-          <ComponentCard title="Owner Information">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div>
-                <Label>Owner Name</Label>
-                <Input {...register("owner_name")} placeholder="Owner Name" />
-              </div>
-              <div>
-                <Label>Phone</Label>
+                <Label>
+                  Phone Number (<span className="text-red-500">*</span>)
+                </Label>
                 <Input {...register("phone")} placeholder="Phone Number" />
               </div>
               <div>
-                <Label>Gender</Label>
-                <Select
-                  {...register("gender")}
-                  options={[
-                    { value: "male", label: "Male" },
-                    { value: "female", label: "Female" },
-                    { value: "others", label: "Others" },
-                  ]}
-                />
-              </div>
-              <div>
-                <Label>Address</Label>
-                <Input {...register("address")} placeholder="Full Address" />
-              </div>
-              <div>
-                <Label>Email</Label>
-                <Input {...register("email")} placeholder="Email" />
+                <Label>Email Address</Label>
+                <Input {...register("email")} placeholder="Email Address" />
               </div>
             </div>
 
