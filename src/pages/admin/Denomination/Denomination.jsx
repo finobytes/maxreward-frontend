@@ -204,40 +204,36 @@ const Denomination = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {denominations?.data?.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>
-                      <input
-                        type="checkbox"
-                        checked={selected.includes(item.id)}
-                        onChange={() => toggleSelect(item.id)}
-                        className="w-4 h-4 rounded"
-                      />
-                    </TableCell>
-                    <TableCell>{item.id}</TableCell>
-                    <TableCell>{item.title}</TableCell>
-                    <TableCell>{item.value}</TableCell>
-                    <TableCell>
-                      {new Date(item.created_at).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => openEditModal(item)}
-                          className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200"
-                        >
-                          <PencilLine size={16} />
-                        </button>
-                        {/* <button
-                          onClick={() => handleDelete(item.id)}
-                          className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200"
-                        >
-                          <Trash2Icon size={16} />
-                        </button> */}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {denominations?.data
+                  ?.slice(0, 3) //
+                  ?.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell>
+                        <input
+                          type="checkbox"
+                          checked={selected.includes(item.id)}
+                          onChange={() => toggleSelect(item.id)}
+                          className="w-4 h-4 rounded"
+                        />
+                      </TableCell>
+                      <TableCell>{item.id}</TableCell>
+                      <TableCell>{item.title}</TableCell>
+                      <TableCell>{item.value}</TableCell>
+                      <TableCell>
+                        {new Date(item.created_at).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => openEditModal(item)}
+                            className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200"
+                          >
+                            <PencilLine size={16} />
+                          </button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
               </TableBody>
             </Table>
           )}

@@ -14,6 +14,7 @@ import { useNavigate } from "react-router";
 import { useGetAllBusinessTypesQuery } from "@/redux/features/admin/businessType/businessTypeApi";
 import { merchantSchema } from "../../../schemas/merchantSchema";
 import { useSelector } from "react-redux";
+import { companyLogoPlaceholder } from "../../../assets/assets";
 
 const MerchantRegistrationForm = () => {
   const { user } = useSelector((state) => state.auth);
@@ -92,11 +93,11 @@ const MerchantRegistrationForm = () => {
 
       <form onSubmit={handleSubmit(onSubmit)}>
         {/* Member Information */}
-        <ComponentCard title="Member Information">
+        <ComponentCard title="Business Information">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:col-span-2">
               <div>
-                <Label>Business Name</Label>
+                <Label>Company Name</Label>
                 <Input
                   {...register("business_name")}
                   placeholder="Business name"
@@ -109,7 +110,18 @@ const MerchantRegistrationForm = () => {
               </div>
 
               <div>
-                <Label>Business Type</Label>
+                <Label>Company Address</Label>
+                <Input
+                  {...register("company_address")}
+                  placeholder="Company Address"
+                />
+              </div>
+              <div>
+                <Label>State</Label>
+                <Input {...register("state")} placeholder="State" />
+              </div>
+              <div>
+                <Label>Product/Service</Label>
 
                 {isBusinessTypeLoading ? (
                   <div className="animate-pulse space-y-2">
@@ -118,7 +130,7 @@ const MerchantRegistrationForm = () => {
                   </div>
                 ) : isBusinessTypeError ? (
                   <p className="text-red-500 text-sm">
-                    Failed to load business types
+                    Failed to load product/service type
                   </p>
                 ) : (
                   <Select
@@ -141,38 +153,17 @@ const MerchantRegistrationForm = () => {
               </div>
 
               <div>
-                <Label>Business Description</Label>
+                <Label>Annual Sales Turnover</Label>
                 <Input
-                  {...register("business_description")}
-                  placeholder="Business Description"
+                  {...register("annual_sales_turnover")}
+                  placeholder="Annual Sales Turnover"
                 />
               </div>
-
               <div>
-                <Label>Company Address</Label>
+                <Label>Reward Budget (%)</Label>
                 <Input
-                  {...register("company_address")}
-                  placeholder="Company Address"
-                />
-              </div>
-
-              {/* <div>
-                <Label>Status</Label>
-                <Select
-                  {...register("status")}
-                  options={[
-                    { value: "pending", label: "Pending" },
-                    { value: "approved", label: "Approved" },
-                    { value: "rejected", label: "Rejected" },
-                  ]}
-                />
-              </div> */}
-
-              <div>
-                <Label>License Number</Label>
-                <Input
-                  {...register("license_number")}
-                  placeholder="License Number"
+                  {...register("reward_budget")}
+                  placeholder="Reward Budget (%)"
                 />
               </div>
             </div>
@@ -180,6 +171,11 @@ const MerchantRegistrationForm = () => {
             <div className="md:col-span-1">
               <Label>Upload Company Logo</Label>
               <Dropzone
+                multiple={false}
+                maxFileSizeMB={5}
+                required
+                validationMessage="Company logo is required"
+                placeholderImage={companyLogoPlaceholder}
                 onFilesChange={(file) => setBusinessLogo(file ?? null)}
               />
             </div>
@@ -188,40 +184,19 @@ const MerchantRegistrationForm = () => {
 
         {/* Bank Information */}
         <div className="mt-6">
-          <ComponentCard title="Bank Information">
+          <ComponentCard title="Authorized Person Information">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <Label>Bank Name</Label>
-                <Input {...register("bank_name")} placeholder="Bank Name" />
-              </div>
-              <div>
-                <Label>Account Holder Name</Label>
+                <Label>Authorized Person Name</Label>
                 <Input
-                  {...register("account_holder_name")}
-                  placeholder="Account Holder Name"
+                  {...register("authorized_person_name")}
+                  placeholder="Authorized Person Name"
                 />
               </div>
               <div>
-                <Label>Account Number / IBAN</Label>
-                <Input
-                  {...register("account_number")}
-                  placeholder="Account Number"
-                />
-              </div>
-            </div>
-          </ComponentCard>
-        </div>
-
-        {/* Owner Information */}
-        <div className="mt-6">
-          <ComponentCard title="Owner Information">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div>
-                <Label>Owner Name</Label>
-                <Input {...register("owner_name")} placeholder="Owner Name" />
-              </div>
-              <div>
-                <Label>Phone</Label>
+                <Label>
+                  Phone Number (<span className="text-red-500">*</span>)
+                </Label>
                 <Input {...register("phone")} placeholder="Phone Number" />
                 {errors.phone && (
                   <p className="text-red-500 text-xs mt-1">
@@ -230,60 +205,10 @@ const MerchantRegistrationForm = () => {
                 )}
               </div>
               <div>
-                <Label>Gender</Label>
-                <Select
-                  {...register("gender")}
-                  options={[
-                    { value: "male", label: "Male" },
-                    { value: "female", label: "Female" },
-                    { value: "others", label: "Others" },
-                  ]}
-                />
-              </div>
-              <div>
-                <Label>Address</Label>
-                <Input {...register("address")} placeholder="Full Address" />
-              </div>
-              <div>
-                <Label>Email</Label>
-                <Input {...register("email")} placeholder="Email" />
+                <Label>Email Address</Label>
+                <Input {...register("email")} placeholder="Email Address" />
               </div>
             </div>
-          </ComponentCard>
-        </div>
-
-        {/* Platform Settings */}
-        <div className="mt-6">
-          <ComponentCard title="Platform Settings">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div>
-                <Label>Password</Label>
-                <Input
-                  type="password"
-                  {...register("merchant_password")}
-                  placeholder="Password"
-                />
-                {errors.merchant_password && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.merchant_password.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <Label>Confirm Password</Label>
-                <Input
-                  type="password"
-                  {...register("confirm_password")}
-                  placeholder="Confirm Password"
-                />
-                {errors.confirm_password && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.confirm_password.message}
-                  </p>
-                )}
-              </div>
-            </div>
-
             <div className="mt-8 flex gap-4">
               <PrimaryButton type="submit" disabled={isLoading}>
                 {isLoading ? "Submitting..." : "Submit"}
