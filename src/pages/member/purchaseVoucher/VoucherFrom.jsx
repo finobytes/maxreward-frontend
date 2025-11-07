@@ -12,7 +12,7 @@ import PrimaryButton from "../../../components/ui/PrimaryButton";
 import Label from "../../../components/form/Label";
 import Input from "../../../components/form/input/InputField";
 import Dropzone from "../../../components/form/form-elements/Dropzone";
-import { useVoucher } from "./../../../redux/features/member/voucherPurchase/useVoucher";
+import { useVouchers } from "./../../../redux/features/member/voucherPurchase/useVouchers";
 import VoucherFromSkeleton from "../../../components/skeleton/VoucherFromSkeleton";
 import { paymentProofPlaceholder } from "../../../assets/assets";
 import { useForm } from "react-hook-form";
@@ -59,7 +59,7 @@ const VoucherForm = () => {
     creating,
     handleCreateVoucher,
     denominationId,
-  } = useVoucher();
+  } = useVouchers();
 
   // React Hook Form Setup
   const {
