@@ -87,6 +87,17 @@ export const memberApi = baseApi.injectEndpoints({
         { type: "Member", id: "LIST" },
       ],
     }),
+    updateStatus: builder.mutation({
+      query: ({ id, formData }) => ({
+        url: `/members/status/${id}`,
+        method: "POST",
+        body: formData,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: "Member", id },
+        { type: "Member", id: "LIST" },
+      ],
+    }),
   }),
 });
 
@@ -98,4 +109,5 @@ export const {
   useGetGeneralMembersQuery,
   useGetCorporateMembersQuery,
   useUpdateMemberMutation,
+  useUpdateStatusMutation,
 } = memberApi;
