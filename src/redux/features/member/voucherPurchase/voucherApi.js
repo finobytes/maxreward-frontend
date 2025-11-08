@@ -3,32 +3,22 @@ import { baseApi } from "../../../api/baseApi";
 export const voucherApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // === inside baseApi.injectEndpoints({ endpoints: (builder) => ({ ... }) })
+
+    // === Member vouchers (no pagination)
     getMemberVouchers: builder.query({
-      query: (params) => ({
+      query: () => ({
         url: "/member/vouchers",
         method: "GET",
-        params, // keep simple for member endpoint
       }),
       transformResponse: (response) => {
-        // Accept shapes:
-        // 1) response.data.vouchers (pagination object)
-        // 2) response.data (pagination object)
-        // 3) response (pagination object or array)
-        const container = response?.data ?? response;
-        const pagination = container?.vouchers ?? container;
-        const vouchersArray =
-          pagination?.data ?? (Array.isArray(pagination) ? pagination : []);
-        const meta = {
-          current_page: pagination?.current_page ?? pagination?.page ?? 1,
-          last_page:
-            pagination?.last_page ??
-            Math.ceil((pagination?.total ?? 0) / (pagination?.per_page ?? 10)),
-          total:
-            pagination?.total ??
-            (Array.isArray(vouchersArray) ? vouchersArray.length : 0),
-          per_page: pagination?.per_page ?? 10,
-        };
-        return { vouchers: vouchersArray ?? [], meta };
+        if (!response?.success) {
+          return {
+            vouchers: [],
+            message: response?.message || "Failed to fetch vouchers",
+          };
+        }
+        const vouchers = response?.data?.vouchers ?? [];
+        return { vouchers };
       },
       providesTags: (result) =>
         result

@@ -15,36 +15,42 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useGetVouchersQuery } from "../../../redux/features/member/voucherPurchase/voucherApi";
+import { useGetMemberVouchersQuery } from "../../../redux/features/member/voucherPurchase/voucherApi";
 import { toast } from "sonner";
 import BulkActionBar from "../../../components/table/BulkActionBar";
-import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSkeleton"; // same skeleton reused
+import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSkeleton";
 
 const PurchaseVoucher = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [selected, setSelected] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 10;
 
   // Fetch vouchers
   const {
-    data: vouchers = [],
+    data: apiResponse,
     isLoading,
     isFetching,
     isError,
-  } = useGetVouchersQuery();
+  } = useGetMemberVouchersQuery();
 
-  const rowsPerPage = 10;
+  const vouchers = apiResponse?.vouchers ?? [];
+  const errorMessage = apiResponse?.message || "Vouchers not found";
+  console.log("api response", apiResponse);
+  console.log("Voucher Data:", vouchers);
 
-  // Filter logic
+  // === Filtering
   const filteredData = useMemo(() => {
     return vouchers.filter((v) => {
       const type = v.voucher_type?.toLowerCase() || "";
       const payment = v.payment_method?.toLowerCase() || "";
+      const idStr = v.id?.toString() || "";
+
       const matchesSearch =
         type.includes(search.toLowerCase()) ||
         payment.includes(search.toLowerCase()) ||
-        v.id.toString().includes(search);
+        idStr.includes(search);
 
       const matchesStatus =
         statusFilter === "All"
@@ -62,11 +68,7 @@ const PurchaseVoucher = () => {
   );
 
   const toggleSelectAll = (checked) => {
-    if (checked) {
-      setSelected(paginatedData.map((v) => v.id));
-    } else {
-      setSelected([]);
-    }
+    setSelected(checked ? paginatedData.map((v) => v.id) : []);
   };
 
   const toggleSelect = (id) => {
@@ -79,6 +81,7 @@ const PurchaseVoucher = () => {
     toast.warning(`Bulk update to ${newStatus} (not implemented yet)`);
   };
 
+  // === Render
   return (
     <div>
       <PageBreadcrumb
@@ -86,7 +89,6 @@ const PurchaseVoucher = () => {
       />
 
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white p-4 shadow-sm relative">
-        {/* Overlay loader like MemberManage */}
         {isFetching && !isLoading && (
           <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-sm flex items-center justify-center rounded-xl">
             <Loader className="w-6 h-6 animate-spin text-gray-500" />
@@ -94,7 +96,7 @@ const PurchaseVoucher = () => {
         )}
 
         <div className="max-w-full overflow-x-auto">
-          {/* Header Section */}
+          {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <SearchInput
               value={search}
@@ -113,9 +115,9 @@ const PurchaseVoucher = () => {
                   onChange={setStatusFilter}
                   options={[
                     { label: "All", value: "All" },
-                    { label: "Pending", value: "Pending" },
-                    { label: "Approved", value: "Approved" },
-                    { label: "Rejected", value: "Rejected" },
+                    { label: "Pending", value: "pending" },
+                    { label: "Success", value: "success" },
+                    { label: "Failed", value: "failed" },
                   ]}
                 />
                 <PrimaryButton
@@ -148,13 +150,13 @@ const PurchaseVoucher = () => {
             />
           )}
 
-          {/* Table & States */}
+          {/* Table Section */}
           <div className="mt-4 relative overflow-x-auto w-full custom-scrollbar">
             {isLoading ? (
-              <MerchantStaffSkeleton rows={8} cols={9} /> // Skeleton placeholder
+              <MerchantStaffSkeleton rows={8} cols={10} />
             ) : isError ? (
               <div className="p-6 text-center text-red-500">
-                Failed to load vouchers.
+                {errorMessage || "Something went wrong"}
               </div>
             ) : paginatedData.length === 0 ? (
               <div className="p-6 text-center text-gray-500">
@@ -180,7 +182,6 @@ const PurchaseVoucher = () => {
                     <TableHead>Denomination</TableHead>
                     <TableHead>Quantity</TableHead>
                     <TableHead>Total Amount</TableHead>
-                    <TableHead>Points</TableHead>
                     <TableHead>Payment Method</TableHead>
                     <TableHead>Created Date</TableHead>
                     <TableHead>Status</TableHead>
@@ -205,14 +206,15 @@ const PurchaseVoucher = () => {
                       <TableCell>{v.id}</TableCell>
                       <TableCell>
                         <StatusBadge status={v.voucher_type}>
-                          {v.voucher_type} voucher
+                          {v.voucher_type}
                         </StatusBadge>
                       </TableCell>
-                      <TableCell>{v?.denomination?.title}</TableCell>
+                      <TableCell>{v?.denomination?.title || "N/A"}</TableCell>
                       <TableCell>{v.quantity}</TableCell>
                       <TableCell>RM {v.total_amount}</TableCell>
-                      <TableCell>{v?.points || "N/A"}</TableCell>
-                      <TableCell>{v.payment_method}</TableCell>
+                      <TableCell className="capitalize">
+                        {v.payment_method}
+                      </TableCell>
                       <TableCell>
                         {new Date(v.created_at).toLocaleDateString()}
                       </TableCell>
@@ -220,14 +222,12 @@ const PurchaseVoucher = () => {
                         <StatusBadge status={v.status}>{v.status}</StatusBadge>
                       </TableCell>
                       <TableCell className="text-center">
-                        <div className="flex justify-center items-center">
-                          <Link
-                            to="#"
-                            className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500"
-                          >
-                            <Eye size={18} />
-                          </Link>
-                        </div>
+                        <Link
+                          to="#"
+                          className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500 inline-block"
+                        >
+                          <Eye size={18} />
+                        </Link>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -235,6 +235,7 @@ const PurchaseVoucher = () => {
               </Table>
             )}
 
+            {/* Manual local pagination */}
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
