@@ -3,7 +3,7 @@ import { userCardCenterLogo } from "../../assets/assets";
 
 const MembershipCard = ({ data }) => {
   return (
-    <div className="w-full aspect-[16/9] bg-[#735DFFB2] rounded-xl shadow-lg flex flex-col justify-between py-6 xl:max-w-max">
+    <div className="w-full h-auto bg-[#735DFFB2] rounded-xl shadow-lg flex flex-col justify-between py-6">
       <h2
         className="font-bold text-center text-white leading-tight px-3 whitespace-nowrap"
         style={{
