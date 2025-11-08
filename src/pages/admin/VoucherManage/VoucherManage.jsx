@@ -84,58 +84,48 @@ const VoucherManage = () => {
             onChange={(e) => dispatch(setSearch(e.target.value))}
             placeholder="Search vouchers..."
           />
+          <div className="flex gap-4 flex-wrap">
+            <Select
+              value={payment_method}
+              onChange={(e) => dispatch(setPaymentMethod(e.target.value))}
+              placeholder="Payment Method"
+              options={[
+                { value: "", label: "All" },
+                { value: "manual", label: "Manual" },
+                { value: "online", label: "Online" },
+              ]}
+            />
 
-          <button
-            onClick={() => dispatch(resetFilters())}
-            className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 text-sm"
-          >
-            Clear Filters
-          </button>
-        </div>
+            <Select
+              value={voucher_type}
+              onChange={(e) => dispatch(setVoucherType(e.target.value))}
+              placeholder="Voucher Type"
+              options={[
+                { value: "", label: "All" },
+                { value: "max", label: "Max" },
+                { value: "refer", label: "Refer" },
+              ]}
+            />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-          <input
-            type="text"
-            placeholder="Member ID"
-            value={member_id}
-            onChange={(e) => dispatch(setMemberId(e.target.value))}
-            className="border px-3 py-2 rounded-lg"
-          />
+            <Select
+              value={status}
+              onChange={(e) => dispatch(setStatus(e.target.value))}
+              placeholder="Status"
+              options={[
+                { value: "all", label: "All" },
+                { value: "pending", label: "Pending" },
+                { value: "failed", label: "Failed" },
+                { value: "success", label: "Success" },
+              ]}
+            />
 
-          <Select
-            value={payment_method}
-            onChange={(e) => dispatch(setPaymentMethod(e.target.value))}
-            placeholder="Payment Method"
-            options={[
-              { value: "", label: "All" },
-              { value: "bank", label: "Bank" },
-              { value: "paypal", label: "PayPal" },
-              { value: "wallet", label: "Wallet" },
-            ]}
-          />
-
-          <Select
-            value={voucher_type}
-            onChange={(e) => dispatch(setVoucherType(e.target.value))}
-            placeholder="Voucher Type"
-            options={[
-              { value: "", label: "All" },
-              { value: "gift", label: "Gift" },
-              { value: "reward", label: "Reward" },
-            ]}
-          />
-
-          <Select
-            value={status}
-            onChange={(e) => dispatch(setStatus(e.target.value))}
-            placeholder="Status"
-            options={[
-              { value: "all", label: "All" },
-              { value: "pending", label: "Pending" },
-              { value: "approved", label: "Approved" },
-              { value: "rejected", label: "Rejected" },
-            ]}
-          />
+            <button
+              onClick={() => dispatch(resetFilters())}
+              className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 text-sm"
+            >
+              Clear Filters
+            </button>
+          </div>
         </div>
 
         {/* Table */}

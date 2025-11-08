@@ -82,14 +82,14 @@ export const voucherApi = baseApi.injectEndpoints({
       keepUnusedDataFor: 60,
     }),
 
-    // ✅ Get single voucher by ID
+    // Get single voucher by ID
     getVoucherById: builder.query({
       query: (id) => `/admin/vouchers/${id}`,
       transformResponse: (res) => res?.data ?? res,
       providesTags: (result, err, id) => [{ type: "Voucher", id }],
     }),
 
-    // ✅ Create voucher (Member)
+    // Create voucher (Member)
     createVoucher: builder.mutation({
       query: (formData) => ({
         url: "/member/voucher/create",
@@ -99,7 +99,7 @@ export const voucherApi = baseApi.injectEndpoints({
       invalidatesTags: [{ type: "Voucher", id: "LIST" }],
     }),
 
-    // ✅ Update voucher
+    // Update voucher
     updateVoucher: builder.mutation({
       query: ({ id, formData }) => ({
         url: `/vouchers/${id}`,
@@ -112,7 +112,7 @@ export const voucherApi = baseApi.injectEndpoints({
       ],
     }),
 
-    // ✅ Admin: Approve voucher
+    // Admin: Approve voucher
     approveVoucher: builder.mutation({
       query: (id) => ({
         url: `/admin/vouchers/${id}/approve`,
@@ -124,7 +124,7 @@ export const voucherApi = baseApi.injectEndpoints({
       ],
     }),
 
-    // ✅ Admin: Reject voucher
+    //  Admin: Reject voucher
     rejectVoucher: builder.mutation({
       query: (id) => ({
         url: `/admin/vouchers/${id}/reject`,
@@ -136,7 +136,7 @@ export const voucherApi = baseApi.injectEndpoints({
       ],
     }),
 
-    // ✅ Delete voucher (if needed)
+    // Delete voucher (if needed)
     deleteVoucher: builder.mutation({
       query: (id) => ({
         url: `/vouchers/${id}`,
