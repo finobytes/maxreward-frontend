@@ -84,7 +84,7 @@ const VoucherManage = () => {
   return (
     <div>
       <PageBreadcrumb
-        items={[{ label: "Home", to: "/" }, { label: "Voucher Management" }]}
+        items={[{ label: "Home", to: "/" }, { label: "Voucher Purchase" }]}
       />
 
       <div className="relative overflow-hidden rounded-xl border bg-white p-4 shadow-sm">
