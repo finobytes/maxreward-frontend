@@ -64,6 +64,23 @@ const VoucherManage = () => {
     }
   };
 
+  const toggleSelectAll = (checked) => {
+    if (checked) {
+      setSelected(vouchers?.map((v) => v.id));
+    } else {
+      setSelected([]);
+    }
+  };
+  const toggleSelect = (id) => {
+    setSelected((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+  // Bulk actions (placeholder)
+  const bulkUpdateStatus = (newStatus) => {
+    toast.warning(`Bulk update to ${newStatus} (not implemented yet)`);
+  };
+
   return (
     <div>
       <PageBreadcrumb
@@ -120,14 +137,34 @@ const VoucherManage = () => {
             />
 
             <button
-              onClick={() => dispatch(resetFilters())}
+              onClick={() => {
+                dispatch(resetFilters());
+                setSelected([]);
+              }}
               className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 text-sm"
             >
               Clear Filters
             </button>
           </div>
         </div>
-
+        {/* Bulk Actions */}
+        {selected.length > 0 && (
+          <BulkActionBar
+            selectedCount={selected.length}
+            actions={[
+              {
+                label: "Approve",
+                variant: "success",
+                onClick: () => bulkUpdateStatus("approve"),
+              },
+              {
+                label: "Reject",
+                variant: "danger",
+                onClick: () => bulkUpdateStatus("reject"),
+              },
+            ]}
+          />
+        )}
         {/* Table */}
         <div className="overflow-x-auto custom-scrollbar">
           {isLoading ? (
@@ -142,11 +179,25 @@ const VoucherManage = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>#</TableHead>
-                  <TableHead>Type</TableHead>
+                  <TableHead>
+                    <input
+                      type="checkbox"
+                      checked={
+                        vouchers?.length > 0 &&
+                        selected.length === vouchers?.length
+                      }
+                      onChange={(e) => toggleSelectAll(e.target.checked)}
+                      className="w-4 h-4 rounded"
+                    />
+                  </TableHead>
+                  <TableHead>Voucher ID</TableHead>
+                  <TableHead>Voucher Type</TableHead>
                   <TableHead>Purchased By</TableHead>
                   <TableHead>Denomination</TableHead>
-                  <TableHead>Payment</TableHead>
+                  <TableHead>Quantity</TableHead>
+                  <TableHead>Total Points</TableHead>
+                  <TableHead>Purchase Date</TableHead>
+                  <TableHead>Payment Method</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
@@ -154,11 +205,28 @@ const VoucherManage = () => {
 
               <TableBody>
                 {vouchers.map((v) => (
-                  <TableRow key={v.id}>
+                  <TableRow key={v.id} className="hover:bg-gray-50 transition">
+                    <TableCell>
+                      <input
+                        type="checkbox"
+                        checked={selected.includes(v.id)}
+                        onChange={() => toggleSelect(v.id)}
+                        className="w-4 h-4 rounded"
+                      />
+                    </TableCell>
                     <TableCell>{v.id}</TableCell>
-                    <TableCell>{v.voucher_type}</TableCell>
-                    <TableCell>{v.member?.name || "N/A"}</TableCell>
-                    <TableCell>{v?.denomination?.title || "-"}</TableCell>
+                    <TableCell>
+                      <StatusBadge status={v.voucher_type}>
+                        {v.voucher_type} voucher
+                      </StatusBadge>
+                    </TableCell>
+                    <TableCell>{v?.purchase_by || "N/A"}</TableCell>
+                    <TableCell>{v?.denomination?.title}</TableCell>
+                    <TableCell>{v.quantity}</TableCell>
+                    <TableCell>RM {v.total_amount}</TableCell>
+                    <TableCell>
+                      {new Date(v.created_at).toLocaleDateString()}
+                    </TableCell>
                     <TableCell>{v.payment_method}</TableCell>
                     <TableCell>
                       <StatusBadge status={v.status}>{v.status}</StatusBadge>
