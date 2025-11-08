@@ -87,13 +87,7 @@ const VoucherManage = () => {
         items={[{ label: "Home", to: "/" }, { label: "Voucher Purchase" }]}
       />
 
-      <div className="relative overflow-hidden rounded-xl border bg-white p-4 shadow-sm">
-        {isFetching && !isLoading && (
-          <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex justify-center items-center z-10">
-            <Loader className="w-6 h-6 animate-spin" />
-          </div>
-        )}
-
+      <div className="rounded-xl border bg-white p-4 shadow-sm">
         {/* Filters */}
         <div className="flex flex-col md:flex-row justify-between gap-4 mb-4">
           <SearchInput
@@ -166,45 +160,53 @@ const VoucherManage = () => {
           />
         )}
         {/* Table */}
-        <div className="overflow-x-auto custom-scrollbar">
-          {isLoading ? (
-            <MerchantStaffSkeleton rows={8} cols={9} />
-          ) : isError ? (
-            <div className="p-6 text-center text-red-500">Failed to load</div>
-          ) : vouchers.length === 0 ? (
-            <div className="p-6 text-center text-gray-500">
-              No vouchers found
+        <div className="relative overflow-x-auto custom-scrollbar">
+          {/* Overlay spinner when fetching new data */}
+          {isFetching && !isLoading && (
+            <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-sm flex items-center justify-center rounded-xl">
+              <Loader className="w-6 h-6 animate-spin text-gray-500" />
             </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>
-                    <input
-                      type="checkbox"
-                      checked={
-                        vouchers?.length > 0 &&
-                        selected.length === vouchers?.length
-                      }
-                      onChange={(e) => toggleSelectAll(e.target.checked)}
-                      className="w-4 h-4 rounded"
-                    />
-                  </TableHead>
-                  <TableHead>Voucher ID</TableHead>
-                  <TableHead>Voucher Type</TableHead>
-                  <TableHead>Purchased By</TableHead>
-                  <TableHead>Denomination</TableHead>
-                  <TableHead>Quantity</TableHead>
-                  <TableHead>Total Points</TableHead>
-                  <TableHead>Purchase Date</TableHead>
-                  <TableHead>Payment Method</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
+          )}
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>
+                  <input
+                    type="checkbox"
+                    checked={
+                      vouchers?.length > 0 &&
+                      selected.length === vouchers?.length
+                    }
+                    onChange={(e) => toggleSelectAll(e.target.checked)}
+                    className="w-4 h-4 rounded"
+                  />
+                </TableHead>
+                <TableHead>Voucher ID</TableHead>
+                <TableHead>Voucher Type</TableHead>
+                <TableHead>Purchased By</TableHead>
+                <TableHead>Denomination</TableHead>
+                <TableHead>Quantity</TableHead>
+                <TableHead>Total Points</TableHead>
+                <TableHead>Purchase Date</TableHead>
+                <TableHead>Payment Method</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
 
-              <TableBody>
-                {vouchers.map((v) => (
+            <TableBody>
+              {isLoading ? (
+                <MerchantStaffSkeleton rows={8} cols={9} />
+              ) : isError ? (
+                <div className="p-6 text-center text-red-500">
+                  Failed to load
+                </div>
+              ) : vouchers.length === 0 ? (
+                <div className="p-6 text-center text-gray-500">
+                  No vouchers found
+                </div>
+              ) : (
+                vouchers.map((v) => (
                   <TableRow key={v.id} className="hover:bg-gray-50 transition">
                     <TableCell>
                       <input
@@ -261,11 +263,10 @@ const VoucherManage = () => {
                       </Link>
                     </TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-
+                ))
+              )}
+            </TableBody>
+          </Table>
           <Pagination
             currentPage={meta.current_page}
             totalPages={meta.last_page}

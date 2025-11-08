@@ -5,7 +5,7 @@ const VoucherDetailsSkeleton = () => {
     <div className="animate-pulse space-y-6">
       {/* Voucher Overview Skeleton */}
       <div className="bg-white shadow-md border border-gray-100 rounded-2xl overflow-hidden">
-        <div className="bg-gradient-to-r from-indigo-300 to-purple-300 p-5 h-24"></div>
+        <div className="bg-gradient-to-r from-orange-300 to-purple-300 p-5 h-24"></div>
         <div className="p-6 space-y-4">
           <SkeletonRow />
           <SkeletonRow />
