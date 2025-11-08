@@ -21,7 +21,7 @@ export const useVoucherForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // 🧠 Correct slice selector
+  // Correct slice selector
   const state = useSelector((s) => s.voucherForm);
 
   // Queries
@@ -31,7 +31,7 @@ export const useVoucherForm = () => {
     useGetCurrentSettingsQuery();
   const [createVoucher, { isLoading: creating }] = useCreateVoucherMutation();
 
-  // ✅ Load settings safely (no dispatch during render)
+  // Load settings safely (no dispatch during render)
   useEffect(() => {
     if (settingsData && !state.settings) {
       dispatch(setSettings(settingsData.setting_attribute));
@@ -42,7 +42,7 @@ export const useVoucherForm = () => {
   // Derived
   const denominations = denomData?.data?.denominations || [];
 
-  // ✅ Create Voucher with FormData
+  // Create Voucher with FormData
   const handleCreateVoucher = async () => {
     try {
       const formData = new FormData();

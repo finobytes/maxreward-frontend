@@ -45,6 +45,7 @@ import profilePlaceholder from "./images/user/profile-placeholder.png";
 import nidPlaceholder from "./images/user/nid.jpg";
 import companyLogoPlaceholder from "./images/company-logo-placeholder.jpg";
 import paymentProofPlaceholder from "./images/payment-proof.png";
+import userCardCenterLogo from "./images/user-card-center-logo.png";
 
 export {
   loginBanner,
@@ -94,4 +95,5 @@ export {
   nidPlaceholder,
   companyLogoPlaceholder,
   paymentProofPlaceholder,
+  userCardCenterLogo,
 };
