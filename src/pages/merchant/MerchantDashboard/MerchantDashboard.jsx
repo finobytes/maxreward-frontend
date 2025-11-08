@@ -1,10 +1,26 @@
 import React from "react";
-import { bag, card, clock, dollar, users } from "../../../assets/assets";
+import { bag, clock, dollar, users } from "../../../assets/assets";
 import DashboardCard from "./components/DashboardCard";
 import RealTimeTransactions from "./components/RealTimeTransactions";
 import PurchasedVsRedeemed from "./components/PurchasedVsRedeemed";
+import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
+import MembershipCard from "../../../components/common/MembershipCard";
+import MemberDashboardSkeleton from "../../../components/skeleton/MemberDashboardSkeleton";
 
 const MerchantDashboard = () => {
+  const { data, isLoading, isFetching, isError } = useVerifyMeQuery("merchant");
+
+  // Show skeleton while loading
+  if (isLoading || isFetching) return <MemberDashboardSkeleton />;
+
+  if (isError || !data) {
+    return (
+      <div className="p-6 text-center text-red-500 font-medium">
+        Failed to load dashboard data.
+      </div>
+    );
+  }
+  console.log("data", data);
   const cardsData = [
     {
       icon: users,
@@ -52,9 +68,7 @@ const MerchantDashboard = () => {
     <div>
       <h1 className="text-xl font-semibold text-gray-600 pb-4">Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <img src={card} />
-        </div>
+        <MembershipCard data={data} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {cardsData.map((card, index) => (
             <DashboardCard key={index} {...card} />

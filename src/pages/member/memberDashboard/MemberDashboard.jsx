@@ -1,11 +1,9 @@
 import React from "react";
 import {
-  card,
   dollar,
   hand,
   purchase,
   star,
-  userCardCenterLogo,
   userCommunity,
   users,
 } from "../../../assets/assets";
@@ -13,6 +11,7 @@ import DashboardCard from "./components/DashboardCard";
 import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
 import { Star } from "lucide-react";
 import MemberDashboardSkeleton from "../../../components/skeleton/MemberDashboardSkeleton";
+import MembershipCard from "../../../components/common/MembershipCard";
 
 const MemberDashboard = () => {
   const { data, isLoading, isFetching, isError } = useVerifyMeQuery();
@@ -109,25 +108,7 @@ const MemberDashboard = () => {
       <h1 className="text-xl font-semibold text-gray-600 pb-4">Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          {/* <img
-            src={card}
-            alt="Membership Card"
-            className="rounded-xl w-full shadow-lg"
-          /> */}
-          <div className="w-full aspect-[16/9] bg-[#735DFFB2] rounded-xl shadow-lg flex flex-col justify-between py-6 xl:max-w-max">
-            <h2 className="text-xl sm:text-3xl md:text-4xl font-bold text-center text-white leading-tight px-3">
-              SEVEN ELEVEN <span className="text-brand-500">MAX REWARD</span>
-            </h2>
-            <div className="flex flex-col justify-center items-center py-3">
-              <img src={userCardCenterLogo} />
-            </div>
-            <div className="bg-white flex justify-between items-center px-4 py-2 text-brand-500 font-bold text-lg sm:text-xl md:text-2xl">
-              <span className="truncate max-w-[50%]">{data?.phone}</span>
-              <span className="truncate text-right max-w-[45%]">
-                {data?.name}
-              </span>
-            </div>
-          </div>
+          <MembershipCard data={data} />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
