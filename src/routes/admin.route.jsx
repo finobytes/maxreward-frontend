@@ -29,6 +29,7 @@ import Notification from "../pages/admin/Notification/Notification";
 import NotificationDetails from "../pages/admin/Notification/NotificationDetails";
 import VoucherManage from "../pages/admin/VoucherManage/VoucherManage";
 import WhatsAppLog from "../pages/admin/reports/WhatsAppLog";
+import VoucherDetails from "../pages/admin/VoucherManage/VoucherDetails";
 
 export const adminRoutes = [
   {
@@ -94,6 +95,10 @@ export const adminRoutes = [
   {
     path: "voucher-manage",
     element: <VoucherManage />,
+  },
+  {
+    path: "vouchers/:id",
+    element: <VoucherDetails />,
   },
   {
     path: "accounts/income",

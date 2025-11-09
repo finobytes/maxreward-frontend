@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  card,
   dollar,
   hand,
   purchase,
@@ -12,6 +11,7 @@ import DashboardCard from "./components/DashboardCard";
 import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
 import { Star } from "lucide-react";
 import MemberDashboardSkeleton from "../../../components/skeleton/MemberDashboardSkeleton";
+import MembershipCard from "../../../components/common/MembershipCard";
 
 const MemberDashboard = () => {
   const { data, isLoading, isFetching, isError } = useVerifyMeQuery();
@@ -26,7 +26,7 @@ const MemberDashboard = () => {
       </div>
     );
   }
-
+  console.log("data", data);
   const wallet = data?.wallet || {};
   const unlockedLevel = wallet.unlocked_level || 0;
 
@@ -108,14 +108,10 @@ const MemberDashboard = () => {
       <h1 className="text-xl font-semibold text-gray-600 pb-4">Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <img
-            src={card}
-            alt="Membership Card"
-            className="rounded-xl w-full shadow-lg"
-          />
+          <MembershipCard data={data} />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4">
           {cardsData.map((card, index) => (
             <DashboardCard key={index} {...card} />
           ))}

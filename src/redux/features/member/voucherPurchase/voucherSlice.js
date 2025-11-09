@@ -1,81 +1,55 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  denominationId: null,
-  denominationValue: 0, // e.g. 10, 20, etc.
-  quantity: 1,
-  paymentMethod: "manual", // or "online"
-  voucherType: "max", // e.g. max, reward, etc.
-  manualPaymentDocs: "",
-  totalAmount: 0,
-  memberId: null,
-  settings: null, // rm_points etc.
+  search: "",
+  page: 1,
+  member_id: "",
+  payment_method: "",
+  voucher_type: "",
+  status: "all",
 };
 
 const voucherSlice = createSlice({
-  name: "voucher",
+  name: "voucherManagement",
   initialState,
   reducers: {
-    setVoucherData: (state, action) => {
-      Object.assign(state, action.payload);
+    setSearch(state, action) {
+      state.search = action.payload;
+      state.page = 1;
     },
-
-    setDenomination: (state, action) => {
-      state.denominationId = action.payload.id;
-      state.denominationValue = Number(action.payload.value);
-      voucherSlice.caseReducers.calculateTotal(state);
+    setPage(state, action) {
+      state.page = action.payload;
     },
-
-    setQuantity: (state, action) => {
-      state.quantity = action.payload;
-      voucherSlice.caseReducers.calculateTotal(state);
+    setMemberId(state, action) {
+      state.member_id = action.payload;
+      state.page = 1;
     },
-
-    setPaymentMethod: (state, action) => {
-      state.paymentMethod = action.payload;
+    setPaymentMethod(state, action) {
+      state.payment_method = action.payload;
+      state.page = 1;
     },
-
-    setManualDocs: (state, action) => {
-      state.manualPaymentDocs = action.payload;
+    setVoucherType(state, action) {
+      state.voucher_type = action.payload;
+      state.page = 1;
     },
-
-    setSettings: (state, action) => {
-      state.settings = action.payload;
-      voucherSlice.caseReducers.calculateTotal(state);
+    setStatus(state, action) {
+      state.status = action.payload;
+      state.page = 1;
     },
-
-    setVoucherType: (state, action) => {
-      state.voucherType = action.payload;
+    resetFilters() {
+      return initialState;
     },
-
-    setMemberId: (state, action) => {
-      state.memberId = action.payload;
-    },
-
-    // 🧮 Derived calculation
-    calculateTotal: (state) => {
-      if (!state.settings) return;
-      const rmPoints = Number(state.settings.rm_points || 1);
-      const denom = Number(state.denominationValue || 0);
-      const qty = Number(state.quantity || 1);
-      state.totalAmount = denom * rmPoints * qty;
-    },
-
-    resetVoucher: () => initialState,
   },
 });
 
 export const {
-  setVoucherData,
-  setDenomination,
-  setQuantity,
-  setPaymentMethod,
-  setManualDocs,
-  setSettings,
-  setVoucherType,
+  setSearch,
+  setPage,
   setMemberId,
-  calculateTotal,
-  resetVoucher,
+  setPaymentMethod,
+  setVoucherType,
+  setStatus,
+  resetFilters,
 } = voucherSlice.actions;
 
 export default voucherSlice.reducer;

@@ -12,13 +12,13 @@ import PrimaryButton from "../../../components/ui/PrimaryButton";
 import Label from "../../../components/form/Label";
 import Input from "../../../components/form/input/InputField";
 import Dropzone from "../../../components/form/form-elements/Dropzone";
-import { useVoucher } from "./../../../redux/features/member/voucherPurchase/useVoucher";
 import VoucherFromSkeleton from "../../../components/skeleton/VoucherFromSkeleton";
 import { paymentProofPlaceholder } from "../../../assets/assets";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
+import { useVoucherForm } from "../../../redux/features/member/voucherPurchase/useVoucherForm";
 
 // Zod Schema for validation
 const voucherSchema = z.object({
@@ -59,7 +59,7 @@ const VoucherForm = () => {
     creating,
     handleCreateVoucher,
     denominationId,
-  } = useVoucher();
+  } = useVoucherForm();
 
   // React Hook Form Setup
   const {
@@ -72,7 +72,7 @@ const VoucherForm = () => {
     resolver: zodResolver(voucherSchema),
     defaultValues: {
       denominationId: denominationId || "",
-      paymentMethod: paymentMethod || "",
+      paymentMethod: paymentMethod || "manual",
       voucherType: "",
       manualDocs: null,
     },

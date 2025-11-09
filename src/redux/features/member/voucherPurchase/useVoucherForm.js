@@ -1,10 +1,11 @@
-// src/hooks/useVoucher.js
+// src/redux/features/member/voucherPurchase/useVoucherForm.js
 import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router";
 import { useGetAllDenominationsQuery } from "../../admin/denomination/denominationApi";
 import { useGetCurrentSettingsQuery } from "../../admin/settings/settingsApi";
 import { useCreateVoucherMutation } from "./voucherApi";
-import { useNavigate } from "react-router";
 import {
   setDenomination,
   setQuantity,
@@ -14,39 +15,50 @@ import {
   setVoucherType,
   calculateTotal,
   resetVoucher,
-} from "./voucherSlice";
+} from "./voucherFormSlice";
 
-export const useVoucher = () => {
-  const navigate = useNavigate();
+export const useVoucherForm = () => {
   const dispatch = useDispatch();
-  const state = useSelector((s) => s.voucher);
+  const navigate = useNavigate();
+
+  // Correct slice selector
+  const state = useSelector((s) => s.voucherForm);
+
+  // Queries
   const { data: denomData, isLoading: denomLoading } =
     useGetAllDenominationsQuery();
   const { data: settingsData, isLoading: settingsLoading } =
     useGetCurrentSettingsQuery();
   const [createVoucher, { isLoading: creating }] = useCreateVoucherMutation();
 
-  // Load settings when available
-  if (settingsData && !state.settings) {
-    dispatch(setSettings(settingsData.setting_attribute));
-    dispatch(calculateTotal());
-  }
+  // Load settings safely (no dispatch during render)
+  useEffect(() => {
+    if (settingsData && !state.settings) {
+      dispatch(setSettings(settingsData.setting_attribute));
+      dispatch(calculateTotal());
+    }
+  }, [settingsData, state.settings, dispatch]);
 
+  // Derived
   const denominations = denomData?.data?.denominations || [];
 
+  // Create Voucher with FormData
   const handleCreateVoucher = async () => {
     try {
-      const body = {
-        member_id: state.memberId || 1, // ideally from auth
-        voucher_type: state.voucherType,
-        denomination_id: state.denominationId,
-        quantity: state.quantity,
-        payment_method: state.paymentMethod.toLowerCase(),
-        total_amount: state.totalAmount,
-        manual_payment_docs: state.manualPaymentDocs || "",
-      };
+      const formData = new FormData();
+      formData.append("member_id", state.memberId || 1);
+      formData.append("voucher_type", state.voucherType);
+      formData.append("denomination_id", state.denominationId);
+      formData.append("quantity", state.quantity);
+      formData.append("payment_method", state.paymentMethod.toLowerCase());
+      formData.append("total_amount", state.totalAmount);
 
-      const res = await createVoucher(body).unwrap();
+      if (state.paymentMethod === "manual" && state.manualPaymentDocs) {
+        formData.append("manual_payment_docs", state.manualPaymentDocs);
+      }
+
+      const res = await createVoucher(formData).unwrap();
+
       if (res?.success) {
         toast.success(res.message || "Voucher created successfully!");
         dispatch(resetVoucher());

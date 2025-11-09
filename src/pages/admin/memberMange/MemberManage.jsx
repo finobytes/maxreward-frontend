@@ -28,6 +28,7 @@ import {
 import { toast } from "sonner";
 import BulkActionBar from "../../../components/table/BulkActionBar";
 import { memberQR } from "../../../assets/assets";
+import { useUpdateStatusMutation } from "../../../redux/features/admin/memberManagement/memberManagementApi";
 
 const useDebounced = (value, delay = 400) => {
   const [v, setV] = useState(value);
@@ -40,6 +41,8 @@ const useDebounced = (value, delay = 400) => {
 
 const MemberManage = () => {
   const [selected, setSelected] = useState([]);
+  const [updatingId, setUpdatingId] = useState(null);
+
   const dispatch = useDispatch();
   const { search, status, page, perPage, memberType } = useSelector(
     (s) => s.memberManagement
@@ -53,6 +56,7 @@ const MemberManage = () => {
   }, [debouncedSearch, dispatch]);
 
   const { members, meta, isLoading, isFetching, isError } = useMembers();
+  const [updateStatus, { isLoading: isUpdating }] = useUpdateStatusMutation();
 
   const handlePageChange = (p) => dispatch(setPage(p));
   const handlePerPageChange = (n) => dispatch(setPerPage(n));
@@ -77,6 +81,21 @@ const MemberManage = () => {
 
   const bulkDelete = () => {
     toast("Bulk delete (not implemented yet)");
+  };
+
+  const handleStatusChange = async (id, newStatus) => {
+    try {
+      setUpdatingId(id);
+
+      const formData = { status: newStatus };
+      const res = await updateStatus({ id, formData }).unwrap();
+
+      toast.success(`Member status updated to ${newStatus}`);
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to update member status");
+    } finally {
+      setUpdatingId(null);
+    }
   };
 
   return (
@@ -131,7 +150,7 @@ const MemberManage = () => {
               onClick={() => {
                 dispatch(resetFilters());
                 setLocalSearch("");
-                setSelected("");
+                setSelected([]);
               }}
             >
               Clear
@@ -251,11 +270,20 @@ const MemberManage = () => {
                         >
                           <PencilLine size={16} />
                         </Link>
-                        <button className="px-2 rounded-md bg-red-100 text-red-700 hover:bg-red-200 ">
-                          Block
+                        <button
+                          onClick={() => handleStatusChange(m.id, "blocked")}
+                          disabled={updatingId === m.id}
+                          className="px-2 rounded-md bg-red-100 text-red-700 hover:bg-red-200 disabled:opacity-50"
+                        >
+                          {updatingId === m.id ? "Updating..." : "Block"}
                         </button>
-                        <button className="px-2 rounded-md bg-yellow-100 text-gray-700 hover:bg-yellow-200">
-                          Suspend
+
+                        <button
+                          onClick={() => handleStatusChange(m.id, "suspended")}
+                          disabled={updatingId === m.id}
+                          className="px-2 rounded-md bg-yellow-100 text-gray-700 hover:bg-yellow-200 disabled:opacity-50"
+                        >
+                          {updatingId === m.id ? "Updating..." : "Suspend"}
                         </button>
                       </div>
                     </TableCell>
