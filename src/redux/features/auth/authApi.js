@@ -40,6 +40,7 @@ export const authApi = baseApi.injectEndpoints({
         };
       },
       providesTags: ["Member", "Merchant", "Admin"],
+      keepUnusedDataFor: 0,
     }),
 
     refreshToken: builder.mutation({
