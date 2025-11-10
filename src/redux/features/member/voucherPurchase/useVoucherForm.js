@@ -15,7 +15,9 @@ import {
   setVoucherType,
   calculateTotal,
   resetVoucher,
+  setMemberId,
 } from "./voucherFormSlice";
+import { useVerifyMeQuery } from "../../auth/authApi";
 
 export const useVoucherForm = () => {
   const dispatch = useDispatch();
@@ -24,12 +26,23 @@ export const useVoucherForm = () => {
   // Correct slice selector
   const state = useSelector((s) => s.voucherForm);
 
+  // Get logged-in member info
+  const { data: verifyData, isLoading: verifying } = useVerifyMeQuery();
+  console.log(verifyData?.id);
   // Queries
   const { data: denomData, isLoading: denomLoading } =
     useGetAllDenominationsQuery();
   const { data: settingsData, isLoading: settingsLoading } =
     useGetCurrentSettingsQuery();
   const [createVoucher, { isLoading: creating }] = useCreateVoucherMutation();
+
+  // Set memberId when verifyMe data available
+  useEffect(() => {
+    const memberId = verifyData?.id;
+    if (memberId && memberId !== state.memberId) {
+      dispatch(setMemberId(memberId));
+    }
+  }, [verifyData, state.memberId, dispatch]);
 
   // Load settings safely (no dispatch during render)
   useEffect(() => {
@@ -46,7 +59,7 @@ export const useVoucherForm = () => {
   const handleCreateVoucher = async () => {
     try {
       const formData = new FormData();
-      formData.append("member_id", state.memberId || 1);
+      formData.append("member_id", state.memberId || verifyData?.data?.id);
       formData.append("voucher_type", state.voucherType);
       formData.append("denomination_id", state.denominationId);
       formData.append("quantity", state.quantity);
@@ -77,6 +90,7 @@ export const useVoucherForm = () => {
     denominations,
     denomLoading,
     settingsLoading,
+    verifying,
     creating,
     setDenomination: (denom) => dispatch(setDenomination(denom)),
     setQuantity: (qty) => dispatch(setQuantity(qty)),
