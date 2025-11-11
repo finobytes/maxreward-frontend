@@ -306,11 +306,23 @@ const VoucherForm = () => {
               </div>
             )}
           </div>
+          <div className="mt-8 flex gap-4">
+            <PrimaryButton type="submit" disabled={creating}>
+              {creating ? "Processing..." : "Submit"}
+            </PrimaryButton>
+            <PrimaryButton
+              variant="secondary"
+              type="button"
+              to="/member/referred-member"
+            >
+              Back
+            </PrimaryButton>
+          </div>
         </ComponentCard>
 
         {/* Buttons */}
-        <div className="mt-8">
-          <ComponentCard title="Referral Information">
+        {/* <div className="mt-8">
+          <ComponentCard>
             <div className="mt-8 flex gap-4">
               <PrimaryButton type="submit" disabled={creating}>
                 {creating ? "Processing..." : "Submit"}
@@ -324,7 +336,7 @@ const VoucherForm = () => {
               </PrimaryButton>
             </div>
           </ComponentCard>
-        </div>
+        </div> */}
       </form>
     </div>
   );
