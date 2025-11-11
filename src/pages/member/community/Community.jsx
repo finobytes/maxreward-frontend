@@ -70,7 +70,7 @@ const Community = () => {
   if (isError) return <ErrorMessage onRetry={refetch} />;
   return (
     <div className="p-6">
-      <h2 className="text-xl font-semibold mb-4">Member Tree</h2>
+      <h2 className="text-xl font-semibold mb-4">My Community</h2>
 
       {/* Responsive Scrollable Container */}
       <div
