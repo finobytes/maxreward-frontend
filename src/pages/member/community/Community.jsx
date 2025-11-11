@@ -1,70 +1,73 @@
 import React, { useEffect, useRef } from "react";
 import ApexTree from "apextree";
-import { convertToApexTreeFormat } from "../../../utils/convertTreeData";
 import { tree } from "../../../constant/tree";
+import { convertToApexTreeFormat } from "../../../utils/convertTreeData";
 
 const Community = () => {
   const treeContainerRef = useRef(null);
 
   useEffect(() => {
-    if (!treeContainerRef.current) return;
-
-    // 🔹 তোমার API data কে ApexTree ফরম্যাটে কনভার্ট করো
     const treeData = convertToApexTreeFormat(tree);
     if (!treeData) return;
 
-    // 🔹 ApexTree Options
+    const container = treeContainerRef.current;
+    if (!container) return;
+
+    const containerWidth = container.offsetWidth;
+
     const options = {
       contentKey: "data",
-      width: 1000,
-      height: 700,
+      width: containerWidth, // ✅ Make width dynamic
+      height: 800, // you can also use container.offsetHeight if needed
       nodeWidth: 170,
       nodeHeight: 110,
-      fontColor: "#fff",
-      borderColor: "#333",
       childrenSpacing: 60,
       siblingSpacing: 30,
-      direction: "top",
       enableExpandCollapse: true,
       enableToolbar: true,
-      canvasStyle:
-        "border:1px solid #ddd;background:#f6f6f6;border-radius:10px;",
+      direction: "top",
+      canvasStyle: "background:#ffffff;", // ✅ white background
 
       nodeTemplate: (content) => `
-        <div style='display:flex;flex-direction:column;align-items:center;gap:8px;justify-content:center;height:100%;'>
-          <img 
-            src='${content.imageURL}' 
-            alt='${content.name}' 
-            style='width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid white;' 
+        <div style='display:flex;flex-direction:column;align-items:center;gap:6px;padding:4px;'>
+          <img src='${content.imageURL}'
+            style='width:45px;height:45px;border-radius:50%;border:2px solid white;'
           />
-          <div style='font-weight:bold;font-family:Arial;font-size:13px;text-align:center;'>${content.name}</div>
-          <div style='font-size:12px;opacity:0.8;'>${content.username}</div>
+          <div style='font-weight:bold;font-size:13px;'>${content.name}</div>
+          <div style='font-size:11px;opacity:0.7;'>${content.username}</div>
         </div>
       `,
     };
 
-    // 🔹 Initialize ApexTree
-    const treeInstance = new ApexTree(treeContainerRef.current, options);
-    treeInstance.render(treeData);
+    const instance = new ApexTree(container, options);
+    instance.render(treeData);
 
-    // 🔹 Cleanup on unmount
+    // ✅ Re-render on window resize (fully responsive)
+    const handleResize = () => {
+      instance.update({ width: container.offsetWidth });
+    };
+    window.addEventListener("resize", handleResize);
+
     return () => {
-      if (treeInstance && treeInstance.destroy) treeInstance.destroy();
+      window.removeEventListener("resize", handleResize);
+      instance.destroy?.();
     };
   }, []);
 
   return (
     <div className="p-6">
       <h2 className="text-xl font-semibold mb-4">Member Tree</h2>
+
+      {/* ✅ Responsive Scrollable Container */}
       <div
         ref={treeContainerRef}
-        id="svg-tree"
         style={{
           width: "100%",
-          height: "700px",
+          height: "80vh",
+          overflow: "auto", // scroll if content too wide
           border: "1px solid #ddd",
           borderRadius: "10px",
-          background: "#fafafa",
+          background: "#fff", // ✅ white background
         }}
       />
     </div>
