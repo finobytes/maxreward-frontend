@@ -20,8 +20,8 @@ const ProfileCard = ({ userInfo }) => {
   const walletInfo = userInfo?.wallet || {};
 
   // Star level logic (min 0, max 5)
-  const unlockedLevel = walletInfo.unlocked_level || 0;
-  const starCount = Math.min(unlockedLevel, 5);
+  const totalReferrals = walletInfo.total_referrals || 0;
+  const starCount = Math.min(totalReferrals, 5);
   const starLabel = starCount === 1 ? "1 Star" : `${starCount} Stars`;
 
   const renderStars = () => (

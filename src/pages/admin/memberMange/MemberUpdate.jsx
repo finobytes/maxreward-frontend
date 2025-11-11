@@ -205,7 +205,12 @@ const MemberUpdate = () => {
                 id="referralStatus"
                 label="Referral Status"
                 readOnly
-                value={isError ? "Invalid" : memberData?.status ?? ""}
+                value={
+                  isError
+                    ? "Invalid"
+                    : memberData?.sponsored_member_info?.sponsor_member
+                        ?.status ?? ""
+                }
               />
             </div>
 

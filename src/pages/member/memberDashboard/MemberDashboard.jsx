@@ -28,10 +28,10 @@ const MemberDashboard = () => {
   }
   console.log("data", data);
   const wallet = data?.wallet || {};
-  const unlockedLevel = wallet.unlocked_level || 0;
+  const totalReferrals = wallet.total_referrals || 0;
 
   // Limit stars between 0–5
-  const starCount = Math.min(unlockedLevel, 5);
+  const starCount = Math.min(totalReferrals, 5);
 
   // Text label (1 Star / 2 Stars / etc.)
   const starLabel = starCount === 1 ? "1 Star" : `${starCount} Stars`;
