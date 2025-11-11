@@ -1,67 +1,62 @@
 export function convertToApexTreeFormat(apiData) {
-  if (!apiData?.data?.root_member || !apiData?.data?.tree) return null;
+  if (!apiData?.data?.root_member || !apiData?.data?.tree_structure)
+    return null;
 
-  const root = apiData.data.root_member;
+  const rootMember = apiData.data.root_member;
+  const treeLevels = apiData.data.tree_structure;
 
-  const levelColors = [
-    "#ffafcc", // Level 1
-    "#cdb4db", // Level 2
-    "#ffc8dd", // Level 3
-    "#bde0fe", // Level 4
-    "#a2d2ff", // Level 5
-  ];
-
-  // 🧩 helper function to make nodes
-  const makeNode = (member, level = 0) => ({
+  const levelColors = ["#ffafcc", "#cdb4db", "#ffc8dd", "#bde0fe", "#a2d2ff"];
+  const DUMMY_IMAGE =
+    "https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250";
+  // Node builder
+  const makeNode = (member, level, position = null) => ({
     id: member.id.toString(),
     data: {
       name: member.name,
-      username: member.user_name,
-      phone: member.phone || "",
-      status: member.status || "active",
-      imageURL:
-        "https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250",
+      phone: member.phone || member.name,
+      imageURL: member.image || DUMMY_IMAGE,
+      position,
     },
     options: {
       nodeBGColor: levelColors[level % levelColors.length],
-      nodeBGColorHover: levelColors[level % levelColors.length],
     },
     children: [],
   });
 
-  // 🗂️ flatten tree levels
-  const levels = apiData.data.tree;
-  const nodesByLevel = {};
+  // Map of ID → Node
+  const nodeMap = {};
 
-  levels.forEach((level) => {
-    nodesByLevel[level.level] = level.members.map((m) =>
-      makeNode(m, level.level - 1)
-    );
+  // Create root node
+  const rootNode = makeNode(rootMember, 0);
+  nodeMap[rootMember.id] = rootNode;
+
+  // Fill node map and connect children
+  treeLevels.forEach((level, idx) => {
+    const currentLevel = idx + 1;
+
+    level.nodes.forEach((n) => {
+      const parent = n.parent
+        ? nodeMap[n.parent.id] || makeNode(n.parent, currentLevel - 1)
+        : null;
+      if (parent) nodeMap[n.parent.id] = parent;
+
+      if (n.left_child) {
+        const leftNode =
+          nodeMap[n.left_child.id] ||
+          makeNode(n.left_child, currentLevel, "left");
+        nodeMap[n.left_child.id] = leftNode;
+        parent.children.push(leftNode);
+      }
+
+      if (n.right_child) {
+        const rightNode =
+          nodeMap[n.right_child.id] ||
+          makeNode(n.right_child, currentLevel, "right");
+        nodeMap[n.right_child.id] = rightNode;
+        parent.children.push(rightNode);
+      }
+    });
   });
-
-  // 🌳 root node
-  const rootNode = makeNode(root, 0);
-
-  // 🔗 Build hierarchy dynamically (auto chain next level under previous)
-  Object.keys(nodesByLevel).forEach((lvl) => {
-    const currentLevel = parseInt(lvl);
-    const nextLevel = currentLevel + 1;
-
-    if (nodesByLevel[nextLevel]) {
-      // distribute children evenly (rough logic since real parent relation missing)
-      nodesByLevel[currentLevel].forEach((node, index) => {
-        const childrenPerParent = Math.floor(
-          nodesByLevel[nextLevel].length / nodesByLevel[currentLevel].length
-        );
-        const start = index * childrenPerParent;
-        const end = start + childrenPerParent;
-        node.children = nodesByLevel[nextLevel].slice(start, end);
-      });
-    }
-  });
-
-  // attach level 1 under root
-  rootNode.children = nodesByLevel[1] || [];
 
   return rootNode;
 }

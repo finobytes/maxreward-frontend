@@ -9,6 +9,7 @@ import { logout as logoutAction } from "../../redux/features/auth/authSlice";
 import { useLogoutMutation } from "../../redux/features/auth/authApi";
 import { toast } from "sonner";
 import { NAV_CONFIG } from "../../config/navConfig";
+import { baseApi } from "../../redux/api/baseApi";
 
 const othersItems = [];
 
@@ -31,6 +32,7 @@ const Sidebar = () => {
       // call backend logout endpoint
       const res = await logoutApi(user?.role).unwrap();
 
+      dispatch(baseApi.util.resetApiState());
       // clear local Redux state & localStorage
       dispatch(logoutAction());
       toast.success(res?.message || "Logged out successfully ");
@@ -39,6 +41,7 @@ const Sidebar = () => {
     } catch (error) {
       console.error("Logout failed:", error);
       toast.error("Logout failed ");
+      dispatch(baseApi.util.resetApiState());
       dispatch(logoutAction());
       navigate("/login");
     }

@@ -29,6 +29,7 @@ import { toast } from "sonner";
 import BulkActionBar from "../../../components/table/BulkActionBar";
 import { memberQR } from "../../../assets/assets";
 import { useUpdateStatusMutation } from "../../../redux/features/admin/memberManagement/memberManagementApi";
+import StatusBadge from "../../../components/table/StatusBadge";
 
 const useDebounced = (value, delay = 400) => {
   const [v, setV] = useState(value);
@@ -222,6 +223,7 @@ const MemberManage = () => {
                   <TableHead>Lifetime Purchase</TableHead>
                   <TableHead>Date Registered</TableHead>
                   <TableHead>QR</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead className="">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -255,6 +257,9 @@ const MemberManage = () => {
                         alt="QR Code"
                         className="w-12 h-12 object-contain"
                       />
+                    </TableCell>
+                    <TableCell>
+                      <StatusBadge status={m.status} />
                     </TableCell>
                     <TableCell className="whitespace-normal break-words">
                       <div className="flex gap-2">

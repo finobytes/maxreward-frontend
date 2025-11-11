@@ -222,7 +222,7 @@ const VoucherManage = () => {
                         {v.voucher_type} voucher
                       </StatusBadge>
                     </TableCell>
-                    <TableCell>{v?.purchase_by || "N/A"}</TableCell>
+                    <TableCell>{v?.member?.name || "N/A"}</TableCell>
                     <TableCell>{v?.denomination?.title}</TableCell>
                     <TableCell>{v.quantity}</TableCell>
                     <TableCell>RM {v.total_amount}</TableCell>

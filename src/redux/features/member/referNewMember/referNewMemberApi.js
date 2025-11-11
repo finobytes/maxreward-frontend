@@ -36,6 +36,19 @@ export const referNewMemberApi = baseApi.injectEndpoints({
       providesTags: ["Member"],
     }),
 
+    // 2️⃣ Get sponsored members (with backend pagination)
+    getSponsoredMembers: builder.query({
+      query: ({ page = 1, search = "", status = "" } = {}) => ({
+        url: `/member/sponsored-members?page=${page}`,
+        method: "GET",
+        params: {
+          search,
+          status,
+        },
+      }),
+      providesTags: ["Member"],
+    }),
+
     // 3️⃣ Get referral tree
     getReferralTree: builder.query({
       query: () => ({
@@ -50,5 +63,6 @@ export const referNewMemberApi = baseApi.injectEndpoints({
 export const {
   useReferNewMemberMutation,
   useGetReferredMembersQuery,
+  useGetSponsoredMembersQuery,
   useGetReferralTreeQuery,
 } = referNewMemberApi;

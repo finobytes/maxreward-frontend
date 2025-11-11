@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Link } from "react-router";
 import { useSidebar } from "../../context/SidebarContext";
@@ -29,7 +29,11 @@ const Header = () => {
   const { user, token } = useSelector((state) => state.auth);
   const role = user?.role || "member"; // admin | merchant | member
 
-  const { data, isLoading, error } = useVerifyMeQuery(role, { skip: !token });
+  const { data, isLoading, refetch } = useVerifyMeQuery(role, { skip: !token });
+
+  useEffect(() => {
+    if (token) refetch();
+  }, [token, refetch]);
 
   const userInfo = data ||
     user || {

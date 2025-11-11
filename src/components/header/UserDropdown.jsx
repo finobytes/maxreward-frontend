@@ -8,6 +8,7 @@ import { logout as logoutAction } from "../../redux/features/auth/authSlice";
 import { useLogoutMutation } from "../../redux/features/auth/authApi";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner.jsx";
+import { baseApi } from "../../redux/api/baseApi";
 
 export default function UserDropdown({ user, role }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,7 +21,7 @@ export default function UserDropdown({ user, role }) {
     try {
       // call backend logout endpoint
       const res = await logoutApi(role).unwrap();
-
+      dispatch(baseApi.util.resetApiState());
       // clear local Redux state & localStorage
       dispatch(logoutAction());
       toast.success(res?.message || "Logged out successfully ");
@@ -29,6 +30,7 @@ export default function UserDropdown({ user, role }) {
     } catch (error) {
       console.error("Logout failed:", error);
       toast.error("Logout failed ");
+      dispatch(baseApi.util.resetApiState());
       dispatch(logoutAction());
       navigate("/login");
     }
