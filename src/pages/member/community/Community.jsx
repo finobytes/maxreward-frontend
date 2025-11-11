@@ -28,7 +28,7 @@ const Community = () => {
       width: containerWidth, // Make width dynamic
       height: 800, // you can also use container.offsetHeight if needed
       nodeWidth: 170,
-      nodeHeight: 150,
+      nodeHeight: 110,
       childrenSpacing: 60,
       siblingSpacing: 30,
       enableExpandCollapse: true,
@@ -42,8 +42,11 @@ const Community = () => {
             style='width:45px;height:45px;border-radius:50%;border:2px solid white;'
           />
           <div style='font-weight:bold;font-size:13px;'>${content.name}</div>
-          <div style='font-size:11px;opacity:0.7;'>${content.username}</div>
-          <div style='font-size:11px;opacity:0.7;'>${content.position}</div>
+          <div style='font-size:11px;opacity:0.7;'>${content.phone} ${
+        content.position
+          ? `<span style='font-size:9px;'> (${content.position})</span>`
+          : ""
+      }</div>
         </div>
       `,
     };
@@ -69,7 +72,7 @@ const Community = () => {
     <div className="p-6">
       <h2 className="text-xl font-semibold mb-4">Member Tree</h2>
 
-      {/* ✅ Responsive Scrollable Container */}
+      {/* Responsive Scrollable Container */}
       <div
         ref={treeContainerRef}
         style={{
@@ -78,7 +81,7 @@ const Community = () => {
           overflow: "auto", // scroll if content too wide
           border: "1px solid #ddd",
           borderRadius: "10px",
-          background: "#fff", // ✅ white background
+          background: "#fff", // white background
         }}
       />
     </div>
