@@ -10,6 +10,7 @@ import voucherReducer from "./features/member/voucherPurchase/voucherSlice";
 import referNewMemberReducer from "./features/member/referNewMember/referNewMemberSlice";
 import voucherManagementReducer from "./features/member/voucherPurchase/voucherSlice";
 import voucherFormReducer from "./features/member/voucherPurchase/voucherFormSlice";
+import shopWithMerchantReducer from "./features/member/shopWithMerchant/shopWithMerchantSlice";
 import { baseApi } from "./api/baseApi";
 
 export const store = configureStore({
@@ -25,6 +26,7 @@ export const store = configureStore({
     referNewMember: referNewMemberReducer,
     voucherManagement: voucherManagementReducer,
     voucherForm: voucherFormReducer,
+    shopWithMerchant: shopWithMerchantReducer,
     [baseApi.reducerPath]: baseApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>

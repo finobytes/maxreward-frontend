@@ -1,39 +1,55 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
-import { useForm } from "react-hook-form";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
-import PrimaryButton from "./../../../components/ui/PrimaryButton";
+import PrimaryButton from "../../../components/ui/PrimaryButton";
 import Label from "../../../components/form/Label";
 import Input from "../../../components/form/input/InputField";
-import { ArrowRight } from "lucide-react";
-import ComponentCard from "./../../../components/common/ComponentCard";
-import { toast } from "sonner";
-import { useCheckMemberRedeemAmountMutation } from "../../../redux/features/member/shopWithMerchant/shopWihtMerchantApi";
+import ComponentCard from "../../../components/common/ComponentCard";
+import { useShopWithMerchant } from "../../../redux/features/member/shopWithMerchant/useShopWithMerchant";
 
 const RedeemWithMerchant = () => {
-  const [verified, setVerified] = useState(false);
-  const [transactionAmount, setTransactionAmount] = useState("");
-
+  const [fieldErrors, setFieldErrors] = useState({});
   const location = useLocation();
   const navigate = useNavigate();
-  const merchant = location.state?.merchant;
-
-  const [checkRedeemAmount, { isLoading }] =
-    useCheckMemberRedeemAmountMutation();
+  const merchantFromRoute = location.state?.merchant;
+  const selectionType = location.state?.selectionType || "merchant_name";
 
   const {
-    register,
-    handleSubmit,
-    setError,
-    formState: { errors },
-  } = useForm({
-    defaultValues: {
-      redeem_amount: "",
-    },
-  });
+    merchant,
+    transactionAmount,
+    transactionAmountValue,
+    redeemAmount,
+    redeemAmountValue,
+    redeemPoints,
+    balanceToPay,
+    cashRedeemAmount,
+    rmPoints,
+    verified,
+    verifyingAmount,
+    submittingPurchase,
+    setMerchantContext,
+    setTransactionAmount,
+    setRedeemAmount,
+    verifyRedeemAmount,
+    submitRedemption,
+    resetShopWithMerchant,
+  } = useShopWithMerchant();
 
-  // 🛑 Prevent direct access without merchant data
-  if (!merchant) {
+  const activeMerchant = merchant || merchantFromRoute;
+
+  useEffect(() => {
+    if (merchantFromRoute) {
+      setMerchantContext(merchantFromRoute, selectionType);
+    }
+  }, [merchantFromRoute, selectionType, setMerchantContext]);
+
+  useEffect(() => {
+    return () => {
+      resetShopWithMerchant();
+    };
+  }, [resetShopWithMerchant]);
+
+  if (!activeMerchant) {
     return (
       <div className="text-center mt-20">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">
@@ -50,40 +66,51 @@ const RedeemWithMerchant = () => {
     );
   }
 
-  const onVerify = async (data) => {
-    const { redeem_amount } = data;
+  const validateInputs = () => {
+    const nextErrors = {};
 
-    if (!redeem_amount) {
-      setError("redeem_amount", {
-        type: "manual",
-        message: "Please enter redeem amount",
-      });
+    if (!transactionAmountValue) {
+      nextErrors.transactionAmount = "Transaction amount is required";
+    }
+
+    if (!redeemAmountValue) {
+      nextErrors.redeemAmount = "Redeem amount is required";
+    } else if (redeemAmountValue > transactionAmountValue) {
+      nextErrors.redeemAmount =
+        "Redeem amount cannot exceed the transaction amount";
+    }
+
+    setFieldErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  };
+
+  const handlePrimaryAction = async () => {
+    if (!validateInputs()) return;
+
+    if (!verified) {
+      await verifyRedeemAmount();
       return;
     }
 
-    try {
-      const formData = new FormData();
-      formData.append("redeem_amount", redeem_amount);
+    const success = await submitRedemption({
+      merchantId: activeMerchant?.id,
+      merchantSelectionType: selectionType,
+    });
 
-      const res = await checkRedeemAmount(formData).unwrap();
-
-      if (!res.success) {
-        // show error under input field
-        setError("redeem_amount", {
-          type: "manual",
-          message: res.message || "Insufficient points for redemption",
-        });
-      } else {
-        toast.success("You have sufficient points!");
-        setVerified(true);
-      }
-    } catch (err) {
-      setError("redeem_amount", {
-        type: "manual",
-        message: err?.data?.message || "Insufficient points for redemption",
-      });
+    if (success) {
+      navigate("/member/redeem-transactions");
     }
   };
+
+  const primaryLabel = verified
+    ? submittingPurchase
+      ? "Submitting..."
+      : "Submit Redemption"
+    : verifyingAmount
+    ? "Verifying..."
+    : "Verify Purchase";
+
+  const formatCurrency = (value) => `RM ${Number(value ?? 0).toFixed(2)}`;
 
   return (
     <div>
@@ -97,79 +124,109 @@ const RedeemWithMerchant = () => {
 
       <ComponentCard title="Merchant Details" className="mt-6">
         <div className="w-full block md:flex justify-center items-start gap-8">
-          {/* ✅ Redeem Form */}
+          {/* Redeem Form */}
           <div className="w-full md:w-1/2">
-            <form className="max-w-[343px]" onSubmit={handleSubmit(onVerify)}>
+            <form
+              className="max-w-[360px]"
+              onSubmit={(e) => {
+                e.preventDefault();
+                handlePrimaryAction();
+              }}
+            >
               <div>
                 <Label htmlFor="merchant-name">Merchant Name</Label>
                 <Input
                   id="merchant-name"
-                  value={merchant.business_name}
+                  value={activeMerchant?.business_name || ""}
                   disabled
                 />
               </div>
 
               <div className="mt-6">
-                <Label htmlFor="transaction-amount">Transaction Amount</Label>
+                <Label htmlFor="transaction-amount">
+                  Transaction Amount (RM)
+                </Label>
                 <Input
                   id="transaction-amount"
                   type="number"
+                  step="0.01"
+                  min="0"
                   value={transactionAmount}
                   onChange={(e) => setTransactionAmount(e.target.value)}
-                  placeholder="Enter amount"
+                  placeholder="0.00"
+                  error={!!fieldErrors.transactionAmount}
+                  hint={fieldErrors.transactionAmount}
                 />
               </div>
 
               <div className="mt-6">
-                <Label htmlFor="redeem-amount">Redeem Amount</Label>
+                <Label htmlFor="redeem-amount">Redeem Amount (RM)</Label>
                 <Input
                   id="redeem-amount"
                   type="number"
-                  placeholder="Enter amount"
-                  {...register("redeem_amount")}
-                  error={!!errors.redeem_amount}
-                  hint={errors.redeem_amount?.message}
+                  step="0.01"
+                  min="0"
+                  value={redeemAmount}
+                  onChange={(e) => setRedeemAmount(e.target.value)}
+                  placeholder="0.00"
+                  error={!!fieldErrors.redeemAmount}
+                  hint={fieldErrors.redeemAmount}
                 />
+                {redeemAmountValue > 0 && (
+                  <p className="mt-2 text-sm text-gray-500">
+                    ≈{" "}
+                    {redeemPoints.toLocaleString(undefined, {
+                      maximumFractionDigits: 0,
+                    })}{" "}
+                    pts · 1 RM = {rmPoints} pts
+                  </p>
+                )}
               </div>
 
-              {verified && (
-                <div className="mt-6">
+              <div className="mt-6 space-y-4">
+                <div>
                   <Label htmlFor="balance-to-pay">Balance to Pay</Label>
                   <Input
                     id="balance-to-pay"
-                    value={`RM ${
-                      transactionAmount -
-                      (Number(errors.redeem_amount?.message) || 0)
-                    }`}
+                    value={formatCurrency(balanceToPay)}
                     disabled
                   />
                 </div>
-              )}
+                <div>
+                  <Label htmlFor="cash-to-pay">Cash Payment</Label>
+                  <Input
+                    id="cash-to-pay"
+                    value={formatCurrency(cashRedeemAmount)}
+                    disabled
+                  />
+                </div>
+              </div>
 
-              <div className="mt-8">
+              <div className="mt-8 flex flex-col gap-3">
                 <PrimaryButton
                   variant="primary"
                   size="md"
                   type="submit"
-                  disabled={isLoading}
+                  disabled={verifyingAmount || submittingPurchase}
                 >
-                  {isLoading
-                    ? "Checking..."
-                    : verified
-                    ? "Continue"
-                    : "Verify Purchase"}
+                  {primaryLabel}
                 </PrimaryButton>
+                {!verified && (
+                  <p className="text-sm text-gray-500">
+                    Verification is required before submitting.
+                  </p>
+                )}
               </div>
             </form>
           </div>
 
-          {/* ✅ Merchant Info Card */}
+          {/* Merchant Info Card */}
           <div className="w-full md:w-1/2">
             <div className="p-4 border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow bg-white">
-              {merchant.business_logo ? (
+              {activeMerchant?.business_logo ? (
                 <img
-                  src={merchant.business_logo}
-                  alt={merchant.business_name}
+                  src={activeMerchant.business_logo}
+                  alt={activeMerchant.business_name}
                   className="w-full h-52 object-cover rounded-lg mb-4"
                 />
               ) : (
@@ -178,8 +235,18 @@ const RedeemWithMerchant = () => {
                 </div>
               )}
               <h4 className="text-2xl lg:text-3xl font-semibold text-gray-800 mb-2">
-                {merchant.business_name}
+                {activeMerchant.business_name}
               </h4>
+              {activeMerchant?.category && (
+                <p className="text-sm text-gray-500">
+                  Category: {activeMerchant.category}
+                </p>
+              )}
+              {activeMerchant?.address && (
+                <p className="text-sm text-gray-500 mt-1">
+                  Address: {activeMerchant.address}
+                </p>
+              )}
             </div>
           </div>
         </div>
