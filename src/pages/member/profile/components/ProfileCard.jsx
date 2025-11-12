@@ -17,7 +17,7 @@ import {
   PenBox,
 } from "lucide-react";
 
-const ProfileCard = ({ userInfo }) => {
+const ProfileCard = ({ userInfo, onEditClick = () => {} }) => {
   const walletInfo = userInfo?.wallet || {};
 
   // Star level logic (min 0, max 5)
@@ -94,7 +94,11 @@ const ProfileCard = ({ userInfo }) => {
                 </span>
               </div>
             </div>
-            <button className="flex gap-1.5 bg-brand-25 text-white px-4 py-2 rounded-lg">
+            <button
+              type="button"
+              onClick={onEditClick}
+              className="flex gap-1.5 bg-brand-25 text-white px-4 py-2 rounded-lg"
+            >
               <PenBox /> <span>Edit</span>
             </button>
           </div>
