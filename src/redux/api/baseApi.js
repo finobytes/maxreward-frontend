@@ -13,6 +13,7 @@ export const baseApi = createApi({
     "CompanyInfo",
     "Settings",
     "MerchantTransactions",
+    "DashboardStats",
   ],
   endpoints: () => ({}),
 });
