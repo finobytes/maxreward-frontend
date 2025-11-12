@@ -70,11 +70,15 @@ const Denomination = () => {
       resetFilters: resetAllFilters,
     },
   } = useDenomination();
-
+  console.log(denominations?.data);
   const handlePageChange = (p) => dispatch(setPage(p));
   const handlePerPageChange = (n) => dispatch(setPerPage(n));
 
   const openCreateModal = () => {
+    if (denominations?.data?.length >= 3) {
+      toast.warning("You can’t create more than 3 denominations.");
+      return;
+    }
     setFormData({ title: "", value: "" });
     setIsModalOpen(true);
   };
