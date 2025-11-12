@@ -2,13 +2,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  denominationId: null,
-  denominationValue: 0,
-  quantity: 1,
+  selectedDenominations: [],
   paymentMethod: "manual",
   voucherType: "max",
-  manualPaymentDocs: "",
+  manualPaymentDocs: null,
   totalAmount: 0,
+  totalAmountWithRm: 0,
+  totalQuantity: 0,
+  rmPoints: 1,
   memberId: null,
   settings: null,
 };
@@ -22,26 +23,51 @@ const voucherFormSlice = createSlice({
     },
 
     setDenomination: (state, action) => {
-      state.denominationId = action.payload.id;
-      state.denominationValue = Number(action.payload.value);
+      const { id, value, title } = action.payload || {};
+      if (!id) return;
+
+      const normalizedValue = Number(value) || 0;
+      const exists = state.selectedDenominations.find((d) => d.id === id);
+
+      if (exists) {
+        state.selectedDenominations = state.selectedDenominations.filter(
+          (d) => d.id !== id
+        );
+      } else {
+        state.selectedDenominations.push({
+          id,
+          value: normalizedValue,
+          quantity: 1,
+          title: title || "",
+        });
+      }
+
       voucherFormSlice.caseReducers.calculateTotal(state);
     },
 
-    setQuantity: (state, action) => {
-      state.quantity = action.payload;
+    setQuantityForDenom: (state, action) => {
+      const { id, quantity } = action.payload || {};
+      const qty = Math.max(1, Number(quantity) || 1);
+      const denom = state.selectedDenominations.find((d) => d.id === id);
+      if (denom) denom.quantity = qty;
       voucherFormSlice.caseReducers.calculateTotal(state);
     },
 
     setPaymentMethod: (state, action) => {
       state.paymentMethod = action.payload;
+      if (action.payload !== "manual") {
+        state.manualPaymentDocs = null;
+      }
     },
 
     setManualDocs: (state, action) => {
-      state.manualPaymentDocs = action.payload;
+      state.manualPaymentDocs = action.payload || null;
     },
 
     setSettings: (state, action) => {
-      state.settings = action.payload;
+      const settings = action.payload || null;
+      state.settings = settings;
+      state.rmPoints = Number(settings?.rm_points ?? 1);
       voucherFormSlice.caseReducers.calculateTotal(state);
     },
 
@@ -54,11 +80,30 @@ const voucherFormSlice = createSlice({
     },
 
     calculateTotal: (state) => {
-      if (!state.settings) return;
-      const rmPoints = Number(state.settings.rm_points || 1);
-      const denom = Number(state.denominationValue || 0);
-      const qty = Number(state.quantity || 1);
-      state.totalAmount = denom * rmPoints * qty;
+      if (!state.selectedDenominations.length) {
+        state.totalAmount = 0;
+        state.totalAmountWithRm = 0;
+        state.totalQuantity = 0;
+        return;
+      }
+
+      const { subtotal, quantitySum } = state.selectedDenominations.reduce(
+        (acc, denom) => {
+          const denomValue = Number(denom.value) || 0;
+          const qty = Number(denom.quantity) || 0;
+
+          acc.subtotal += denomValue * qty;
+          acc.quantitySum += qty;
+          return acc;
+        },
+        { subtotal: 0, quantitySum: 0 }
+      );
+
+      const rmPoints = Number(state.settings?.rm_points ?? state.rmPoints ?? 1);
+
+      state.totalAmount = subtotal;
+      state.totalAmountWithRm = subtotal * rmPoints;
+      state.totalQuantity = quantitySum;
     },
 
     resetVoucher: () => initialState,
@@ -68,7 +113,7 @@ const voucherFormSlice = createSlice({
 export const {
   setVoucherData,
   setDenomination,
-  setQuantity,
+  setQuantityForDenom,
   setPaymentMethod,
   setManualDocs,
   setSettings,
