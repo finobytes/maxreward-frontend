@@ -114,8 +114,8 @@ export const NAV_CONFIG = {
           path: "/merchant/transactions/pending-approval",
         },
         {
-          name: "Approved Transactions",
-          path: "/merchant/transactions/approved-transactions",
+          name: "All Transactions",
+          path: "/merchant/transactions/all-transactions",
         },
       ],
     },

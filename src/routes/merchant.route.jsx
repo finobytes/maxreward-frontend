@@ -2,7 +2,7 @@ import MemberRegistration from "../pages/merchant/MemberRegistration/MemberRegis
 import MerchantDashboard from "../pages/merchant/MerchantDashboard/MerchantDashboard";
 import RedeemMall from "../pages/merchant/RedeemMall/RedeemMall";
 import MemberTransaction from "../pages/merchant/Reports/MemberTransaction";
-import ApprovedTransactions from "../pages/merchant/Transactions/ApprovedTransactions";
+import AllTransactions from "../pages/merchant/Transactions/AllTransactions";
 import PendingApproval from "../pages/merchant/Transactions/PendingApproval";
 import VoucherPurchase from "../pages/merchant/VoucherPurchase/VoucherPurchase";
 import VoucherPurchaseReport from "../pages/merchant/Reports/VoucherPurchase";
@@ -43,8 +43,8 @@ export const merchantRoute = [
     element: <PendingApproval />,
   },
   {
-    path: "transactions/approved-transactions",
-    element: <ApprovedTransactions />,
+    path: "transactions/all-transactions",
+    element: <AllTransactions />,
   },
   {
     path: "redeem-mall",
