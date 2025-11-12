@@ -14,6 +14,7 @@ import {
   Users,
   Trophy,
   ShieldCheck,
+  PenBox,
 } from "lucide-react";
 
 const ProfileCard = ({ userInfo }) => {
@@ -77,18 +78,25 @@ const ProfileCard = ({ userInfo }) => {
       {/* User Info */}
       <div className="block 2xl:flex gap-4 2xl:justify-between relative -top-8">
         <div className="ml-2">
-          <h3 className="text-xl font-semibold text-gray-800">
-            {userInfo?.name}
-          </h3>
-          <p className="text-sm mt-1 text-gray-500 font-medium">
-            {userInfo?.email ?? "Member"}
-          </p>
+          <div className="flex justify-between items-center">
+            <div className="">
+              <h3 className="text-xl font-semibold text-gray-800">
+                {userInfo?.name}
+              </h3>
+              <p className="text-sm mt-1 text-gray-500 font-medium">
+                {userInfo?.email ?? "Member"}
+              </p>
 
-          <div className="flex gap-3 mt-1 items-center">
-            <img src={locationIcon} alt="icon" className="w-4 h-4" />
-            <span className="text-sm text-gray-400">
-              {userInfo?.address ?? "N/A"}
-            </span>
+              <div className="flex gap-3 mt-1 items-center">
+                <img src={locationIcon} alt="icon" className="w-4 h-4" />
+                <span className="text-sm text-gray-400">
+                  {userInfo?.address ?? "N/A"}
+                </span>
+              </div>
+            </div>
+            <button className="flex gap-1.5 bg-brand-25 text-white px-4 py-2 rounded-lg">
+              <PenBox /> <span>Edit</span>
+            </button>
           </div>
 
           {/* Wallet Info Section */}
