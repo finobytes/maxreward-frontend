@@ -182,6 +182,7 @@ const VoucherForm = () => {
                           id={checkboxId}
                           checked={isSelected}
                           onCheckedChange={() => handleDenomToggle(item)}
+                          className="bg-brand-25"
                         />
                         <Label
                           htmlFor={checkboxId}
@@ -347,6 +348,28 @@ const VoucherForm = () => {
 
             {selectedPaymentMethod === "manual" && (
               <div>
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    <span className="font-semibold">Note:</span> Please make the
+                    payment to the bank account listed below according to your{" "}
+                    <span className="font-semibold">
+                      Equivalent Points (RM {totalAmount})
+                    </span>
+                    .
+                    <br />
+                    Bank Name: <span className="font-semibold">Maybank</span>
+                    <br />
+                    Account Holder Name:{" "}
+                    <span className="font-semibold">John Doe</span>
+                    <br />
+                    Account Number:{" "}
+                    <span className="font-semibold">1234 5678 9012</span>
+                    <br />
+                    After sending the payment, please upload the “Payment Proof”
+                    file (receipt/screenshot) below.
+                  </p>
+                </div>
+
                 <Label htmlFor="paymentProof">Payment Proof</Label>
                 <div className="mt-4">
                   <Dropzone
