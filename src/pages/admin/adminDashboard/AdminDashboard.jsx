@@ -11,6 +11,7 @@ import MemberOnboard from "./components/MemberOnboard";
 import VisitorsByGender from "./components/VisitorsByGender";
 import { useGetDashboardStatsQuery } from "../../../redux/features/admin/dashboard/dashboardApi";
 import AdminDashboardSkeleton from "../../../components/skeleton/AdminDashboardSkeleton";
+import { FileClock } from "lucide-react";
 
 const AdminDashboard = () => {
   const { data, isLoading, isError } = useGetDashboardStatsQuery();
@@ -54,8 +55,18 @@ const AdminDashboard = () => {
     },
     {
       icon: clock,
-      title: "Merchant Approvals",
+      title: "Pending Merchant",
       value: stats.total_merchant_approvals.toLocaleString(),
+      changeText: "+0.892",
+      changeColor: "text-green-500",
+      subtitle: "Increased",
+      chartColor: "#3B82F6",
+      chartData: [6, 8, 7, 9, 8, 10, 9],
+    },
+    {
+      icon: clock,
+      title: "Pending Voucher",
+      value: 18,
       changeText: "+0.892",
       changeColor: "text-green-500",
       subtitle: "Increased",
@@ -78,7 +89,7 @@ const AdminDashboard = () => {
   return (
     <div>
       <h1 className="text-xl font-semibold text-gray-600 pb-4">Dashboard</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         {cardsData.map((card, index) => (
           <DashboardCard key={index} {...card} />
         ))}
@@ -96,11 +107,11 @@ const AdminDashboard = () => {
         <PointsRedeemed />
         <PointsPurchased />
       </div>
-      <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <AudienceReport />
         <MemberOnboard />
         <VisitorsByGender />
-      </div>
+      </div> */}
     </div>
   );
 };
