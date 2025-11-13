@@ -71,11 +71,11 @@ const MemberDetails = () => {
                 <PersonalInfo member={member} />
               </div>
               <div>
-                <ActiveReferrals memberId={member.id} />
+                <ActiveReferrals member={member} />
               </div>
             </div>
 
-            <TransactionActivity memberId={member.id} />
+            <TransactionActivity member={member} />
           </div>
 
           {/* Right Column */}

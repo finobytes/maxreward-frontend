@@ -65,14 +65,14 @@ const MemberProfile = ({ member }) => {
           <div className="border-2 border-gray-300 flex items-center gap-4 px-2 py-0.5 rounded-full">
             <img className="w-10 h-10" src={users2} alt="icon" />
             <div className="pr-3">
-              <p>{member?.wallet?.total_referrals}</p>
+              <p>{member?.wallet?.total_referrals || 0}</p>
               <span className="text-sm text-gray-600">Referrals</span>
             </div>
           </div>
           <div className="border-2 border-gray-300 flex items-center gap-4 px-2 py-0.5 rounded-full">
             <img className="w-10 h-10" src={profile} alt="icon" />
             <div className="pr-3">
-              <p>RM 0</p>
+              <p>RM {member?.lifetime_purchase || 0}</p>
               <span className="text-sm text-gray-600">Purchased</span>
             </div>
           </div>
