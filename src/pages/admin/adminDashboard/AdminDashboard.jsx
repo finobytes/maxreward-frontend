@@ -70,7 +70,7 @@ const AdminDashboard = () => {
       changeText: "+0.892",
       changeColor: "text-green-500",
       subtitle: "Increased",
-      chartColor: "#3B82F6",
+      chartColor: "#FFD700",
       chartData: [6, 8, 7, 9, 8, 10, 9],
     },
   ];
