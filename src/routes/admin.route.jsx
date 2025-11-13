@@ -30,7 +30,7 @@ import NotificationDetails from "../pages/admin/Notification/NotificationDetails
 import VoucherManage from "../pages/admin/VoucherManage/VoucherManage";
 import WhatsAppLog from "../pages/admin/reports/WhatsAppLog";
 import VoucherDetails from "../pages/admin/VoucherManage/VoucherDetails";
-import ReferralList from "../pages/admin/memberMange/ReferralLIst";
+import ReferralList from "../pages/admin/memberMange/ReferralList";
 
 export const adminRoutes = [
   {
