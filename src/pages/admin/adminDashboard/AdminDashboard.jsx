@@ -9,7 +9,7 @@ import PointsPurchased from "./components/PointsPurchased";
 import AudienceReport from "./components/AudienceReport";
 import MemberOnboard from "./components/MemberOnboard";
 import VisitorsByGender from "./components/VisitorsByGender";
-import { useGetDashboardStatsQuery } from "../../../redux/features/admin/dashboard/DashboardApi";
+import { useGetDashboardStatsQuery } from "../../../redux/features/admin/dashboard/dashboardApi";
 import AdminDashboardSkeleton from "../../../components/skeleton/AdminDashboardSkeleton";
 
 const AdminDashboard = () => {
