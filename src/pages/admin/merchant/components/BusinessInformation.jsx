@@ -1,38 +1,42 @@
 import React from "react";
 
-const OwnerInformation = ({ owner }) => {
+const BusinessInformation = ({ merchantData }) => {
   const people = [
     {
-      key: "Name:",
-      value: owner ? owner.owner_name : "John Doe",
+      key: "Company Name:",
+      value: merchantData ? merchantData.business_name : "-- No Data --",
     },
     {
-      key: "Email:",
-      value: owner ? owner.email : "youremail@example.com",
+      key: "Company Address:",
+      value: merchantData ? merchantData.company_address : "-- No Address --",
     },
     {
-      key: "Phone:",
-      value: owner ? owner.phone : "+1 234 567 890",
+      key: "Product / Service:",
+      value: merchantData ? merchantData.business_type : "-- No Data --",
     },
     {
-      key: "Designation:",
-      value: "C.E.O",
+      key: "Annual Sales Turnover:",
+      value: merchantData
+        ? merchantData.annual_sales_turnover
+        : "-- No Data --",
     },
     {
-      key: "Address:",
-      value: owner ? owner.address : "1234 Street, City, Country",
+      key: "Reward Budget:",
+      value: merchantData ? merchantData.reward_budget : "-- No Data --",
     },
     {
-      key: "Create at :",
-      value: owner
-        ? new Date(owner.created_at).toLocaleDateString()
+      key: "Join Date:",
+      value: merchantData
+        ? new Date(merchantData.created_at).toLocaleDateString()
         : "01 Jan, 2023",
     },
   ];
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 sm:px-2 sm:pt-6 lg:px-6 shadow-md">
       {/* Info List */}
-      <h3 className="text-lg font-semibold text-gray-700">Owner Information</h3>
+      <h3 className="text-lg font-semibold text-gray-700">
+        Business Information
+      </h3>
       <div className="mt-2 w-full border-t border-gray-300"></div>
       <div className="flow-root">
         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -58,4 +62,4 @@ const OwnerInformation = ({ owner }) => {
   );
 };
 
-export default OwnerInformation;
+export default BusinessInformation;

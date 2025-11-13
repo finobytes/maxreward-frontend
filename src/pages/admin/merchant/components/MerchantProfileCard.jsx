@@ -28,7 +28,9 @@ const MerchantProfileCard = ({ merchant }) => {
           <div className="absolute top-3 right-3">
             <div className="bg-white border-2 border-gray-300 flex items-center gap-2 px-2 py-0.5 rounded-xl">
               <img className="w-10 h-10" src={profile} alt="icon" />
-              <span className="text-gray-700">Active</span>
+              <span className="text-gray-700">
+                {merchant?.status.toUpperCase()}
+              </span>
             </div>
           </div>
         </div>
@@ -37,14 +39,14 @@ const MerchantProfileCard = ({ merchant }) => {
         <div className="ml-2">
           <h3 className="text-xl font-semibold">{merchant?.business_name}</h3>
           <p className="text-sm mt-2 text-gray-400 font-medium">
-            {merchant?.company_address}
+            Unique Number: {merchant?.unique_number}
           </p>
-          <div className="flex gap-4 mt-1">
+          {/* <div className="flex gap-4 mt-1">
             <div className="flex gap-1">
               <img src={locationIcon} alt="icon" />
               <span className="text-sm text-gray-400">{merchant?.address}</span>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>

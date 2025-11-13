@@ -111,8 +111,8 @@ const ReferredMember = () => {
           <div className="">
             <div className="flex justify-between">
               <div>
-                <p className="text-xs text-gray-500 mb-1">Total Staff</p>
-                <p className="text-xl font-semibold text-gray-900">45</p>
+                <p className="text-xs text-gray-500 mb-1">Referred Members</p>
+                <p className="text-xl font-semibold text-gray-900">40</p>
               </div>
               <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                 <UserSquare2 className="w-4 h-4 text-blue-600" />
@@ -161,7 +161,7 @@ const ReferredMember = () => {
         {/* Table */}
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead>
+            {/* <thead>
               <tr className="border-b border-gray-200">
                 <th className="text-left py-3 px-4 text-gray-700 text-sm">
                   <div className="">Date</div>
@@ -222,7 +222,7 @@ const ReferredMember = () => {
                   </td>
                 </tr>
               ))}
-            </tbody>
+            </tbody> */}
           </table>
         </div>
 

@@ -1,98 +1,81 @@
 import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import {
-  CreditCard,
-  Hand,
-  Users,
-  UserCheck,
-  ChevronDown,
-  Search,
-} from "lucide-react";
+import { CreditCard, Hand, Users, UserCheck } from "lucide-react";
 
-import Pagination from "./../../../../components/table/Pagination";
+import Pagination from "../../../../components/table/Pagination";
 import PrimaryButton from "../../../../components/ui/PrimaryButton";
 import SearchInput from "../../../../components/form/form-elements/SearchInput";
 
 const mockData = [
   {
+    id: 1,
     date: "01-Sept-25",
-    method: "Manual",
-    description: "Voucher Purchase (RM-10)",
-    status: "Approved",
-    points: "+1,000",
+    point_types: "Voucher",
+    total_points: "+1000",
+    status: "Available",
   },
   {
+    id: 2,
     date: "02-Sept-25",
-    method: "QR",
-    description: "Referral Bonus",
-    status: "Pending",
-    points: "+250",
+    point_types: "Referral",
+    total_points: "+250",
+    status: "On Hold",
   },
   {
+    id: 3,
     date: "03-Sept-25",
-    method: "QR",
-    description: "Product Purchase-ID72364",
-    status: "Approved",
-    points: "-950",
+    point_types: "Personal",
+    total_points: "-950",
+    status: "Redeemed",
   },
   {
+    id: 4,
     date: "04-Sept-25",
-    method: "QR",
-    description: "Referral Bonus",
-    status: "Approved",
-    points: "+250",
+    point_types: "Referral",
+    total_points: "+250",
+    status: "Available",
   },
   {
+    id: 5,
     date: "05-Sept-25",
-    method: "Online",
-    description: "Voucher Purchase (RM-10)",
-    status: "Approved",
-    points: "+1,000",
+    point_types: "Voucher",
+    total_points: "+1000",
+    status: "Available",
   },
   {
+    id: 6,
     date: "06-Sept-25",
-    method: "Bank",
-    description: "Product Purchase-ID72366",
-    status: "Pending",
-    points: "-1,000",
+    point_types: "Community",
+    total_points: "-1000",
+    status: "On Hold",
   },
   {
+    id: 7,
     date: "07-Sept-25",
-    method: "QR",
-    description: "Referral Bonus",
-    status: "Approved",
-    points: "+250",
+    point_types: "Referral",
+    total_points: "+250",
+    status: "Available",
   },
   {
+    id: 8,
     date: "08-Sept-25",
-    method: "Bank",
-    description: "Withdrawal (RM-10)",
-    status: "Approved",
-    points: "-1000",
+    point_types: "Personal",
+    total_points: "-1000",
+    status: "Redeemed",
   },
   {
+    id: 9,
     date: "09-Sept-25",
-    method: "QR",
-    description: "Product Purchase-ID72364",
-    status: "Approved",
-    points: "-500",
+    point_types: "Community",
+    total_points: "-500",
+    status: "Redeemed",
   },
   {
+    id: 10,
     date: "10-Sept-25",
-    method: "Bank",
-    description: "Referral Bonus",
-    status: "Approved",
-    points: "+250",
+    point_types: "Referral",
+    total_points: "+250",
+    status: "Referred",
   },
 ];
 
@@ -102,66 +85,66 @@ const Statements = () => {
   const [search, setSearch] = useState("");
 
   const totalPages = 5;
+
+  // Filter by search
+  const filteredData = mockData.filter((item) =>
+    Object.values(item).some((value) =>
+      value.toString().toLowerCase().includes(search.toLowerCase())
+    )
+  );
+
   return (
     <div>
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
         <div className="bg-white border-0 shadow-sm p-2 rounded-b-sm">
-          <div className="">
-            <div className="flex justify-between">
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Available Points</p>
-                <p className="text-xl font-semibold text-gray-900">12,432</p>
-                <p className="text-xs text-green-500 mt-1">+0.892 Increased</p>
-              </div>
-              <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                <CreditCard className="w-4 h-4 text-purple-600" />
-              </div>
+          <div className="flex justify-between">
+            <div>
+              <p className="text-xs text-gray-500 mb-1">Available Points</p>
+              <p className="text-xl font-semibold text-gray-900">12,432</p>
+              <p className="text-xs text-green-500 mt-1">+0.892 Increased</p>
+            </div>
+            <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+              <CreditCard className="w-4 h-4 text-purple-600" />
             </div>
           </div>
         </div>
 
         <div className="bg-white border-0 shadow-sm p-2 rounded-b-sm">
-          <div className="">
-            <div className="flex justify-between">
-              <div>
-                <p className="text-xs text-gray-500 mb-1">On Hold Points</p>
-                <p className="text-xl font-semibold text-gray-900">12,432</p>
-                <p className="text-xs text-green-500 mt-1">+0.892 Increased</p>
-              </div>
-              <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                <Hand className="w-4 h-4 text-orange-600" />
-              </div>
+          <div className="flex justify-between">
+            <div>
+              <p className="text-xs text-gray-500 mb-1">On Hold Points</p>
+              <p className="text-xl font-semibold text-gray-900">2,540</p>
+              <p className="text-xs text-orange-500 mt-1">+0.321 Increased</p>
+            </div>
+            <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+              <Hand className="w-4 h-4 text-orange-600" />
             </div>
           </div>
         </div>
 
         <div className="bg-white border-0 shadow-sm p-2 rounded-b-sm">
-          <div className="">
-            <div className="flex justify-between">
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Refer Points</p>
-                <p className="text-xl font-semibold text-gray-900">12,432</p>
-                <p className="text-xs text-green-500 mt-1">+0.892 Increased</p>
-              </div>
-              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                <Users className="w-4 h-4 text-green-600" />
-              </div>
+          <div className="flex justify-between">
+            <div>
+              <p className="text-xs text-gray-500 mb-1">Refer Points</p>
+              <p className="text-xl font-semibold text-gray-900">1,250</p>
+              <p className="text-xs text-green-500 mt-1">+1.245 Increased</p>
+            </div>
+            <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+              <Users className="w-4 h-4 text-green-600" />
             </div>
           </div>
         </div>
 
         <div className="bg-white border-0 shadow-sm p-2 rounded-b-sm">
-          <div className="">
-            <div className="flex justify-between">
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Community Member</p>
-                <p className="text-xl font-semibold text-gray-900">45</p>
-                <p className="text-xs text-green-500 mt-1">+0.892 Increased</p>
-              </div>
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <UserCheck className="w-4 h-4 text-blue-600" />
-              </div>
+          <div className="flex justify-between">
+            <div>
+              <p className="text-xs text-gray-500 mb-1">Community Member</p>
+              <p className="text-xl font-semibold text-gray-900">45</p>
+              <p className="text-xs text-blue-500 mt-1">+0.892 Increased</p>
+            </div>
+            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+              <UserCheck className="w-4 h-4 text-blue-600" />
             </div>
           </div>
         </div>
@@ -181,17 +164,15 @@ const Statements = () => {
         <div className="mt-10 lg:flex lg:items-center lg:justify-between mb-4">
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-600">Show</span>
-            <Select value={entriesPerPage} onValueChange={setEntriesPerPage}>
-              <SelectTrigger className="w-20">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="25">25</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-              </SelectContent>
-            </Select>
-            {/* <span className="text-sm text-gray-600">entries</span> */}
+            <select
+              value={entriesPerPage}
+              onChange={(e) => setEntriesPerPage(e.target.value)}
+              className="border border-gray-300 rounded-md px-2 py-1 text-sm"
+            >
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+            </select>
           </div>
           <div className="relative mt-4 lg:mt-0">
             <SearchInput
@@ -204,65 +185,54 @@ const Statements = () => {
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4 text-gray-700 text-sm">
-                  <div className="">Date</div>
+                <th className="text-left py-3 px-4 text-gray-700">ID</th>
+                <th className="text-left py-3 px-4 text-gray-700">Date</th>
+                <th className="text-left py-3 px-4 text-gray-700">
+                  Point Types
                 </th>
-                <th className="text-left py-3 px-4 text-gray-700 text-sm">
-                  Method
+                <th className="text-left py-3 px-4 text-gray-700">
+                  Total Points
                 </th>
-                <th className="text-left py-3 px-4 text-gray-700 text-sm">
-                  Description
-                </th>
-                <th className="text-left py-3 px-4 text-gray-700 text-sm">
-                  Status
-                </th>
-                <th className="text-left py-3 px-4 text-gray-700 text-sm">
-                  Points
-                </th>
+                <th className="text-left py-3 px-4 text-gray-700">Status</th>
               </tr>
             </thead>
             <tbody>
-              {mockData.map((transaction, index) => (
+              {filteredData.map((item) => (
                 <tr
-                  key={index}
-                  className="border-b border-gray-100 hover:bg-gray-50"
+                  key={item.id}
+                  className="border-b border-gray-100 hover:bg-gray-50 transition"
                 >
-                  <td className="py-3 text-xs px-4 text-gray-900">
-                    {transaction.date}
-                  </td>
-                  <td className="py-3 px-4 text-xs text-gray-900">
-                    {transaction.method}
-                  </td>
-                  <td className="py-3 px-4 text-xs text-gray-900">
-                    {transaction.description}
-                  </td>
-                  <td className="py-3 px-4">
-                    <Badge
-                      variant={
-                        transaction.status === "Approved"
-                          ? "default"
-                          : "secondary"
-                      }
-                      className={
-                        transaction.status === "Approved"
-                          ? "bg-green-100 text-green-800 hover:bg-green-100"
-                          : "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
-                      }
-                    >
-                      {transaction.status}
-                    </Badge>
+                  <td className="py-3 px-4 text-gray-900">{item.id}</td>
+                  <td className="py-3 px-4 text-gray-900">{item.date}</td>
+                  <td className="py-3 px-4 text-gray-900">
+                    {item.point_types}
                   </td>
                   <td
-                    className={`py-3 px-4 text-xs ${
-                      transaction.points.startsWith("+")
+                    className={`py-3 px-4 font-medium ${
+                      item.total_points.startsWith("+")
                         ? "text-green-600"
                         : "text-red-600"
                     }`}
                   >
-                    {transaction.points}
+                    {item.total_points}
+                  </td>
+                  <td className="py-3 px-4">
+                    <Badge
+                      className={
+                        item.status === "Available"
+                          ? "bg-green-100 text-green-800"
+                          : item.status === "On Hold"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : item.status === "Redeemed"
+                          ? "bg-red-100 text-red-800"
+                          : "bg-blue-100 text-blue-800"
+                      }
+                    >
+                      {item.status}
+                    </Badge>
                   </td>
                 </tr>
               ))}

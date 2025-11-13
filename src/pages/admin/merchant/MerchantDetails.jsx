@@ -3,16 +3,17 @@ import { ScrollText, UsersRound, BoxIcon, UserSquare2 } from "lucide-react";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import ComponentCard from "../../../components/common/ComponentCard";
 import MerchantProfileCard from "./components/MerchantProfileCard";
-import OwnerInformation from "./components/OwnerInformation";
+import BusinessInformation from "./components/BusinessInformation";
 import TopSellingProducts from "./components/TopSellingProducts";
 import MerchantProfileTabs from "./components/MerchantProfileTabs";
 import MerchantProfileTabsContent from "./components/MerchantProfileTabsContent";
 import { useGetMerchantByIdQuery } from "../../../redux/features/admin/merchantManagement/merchantManagementApi";
 import { useParams } from "react-router";
 import MerchantDetailsSkeleton from "../../../components/skeleton/MerchantDetailsSkeleton";
+import AuthorizedPersonInformation from "./components/AuthorizedPersonInformation";
 
 const tabs = [
-  { name: "Products", icon: BoxIcon, key: "products" },
+  // { name: "Products", icon: BoxIcon, key: "products" },
   { name: "Statement", icon: ScrollText, key: "statements" },
   { name: "Staff", icon: UserSquare2, key: "staff" },
   { name: "Referred Member", icon: UsersRound, key: "referredMember" },
@@ -44,13 +45,17 @@ const MerchantDetails = () => {
 
           {/* Owner Info  */}
           <div>
-            <OwnerInformation owner={data?.data} />
+            <BusinessInformation merchantData={data?.data} />
+          </div>
+
+          <div>
+            <AuthorizedPersonInformation merchantData={data?.data} />
           </div>
 
           {/* Transaction Activity */}
-          <div>
+          {/* <div>
             <TopSellingProducts />
-          </div>
+          </div> */}
         </div>
 
         {/* Right Column */}
