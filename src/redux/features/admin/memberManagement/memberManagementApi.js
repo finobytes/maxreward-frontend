@@ -128,6 +128,31 @@ export const memberApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Member"],
     }),
+
+    getReferralMemberList: builder.query({
+      query: ({ memberId, page, search, status }) => ({
+        url: `/members/${memberId}/referrals`,
+        params: {
+          page,
+          search,
+          status,
+        },
+      }),
+
+      transformResponse: (res) => {
+        const payload = res?.data ?? {};
+
+        return {
+          members: payload?.data ?? [],
+          meta: {
+            current_page: payload?.current_page ?? 1,
+            last_page: payload?.last_page ?? 1,
+            total: payload?.total ?? 0,
+            per_page: payload?.per_page ?? 20,
+          },
+        };
+      },
+    }),
   }),
 });
 
@@ -142,4 +167,5 @@ export const {
   useUpdateStatusMutation,
   useBlockOrSuspendMemberMutation,
   useGetReferralTreeQuery,
+  useGetReferralMemberListQuery,
 } = memberApi;

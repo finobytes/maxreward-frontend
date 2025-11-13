@@ -14,7 +14,10 @@ const ActiveReferrals = ({ member }) => {
         <h3 className="text-lg font-semibold text-gray-800">
           Active Referrals
         </h3>
-        <Link to="" className="text-sm text-gray-400">
+        <Link
+          to={`/admin/member-manage/referrals/${member.id}`}
+          className="text-sm text-gray-400"
+        >
           View All
         </Link>
       </div>
