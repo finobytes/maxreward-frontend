@@ -3,6 +3,7 @@ import {
   locationIcon,
   profile,
   profileCover,
+  userImage,
   userProfile,
 } from "../../../../assets/assets";
 
@@ -20,7 +21,7 @@ const ProfileCard = ({ userInfo }) => {
         {/* User Profile Image */}
         <div className="w-full">
           <img
-            src={userProfile}
+            src={userImage}
             className="rounded-full object-cover w-24 h-24 relative -top-12 left-6"
             alt="user profile"
           />

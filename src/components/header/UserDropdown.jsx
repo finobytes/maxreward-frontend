@@ -50,7 +50,7 @@ export default function UserDropdown({ user, role }) {
         className="flex items-center text-gray-700 dropdown-toggle"
       >
         <span className="mr-3 overflow-hidden rounded-full h-8 w-8">
-          <img src={userImage} alt="User" />
+          <img src={user?.image || userImage} alt="User" />
         </span>
 
         <span className="block mr-1 font-medium text-theme-sm">
