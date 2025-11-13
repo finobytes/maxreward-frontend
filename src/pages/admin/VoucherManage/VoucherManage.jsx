@@ -72,7 +72,11 @@ const VoucherManage = () => {
       if (action === "approved") {
         res = await approveVoucher(id).unwrap();
       } else if (action === "rejected") {
-        res = await rejectVoucher({ id, reason: payload.reason }).unwrap();
+        res = await rejectVoucher({
+          id,
+          status: "rejected",
+          reason: payload.reason,
+        }).unwrap();
       }
       toast.success(res?.message || `Voucher updated successfully`);
       refetch();
