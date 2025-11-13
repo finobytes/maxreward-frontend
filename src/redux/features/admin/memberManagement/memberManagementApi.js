@@ -98,6 +98,28 @@ export const memberApi = baseApi.injectEndpoints({
         { type: "Member", id: "LIST" },
       ],
     }),
+    blockOrSuspendMember: builder.mutation({
+      query: ({ memberId, status, reason }) => {
+        const payload = {
+          member_id: memberId,
+          status,
+        };
+
+        if (reason) {
+          payload.reason = reason;
+        }
+
+        return {
+          url: "/member/status/block-suspend",
+          method: "POST",
+          body: payload,
+        };
+      },
+      invalidatesTags: (result, error, { memberId }) => [
+        { type: "Member", id: memberId },
+        { type: "Member", id: "LIST" },
+      ],
+    }),
   }),
 });
 
@@ -110,4 +132,5 @@ export const {
   useGetCorporateMembersQuery,
   useUpdateMemberMutation,
   useUpdateStatusMutation,
+  useBlockOrSuspendMemberMutation,
 } = memberApi;
