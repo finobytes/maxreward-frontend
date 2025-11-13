@@ -116,12 +116,15 @@ export const voucherApi = baseApi.injectEndpoints({
 
     //  Admin: Reject voucher
     rejectVoucher: builder.mutation({
-      query: ({ id, reason }) => ({
-        url: `/admin/vouchers/${id}/reject`,
+      query: ({ id, status, reason }) => ({
+        url: `/admin/vouchers/${id}/status-change`,
         method: "POST",
-        body: reason ? { reason } : undefined,
+        body: {
+          status: status ?? "rejected",
+          reason,
+        },
       }),
-      invalidatesTags: (result, err, id) => [
+      invalidatesTags: (result, err, { id }) => [
         { type: "Voucher", id },
         { type: "Voucher", id: "LIST" },
       ],

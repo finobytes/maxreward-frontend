@@ -30,6 +30,7 @@ import NotificationDetails from "../pages/admin/Notification/NotificationDetails
 import VoucherManage from "../pages/admin/VoucherManage/VoucherManage";
 import WhatsAppLog from "../pages/admin/reports/WhatsAppLog";
 import VoucherDetails from "../pages/admin/VoucherManage/VoucherDetails";
+import ReferralList from "../pages/admin/memberMange/ReferralLIst";
 
 export const adminRoutes = [
   {
@@ -47,6 +48,10 @@ export const adminRoutes = [
   {
     path: "member-manage/details/:id",
     element: <MemberDetails />,
+  },
+  {
+    path: "member-manage/referrals/:id",
+    element: <ReferralList />,
   },
   {
     path: "member-manage/edit/:id",

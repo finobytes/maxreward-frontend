@@ -56,7 +56,7 @@ const MemberDashboard = () => {
     {
       icon: dollar,
       title: "Available Points",
-      value: wallet.available_points ?? "12,432",
+      value: wallet.available_points ?? "0",
       subtitle: "Increased",
       chartColor: "#8B5CF6",
       chartData: [10, 14, 12, 18, 16, 20, 17],
@@ -72,7 +72,7 @@ const MemberDashboard = () => {
     {
       icon: users,
       title: "Referral Points",
-      value: wallet.total_rp ?? "4,876",
+      value: wallet.total_rp ?? "0",
       subtitle: "Increased",
       chartColor: "#F59E0B",
       chartData: [5, 7, 9, 12, 11, 9, 10],
@@ -80,7 +80,7 @@ const MemberDashboard = () => {
     {
       icon: userCommunity,
       title: "Community Members",
-      value: wallet.total_referrals ?? "45",
+      value: data.community_members ?? "0",
       subtitle: "Increased",
       chartColor: "#3B82F6",
       chartData: [6, 8, 7, 9, 8, 10, 9],
@@ -88,7 +88,7 @@ const MemberDashboard = () => {
     {
       icon: purchase,
       title: "Lifetime Purchase",
-      value: wallet.total_pp ?? "2,341",
+      value: data.lifetime_purchase ?? "0",
       subtitle: "Increased",
       chartColor: "#EC4899",
       chartData: [6, 8, 7, 9, 8, 10, 9],

@@ -94,6 +94,21 @@ export const merchantManagementApi = baseApi.injectEndpoints({
         { type: "Merchant", id: "LIST" },
       ],
     }),
+    suspendMerchant: builder.mutation({
+      query: ({ merchantId, status = "suspended", suspendReason }) => ({
+        url: "/merchants/suspend",
+        method: "POST",
+        body: {
+          merchant_id: merchantId,
+          status,
+          ...(suspendReason && { suspended_reason: suspendReason }),
+        },
+      }),
+      invalidatesTags: (result, error, { merchantId }) => [
+        { type: "Merchant", id: merchantId },
+        { type: "Merchant", id: "LIST" },
+      ],
+    }),
   }),
   overrideExisting: false,
 });
@@ -105,4 +120,5 @@ export const {
   useCreateMerchantMutation,
   useUpdateMerchantMutation,
   useDeleteMerchantMutation,
+  useSuspendMerchantMutation,
 } = merchantManagementApi;

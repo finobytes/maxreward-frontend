@@ -2,18 +2,18 @@ import React from "react";
 import Chart from "react-apexcharts";
 
 const PointsRedeemed = () => {
-  const male = 18235;
-  const female = 12743;
-  const total = male + female;
+  const shopping = 18235;
+  const referMember = 12743;
+  const total = shopping + referMember;
 
-  const series = [male, female]; // Male, Female
+  const series = [shopping, referMember]; // Shopping, Refer Member
 
   const options = {
     chart: {
       type: "donut",
     },
-    labels: ["Male", "Female"],
-    colors: ["#FF5A29", "#1E90FF"], // Orange = Male, Blue = Female
+    labels: ["Shopping", "Refer Member"],
+    colors: ["#FF5A29", "#1E90FF"], // Orange = Shopping, Blue = Refer Member
     plotOptions: {
       pie: {
         startAngle: -90,
@@ -68,29 +68,29 @@ const PointsRedeemed = () => {
         <div className="flex justify-between items-center px-4 py-3">
           <div className="flex items-center">
             <span className="w-2.5 h-2.5 rounded-full bg-orange-500 mr-2"></span>
-            <span className="text-gray-700">Male</span>
+            <span className="text-gray-700">Shopping</span>
           </div>
           <div className="flex items-center gap-6">
             <span className="text-sm font-medium text-green-500">
-              {((male / total) * 100).toFixed(2)}%
+              {((shopping / total) * 100).toFixed(2)}%
             </span>
             <span className="text-gray-800 font-semibold">
-              {male.toLocaleString()}
+              {shopping.toLocaleString()}
             </span>
           </div>
         </div>
-        {/* Female */}
+        {/* Refer Member */}
         <div className="flex justify-between items-center px-4 py-3">
           <div className="flex items-center">
             <span className="w-2.5 h-2.5 rounded-full bg-blue-500 mr-2"></span>
-            <span className="text-gray-700">Female</span>
+            <span className="text-gray-700">Refer Member</span>
           </div>
           <div className="flex items-center gap-6">
             <span className="text-sm font-medium text-red-500">
-              {((female / total) * 100).toFixed(2)}%
+              {((referMember / total) * 100).toFixed(2)}%
             </span>
             <span className="text-gray-800 font-semibold">
-              {female.toLocaleString()}
+              {referMember.toLocaleString()}
             </span>
           </div>
         </div>

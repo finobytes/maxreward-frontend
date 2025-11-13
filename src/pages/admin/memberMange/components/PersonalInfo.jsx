@@ -1,56 +1,45 @@
 import React from "react";
-const people = [
-  {
-    key: "Name:",
-    value: "Leo Phillips",
-  },
-  {
-    key: "Email:",
-    value: "youremail@example.com",
-  },
-  {
-    key: "Phone:",
-    value: "+1 (555) 123-4567",
-  },
-  {
-    key: "Designation:",
-    value: "C.E.O",
-  },
-  {
-    key: "Address:",
-    value: "Washington D.C",
-  },
-  {
-    key: "Contributor level :",
-    value: "Level-3",
-  },
-];
 
-const PersonalInfo = () => {
+const PersonalInfo = ({ member }) => {
+  if (!member) {
+    return (
+      <div className="rounded-2xl border border-gray-200 bg-white px-5 py-6 shadow-md">
+        <p className="text-gray-500 text-center">No member data available.</p>
+      </div>
+    );
+  }
+  const totalReferrals = member.total_referrals || 0;
+
+  // Limit stars between 0–5
+  const starCount = Math.min(totalReferrals, 5);
+
+  // Text label (1 Star / 2 Stars / etc.)
+  const starLabel = starCount === 1 ? "1 Star" : `${starCount} Stars`;
+  // Dynamically map member info
+  const infoList = [
+    { key: "Name:", value: member.name || "N/A" },
+    { key: "Email:", value: member.email || "N/A" },
+    { key: "Phone:", value: member.phone || "N/A" },
+    { key: "Member Type:", value: member.member_type || "N/A" },
+    { key: "Referral Code:", value: member.referral_code || "N/A" },
+    { key: "Status:", value: member.status || "N/A" },
+    { key: "Member Level:", value: starLabel || "N/A" },
+  ];
+
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 sm:px-2 sm:pt-6 lg:px-6 shadow-md">
-      {/* Info List */}
       <h3 className="text-lg font-semibold text-gray-700">Personal Info</h3>
       <div className="mt-2 w-full border-t border-gray-300"></div>
-      <div className="flow-root">
-        <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-          <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-            <div className="relative min-w-full divide-y divide-gray-200">
-              <ul className="divide-y divide-gray-200">
-                {people.map((person) => (
-                  <li className="flex" key={person.email}>
-                    <p className="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-0">
-                      {person.key}
-                    </p>
-                    <p className="py-4 text-sm whitespace-nowrap text-gray-900">
-                      {person.value}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
+
+      <div className="flow-root mt-2">
+        <ul className="divide-y divide-gray-200">
+          {infoList.map((item, index) => (
+            <li key={index} className="flex justify-between py-3">
+              <p className="text-sm font-medium text-gray-600">{item.key}</p>
+              <p className="text-sm text-gray-900">{item.value}</p>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );

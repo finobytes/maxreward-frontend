@@ -52,7 +52,7 @@ const ProfileCard = ({ userInfo, onEditClick = () => {} }) => {
         {/* Profile Image */}
         <div className="w-full">
           <img
-            src={userProfile}
+            src={userInfo?.image || userProfile}
             className="rounded-full object-cover w-24 h-24 relative -top-12 left-6 border-4 border-white shadow-md"
             alt="user profile"
           />

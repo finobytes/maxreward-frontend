@@ -20,12 +20,17 @@ import { Input } from "../../../components/ui/input";
 import { Button } from "../../../components/ui/button";
 import { profilePlaceholder } from "../../../assets/assets";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
+import { useUpdateMemberProfileMutation } from "../../../redux/features/member/profile/profileUpdateApi";
 
 const Profile = () => {
   const { user, token } = useSelector((state) => state.auth);
   const role = user?.role || "member"; // admin | merchant | member
 
-  const { data, isLoading, error } = useVerifyMeQuery(role, { skip: !token });
+  const { data, isLoading, error, refetch } = useVerifyMeQuery(role, {
+    skip: !token,
+  });
+  const [updateMemberProfile, { isLoading: isUpdating }] =
+    useUpdateMemberProfileMutation();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editFormValues, setEditFormValues] = useState({
     name: "",
@@ -115,11 +120,30 @@ const Profile = () => {
     setEditFormValues((prev) => ({ ...prev, avatar: file }));
   };
 
-  const handleEditFormSubmit = (event) => {
+  const handleEditFormSubmit = async (event) => {
     event.preventDefault();
-    toast.success("Profile information updated");
-    setIsEditDialogOpen(false);
-    resetEditForm();
+    const formData = new FormData();
+    formData.append("name", editFormValues.name ?? "");
+    formData.append("email", editFormValues.email ?? "");
+    formData.append("address", editFormValues.address ?? "");
+    if (editFormValues.avatar) {
+      formData.append("image", editFormValues.avatar);
+    }
+
+    try {
+      const response = await updateMemberProfile(formData).unwrap();
+      toast.success(
+        response?.message || "Profile information updated successfully."
+      );
+      await refetch();
+      handleDialogOpenChange(false);
+    } catch (updateError) {
+      console.error("Failed to update profile:", updateError);
+      const errorMessage =
+        updateError?.data?.message ||
+        "Failed to update profile information. Please try again.";
+      toast.error(errorMessage);
+    }
   };
 
   if (isLoading) return <ProfileSkeleton />;
@@ -141,6 +165,7 @@ const Profile = () => {
         onInputChange={handleFormInputChange}
         onAvatarChange={handleAvatarChange}
         onSubmit={handleEditFormSubmit}
+        isSubmitting={isUpdating}
       />
     </div>
   );
@@ -154,6 +179,7 @@ const EditProfileDialog = ({
   onInputChange,
   onAvatarChange,
   onSubmit,
+  isSubmitting = false,
 }) => (
   <Dialog open={open} onOpenChange={onOpenChange}>
     <DialogContent className="sm:max-w-xl">
@@ -177,6 +203,7 @@ const EditProfileDialog = ({
               type="file"
               accept="image/*"
               onChange={onAvatarChange}
+              disabled={isSubmitting}
             />
             <p className="text-xs text-gray-500">JPG, PNG or WebP up to 5MB.</p>
           </div>
@@ -190,6 +217,7 @@ const EditProfileDialog = ({
               placeholder="John Doe"
               value={formValues.name}
               onChange={onInputChange}
+              disabled={isSubmitting}
             />
           </div>
           <div className="space-y-2">
@@ -201,6 +229,7 @@ const EditProfileDialog = ({
               placeholder="john@email.com"
               value={formValues.email}
               onChange={onInputChange}
+              disabled={isSubmitting}
             />
           </div>
           <div className="space-y-2">
@@ -213,6 +242,7 @@ const EditProfileDialog = ({
               placeholder="Street, City, Country"
               value={formValues.address}
               onChange={onInputChange}
+              disabled={isSubmitting}
             />
           </div>
         </div>
@@ -222,11 +252,12 @@ const EditProfileDialog = ({
             size="sm"
             variant="secondary"
             onClick={() => onOpenChange(false)}
+            disabled={isSubmitting}
           >
             Cancel
           </PrimaryButton>
-          <PrimaryButton size="sm" type="submit">
-            Save changes
+          <PrimaryButton size="sm" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Saving..." : "Save changes"}
           </PrimaryButton>
         </DialogFooter>
       </form>

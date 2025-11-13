@@ -98,6 +98,61 @@ export const memberApi = baseApi.injectEndpoints({
         { type: "Member", id: "LIST" },
       ],
     }),
+    blockOrSuspendMember: builder.mutation({
+      query: ({ memberId, status, reason }) => {
+        const payload = {
+          member_id: memberId,
+          status,
+        };
+
+        if (reason) {
+          payload.reason = reason;
+        }
+
+        return {
+          url: "/member/status/block-suspend",
+          method: "POST",
+          body: payload,
+        };
+      },
+      invalidatesTags: (result, error, { memberId }) => [
+        { type: "Member", id: memberId },
+        { type: "Member", id: "LIST" },
+      ],
+    }),
+    // Get member referral tree from admin
+    getReferralTree: builder.query({
+      query: (id) => ({
+        url: `/members/${id}/community-tree`,
+        method: "GET",
+      }),
+      providesTags: ["Member"],
+    }),
+
+    getReferralMemberList: builder.query({
+      query: ({ memberId, page, search, status }) => ({
+        url: `/members/${memberId}/referrals`,
+        params: {
+          page,
+          search,
+          status,
+        },
+      }),
+
+      transformResponse: (res) => {
+        const payload = res?.data ?? {};
+
+        return {
+          members: payload?.data ?? [],
+          meta: {
+            current_page: payload?.current_page ?? 1,
+            last_page: payload?.last_page ?? 1,
+            total: payload?.total ?? 0,
+            per_page: payload?.per_page ?? 20,
+          },
+        };
+      },
+    }),
   }),
 });
 
@@ -110,4 +165,7 @@ export const {
   useGetCorporateMembersQuery,
   useUpdateMemberMutation,
   useUpdateStatusMutation,
+  useBlockOrSuspendMemberMutation,
+  useGetReferralTreeQuery,
+  useGetReferralMemberListQuery,
 } = memberApi;

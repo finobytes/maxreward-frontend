@@ -9,12 +9,21 @@ import TransactionActivity from "./components/TransactionActivity";
 import ProfileTabs from "./components/ProfileTabs";
 import ProfileTabContent from "./components/ProfileTabContent";
 import { Skeleton } from "@/components/ui/skeleton";
-import { UsersRound, ScrollText } from "lucide-react";
+import {
+  UsersRound,
+  ScrollText,
+  LucideAlignVerticalDistributeEnd,
+} from "lucide-react";
 import { useGetMemberByIdQuery } from "../../../redux/features/admin/memberManagement/memberManagementApi";
 import MerchantDetailsSkeleton from "../../../components/skeleton/MerchantDetailsSkeleton";
 
 const tabs = [
   { name: "Community", icon: UsersRound, key: "community" },
+  {
+    name: "Community Uplink",
+    icon: LucideAlignVerticalDistributeEnd,
+    key: "communityUplink",
+  },
   { name: "Statements", icon: ScrollText, key: "statements" },
 ];
 
@@ -62,11 +71,11 @@ const MemberDetails = () => {
                 <PersonalInfo member={member} />
               </div>
               <div>
-                <ActiveReferrals memberId={member.id} />
+                <ActiveReferrals member={member} />
               </div>
             </div>
 
-            <TransactionActivity memberId={member.id} />
+            <TransactionActivity member={member} />
           </div>
 
           {/* Right Column */}

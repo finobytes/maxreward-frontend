@@ -28,7 +28,10 @@ import {
 import { toast } from "sonner";
 import BulkActionBar from "../../../components/table/BulkActionBar";
 import { memberQR } from "../../../assets/assets";
-import { useUpdateStatusMutation } from "../../../redux/features/admin/memberManagement/memberManagementApi";
+import {
+  useUpdateStatusMutation,
+  useBlockOrSuspendMemberMutation,
+} from "../../../redux/features/admin/memberManagement/memberManagementApi";
 import StatusBadge from "../../../components/table/StatusBadge";
 import {
   Dialog,
@@ -72,7 +75,8 @@ const MemberManage = () => {
   }, [debouncedSearch, dispatch]);
 
   const { members, meta, isLoading, isFetching, isError } = useMembers();
-  const [updateStatus, { isLoading: isUpdating }] = useUpdateStatusMutation();
+  const [updateStatus] = useUpdateStatusMutation();
+  const [blockOrSuspendMember] = useBlockOrSuspendMemberMutation();
 
   const handlePageChange = (p) => dispatch(setPage(p));
   const handlePerPageChange = (n) => dispatch(setPerPage(n));
@@ -103,11 +107,32 @@ const MemberManage = () => {
     try {
       setUpdatingId(id);
 
-      const formData = { status: newStatus };
-      if (reasonText) formData.reason = reasonText;
+      const normalizedStatus = (newStatus || "").toLowerCase();
+      const trimmedReason =
+        typeof reasonText === "string" ? reasonText.trim() : "";
 
-      await updateStatus({ id, formData }).unwrap();
-      toast.success(`Member status updated to ${newStatus}`);
+      if (
+        ["blocked", "suspended"].includes(normalizedStatus) &&
+        !trimmedReason
+      ) {
+        toast.error("Reason is required to update member status.");
+        return false;
+      }
+
+      if (["blocked", "suspended"].includes(normalizedStatus)) {
+        await blockOrSuspendMember({
+          memberId: id,
+          status: normalizedStatus,
+          reason: trimmedReason,
+        }).unwrap();
+      } else {
+        await updateStatus({
+          id,
+          formData: { status: normalizedStatus },
+        }).unwrap();
+      }
+
+      toast.success(`Member status updated to ${normalizedStatus}`);
       return true;
     } catch (err) {
       toast.error(err?.data?.message || "Failed to update member status");

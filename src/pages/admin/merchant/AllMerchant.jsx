@@ -2,13 +2,24 @@ import React, { useState } from "react";
 import PageBreadcrumb from "@/components/common/PageBreadcrumb";
 import SearchInput from "@/components/form/form-elements/SearchInput";
 import PrimaryButton from "@/components/ui/PrimaryButton";
-import { Eye, Loader, PencilLine, Trash2Icon } from "lucide-react";
+import { Eye, Loader, PencilLine } from "lucide-react";
 import DropdownSelect from "@/components/ui/dropdown/DropdownSelect";
 import Pagination from "@/components/table/Pagination";
 import { useMerchantManagement } from "../../../redux/features/admin/merchantManagement/useMerchantManagement";
 import { Link } from "react-router";
-import { useDeleteMerchantMutation } from "../../../redux/features/admin/merchantManagement/merchantManagementApi";
+import {
+  useDeleteMerchantMutation,
+  useSuspendMerchantMutation,
+} from "../../../redux/features/admin/merchantManagement/merchantManagementApi";
 import { useGetAllBusinessTypesQuery } from "../../../redux/features/admin/businessType/businessTypeApi";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "../../../components/ui/dialog";
 
 import {
   Table,
@@ -23,6 +34,13 @@ import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSke
 import BulkActionBar from "../../../components/table/BulkActionBar";
 import StatusBadge from "../../../components/table/StatusBadge";
 import { toast } from "sonner";
+
+const initialSuspendState = {
+  open: false,
+  merchant: null,
+  reason: "",
+  error: "",
+};
 
 const AllMerchant = () => {
   const {
@@ -51,11 +69,14 @@ const AllMerchant = () => {
   } = useMerchantManagement();
 
   const [deleteMerchant] = useDeleteMerchantMutation();
+  const [suspendMerchant, { isLoading: isSuspending }] =
+    useSuspendMerchantMutation();
   const [selected, setSelected] = useState([]);
+  const [suspendModal, setSuspendModal] = useState(initialSuspendState);
 
   const handleClear = () => {
     clearFilters();
-    setDebouncedSearch(""); // Local search input ও reset
+    setDebouncedSearch(""); // Local search input reset
     setSelected([]);
   };
 
@@ -83,6 +104,49 @@ const AllMerchant = () => {
     setSelected((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
+  };
+
+  const openSuspendModal = (merchant) => {
+    setSuspendModal({
+      open: true,
+      merchant,
+      reason: "",
+      error: "",
+    });
+  };
+
+  const closeSuspendModal = () => {
+    setSuspendModal({ ...initialSuspendState });
+  };
+
+  const handleSuspendSubmit = async () => {
+    if (!suspendModal.reason.trim()) {
+      setSuspendModal((prev) => ({
+        ...prev,
+        error: "Suspension reason is required.",
+      }));
+      return;
+    }
+
+    try {
+      await suspendMerchant({
+        merchantId: suspendModal.merchant.id,
+        status: "suspended",
+        suspendReason: suspendModal.reason.trim(),
+      }).unwrap();
+      toast.success("Merchant suspended successfully.");
+      closeSuspendModal();
+      refetch();
+    } catch (error) {
+      const message =
+        error?.data?.message ||
+        error?.error ||
+        "Failed to suspend merchant.";
+      setSuspendModal((prev) => ({
+        ...prev,
+        error: message,
+      }));
+    }
   };
 
   // Bulk actions (placeholder)
@@ -239,27 +303,33 @@ const AllMerchant = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                merchants.map((m) => (
-                  <TableRow
-                    key={m.id}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
-                    <TableCell>
-                      <input
-                        type="checkbox"
-                        checked={selected.includes(m.id)}
-                        onChange={() => toggleSelect(m.id)}
-                        className="w-4 h-4 rounded"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      {m?.staffs?.find((staff) => staff?.type === "merchant")
-                        ?.user_name || "N/A"}
-                    </TableCell>
-                    {/* Name + Avatar */}
-                    <TableCell className="whitespace-normal break-words">
-                      {m?.business_name}
-                      {/* <div className="flex items-center gap-3">
+                merchants.map((m) => {
+                  const isSuspended =
+                    (m?.status || "").toLowerCase() === "suspended";
+                  const isCurrentMerchantSubmitting =
+                    isSuspending && suspendModal.merchant?.id === m.id;
+
+                  return (
+                    <TableRow
+                      key={m.id}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      <TableCell>
+                        <input
+                          type="checkbox"
+                          checked={selected.includes(m.id)}
+                          onChange={() => toggleSelect(m.id)}
+                          className="w-4 h-4 rounded"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        {m?.staffs?.find((staff) => staff?.type === "merchant")
+                          ?.user_name || "N/A"}
+                      </TableCell>
+                      {/* Name + Avatar */}
+                      <TableCell className="whitespace-normal break-words">
+                        {m?.business_name}
+                        {/* <div className="flex items-center gap-3">
                         <img
                           src={userImage}
                           alt="user"
@@ -269,50 +339,61 @@ const AllMerchant = () => {
                           <div className="font-medium text-gray-900"></div>
                         </div>
                       </div> */}
-                    </TableCell>
+                      </TableCell>
 
-                    <TableCell>
-                      {m?.authorized_person || <span>N/A</span>}
-                    </TableCell>
-                    <TableCell>{m?.phone ?? "N/A"}</TableCell>
-                    <TableCell>{m?.email ?? "N/A"}</TableCell>
-                    <TableCell>{m?.reward_budget ?? "N/A"}</TableCell>
-                    <TableCell>
-                      {new Date(m?.created_at).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>{m?.wallet?.total_points ?? "N/A"}</TableCell>
+                      <TableCell>
+                        {m?.authorized_person || <span>N/A</span>}
+                      </TableCell>
+                      <TableCell>{m?.phone ?? "N/A"}</TableCell>
+                      <TableCell>{m?.email ?? "N/A"}</TableCell>
+                      <TableCell>{m?.reward_budget ?? "N/A"}</TableCell>
+                      <TableCell>
+                        {new Date(m?.created_at).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>{m?.wallet?.total_points ?? "N/A"}</TableCell>
 
-                    <TableCell>
-                      <StatusBadge status={m.status} />
-                    </TableCell>
-                    <TableCell>
-                      <img
-                        src={memberQR}
-                        alt="QR Code"
-                        className="w-12 h-12 object-contain"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Link
-                          to={`/admin/merchant/details/${m?.id}`}
-                          className="p-2 rounded-md bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
-                        >
-                          <Eye size={16} />
-                        </Link>
-                        <Link
-                          to={`/admin/merchant/update/${m?.id}`}
-                          className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200"
-                        >
-                          <PencilLine size={16} />
-                        </Link>
-                        {/* <button className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200">
-                          <Trash2Icon size={16} />
-                        </button> */}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
+                      <TableCell>
+                        <StatusBadge status={m.status} />
+                      </TableCell>
+                      <TableCell>
+                        <img
+                          src={memberQR}
+                          alt="QR Code"
+                          className="w-12 h-12 object-contain"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Link
+                            to={`/admin/merchant/details/${m?.id}`}
+                            className="p-2 rounded-md bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
+                          >
+                            <Eye size={16} />
+                          </Link>
+                          <Link
+                            to={`/admin/merchant/update/${m?.id}`}
+                            className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200"
+                          >
+                            <PencilLine size={16} />
+                          </Link>
+                          <button
+                            onClick={() => openSuspendModal(m)}
+                            disabled={
+                              isSuspended || isCurrentMerchantSubmitting
+                            }
+                            className="px-2 rounded-md bg-yellow-100 text-gray-700 hover:bg-yellow-200 disabled:opacity-50"
+                          >
+                            {isCurrentMerchantSubmitting
+                              ? "Submitting..."
+                              : isSuspended
+                              ? "Suspended"
+                              : "Suspend"}
+                          </button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>
@@ -324,6 +405,68 @@ const AllMerchant = () => {
           onPageChange={(page) => setPage(page)}
         />
       </div>
+
+      <Dialog
+        open={suspendModal.open}
+        onOpenChange={(open) => {
+          if (!open) closeSuspendModal();
+        }}
+      >
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Suspend Merchant</DialogTitle>
+            <DialogDescription>
+              Provide a reason for suspending{" "}
+              {suspendModal.merchant?.business_name || "this merchant"}.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-2">
+            <label
+              htmlFor="merchant-action-reason"
+              className="text-sm font-medium text-gray-700"
+            >
+              Reason
+            </label>
+            <textarea
+              id="merchant-action-reason"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              rows={4}
+              placeholder="Add a brief justification..."
+              value={suspendModal.reason}
+              onChange={(e) =>
+                setSuspendModal((prev) => ({
+                  ...prev,
+                  reason: e.target.value,
+                  error: "",
+                }))
+              }
+            />
+            {suspendModal.error && (
+              <p className="text-sm text-red-500">{suspendModal.error}</p>
+            )}
+          </div>
+
+          <DialogFooter className="gap-3">
+            <button
+              type="button"
+              onClick={closeSuspendModal}
+              className="px-4 py-2 text-sm rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+              disabled={isSuspending}
+            >
+              Cancel
+            </button>
+            <PrimaryButton
+              variant="warning"
+              size="md"
+              onClick={handleSuspendSubmit}
+              disabled={isSuspending}
+            >
+              {isSuspending ? "Submitting..." : "Suspend"}
+            </PrimaryButton>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
