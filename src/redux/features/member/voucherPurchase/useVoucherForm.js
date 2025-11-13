@@ -1,14 +1,15 @@
 // src/redux/features/member/voucherPurchase/useVoucherForm.js
-import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { toast } from "sonner";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
+import { toast } from "sonner";
 import { useGetAllDenominationsQuery } from "../../admin/denomination/denominationApi";
 import { useGetCurrentSettingsQuery } from "../../admin/settings/settingsApi";
+import { useVerifyMeQuery } from "../../auth/authApi";
 import { useCreateVoucherMutation } from "./voucherApi";
 import {
   setDenomination,
-  setQuantity,
+  setQuantityForDenom,
   setPaymentMethod,
   setManualDocs,
   setSettings,
@@ -17,54 +18,98 @@ import {
   resetVoucher,
   setMemberId,
 } from "./voucherFormSlice";
-import { useVerifyMeQuery } from "../../auth/authApi";
 
 export const useVoucherForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  // Correct slice selector
   const state = useSelector((s) => s.voucherForm);
 
-  // Get logged-in member info
   const { data: verifyData, isLoading: verifying } = useVerifyMeQuery();
-  console.log(verifyData?.id);
-  // Queries
   const { data: denomData, isLoading: denomLoading } =
     useGetAllDenominationsQuery();
   const { data: settingsData, isLoading: settingsLoading } =
     useGetCurrentSettingsQuery();
   const [createVoucher, { isLoading: creating }] = useCreateVoucherMutation();
 
-  // Set memberId when verifyMe data available
   useEffect(() => {
-    const memberId = verifyData?.id;
+    const memberId =
+      verifyData?.id || verifyData?.data?.id || verifyData?.member?.id;
     if (memberId && memberId !== state.memberId) {
       dispatch(setMemberId(memberId));
     }
   }, [verifyData, state.memberId, dispatch]);
 
-  // Load settings safely (no dispatch during render)
   useEffect(() => {
-    if (settingsData && !state.settings) {
-      dispatch(setSettings(settingsData.setting_attribute));
+    const normalizedSettings =
+      settingsData?.setting_attribute?.maxreward ||
+      settingsData?.setting_attribute ||
+      settingsData ||
+      null;
+
+    if (!normalizedSettings) return;
+
+    const hasChanged =
+      !state.settings ||
+      JSON.stringify(state.settings) !== JSON.stringify(normalizedSettings);
+
+    if (hasChanged) {
+      dispatch(setSettings(normalizedSettings));
       dispatch(calculateTotal());
     }
   }, [settingsData, state.settings, dispatch]);
 
-  // Derived
-  const denominations = denomData?.data?.denominations || [];
+  const denominations =
+    denomData?.data?.denominations ||
+    denomData?.denominations ||
+    [];
 
-  // Create Voucher with FormData
   const handleCreateVoucher = async () => {
     try {
+      if (!state.selectedDenominations.length) {
+        toast.error("Please select at least one denomination.");
+        return;
+      }
+
+      const denomHistory = state.selectedDenominations
+        .filter((d) => d.quantity > 0)
+        .map((d) => ({
+          denomination_id: d.id,
+          quantity: d.quantity,
+        }));
+
+      if (!denomHistory.length) {
+        toast.error("Please select at least one denomination.");
+        return;
+      }
+
+      if (state.paymentMethod === "manual" && !state.manualPaymentDocs) {
+        toast.error("Payment proof is required for manual payments.");
+        return;
+      }
+
       const formData = new FormData();
-      formData.append("member_id", state.memberId || verifyData?.data?.id);
+      formData.append(
+        "member_id",
+        state.memberId ||
+          verifyData?.id ||
+          verifyData?.data?.id ||
+          verifyData?.member?.id
+      );
       formData.append("voucher_type", state.voucherType);
-      formData.append("denomination_id", state.denominationId);
-      formData.append("quantity", state.quantity);
       formData.append("payment_method", state.paymentMethod.toLowerCase());
-      formData.append("total_amount", state.totalAmount);
+      formData.append("quantity", String(state.totalQuantity || 0));
+      formData.append("total_amount", String(state.totalAmount || 0));
+
+      denomHistory.forEach((item, index) => {
+        formData.append(
+          `denomination_history[${index}][denomination_id]`,
+          String(item.denomination_id)
+        );
+        formData.append(
+          `denomination_history[${index}][quantity]`,
+          String(item.quantity)
+        );
+      });
 
       if (state.paymentMethod === "manual" && state.manualPaymentDocs) {
         formData.append("manual_payment_docs", state.manualPaymentDocs);
@@ -77,11 +122,11 @@ export const useVoucherForm = () => {
         dispatch(resetVoucher());
         navigate("/member/purchase-voucher");
       } else {
-        toast.error(res.message || "Failed to create voucher");
+        toast.error(res?.message || "Failed to create voucher.");
       }
-    } catch (err) {
-      console.error(err);
-      toast.error(err?.data?.message || "Something went wrong!");
+    } catch (error) {
+      console.error(error);
+      toast.error(error?.data?.message || "Something went wrong!");
     }
   };
 
@@ -93,10 +138,10 @@ export const useVoucherForm = () => {
     verifying,
     creating,
     setDenomination: (denom) => dispatch(setDenomination(denom)),
-    setQuantity: (qty) => dispatch(setQuantity(qty)),
-    setPaymentMethod: (m) => dispatch(setPaymentMethod(m)),
-    setManualDocs: (f) => dispatch(setManualDocs(f)),
-    setVoucherType: (v) => dispatch(setVoucherType(v)),
+    updateQuantity: (payload) => dispatch(setQuantityForDenom(payload)),
+    setPaymentMethod: (method) => dispatch(setPaymentMethod(method)),
+    setManualDocs: (file) => dispatch(setManualDocs(file)),
+    setVoucherType: (type) => dispatch(setVoucherType(type)),
     handleCreateVoucher,
   };
 };

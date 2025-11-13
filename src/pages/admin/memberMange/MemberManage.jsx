@@ -30,6 +30,14 @@ import BulkActionBar from "../../../components/table/BulkActionBar";
 import { memberQR } from "../../../assets/assets";
 import { useUpdateStatusMutation } from "../../../redux/features/admin/memberManagement/memberManagementApi";
 import StatusBadge from "../../../components/table/StatusBadge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "../../../components/ui/dialog";
 
 const useDebounced = (value, delay = 400) => {
   const [v, setV] = useState(value);
@@ -43,6 +51,13 @@ const useDebounced = (value, delay = 400) => {
 const MemberManage = () => {
   const [selected, setSelected] = useState([]);
   const [updatingId, setUpdatingId] = useState(null);
+  const [actionDialog, setActionDialog] = useState({
+    open: false,
+    action: null,
+    member: null,
+    reason: "",
+    error: "",
+  });
 
   const dispatch = useDispatch();
   const { search, status, page, perPage, memberType } = useSelector(
@@ -84,18 +99,66 @@ const MemberManage = () => {
     toast("Bulk delete (not implemented yet)");
   };
 
-  const handleStatusChange = async (id, newStatus) => {
+  const handleStatusChange = async (id, newStatus, reasonText = "") => {
     try {
       setUpdatingId(id);
 
       const formData = { status: newStatus };
-      const res = await updateStatus({ id, formData }).unwrap();
+      if (reasonText) formData.reason = reasonText;
 
+      await updateStatus({ id, formData }).unwrap();
       toast.success(`Member status updated to ${newStatus}`);
+      return true;
     } catch (err) {
       toast.error(err?.data?.message || "Failed to update member status");
+      return false;
     } finally {
       setUpdatingId(null);
+    }
+  };
+
+  const openActionDialog = (member, action) => {
+    setActionDialog({
+      open: true,
+      action,
+      member,
+      reason: "",
+      error: "",
+    });
+  };
+
+  const closeActionDialog = () =>
+    setActionDialog({
+      open: false,
+      action: null,
+      member: null,
+      reason: "",
+      error: "",
+    });
+
+  const submitActionDialog = async () => {
+    if (!actionDialog.member || !actionDialog.action) return;
+    const trimmedReason = actionDialog.reason.trim();
+
+    if (!trimmedReason) {
+      setActionDialog((prev) => ({
+        ...prev,
+        error: "Reason is required.",
+      }));
+      return;
+    }
+
+    const targetStatus =
+      actionDialog.action === "block" ? "blocked" : "suspended";
+
+    const success = await handleStatusChange(
+      actionDialog.member.id,
+      targetStatus,
+      trimmedReason
+    );
+
+    if (success) {
+      closeActionDialog();
     }
   };
 
@@ -228,11 +291,16 @@ const MemberManage = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {members.map((m) => (
-                  <TableRow key={m.id}>
-                    <TableCell>
-                      <input
-                        type="checkbox"
+                {members.map((m) => {
+                  const normalizedStatus = (m.status || "").toLowerCase();
+                  const isBlocked = normalizedStatus === "blocked";
+                  const isSuspended = normalizedStatus === "suspended";
+
+                  return (
+                    <TableRow key={m.id}>
+                      <TableCell>
+                        <input
+                          type="checkbox"
                         checked={selected.includes(m.id)}
                         onChange={() => toggleSelect(m.id)}
                         className="w-4 h-4 rounded"
@@ -275,25 +343,46 @@ const MemberManage = () => {
                         >
                           <PencilLine size={16} />
                         </Link>
-                        <button
-                          onClick={() => handleStatusChange(m.id, "blocked")}
-                          disabled={updatingId === m.id}
-                          className="px-2 rounded-md bg-red-100 text-red-700 hover:bg-red-200 disabled:opacity-50"
-                        >
-                          {updatingId === m.id ? "Updating..." : "Block"}
-                        </button>
+                        {isBlocked ? (
+                          <button
+                            onClick={() => handleStatusChange(m.id, "active")}
+                            disabled={updatingId === m.id}
+                            className="px-2 rounded-md bg-green-100 text-green-700 hover:bg-green-200 disabled:opacity-50"
+                          >
+                            {updatingId === m.id ? "Updating..." : "Unblock"}
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => openActionDialog(m, "block")}
+                            disabled={updatingId === m.id}
+                            className="px-2 rounded-md bg-red-100 text-red-700 hover:bg-red-200 disabled:opacity-50"
+                          >
+                            {updatingId === m.id ? "Updating..." : "Block"}
+                          </button>
+                        )}
 
-                        <button
-                          onClick={() => handleStatusChange(m.id, "suspended")}
-                          disabled={updatingId === m.id}
-                          className="px-2 rounded-md bg-yellow-100 text-gray-700 hover:bg-yellow-200 disabled:opacity-50"
-                        >
-                          {updatingId === m.id ? "Updating..." : "Suspend"}
-                        </button>
+                        {isSuspended ? (
+                          <button
+                            onClick={() => handleStatusChange(m.id, "active")}
+                            disabled={updatingId === m.id}
+                            className="px-2 rounded-md bg-green-100 text-green-700 hover:bg-green-200 disabled:opacity-50"
+                          >
+                            {updatingId === m.id ? "Updating..." : "Unsuspend"}
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => openActionDialog(m, "suspend")}
+                            disabled={updatingId === m.id}
+                            className="px-2 rounded-md bg-yellow-100 text-gray-700 hover:bg-yellow-200 disabled:opacity-50"
+                          >
+                            {updatingId === m.id ? "Updating..." : "Suspend"}
+                          </button>
+                        )}
                       </div>
                     </TableCell>
-                  </TableRow>
-                ))}
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           )}
@@ -305,6 +394,79 @@ const MemberManage = () => {
           onPageChange={handlePageChange}
         />
       </div>
+
+      <Dialog
+        open={actionDialog.open}
+        onOpenChange={(open) => {
+          if (!open) closeActionDialog();
+        }}
+      >
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>
+              {actionDialog.action === "suspend"
+                ? "Suspend Member"
+                : "Block Member"}
+            </DialogTitle>
+            <DialogDescription>
+              {actionDialog.action === "suspend"
+                ? `Provide a reason for suspending ${
+                    actionDialog.member?.name || "this member"
+                  }.`
+                : `Provide a reason for blocking ${
+                    actionDialog.member?.name || "this member"
+                  }.`}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-2">
+            <label
+              htmlFor="member-action-reason"
+              className="text-sm font-medium text-gray-700"
+            >
+              Reason
+            </label>
+            <textarea
+              id="member-action-reason"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              rows={4}
+              placeholder="Add a brief justification..."
+              value={actionDialog.reason}
+              onChange={(e) =>
+                setActionDialog((prev) => ({
+                  ...prev,
+                  reason: e.target.value,
+                  error: "",
+                }))
+              }
+            />
+            {actionDialog.error && (
+              <p className="text-sm text-red-500">{actionDialog.error}</p>
+            )}
+          </div>
+
+          <DialogFooter className="gap-3">
+            <button
+              type="button"
+              onClick={closeActionDialog}
+              className="px-4 py-2 text-sm rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+              disabled={updatingId === actionDialog.member?.id}
+            >
+              Cancel
+            </button>
+            <PrimaryButton
+              variant={actionDialog.action === "block" ? "danger" : "warning"}
+              size="md"
+              onClick={submitActionDialog}
+              disabled={updatingId === actionDialog.member?.id}
+            >
+              {updatingId === actionDialog.member?.id
+                ? "Submitting..."
+                : "Submit"}
+            </PrimaryButton>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

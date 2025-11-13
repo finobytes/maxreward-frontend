@@ -19,8 +19,19 @@ export const shopWithMerchantApi = baseApi.injectEndpoints({
       }),
       transformResponse: (res) => res ?? {},
     }),
+
+    makePurchaseForMember: builder.mutation({
+      query: (body) => ({
+        url: "/members/make-purchase",
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
-export const { useGetMerchantMutation, useCheckMemberRedeemAmountMutation } =
-  shopWithMerchantApi;
+export const {
+  useGetMerchantMutation,
+  useCheckMemberRedeemAmountMutation,
+  useMakePurchaseForMemberMutation,
+} = shopWithMerchantApi;

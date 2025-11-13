@@ -35,6 +35,15 @@ import {
   useRejectVoucherMutation,
 } from "../../../redux/features/member/voucherPurchase/voucherApi";
 import Select from "../../../components/form/Select";
+import PrimaryButton from "../../../components/ui/PrimaryButton";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../../../components/ui/dialog";
 
 const VoucherManage = () => {
   const dispatch = useDispatch();
@@ -46,21 +55,67 @@ const VoucherManage = () => {
 
   const [selected, setSelected] = useState([]);
   const [updatingId, setUpdatingId] = useState(null);
+  const [rejectDialog, setRejectDialog] = useState({
+    open: false,
+    voucher: null,
+    reason: "",
+    error: "",
+  });
 
   const [approveVoucher] = useApproveVoucherMutation();
   const [rejectVoucher] = useRejectVoucherMutation();
 
-  const handleStatusUpdate = async (id, action) => {
+  const handleStatusUpdate = async (id, action, payload = {}) => {
     setUpdatingId(id);
     try {
-      const apiCall = action === "approved" ? approveVoucher : rejectVoucher;
-      const res = await apiCall(id).unwrap();
+      let res;
+      if (action === "approved") {
+        res = await approveVoucher(id).unwrap();
+      } else if (action === "rejected") {
+        res = await rejectVoucher({ id, reason: payload.reason }).unwrap();
+      }
       toast.success(res?.message || `Voucher updated successfully`);
       refetch();
+      return true;
     } catch (err) {
       toast.error(err?.data?.message || "Something went wrong!");
+      return false;
     } finally {
       setUpdatingId(null);
+    }
+  };
+
+  const openRejectDialog = (voucher) =>
+    setRejectDialog({
+      open: true,
+      voucher,
+      reason: "",
+      error: "",
+    });
+
+  const closeRejectDialog = () =>
+    setRejectDialog({
+      open: false,
+      voucher: null,
+      reason: "",
+      error: "",
+    });
+
+  const submitRejectDialog = async () => {
+    const reason = rejectDialog.reason.trim();
+    if (!reason) {
+      setRejectDialog((prev) => ({ ...prev, error: "Reason is required." }));
+      return;
+    }
+
+    const success = await handleStatusUpdate(
+      rejectDialog.voucher.id,
+      "rejected",
+      { reason }
+    );
+
+    if (success) {
+      closeRejectDialog();
     }
   };
 
@@ -246,7 +301,7 @@ const VoucherManage = () => {
                           </button>
 
                           <button
-                            onClick={() => handleStatusUpdate(v.id, "rejected")}
+                            onClick={() => openRejectDialog(v)}
                             disabled={updatingId === v.id}
                             className="px-3 py-1 bg-red-100 text-red-600 rounded-md"
                           >
@@ -274,6 +329,68 @@ const VoucherManage = () => {
           />
         </div>
       </div>
+
+      <Dialog
+        open={rejectDialog.open}
+        onOpenChange={(open) => {
+          if (!open) closeRejectDialog();
+        }}
+      >
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Reject Voucher</DialogTitle>
+            <DialogDescription>
+              Provide a reason for rejecting voucher #
+              {rejectDialog.voucher?.id}.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <label
+              htmlFor="voucher-reject-reason"
+              className="text-sm font-medium text-gray-700"
+            >
+              Reason
+            </label>
+            <textarea
+              id="voucher-reject-reason"
+              rows={4}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              placeholder="Explain why this voucher is being rejected..."
+              value={rejectDialog.reason}
+              onChange={(e) =>
+                setRejectDialog((prev) => ({
+                  ...prev,
+                  reason: e.target.value,
+                  error: "",
+                }))
+              }
+            />
+            {rejectDialog.error && (
+              <p className="text-sm text-red-500">{rejectDialog.error}</p>
+            )}
+          </div>
+          <DialogFooter className="gap-3">
+            <button
+              type="button"
+              onClick={closeRejectDialog}
+              className="px-4 py-2 text-sm rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+              disabled={updatingId === rejectDialog.voucher?.id}
+            >
+              Cancel
+            </button>
+            <PrimaryButton
+              variant="danger"
+              size="md"
+              onClick={submitRejectDialog}
+              disabled={updatingId === rejectDialog.voucher?.id}
+            >
+              {updatingId === rejectDialog.voucher?.id
+                ? "Submitting..."
+                : "Submit"}
+            </PrimaryButton>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

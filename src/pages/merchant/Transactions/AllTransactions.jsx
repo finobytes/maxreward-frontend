@@ -2,6 +2,7 @@ import React from "react";
 import { Eye, Loader2 } from "lucide-react";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import SearchInput from "../../../components/form/form-elements/SearchInput";
+import DropdownSelect from "../../../components/ui/dropdown/DropdownSelect";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
 import Pagination from "../../../components/table/Pagination";
 import StatusBadge from "../../../components/table/StatusBadge";
@@ -17,6 +18,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useTransactions } from "../../../redux/features/merchant/transactions/useTransaction";
 import { Link } from "react-router";
 
+const statusOptions = [
+  { label: "All Statuses", value: "all" },
+  { label: "Pending", value: "pending" },
+  { label: "Approved", value: "approved" },
+  { label: "Rejected", value: "rejected" },
+];
+
 const currency = (value) =>
   `RM ${Number(value ?? 0).toLocaleString(undefined, {
     minimumFractionDigits: 2,
@@ -26,7 +34,7 @@ const currency = (value) =>
 const formatDateTime = (value) =>
   value ? new Date(value).toLocaleString() : "—";
 
-const PendingApproval = () => {
+const AllTransactions = () => {
   const {
     transactions,
     meta,
@@ -35,15 +43,13 @@ const PendingApproval = () => {
     error,
     searchValue,
     setSearchValue,
+    status,
+    setStatus,
     perPage,
     setPerPage,
     setPage,
     refresh,
-    approvePurchase,
-    approving,
-    approvingId,
-    reset,
-  } = useTransactions("pending");
+  } = useTransactions("all");
 
   const handleSearchChange = (eventOrValue) => {
     const nextValue =
@@ -64,7 +70,7 @@ const PendingApproval = () => {
         items={[
           { label: "Home", to: "/" },
           { label: "Transactions" },
-          { label: "Pending Approval" },
+          { label: "All Transactions" },
         ]}
       />
 
@@ -73,10 +79,16 @@ const PendingApproval = () => {
           <SearchInput
             value={searchValue}
             onChange={handleSearchChange}
-            placeholder="Search by transaction ID or member"
+            placeholder="Search by transaction ID, member or merchant"
           />
 
           <div className="flex flex-wrap items-center gap-3">
+            <DropdownSelect
+              value={status}
+              onChange={(value) => setStatus(value)}
+              options={statusOptions}
+            />
+
             <label className="text-sm text-gray-600 flex items-center gap-2">
               Rows per page
               <select
@@ -106,17 +118,6 @@ const PendingApproval = () => {
                 "Refresh"
               )}
             </PrimaryButton>
-
-            <PrimaryButton
-              variant="secondary"
-              onClick={() => {
-                setSearchValue("");
-                reset();
-              }}
-              disabled={isFetching || approving}
-            >
-              Clear Filters
-            </PrimaryButton>
           </div>
         </div>
 
@@ -144,10 +145,10 @@ const PendingApproval = () => {
 
             <TableBody>
               {isLoading ? (
-                Array.from({ length: 5 }).map((_, index) => (
-                  <TableRow key={index}>
-                    {Array.from({ length: 9 }).map((__, idx) => (
-                      <TableCell key={idx}>
+                Array.from({ length: 6 }).map((_, rowIdx) => (
+                  <TableRow key={rowIdx}>
+                    {Array.from({ length: 9 }).map((__, colIdx) => (
+                      <TableCell key={colIdx}>
                         <Skeleton className="h-4 w-full" />
                       </TableCell>
                     ))}
@@ -159,8 +160,7 @@ const PendingApproval = () => {
                     colSpan={9}
                     className="py-8 text-center text-red-500"
                   >
-                    {error?.data?.message ||
-                      "Failed to load pending transactions."}
+                    {error?.data?.message || "Failed to load transactions."}
                   </TableCell>
                 </TableRow>
               ) : transactions.length === 0 ? (
@@ -169,7 +169,7 @@ const PendingApproval = () => {
                     colSpan={9}
                     className="py-8 text-center text-gray-500"
                   >
-                    No pending purchases found.
+                    No transactions found.
                   </TableCell>
                 </TableRow>
               ) : (
@@ -211,25 +211,6 @@ const PendingApproval = () => {
                       >
                         <Eye size={16} />
                       </Link>
-                      <PrimaryButton
-                        variant="success"
-                        size="sm"
-                        onClick={() => approvePurchase(txn.id)}
-                        disabled={approving || approvingId === txn.id}
-                      >
-                        {approvingId === txn.id ? (
-                          <>
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                            Approving
-                          </>
-                        ) : (
-                          "Approve"
-                        )}
-                      </PrimaryButton>
-
-                      <PrimaryButton variant="danger" size="sm">
-                        Reject
-                      </PrimaryButton>
                     </TableCell>
                   </TableRow>
                 ))
@@ -254,4 +235,4 @@ const PendingApproval = () => {
   );
 };
 
-export default PendingApproval;
+export default AllTransactions;

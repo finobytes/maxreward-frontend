@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -5,7 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { UploadCloud, Minus, Plus } from "lucide-react";
+import { Minus, Plus } from "lucide-react";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import ComponentCard from "../../../components/common/ComponentCard";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
@@ -16,13 +17,13 @@ import VoucherFromSkeleton from "../../../components/skeleton/VoucherFromSkeleto
 import { paymentProofPlaceholder } from "../../../assets/assets";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Checkbox } from "@/components/ui/checkbox";
 import * as z from "zod";
-import { toast } from "sonner";
 import { useVoucherForm } from "../../../redux/features/member/voucherPurchase/useVoucherForm";
+import { toast } from "sonner";
 
 // Zod Schema for validation
 const voucherSchema = z.object({
-  denominationId: z.string().min(1, "Please select a denomination"),
   paymentMethod: z.enum(["online", "manual"], {
     required_error: "Please select a payment method",
   }),
@@ -34,8 +35,7 @@ const voucherSchema = z.object({
     .optional()
     .refine(
       (file, ctx) => {
-        const method = ctx?.parent?.paymentMethod;
-        if (method === "manual") {
+        if (ctx?.parent?.paymentMethod === "manual") {
           return !!file;
         }
         return true;
@@ -48,17 +48,21 @@ const VoucherForm = () => {
   const {
     denominations,
     denomLoading,
+    settingsLoading,
+    verifying,
     paymentMethod,
+    voucherType,
+    selectedDenominations,
     setDenomination,
-    setQuantity,
+    updateQuantity,
     setPaymentMethod,
     setVoucherType,
     setManualDocs,
-    quantity,
     totalAmount,
+    totalAmountWithRm,
+    totalQuantity,
     creating,
     handleCreateVoucher,
-    denominationId,
   } = useVoucherForm();
 
   // React Hook Form Setup
@@ -71,51 +75,72 @@ const VoucherForm = () => {
   } = useForm({
     resolver: zodResolver(voucherSchema),
     defaultValues: {
-      denominationId: denominationId || "",
       paymentMethod: paymentMethod || "manual",
-      voucherType: "",
+      voucherType: voucherType || "max",
       manualDocs: null,
     },
   });
 
   // Watch for real-time updates
-  const selectedPaymentMethod = watch("paymentMethod");
+  const selectedPaymentMethod = watch("paymentMethod") || paymentMethod;
+  const selectedVoucherType = watch("voucherType") || voucherType;
 
-  // Handle denomination selection
-  const handleDenomSelect = (denom) => {
-    setDenomination(denom);
-    setValue("denominationId", String(denom.id));
-    setQuantity(1);
+  useEffect(() => {
+    register("manualDocs");
+    register("voucherType");
+  }, [register]);
+
+  useEffect(() => {
+    setValue("paymentMethod", paymentMethod);
+  }, [paymentMethod, setValue]);
+
+  useEffect(() => {
+    setValue("voucherType", voucherType);
+  }, [voucherType, setValue]);
+
+  const handleDenomToggle = (item) => {
+    setDenomination(item);
+  };
+
+  const handleQtyChange = (id, newQty) => {
+    updateQuantity({ id, quantity: Math.max(1, newQty) });
   };
 
   // Handle payment method
   const handlePaymentMethod = (method) => {
     setPaymentMethod(method);
-    setValue("paymentMethod", method);
+    setValue("paymentMethod", method, { shouldValidate: true });
+    if (method === "online") {
+      setManualDocs(null);
+      setValue("manualDocs", null, { shouldValidate: true });
+    }
   };
 
   // Handle voucher type
   const handleVoucherType = (type) => {
     setVoucherType(type);
-    setValue("voucherType", type);
+    setValue("voucherType", type, { shouldValidate: true });
   };
 
   // Handle file upload
   const handleFileSelect = (file) => {
-    setManualDocs(file);
-    setValue("manualDocs", file, { shouldValidate: true });
+    const selectedFile = Array.isArray(file) ? file[0] : file;
+    setManualDocs(selectedFile || null);
+    setValue("manualDocs", selectedFile || null, { shouldValidate: true });
   };
 
   // On Submit
-  const onSubmit = (data) => {
-    if (data.paymentMethod === "manual" && !data.manualDocs) {
-      toast.error("Payment proof is required for manual payment.");
+  const onSubmit = async () => {
+    if (!selectedDenominations.length) {
+      toast.error("Select at least one denomination to proceed.");
       return;
     }
-    handleCreateVoucher();
+    await handleCreateVoucher();
   };
 
-  if (denomLoading) return <VoucherFromSkeleton />;
+  if (denomLoading || settingsLoading || verifying) {
+    return <VoucherFromSkeleton />;
+  }
 
   return (
     <div>
@@ -135,56 +160,72 @@ const VoucherForm = () => {
               {/* Denomination */}
               <div>
                 <p className="font-semibold mb-2">Denomination</p>
-                {denominations.slice(0, 3).map((item) => {
-                  const isSelected = item.id === denominationId;
-                  return (
-                    <div key={item.id} className="flex items-center gap-3 mb-4">
-                      <input
-                        type="radio"
-                        id={`denom-${item.id}`}
-                        name="denomination"
-                        checked={isSelected}
-                        onChange={() => handleDenomSelect(item)}
-                        className="text-orange-500 focus:ring-orange-500"
-                      />
-                      <Label
-                        htmlFor={`denom-${item.id}`}
-                        className="w-20 cursor-pointer"
-                      >
-                        {item.title}
-                      </Label>
-
-                      {/* Quantity Counter */}
-                      {isSelected && (
-                        <div className="flex justify-between items-center border rounded-lg px-2 py-1 w-56">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setQuantity(Math.max(1, quantity - 1))
-                            }
-                            className="p-1 hover:bg-gray-100 rounded border"
-                          >
-                            <Minus size={14} />
-                          </button>
-                          <span className="w-8 text-center text-gray-400">
-                            {quantity}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => setQuantity(quantity + 1)}
-                            className="p-1 hover:bg-gray-100 rounded border"
-                          >
-                            <Plus size={14} />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-                {errors.denominationId && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.denominationId.message}
+                {!denominations.length ? (
+                  <p className="text-sm text-gray-500">
+                    No denominations available. Please try again later.
                   </p>
+                ) : (
+                  denominations.map((item) => {
+                    const isSelected = selectedDenominations.some(
+                      (d) => d.id === item.id
+                    );
+                    const selectedItem = selectedDenominations.find(
+                      (d) => d.id === item.id
+                    );
+                    const checkboxId = `denom-${item.id}`;
+                    return (
+                      <div
+                        key={item.id}
+                        className="flex items-center gap-3 mb-4"
+                      >
+                        <Checkbox
+                          id={checkboxId}
+                          checked={isSelected}
+                          onCheckedChange={() => handleDenomToggle(item)}
+                          className="bg-brand-25"
+                        />
+                        <Label
+                          htmlFor={checkboxId}
+                          className="cursor-pointer w-24"
+                        >
+                          {item.title}
+                        </Label>
+
+                        {/* Quantity Counter */}
+                        {isSelected && (
+                          <div className="flex justify-between items-center border rounded-lg px-2 py-1 w-56">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleQtyChange(
+                                  item.id,
+                                  Math.max(1, (selectedItem?.quantity || 1) - 1)
+                                )
+                              }
+                              className="p-1 hover:bg-gray-100 rounded border"
+                            >
+                              <Minus size={14} />
+                            </button>
+                            <span className="w-8 text-center text-gray-400">
+                              {selectedItem?.quantity ?? 1}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleQtyChange(
+                                  item.id,
+                                  (selectedItem?.quantity || 1) + 1
+                                )
+                              }
+                              className="p-1 hover:bg-gray-100 rounded border"
+                            >
+                              <Plus size={14} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
                 )}
               </div>
 
@@ -223,7 +264,10 @@ const VoucherForm = () => {
                 <Label className="text-sm font-medium mb-2 block">
                   Voucher Type
                 </Label>
-                <Select onValueChange={handleVoucherType}>
+                <Select
+                  value={selectedVoucherType || undefined}
+                  onValueChange={handleVoucherType}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select Voucher Type" />
                   </SelectTrigger>
@@ -239,17 +283,35 @@ const VoucherForm = () => {
                 )}
               </div>
 
-              {/* Equivalent Points */}
-              <div className="mt-6 max-w-[350px]">
-                <Label className="text-sm font-medium mb-2 block">
-                  Equivalent Points
-                </Label>
-                <Input
-                  readOnly
-                  value={totalAmount}
-                  placeholder="Points / Price"
-                  className="bg-gray-100"
-                />
+              {/* Totals */}
+              <div className="mt-6 grid gap-4 max-w-[350px]">
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">
+                    Total Quantity
+                  </Label>
+                  <Input
+                    readOnly
+                    value={String(totalQuantity || 0)}
+                    placeholder="Quantity"
+                    className="bg-gray-100"
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">
+                    Equivalent Points
+                  </Label>
+                  <Input
+                    readOnly
+                    value={String(totalAmount || 0)}
+                    placeholder="Points / Price"
+                    className="bg-gray-100"
+                  />
+                  {totalAmountWithRm && totalAmountWithRm !== totalAmount ? (
+                    <p className="text-xs text-gray-500 mt-1">
+                      After RM points: {totalAmountWithRm}
+                    </p>
+                  ) : null}
+                </div>
               </div>
             </div>
 
@@ -286,12 +348,34 @@ const VoucherForm = () => {
 
             {selectedPaymentMethod === "manual" && (
               <div>
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    <span className="font-semibold">Note:</span> Please make the
+                    payment to the bank account listed below according to your{" "}
+                    <span className="font-semibold">
+                      Equivalent Points (RM {totalAmount})
+                    </span>
+                    .
+                    <br />
+                    Bank Name: <span className="font-semibold">Maybank</span>
+                    <br />
+                    Account Holder Name:{" "}
+                    <span className="font-semibold">John Doe</span>
+                    <br />
+                    Account Number:{" "}
+                    <span className="font-semibold">1234 5678 9012</span>
+                    <br />
+                    After sending the payment, please upload the “Payment Proof”
+                    file (receipt/screenshot) below.
+                  </p>
+                </div>
+
                 <Label htmlFor="paymentProof">Payment Proof</Label>
                 <div className="mt-4">
                   <Dropzone
                     multiple={false}
                     maxFileSizeMB={5}
-                    required
+                    required={selectedPaymentMethod === "manual"}
                     validationMessage="Payment proof is required"
                     placeholderImage={paymentProofPlaceholder}
                     onFilesChange={handleFileSelect}
@@ -319,24 +403,6 @@ const VoucherForm = () => {
             </PrimaryButton>
           </div>
         </ComponentCard>
-
-        {/* Buttons */}
-        {/* <div className="mt-8">
-          <ComponentCard>
-            <div className="mt-8 flex gap-4">
-              <PrimaryButton type="submit" disabled={creating}>
-                {creating ? "Processing..." : "Submit"}
-              </PrimaryButton>
-              <PrimaryButton
-                variant="secondary"
-                type="button"
-                to="/member/referred-member"
-              >
-                Back
-              </PrimaryButton>
-            </div>
-          </ComponentCard>
-        </div> */}
       </form>
     </div>
   );
