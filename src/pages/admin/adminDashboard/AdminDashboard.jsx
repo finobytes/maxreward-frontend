@@ -17,9 +17,9 @@ const AdminDashboard = () => {
   const { data, isLoading, isError } = useGetDashboardStatsQuery();
   const stats = {
     total_members: data?.total_members ?? 0,
-    total_merchants: data?.total_merchants ?? 0,
+    total_merchants: data?.approved_merchants ?? 0,
     total_transactions: data?.total_transactions ?? 0,
-    total_merchant_approvals: data?.total_merchant_approvals ?? 0,
+    pending_merchants: data?.pending_merchants ?? 0,
   };
 
   const cardsData = [
@@ -56,7 +56,7 @@ const AdminDashboard = () => {
     {
       icon: clock,
       title: "Pending Merchant",
-      value: stats.total_merchant_approvals.toLocaleString(),
+      value: stats.pending_merchants.toLocaleString(),
       changeText: "+0.892",
       changeColor: "text-green-500",
       subtitle: "Increased",
