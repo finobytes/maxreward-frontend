@@ -120,6 +120,14 @@ export const memberApi = baseApi.injectEndpoints({
         { type: "Member", id: "LIST" },
       ],
     }),
+    // Get member referral tree from admin
+    getReferralTree: builder.query({
+      query: (id) => ({
+        url: `/members/${id}/community-tree`,
+        method: "GET",
+      }),
+      providesTags: ["Member"],
+    }),
   }),
 });
 
@@ -133,4 +141,5 @@ export const {
   useUpdateMemberMutation,
   useUpdateStatusMutation,
   useBlockOrSuspendMemberMutation,
+  useGetReferralTreeQuery,
 } = memberApi;

@@ -1,13 +1,13 @@
 import React, { useEffect, useRef } from "react";
 import ApexTree from "apextree";
-import { useGetReferralTreeQuery } from "../../../../redux/features/member/referNewMember/referNewMemberApi";
 import TreeSkeleton from "../../../../components/skeleton/TreeSkeleton";
 import ErrorMessage from "../../../../components/errorMsg/ErrorMessage";
 import { convertToApexTreeFormat } from "./../../../../utils/convertTreeData";
+import { useGetReferralTreeQuery } from "../../../../redux/features/admin/memberManagement/memberManagementApi";
 
-const CommunityTree = () => {
+const CommunityTree = ({ memberId }) => {
   const { data, isFetching, isLoading, error, isError, refetch } =
-    useGetReferralTreeQuery();
+    useGetReferralTreeQuery(memberId);
 
   const treeContainerRef = useRef(null);
   console.log(treeContainerRef.data);
