@@ -223,7 +223,7 @@ const PurchaseVoucher = () => {
                       </TableCell>
                       <TableCell className="text-center">
                         <Link
-                          to="#"
+                          to={`/member/voucher-details/${v.id}`}
                           className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500 inline-block"
                         >
                           <Eye size={18} />
