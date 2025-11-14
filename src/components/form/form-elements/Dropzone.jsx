@@ -173,11 +173,15 @@ const Dropzone = ({
       )}
 
       {/* Validation message */}
-      {required && files.length < (requiredCount || maxFiles) && (
+      {/* {required && files.length < (requiredCount || maxFiles) && (
         <p className="text-red-500 text-xs mt-1">
           {countValidationMessage ||
             `Please upload all ${requiredCount || maxFiles} required files.`}
         </p>
+      )} */}
+      {/* Validation message */}
+      {validationMessage && (
+        <p className="text-red-500 text-xs mt-1">{validationMessage}</p>
       )}
     </>
   );
