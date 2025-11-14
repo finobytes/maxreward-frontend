@@ -53,7 +53,6 @@ const MerchantEdit = () => {
   const onSubmit = async (data) => {
     try {
       const payload = { ...data };
-      delete payload.confirm_password;
 
       if (!payload.merchant_password) {
         delete payload.merchant_password;
@@ -169,6 +168,19 @@ const MerchantEdit = () => {
                   placeholder="Reward Budget (%)"
                 />
               </div>
+              <div>
+                <Label>Password</Label>
+                <Input
+                  type="password"
+                  {...register("merchant_password")}
+                  placeholder="Password"
+                />
+                {errors.merchant_password && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.merchant_password.message}
+                  </p>
+                )}
+              </div>
             </div>
 
             <div className="md:col-span-1">
@@ -188,7 +200,7 @@ const MerchantEdit = () => {
         {/* Authorized Person Information */}
         <div className="mt-6">
           <ComponentCard title="Authorized Person Information">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
                 <Label>Authorized Person Name</Label>
                 <Input
@@ -205,6 +217,10 @@ const MerchantEdit = () => {
               <div>
                 <Label>Email Address</Label>
                 <Input {...register("email")} placeholder="Email Address" />
+              </div>
+              <div>
+                <Label>Designation</Label>
+                <Input {...register("designation")} placeholder="Designation" />
               </div>
             </div>
 

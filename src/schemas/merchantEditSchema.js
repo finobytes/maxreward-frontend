@@ -1,40 +1,32 @@
 import { z } from "zod";
 
-export const merchantEditSchema = z
-  .object({
-    business_name: z.string().min(1, "Business name is required"),
-    business_type: z.string().min(1, "Business type is required"),
-    business_description: z.string().min(5, "Description too short"),
-    company_address: z.string().min(3, "Company address is required"),
-    license_number: z.string().min(3, "License number is required"),
-    status: z.string().min(1, "Status is required"),
-    bank_name: z.string().min(1, "Bank name is required"),
-    account_holder_name: z.string().min(1, "Account holder name required"),
-    account_number: z.string().min(6, "Account number required"),
-    owner_name: z.string().min(1, "Owner name required"),
-    phoneNumber: z
-      .string()
-      .transform((value) => value.replace(/[\s-]/g, "")) // space & dash remove
-      .refine((value) => /^\d{10,11}$/.test(value), {
-        message: "Invalid phone number",
-      }),
-    gender: z.string().min(1, "Gender required"),
-    address: z.string().min(3, "Address required"),
-    email: z.string().email("Invalid email address"),
+const optionalText = z.string().optional().or(z.literal(""));
+const optionalPassword = z
+  .union([
+    z.literal(""),
+    z.string().min(6, "Password must be at least 6 characters"),
+  ])
+  .optional();
 
-    // 🔹 Password optional for edit
-    merchant_password: z
-      .string()
-      .min(6, "Password must be 6+ characters")
-      .optional(),
-    confirm_password: z.string().min(6, "Confirm your password").optional(),
-  })
-  .refine(
-    (data) =>
-      !data.merchant_password ||
-      data.merchant_password === data.confirm_password,
-    {
-      message: "Passwords do not match",
-      path: ["confirm_password"],
-    }
-  );
+export const merchantEditSchema = z.object({
+  business_name: z.string().min(1, "Business name is required"),
+  company_address: z.string().min(3, "Company address is required"),
+  state: optionalText,
+  business_type: z.string().min(1, "Business type is required"),
+  annual_sales_turnover: optionalText,
+  reward_budget: optionalText,
+  authorized_person_name: z
+    .string()
+    .min(1, "Authorized person name is required"),
+  phone: z
+    .string()
+    .transform((value) => value.replace(/[\s-]/g, ""))
+    .refine((value) => /^\d{10,11}$/.test(value), {
+      message: "Invalid phone number",
+    }),
+  email: z
+    .union([z.literal(""), z.string().email("Invalid email address")])
+    .optional(),
+  designation: optionalText,
+  merchant_password: optionalPassword,
+});
