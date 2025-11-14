@@ -5,6 +5,7 @@ import {
   locationIcon,
   profile,
   profileCover,
+  userImage,
   userProfile,
   users2,
 } from "../../../../assets/assets";
@@ -23,7 +24,7 @@ const MemberProfile = ({ member }) => {
         {/* User Profile Image */}
         <div className="w-full">
           <img
-            src={userProfile}
+            src={member?.image || userImage}
             className="rounded-full object-cover w-24 h-24 relative -top-12 left-6"
             alt="user profile"
           />
