@@ -15,6 +15,7 @@ import { useGetAllBusinessTypesQuery } from "@/redux/features/admin/businessType
 import { merchantSchema } from "../../../schemas/merchantSchema";
 import { useSelector } from "react-redux";
 import { companyLogoPlaceholder } from "../../../assets/assets";
+import { useSearchParams } from "react-router";
 
 const MerchantRegistrationForm = () => {
   const { user } = useSelector((state) => state.auth);
@@ -78,15 +79,22 @@ const MerchantRegistrationForm = () => {
     }
   };
 
+  const [searchParams] = useSearchParams();
+  const from = searchParams.get("from"); // pending OR all
+
+  const breadcrumbItems = [
+    { label: "Home", to: "/" },
+
+    from === "pending"
+      ? { label: "Pending Merchant", to: "/admin/merchant/pending-merchant" }
+      : { label: "All Merchant", to: "/admin/merchant/all-merchant" },
+
+    { label: "Merchant Registration" },
+  ];
+
   return (
     <div>
-      <PageBreadcrumb
-        items={[
-          { label: "Home", to: "/" },
-          { label: "Pending Merchant", to: "/admin/merchant/pending-merchant" },
-          { label: "Merchant Registration" },
-        ]}
-      />
+      <PageBreadcrumb items={breadcrumbItems} />
 
       <form onSubmit={handleSubmit(onSubmit)}>
         {/* Member Information */}

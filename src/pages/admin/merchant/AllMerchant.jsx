@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import PageBreadcrumb from "@/components/common/PageBreadcrumb";
 import SearchInput from "@/components/form/form-elements/SearchInput";
 import PrimaryButton from "@/components/ui/PrimaryButton";
-import { Eye, Loader, PencilLine } from "lucide-react";
+import { Eye, Loader, PencilLine, Plus } from "lucide-react";
 import DropdownSelect from "@/components/ui/dropdown/DropdownSelect";
 import Pagination from "@/components/table/Pagination";
 import { useMerchantManagement } from "../../../redux/features/admin/merchantManagement/useMerchantManagement";
@@ -200,6 +200,14 @@ const AllMerchant = () => {
                   ]}
                 />
               )}
+              <PrimaryButton
+                variant="primary"
+                size="md"
+                to="/admin/merchant/merchant-registration?from=all"
+              >
+                <Plus size={18} />
+                Add New Merchant
+              </PrimaryButton>
 
               <PrimaryButton
                 variant="secondary"
