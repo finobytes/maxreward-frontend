@@ -20,12 +20,13 @@ const MerchantDashboard = () => {
       </div>
     );
   }
-  console.log("data", data);
+  console.log("data", data?.merchant);
+  const wallet = data?.merchant?.corporate_member?.wallet || {};
   const cardsData = [
     {
-      icon: users,
+      icon: bag,
       title: "Available Points",
-      value: "12,432",
+      value: wallet.available_points || "0",
       changeText: "+0.892",
       changeColor: "text-green-500",
       subtitle: "Increased",
@@ -33,9 +34,9 @@ const MerchantDashboard = () => {
       chartData: [10, 14, 12, 18, 16, 20, 17],
     },
     {
-      icon: bag,
+      icon: clock,
       title: "On Hold Points",
-      value: "12,432",
+      value: wallet.onhold_points || "0",
       changeText: "+0.892",
       changeColor: "text-green-500",
       subtitle: "Increased",
@@ -45,7 +46,7 @@ const MerchantDashboard = () => {
     {
       icon: dollar,
       title: "Referral Points",
-      value: "12,432",
+      value: wallet.total_rp || "0",
       changeText: "+0.892",
       changeColor: "text-green-500",
       subtitle: "Increased",
@@ -55,7 +56,7 @@ const MerchantDashboard = () => {
     {
       icon: clock,
       title: "Pending Transaction",
-      value: "45",
+      value: wallet.pending_transactions || "0",
       changeText: "+0.892",
       changeColor: "text-green-500",
       subtitle: "Increased",
@@ -63,9 +64,9 @@ const MerchantDashboard = () => {
       chartData: [6, 8, 7, 9, 8, 10, 9],
     },
     {
-      icon: clock,
+      icon: users,
       title: "Community Member",
-      value: "45",
+      value: wallet.community_members || "0",
       changeText: "+0.892",
       changeColor: "text-green-500",
       subtitle: "Increased",
@@ -78,7 +79,10 @@ const MerchantDashboard = () => {
     <div>
       <h1 className="text-xl font-semibold text-gray-600 pb-4">Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <MembershipCard data={data} />
+        <div>
+          <MembershipCard data={data} />
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {cardsData.map((card, index) => (
             <DashboardCard key={index} {...card} />
