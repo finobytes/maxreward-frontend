@@ -2,18 +2,19 @@ import React from "react";
 import ComponentCard from "../../../../components/common/ComponentCard";
 
 const AuthorizedPersonInformation = ({ userInfo }) => {
+  console.log("AuthorizedPersonInformation userInfo:", userInfo);
   const authorizedPersonInformation = [
     {
       key: "Name:",
-      value: userInfo?.authorized_person_name || "N/A",
+      value: userInfo?.merchant?.authorized_person_name || "N/A",
     },
     {
       key: "Phone:",
-      value: userInfo?.authorized_person_phone || "N/A",
+      value: userInfo?.merchant?.phone || "N/A",
     },
     {
       key: "Email:",
-      value: userInfo?.authorized_person_email || "N/A",
+      value: userInfo?.merchant?.email || "N/A",
     },
   ];
   return (
