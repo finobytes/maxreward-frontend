@@ -139,7 +139,7 @@ export const memberApi = baseApi.injectEndpoints({
 
     getReferralMemberList: builder.query({
       query: ({ memberId, page, search, status }) => ({
-        url: `/members/${memberId}/upline`,
+        url: `/members/${memberId}/referrals`,
         params: {
           page,
           search,
