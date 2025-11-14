@@ -139,9 +139,7 @@ const AllMerchant = () => {
       refetch();
     } catch (error) {
       const message =
-        error?.data?.message ||
-        error?.error ||
-        "Failed to suspend merchant.";
+        error?.data?.message || error?.error || "Failed to suspend merchant.";
       setSuspendModal((prev) => ({
         ...prev,
         error: message,
@@ -342,7 +340,7 @@ const AllMerchant = () => {
                       </TableCell>
 
                       <TableCell>
-                        {m?.authorized_person || <span>N/A</span>}
+                        {m?.authorized_person_name || <span>N/A</span>}
                       </TableCell>
                       <TableCell>{m?.phone ?? "N/A"}</TableCell>
                       <TableCell>{m?.email ?? "N/A"}</TableCell>

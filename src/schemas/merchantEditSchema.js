@@ -12,12 +12,12 @@ export const merchantEditSchema = z
     account_holder_name: z.string().min(1, "Account holder name required"),
     account_number: z.string().min(6, "Account number required"),
     owner_name: z.string().min(1, "Owner name required"),
-    phone: z
+    phoneNumber: z
       .string()
-      .regex(
-        /^(?:\+?8801[3-9]\d{8}|01[3-9]\d{8}|\+?601[0-46-9]\d{7,8}|601[0-46-9]\d{7,8})$/,
-        "Phone number must be Bangladeshi or Malaysian"
-      ),
+      .transform((value) => value.replace(/[\s-]/g, "")) // space & dash remove
+      .refine((value) => /^\d{10,11}$/.test(value), {
+        message: "Invalid phone number",
+      }),
     gender: z.string().min(1, "Gender required"),
     address: z.string().min(3, "Address required"),
     email: z.string().email("Invalid email address"),
