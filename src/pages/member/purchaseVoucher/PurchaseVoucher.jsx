@@ -209,7 +209,13 @@ const PurchaseVoucher = () => {
                           {v.voucher_type}
                         </StatusBadge>
                       </TableCell>
-                      <TableCell>{v?.denomination?.title || "N/A"}</TableCell>
+                      <TableCell>
+                        {v?.denomination_history?.map((item, index) => (
+                          <div key={index} className="text-sm">
+                            {item.value}, {item.quantity}
+                          </div>
+                        ))}
+                      </TableCell>
                       <TableCell>{v.quantity}</TableCell>
                       <TableCell>RM {v.total_amount}</TableCell>
                       <TableCell className="capitalize">
