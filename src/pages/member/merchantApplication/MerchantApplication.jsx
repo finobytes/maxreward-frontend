@@ -20,7 +20,6 @@ const MerchantApplication = () => {
   const role = user?.role;
 
   const [businessLogo, setBusinessLogo] = useState(null);
-
   const [createMerchant, { isLoading }] = useCreateMerchantMutation();
 
   const {
@@ -44,20 +43,14 @@ const MerchantApplication = () => {
   const onSubmit = async (data) => {
     try {
       data.merchant_created_by = role === "admin" ? "admin" : "general_member";
-
       const formData = new FormData();
 
-      // copy all fields except phoneNumber
       Object.keys(data).forEach((key) => {
-        if (key !== "phoneNumber") {
+        if (data[key] !== undefined && data[key] !== null) {
           formData.append(key, data[key]);
         }
       });
 
-      // ⚡ send as "phone" (because backend needs "phone")
-      formData.append("phone", data.phoneNumber);
-
-      // file
       if (businessLogo) {
         formData.append("business_logo", businessLogo);
       }
@@ -87,11 +80,9 @@ const MerchantApplication = () => {
       />
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/* Business Information */}
         <ComponentCard title="Business Information">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:col-span-2">
-              {/* Business Name */}
               <div>
                 <Label>Company Name</Label>
                 <Input
@@ -105,7 +96,6 @@ const MerchantApplication = () => {
                 )}
               </div>
 
-              {/* Address (Fixed) */}
               <div>
                 <Label>Company Address</Label>
                 <Input {...register("address")} placeholder="Company Address" />
@@ -116,13 +106,11 @@ const MerchantApplication = () => {
                 )}
               </div>
 
-              {/* State */}
               <div>
                 <Label>State</Label>
                 <Input {...register("state")} placeholder="State" />
               </div>
 
-              {/* Business Type */}
               <div>
                 <Label>Product/Service</Label>
 
@@ -137,25 +125,25 @@ const MerchantApplication = () => {
                   </p>
                 ) : (
                   <Select
-                    {...register("business_type")}
-                    options={
-                      businessTypes?.data?.business_types?.map((type) => ({
+                    defaultValue=""
+                    {...register("business_type_id")}
+                    options={[
+                      ...(businessTypes?.data?.business_types?.map((type) => ({
                         value: type.id,
                         label: type.name,
-                      })) || []
-                    }
-                    placeholder="Select Business Type"
+                      })) || []),
+                    ]}
+                    placeholder="Select Product/Service Type"
                   />
                 )}
 
-                {errors.business_type && (
+                {errors.business_type_id && (
                   <p className="text-red-500 text-xs mt-1">
-                    {errors.business_type.message}
+                    {errors.business_type_id.message}
                   </p>
                 )}
               </div>
 
-              {/* Annual Sales Turnover */}
               <div>
                 <Label>Annual Sales Turnover</Label>
                 <Input
@@ -164,7 +152,6 @@ const MerchantApplication = () => {
                 />
               </div>
 
-              {/* Reward Budget */}
               <div>
                 <Label>Reward Budget (%)</Label>
                 <Input
@@ -172,9 +159,22 @@ const MerchantApplication = () => {
                   placeholder="Reward Budget (%)"
                 />
               </div>
+
+              <div>
+                <Label>Password</Label>
+                <Input
+                  type="password"
+                  {...register("merchant_password")}
+                  placeholder="Password"
+                />
+                {errors.merchant_password && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.merchant_password.message}
+                  </p>
+                )}
+              </div>
             </div>
 
-            {/* Upload Logo */}
             <div className="md:col-span-1">
               <Label>Upload Company Logo</Label>
               <Dropzone
@@ -189,11 +189,9 @@ const MerchantApplication = () => {
           </div>
         </ComponentCard>
 
-        {/* Authorized Person */}
         <div className="mt-6">
           <ComponentCard title="Authorized Person Information">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Authorized Person Name */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
                 <Label>Authorized Person Name</Label>
                 <Input
@@ -207,23 +205,18 @@ const MerchantApplication = () => {
                 )}
               </div>
 
-              {/* Phone (Fixed phoneNumber) */}
               <div>
                 <Label>
                   Phone Number (<span className="text-red-500">*</span>)
                 </Label>
-                <Input
-                  {...register("phoneNumber")}
-                  placeholder="Phone Number"
-                />
-                {errors.phoneNumber && (
+                <Input {...register("phone")} placeholder="Phone Number" />
+                {errors.phone && (
                   <p className="text-red-500 text-xs mt-1">
-                    {errors.phoneNumber.message}
+                    {errors.phone.message}
                   </p>
                 )}
               </div>
 
-              {/* Email */}
               <div>
                 <Label>Email Address</Label>
                 <Input {...register("email")} placeholder="Email Address" />
@@ -232,6 +225,11 @@ const MerchantApplication = () => {
                     {errors.email.message}
                   </p>
                 )}
+              </div>
+
+              <div>
+                <Label>Designation</Label>
+                <Input {...register("designation")} placeholder="Designation" />
               </div>
             </div>
 
