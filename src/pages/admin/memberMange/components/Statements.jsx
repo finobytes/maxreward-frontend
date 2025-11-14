@@ -87,11 +87,13 @@ const mockData = [
   },
 ];
 
-const Statements = () => {
+const Statements = ({ member }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage, setEntriesPerPage] = useState("10");
   const [search, setSearch] = useState("");
 
+  console.log("Member in Statements:", member?.wallet);
+  const wallet = member?.wallet;
   const totalPages = 5;
 
   // ✅ Filter search
@@ -110,8 +112,10 @@ const Statements = () => {
           <div className="flex justify-between">
             <div>
               <p className="text-xs text-gray-500 mb-1">Available Points</p>
-              <p className="text-xl font-semibold text-gray-900">12,432</p>
-              <p className="text-xs text-green-500 mt-1">+0.892 Increased</p>
+              <p className="text-xl font-semibold text-gray-900">
+                {wallet?.available_points || 0}
+              </p>
+              <p className="text-xs text-green-500 mt-1">+0.00 Increased</p>
             </div>
             <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
               <CreditCard className="w-4 h-4 text-purple-600" />
@@ -123,8 +127,10 @@ const Statements = () => {
           <div className="flex justify-between">
             <div>
               <p className="text-xs text-gray-500 mb-1">On Hold Points</p>
-              <p className="text-xl font-semibold text-gray-900">8,950</p>
-              <p className="text-xs text-orange-500 mt-1">+0.520 Increased</p>
+              <p className="text-xl font-semibold text-gray-900">
+                {wallet?.onhold_points || 0}
+              </p>
+              <p className="text-xs text-orange-500 mt-1">+0.00 Increased</p>
             </div>
             <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
               <Hand className="w-4 h-4 text-orange-600" />
@@ -136,8 +142,10 @@ const Statements = () => {
           <div className="flex justify-between">
             <div>
               <p className="text-xs text-gray-500 mb-1">Referral Points</p>
-              <p className="text-xl font-semibold text-gray-900">3,250</p>
-              <p className="text-xs text-green-500 mt-1">+0.742 Increased</p>
+              <p className="text-xl font-semibold text-gray-900">
+                {wallet?.total_rp || 0}
+              </p>
+              <p className="text-xs text-green-500 mt-1">+0.00 Increased</p>
             </div>
             <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
               <Users className="w-4 h-4 text-green-600" />
@@ -149,8 +157,8 @@ const Statements = () => {
           <div className="flex justify-between">
             <div>
               <p className="text-xs text-gray-500 mb-1">Community Members</p>
-              <p className="text-xl font-semibold text-gray-900">45</p>
-              <p className="text-xs text-green-500 mt-1">+0.892 Increased</p>
+              <p className="text-xl font-semibold text-gray-900">0</p>
+              <p className="text-xs text-green-500 mt-1">+0.00 Increased</p>
             </div>
             <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
               <UserCheck className="w-4 h-4 text-blue-600" />
