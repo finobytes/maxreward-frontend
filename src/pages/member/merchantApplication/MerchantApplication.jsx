@@ -10,7 +10,6 @@ import Select from "@/components/form/Select";
 import PrimaryButton from "@/components/ui/PrimaryButton";
 import Dropzone from "@/components/form/form-elements/Dropzone";
 import { toast } from "sonner";
-import { useNavigate } from "react-router";
 import { useGetAllBusinessTypesQuery } from "@/redux/features/admin/businessType/businessTypeApi";
 import { merchantSchema } from "../../../schemas/merchantSchema";
 import { useSelector } from "react-redux";
@@ -20,12 +19,10 @@ const MerchantApplication = () => {
   const { user } = useSelector((state) => state.auth);
   const role = user?.role;
 
-  console.log(role);
-
   const [businessLogo, setBusinessLogo] = useState(null);
 
   const [createMerchant, { isLoading }] = useCreateMerchantMutation();
-  const navigate = useNavigate();
+
   const {
     data: businessTypes,
     isLoading: isBusinessTypeLoading,
@@ -40,35 +37,34 @@ const MerchantApplication = () => {
   } = useForm({
     resolver: zodResolver(merchantSchema),
     defaultValues: {
-      status: "approved",
+      status: "pending",
     },
   });
 
   const onSubmit = async (data) => {
     try {
       data.merchant_created_by = role === "admin" ? "admin" : "general_member";
+
       const formData = new FormData();
 
-      //  Append all text fields
+      // copy all fields except phoneNumber
       Object.keys(data).forEach((key) => {
-        if (data[key] !== undefined && data[key] !== null) {
+        if (key !== "phoneNumber") {
           formData.append(key, data[key]);
         }
       });
 
-      //  File append
+      // ⚡ send as "phone" (because backend needs "phone")
+      formData.append("phone", data.phoneNumber);
+
+      // file
       if (businessLogo) {
         formData.append("business_logo", businessLogo);
       }
 
-      //  confirm_password
-      formData.delete("confirm_password");
-
-      const response = await createMerchant(formData).unwrap();
-
-      toast.success("Merchant created successfully!");
+      await createMerchant(formData).unwrap();
+      toast.success("Apply for Merchant successfully!");
       reset();
-      navigate("/admin/merchant/pending-merchant");
     } catch (err) {
       console.error("Create Error:", err);
       if (err?.data?.errors) {
@@ -91,10 +87,11 @@ const MerchantApplication = () => {
       />
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/* Member Information */}
+        {/* Business Information */}
         <ComponentCard title="Business Information">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:col-span-2">
+              {/* Business Name */}
               <div>
                 <Label>Company Name</Label>
                 <Input
@@ -108,17 +105,24 @@ const MerchantApplication = () => {
                 )}
               </div>
 
+              {/* Address (Fixed) */}
               <div>
                 <Label>Company Address</Label>
-                <Input
-                  {...register("company_address")}
-                  placeholder="Company Address"
-                />
+                <Input {...register("address")} placeholder="Company Address" />
+                {errors.address && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.address.message}
+                  </p>
+                )}
               </div>
+
+              {/* State */}
               <div>
                 <Label>State</Label>
                 <Input {...register("state")} placeholder="State" />
               </div>
+
+              {/* Business Type */}
               <div>
                 <Label>Product/Service</Label>
 
@@ -151,6 +155,7 @@ const MerchantApplication = () => {
                 )}
               </div>
 
+              {/* Annual Sales Turnover */}
               <div>
                 <Label>Annual Sales Turnover</Label>
                 <Input
@@ -158,6 +163,8 @@ const MerchantApplication = () => {
                   placeholder="Annual Sales Turnover"
                 />
               </div>
+
+              {/* Reward Budget */}
               <div>
                 <Label>Reward Budget (%)</Label>
                 <Input
@@ -167,6 +174,7 @@ const MerchantApplication = () => {
               </div>
             </div>
 
+            {/* Upload Logo */}
             <div className="md:col-span-1">
               <Label>Upload Company Logo</Label>
               <Dropzone
@@ -181,37 +189,57 @@ const MerchantApplication = () => {
           </div>
         </ComponentCard>
 
-        {/* Bank Information */}
+        {/* Authorized Person */}
         <div className="mt-6">
           <ComponentCard title="Authorized Person Information">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Authorized Person Name */}
               <div>
                 <Label>Authorized Person Name</Label>
                 <Input
                   {...register("authorized_person_name")}
                   placeholder="Authorized Person Name"
                 />
+                {errors.authorized_person_name && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.authorized_person_name.message}
+                  </p>
+                )}
               </div>
+
+              {/* Phone (Fixed phoneNumber) */}
               <div>
                 <Label>
                   Phone Number (<span className="text-red-500">*</span>)
                 </Label>
-                <Input {...register("phone")} placeholder="Phone Number" />
-                {errors.phone && (
+                <Input
+                  {...register("phoneNumber")}
+                  placeholder="Phone Number"
+                />
+                {errors.phoneNumber && (
                   <p className="text-red-500 text-xs mt-1">
-                    {errors.phone.message}
+                    {errors.phoneNumber.message}
                   </p>
                 )}
               </div>
+
+              {/* Email */}
               <div>
                 <Label>Email Address</Label>
                 <Input {...register("email")} placeholder="Email Address" />
+                {errors.email && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.email.message}
+                  </p>
+                )}
               </div>
             </div>
+
             <div className="mt-8 flex gap-4">
               <PrimaryButton type="submit" disabled={isLoading}>
                 {isLoading ? "Submitting..." : "Submit"}
               </PrimaryButton>
+
               <PrimaryButton
                 variant="secondary"
                 type="button"
