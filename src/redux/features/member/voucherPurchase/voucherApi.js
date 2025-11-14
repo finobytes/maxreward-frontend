@@ -80,7 +80,7 @@ export const voucherApi = baseApi.injectEndpoints({
     }),
     // Get single voucher by ID For member
     getVoucherByIdForMember: builder.query({
-      query: (id) => `/member/vouchers/${id}`,
+      query: (id) => `/members/${id}/vouchers`,
       transformResponse: (res) => res?.data ?? res,
       providesTags: (result, err, id) => [{ type: "Voucher", id }],
     }),
@@ -155,4 +155,5 @@ export const {
   useApproveVoucherMutation,
   useRejectVoucherMutation,
   useDeleteVoucherMutation,
+  useGetVoucherByIdForMemberQuery,
 } = voucherApi;
