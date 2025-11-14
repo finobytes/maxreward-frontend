@@ -128,10 +128,18 @@ export const memberApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Member"],
     }),
+    // Get member upline members from admin
+    getUpLineMember: builder.query({
+      query: (id) => ({
+        url: `/member/${id}/upline`,
+        method: "GET",
+      }),
+      providesTags: ["Member"],
+    }),
 
     getReferralMemberList: builder.query({
       query: ({ memberId, page, search, status }) => ({
-        url: `/members/${memberId}/referrals`,
+        url: `/members/${memberId}/upline`,
         params: {
           page,
           search,
@@ -168,4 +176,5 @@ export const {
   useBlockOrSuspendMemberMutation,
   useGetReferralTreeQuery,
   useGetReferralMemberListQuery,
+  useGetUpLineMemberQuery,
 } = memberApi;
