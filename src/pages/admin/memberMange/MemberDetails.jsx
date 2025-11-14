@@ -18,18 +18,18 @@ import { useGetMemberByIdQuery } from "../../../redux/features/admin/memberManag
 import MerchantDetailsSkeleton from "../../../components/skeleton/MerchantDetailsSkeleton";
 
 const tabs = [
+  { name: "Statements", icon: ScrollText, key: "statements" },
   { name: "Community", icon: UsersRound, key: "community" },
   {
     name: "Community Uplink",
     icon: LucideAlignVerticalDistributeEnd,
     key: "communityUplink",
   },
-  { name: "Statements", icon: ScrollText, key: "statements" },
 ];
 
 const MemberDetails = () => {
   const { id } = useParams();
-  const [currentTab, setCurrentTab] = useState("community");
+  const [currentTab, setCurrentTab] = useState("statements");
 
   const {
     data: member,

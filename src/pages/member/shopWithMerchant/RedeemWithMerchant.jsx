@@ -192,14 +192,14 @@ const RedeemWithMerchant = () => {
                     disabled
                   />
                 </div>
-                <div>
+                {/* <div>
                   <Label htmlFor="cash-to-pay">Cash Payment</Label>
                   <Input
                     id="cash-to-pay"
                     value={formatCurrency(cashRedeemAmount)}
                     disabled
                   />
-                </div>
+                </div> */}
               </div>
 
               <div className="mt-8 flex flex-col gap-3">

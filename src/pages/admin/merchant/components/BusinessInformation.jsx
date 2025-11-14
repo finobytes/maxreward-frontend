@@ -22,7 +22,9 @@ const BusinessInformation = ({ merchantData }) => {
     },
     {
       key: "Reward Budget:",
-      value: merchantData ? merchantData.reward_budget : "-- No Data --",
+      value: `${
+        merchantData ? merchantData.reward_budget : "-- No Data --"
+      } % `,
     },
     {
       key: "Join Date:",

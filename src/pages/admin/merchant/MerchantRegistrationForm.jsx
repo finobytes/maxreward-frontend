@@ -15,6 +15,7 @@ import { useGetAllBusinessTypesQuery } from "@/redux/features/admin/businessType
 import { merchantSchema } from "../../../schemas/merchantSchema";
 import { useSelector } from "react-redux";
 import { companyLogoPlaceholder } from "../../../assets/assets";
+import { useSearchParams } from "react-router";
 
 const MerchantRegistrationForm = () => {
   const { user } = useSelector((state) => state.auth);
@@ -61,9 +62,6 @@ const MerchantRegistrationForm = () => {
         formData.append("business_logo", businessLogo);
       }
 
-      //  confirm_password
-      formData.delete("confirm_password");
-
       const response = await createMerchant(formData).unwrap();
 
       toast.success("Merchant created successfully!");
@@ -81,15 +79,22 @@ const MerchantRegistrationForm = () => {
     }
   };
 
+  const [searchParams] = useSearchParams();
+  const from = searchParams.get("from"); // pending OR all
+
+  const breadcrumbItems = [
+    { label: "Home", to: "/" },
+
+    from === "pending"
+      ? { label: "Pending Merchant", to: "/admin/merchant/pending-merchant" }
+      : { label: "All Merchant", to: "/admin/merchant/all-merchant" },
+
+    { label: "Merchant Registration" },
+  ];
+
   return (
     <div>
-      <PageBreadcrumb
-        items={[
-          { label: "Home", to: "/" },
-          { label: "Pending Merchant", to: "/admin/merchant/pending-merchant" },
-          { label: "Merchant Registration" },
-        ]}
-      />
+      <PageBreadcrumb items={breadcrumbItems} />
 
       <form onSubmit={handleSubmit(onSubmit)}>
         {/* Member Information */}
@@ -131,20 +136,21 @@ const MerchantRegistrationForm = () => {
                   </p>
                 ) : (
                   <Select
-                    {...register("business_type")}
-                    options={
-                      businessTypes?.data?.business_types?.map((type) => ({
+                    defaultValue=""
+                    {...register("business_type_id")}
+                    options={[
+                      ...(businessTypes?.data?.business_types?.map((type) => ({
                         value: type.id,
                         label: type.name,
-                      })) || []
-                    }
-                    placeholder="Select Business Type"
+                      })) || []),
+                    ]}
+                    placeholder="Select Product/Service Type"
                   />
                 )}
 
-                {errors.business_type && (
+                {errors.business_type_id && (
                   <p className="text-red-500 text-xs mt-1">
-                    {errors.business_type.message}
+                    {errors.business_type_id.message}
                   </p>
                 )}
               </div>
@@ -161,6 +167,14 @@ const MerchantRegistrationForm = () => {
                 <Input
                   {...register("reward_budget")}
                   placeholder="Reward Budget (%)"
+                />
+              </div>
+              <div>
+                <Label>Password</Label>
+                <Input
+                  type="password"
+                  {...register("merchant_password")}
+                  placeholder="Password"
                 />
               </div>
             </div>
@@ -182,7 +196,7 @@ const MerchantRegistrationForm = () => {
         {/* Bank Information */}
         <div className="mt-6">
           <ComponentCard title="Authorized Person Information">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
                 <Label>Authorized Person Name</Label>
                 <Input
@@ -204,6 +218,11 @@ const MerchantRegistrationForm = () => {
               <div>
                 <Label>Email Address</Label>
                 <Input {...register("email")} placeholder="Email Address" />
+              </div>
+
+              <div>
+                <Label>Designation</Label>
+                <Input {...register("designation")} placeholder="Designation" />
               </div>
             </div>
             <div className="mt-8 flex gap-4">

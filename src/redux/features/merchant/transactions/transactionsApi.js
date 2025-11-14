@@ -64,7 +64,7 @@ export const transactionsApi = baseApi.injectEndpoints({
 
     approvePurchase: builder.mutation({
       query: ({ merchantId, purchaseId }) => ({
-        url: `/merchants/${merchantId}/approve/purchase`,
+        url: `/merchants/${purchaseId}/approve/purchase`,
         method: "POST",
         body: {
           purchase_id: purchaseId,

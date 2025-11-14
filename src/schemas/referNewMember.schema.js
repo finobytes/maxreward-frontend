@@ -6,10 +6,10 @@ export const referNewMemberSchema = z.object({
     .min(3, { message: "Full name must be at least 3 characters long" }),
   phoneNumber: z
     .string()
-    .regex(
-      /^(?:\+?8801[3-9]\d{8}|01[3-9]\d{8}|\+?601[0-46-9]\d{7,8}|601[0-46-9]\d{7,8})$/,
-      "Phone number must be Bangladeshi or Malaysian"
-    ),
+    .transform((value) => value.replace(/[\s-]/g, "")) // space & dash remove
+    .refine((value) => /^\d{10,11}$/.test(value), {
+      message: "Invalid phone number",
+    }),
   email: z
     .string()
     .email({ message: "Enter a valid email address" })

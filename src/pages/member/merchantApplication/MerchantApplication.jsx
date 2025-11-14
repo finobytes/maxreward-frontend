@@ -10,7 +10,6 @@ import Select from "@/components/form/Select";
 import PrimaryButton from "@/components/ui/PrimaryButton";
 import Dropzone from "@/components/form/form-elements/Dropzone";
 import { toast } from "sonner";
-import { useNavigate } from "react-router";
 import { useGetAllBusinessTypesQuery } from "@/redux/features/admin/businessType/businessTypeApi";
 import { merchantSchema } from "../../../schemas/merchantSchema";
 import { useSelector } from "react-redux";
@@ -20,12 +19,9 @@ const MerchantApplication = () => {
   const { user } = useSelector((state) => state.auth);
   const role = user?.role;
 
-  console.log(role);
-
   const [businessLogo, setBusinessLogo] = useState(null);
-
   const [createMerchant, { isLoading }] = useCreateMerchantMutation();
-  const navigate = useNavigate();
+
   const {
     data: businessTypes,
     isLoading: isBusinessTypeLoading,
@@ -40,7 +36,7 @@ const MerchantApplication = () => {
   } = useForm({
     resolver: zodResolver(merchantSchema),
     defaultValues: {
-      status: "approved",
+      status: "pending",
     },
   });
 
@@ -49,26 +45,19 @@ const MerchantApplication = () => {
       data.merchant_created_by = role === "admin" ? "admin" : "general_member";
       const formData = new FormData();
 
-      //  Append all text fields
       Object.keys(data).forEach((key) => {
         if (data[key] !== undefined && data[key] !== null) {
           formData.append(key, data[key]);
         }
       });
 
-      //  File append
       if (businessLogo) {
         formData.append("business_logo", businessLogo);
       }
 
-      //  confirm_password
-      formData.delete("confirm_password");
-
-      const response = await createMerchant(formData).unwrap();
-
-      toast.success("Merchant created successfully!");
+      await createMerchant(formData).unwrap();
+      toast.success("Apply for Merchant successfully!");
       reset();
-      navigate("/admin/merchant/pending-merchant");
     } catch (err) {
       console.error("Create Error:", err);
       if (err?.data?.errors) {
@@ -91,7 +80,6 @@ const MerchantApplication = () => {
       />
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/* Member Information */}
         <ComponentCard title="Business Information">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:col-span-2">
@@ -110,15 +98,19 @@ const MerchantApplication = () => {
 
               <div>
                 <Label>Company Address</Label>
-                <Input
-                  {...register("company_address")}
-                  placeholder="Company Address"
-                />
+                <Input {...register("address")} placeholder="Company Address" />
+                {errors.address && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.address.message}
+                  </p>
+                )}
               </div>
+
               <div>
                 <Label>State</Label>
                 <Input {...register("state")} placeholder="State" />
               </div>
+
               <div>
                 <Label>Product/Service</Label>
 
@@ -133,20 +125,21 @@ const MerchantApplication = () => {
                   </p>
                 ) : (
                   <Select
-                    {...register("business_type")}
-                    options={
-                      businessTypes?.data?.business_types?.map((type) => ({
+                    defaultValue=""
+                    {...register("business_type_id")}
+                    options={[
+                      ...(businessTypes?.data?.business_types?.map((type) => ({
                         value: type.id,
                         label: type.name,
-                      })) || []
-                    }
-                    placeholder="Select Business Type"
+                      })) || []),
+                    ]}
+                    placeholder="Select Product/Service Type"
                   />
                 )}
 
-                {errors.business_type && (
+                {errors.business_type_id && (
                   <p className="text-red-500 text-xs mt-1">
-                    {errors.business_type.message}
+                    {errors.business_type_id.message}
                   </p>
                 )}
               </div>
@@ -158,12 +151,27 @@ const MerchantApplication = () => {
                   placeholder="Annual Sales Turnover"
                 />
               </div>
+
               <div>
                 <Label>Reward Budget (%)</Label>
                 <Input
                   {...register("reward_budget")}
                   placeholder="Reward Budget (%)"
                 />
+              </div>
+
+              <div>
+                <Label>Password</Label>
+                <Input
+                  type="password"
+                  {...register("merchant_password")}
+                  placeholder="Password"
+                />
+                {errors.merchant_password && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.merchant_password.message}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -181,17 +189,22 @@ const MerchantApplication = () => {
           </div>
         </ComponentCard>
 
-        {/* Bank Information */}
         <div className="mt-6">
           <ComponentCard title="Authorized Person Information">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
                 <Label>Authorized Person Name</Label>
                 <Input
                   {...register("authorized_person_name")}
                   placeholder="Authorized Person Name"
                 />
+                {errors.authorized_person_name && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.authorized_person_name.message}
+                  </p>
+                )}
               </div>
+
               <div>
                 <Label>
                   Phone Number (<span className="text-red-500">*</span>)
@@ -203,15 +216,28 @@ const MerchantApplication = () => {
                   </p>
                 )}
               </div>
+
               <div>
                 <Label>Email Address</Label>
                 <Input {...register("email")} placeholder="Email Address" />
+                {errors.email && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.email.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <Label>Designation</Label>
+                <Input {...register("designation")} placeholder="Designation" />
               </div>
             </div>
+
             <div className="mt-8 flex gap-4">
               <PrimaryButton type="submit" disabled={isLoading}>
                 {isLoading ? "Submitting..." : "Submit"}
               </PrimaryButton>
+
               <PrimaryButton
                 variant="secondary"
                 type="button"

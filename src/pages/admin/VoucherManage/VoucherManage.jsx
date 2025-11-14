@@ -282,7 +282,14 @@ const VoucherManage = () => {
                       </StatusBadge>
                     </TableCell>
                     <TableCell>{v?.member?.name || "N/A"}</TableCell>
-                    <TableCell>{v?.denomination?.title}</TableCell>
+                    <TableCell>
+                      {v?.denomination_history?.map((item, index) => (
+                        <div key={index} className="text-sm">
+                          {item.value}, {item.quantity}
+                        </div>
+                      ))}
+                    </TableCell>
+
                     <TableCell>{v.quantity}</TableCell>
                     <TableCell>RM {v.total_amount}</TableCell>
                     <TableCell>
@@ -344,8 +351,8 @@ const VoucherManage = () => {
           <DialogHeader>
             <DialogTitle>Reject Voucher</DialogTitle>
             <DialogDescription>
-              Provide a reason for rejecting voucher #
-              {rejectDialog.voucher?.id}.
+              Provide a reason for rejecting voucher #{rejectDialog.voucher?.id}
+              .
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-2">

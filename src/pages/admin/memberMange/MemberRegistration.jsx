@@ -21,9 +21,12 @@ const referNewMemberSchema = z.object({
   fullName: z
     .string()
     .min(3, { message: "Full name must be at least 3 characters long" }),
-  phoneNumber: z.string().regex(/^(?:\+?8801[3-9]\d{8}|01[3-9]\d{8})$/, {
-    message: "Invalid Bangladeshi phone number format",
-  }),
+  phoneNumber: z
+    .string()
+    .transform((value) => value.replace(/[\s-]/g, "")) // space & dash remove
+    .refine((value) => /^\d{10,11}$/.test(value), {
+      message: "Invalid phone number",
+    }),
   email: z
     .string()
     .email({ message: "Invalid email address" })

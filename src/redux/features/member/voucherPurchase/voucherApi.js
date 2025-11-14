@@ -72,13 +72,18 @@ export const voucherApi = baseApi.injectEndpoints({
       keepUnusedDataFor: 60,
     }),
 
-    // Get single voucher by ID
+    // Get single voucher by ID For Admin
     getVoucherById: builder.query({
       query: (id) => `/admin/vouchers/${id}`,
       transformResponse: (res) => res?.data ?? res,
       providesTags: (result, err, id) => [{ type: "Voucher", id }],
     }),
-
+    // Get single voucher by ID For member
+    getVoucherByIdForMember: builder.query({
+      query: (id) => `/members/${id}/vouchers`,
+      transformResponse: (res) => res?.data ?? res,
+      providesTags: (result, err, id) => [{ type: "Voucher", id }],
+    }),
     // Create voucher (Member)
     createVoucher: builder.mutation({
       query: (formData) => ({
@@ -150,4 +155,5 @@ export const {
   useApproveVoucherMutation,
   useRejectVoucherMutation,
   useDeleteVoucherMutation,
+  useGetVoucherByIdForMemberQuery,
 } = voucherApi;

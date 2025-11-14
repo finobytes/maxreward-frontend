@@ -5,30 +5,35 @@ import PrimaryButton from "../../../../components/ui/PrimaryButton";
 const OwnerInfoCard = ({ userInfo }) => {
   const people = [
     {
-      key: "Name:",
-      value: userInfo?.name || "N/A",
+      key: "Company Name:",
+      value: userInfo?.merchant?.business_name || "N/A",
     },
     {
-      key: "Email:",
-      value: userInfo?.email || "N/A",
+      key: "Company Address:",
+      value: userInfo?.merchant?.address || "N/A",
     },
     {
-      key: "Phone:",
-      value: userInfo?.phone || "N/A",
+      key: "Product/Service:",
+      value: userInfo?.merchant?.business_type || "N/A",
     },
     {
-      key: "Address:",
-      value: userInfo?.address || "N/A",
+      key: "Annual Sales Turnover:",
+      value: userInfo?.merchant?.annual_sales_turnover || "N/A",
     },
     {
-      key: "Create at:",
+      key: "Reward Budget:",
+      value: userInfo?.merchant?.reward_budget || "N/A",
+    },
+    {
+      key: "Join Date:",
       value: `${new Date(userInfo?.created_at).toLocaleDateString()}` || "N/A",
     },
   ];
+  console.log(userInfo);
   return (
     <div className="">
       {/* Info List */}
-      <ComponentCard title="Owner Information">
+      <ComponentCard title="Business Information">
         <div className="flow-root">
           <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">

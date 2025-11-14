@@ -45,6 +45,7 @@ const Select = React.forwardRef(
           className={selectClasses}
           {...rest}
         >
+          {/* Default placeholder */}
           <option value="" disabled>
             {placeholder}
           </option>

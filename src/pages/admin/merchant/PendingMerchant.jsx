@@ -132,7 +132,7 @@ const PendingMerchant = () => {
             <PrimaryButton
               variant="primary"
               size="md"
-              to="/admin/merchant/merchant-registration"
+              to="/admin/merchant/merchant-registration?from=pending"
             >
               <Plus size={18} />
               Add New Merchant
