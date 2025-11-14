@@ -50,7 +50,7 @@ export const referNewMemberApi = baseApi.injectEndpoints({
     }),
 
     // 3️⃣ Get referral tree
-    getReferralTree: builder.query({
+    getReferralTreeForMember: builder.query({
       query: () => ({
         url: "/member/referral-tree",
         method: "GET",
@@ -64,5 +64,5 @@ export const {
   useReferNewMemberMutation,
   useGetReferredMembersQuery,
   useGetSponsoredMembersQuery,
-  useGetReferralTreeQuery,
+  useGetReferralTreeForMemberQuery,
 } = referNewMemberApi;
