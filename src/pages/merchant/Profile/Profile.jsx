@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
 import ProfileSkeleton from "../../../components/skeleton/ProfileSkeleton";
 import { toast } from "sonner";
+import AuthorizedPersonInformation from "./components/AuthorizedPersonInformation";
 
 const Profile = () => {
   const { user, token } = useSelector((state) => state.auth);
@@ -32,6 +33,7 @@ const Profile = () => {
         <ProfileCard userInfo={data} />
         <OwnerInfoCard userInfo={data} />
         <PasswordUpdate />
+        <AuthorizedPersonInformation userInfo={data} />
       </div>
     </div>
   );
