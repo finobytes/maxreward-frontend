@@ -120,17 +120,40 @@ const VoucherDetails = () => {
             <div className="space-y-3">
               <InfoRow label="Payment Method" value={data.payment_method} />
               <InfoRow
-                label="Denomination"
-                value={`${data.denomination?.title} (RM ${data.denomination?.value})`}
-              />
-              <InfoRow
                 label="Created At"
                 value={new Date(data.created_at).toLocaleString()}
               />
-              <InfoRow
-                label="Updated At"
-                value={new Date(data.updated_at).toLocaleString()}
-              />
+              <div>
+                {/* Denomination Table */}
+                <h3 className="text-lg font-semibold mt-8 mb-3">
+                  Denomination History
+                </h3>
+
+                <div className="border rounded-lg overflow-hidden">
+                  <table className="w-full">
+                    <thead className="bg-gray-100">
+                      <tr>
+                        <th className="p-3 text-left">Denomination ID</th>
+                        <th className="p-3 text-left">Value (RM)</th>
+                        <th className="p-3 text-left">Quantity</th>
+                        <th className="p-3 text-left">Total Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.denomination_history?.map((item, index) => (
+                        <tr key={index} className="border-t">
+                          <td className="p-3">{item.denomination_id}</td>
+                          <td className="p-3">{item.value}</td>
+                          <td className="p-3">{item.quantity}</td>
+                          <td className="p-3 font-semibold text-green-700">
+                            RM {item.totalAmount}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
 
             <div className="space-y-3">
