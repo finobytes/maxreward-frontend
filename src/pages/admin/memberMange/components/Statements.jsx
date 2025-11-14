@@ -157,7 +157,9 @@ const Statements = ({ member }) => {
           <div className="flex justify-between">
             <div>
               <p className="text-xs text-gray-500 mb-1">Community Members</p>
-              <p className="text-xl font-semibold text-gray-900">0</p>
+              <p className="text-xl font-semibold text-gray-900">
+                {member?.community_members || 0}
+              </p>
               <p className="text-xs text-green-500 mt-1">+0.00 Increased</p>
             </div>
             <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">

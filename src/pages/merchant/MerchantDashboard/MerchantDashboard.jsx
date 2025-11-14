@@ -24,7 +24,7 @@ const MerchantDashboard = () => {
   const cardsData = [
     {
       icon: users,
-      title: "Total Users",
+      title: "Available Points",
       value: "12,432",
       changeText: "+0.892",
       changeColor: "text-green-500",
@@ -34,7 +34,7 @@ const MerchantDashboard = () => {
     },
     {
       icon: bag,
-      title: "Total Merchants",
+      title: "On Hold Points",
       value: "12,432",
       changeText: "+0.892",
       changeColor: "text-green-500",
@@ -44,7 +44,7 @@ const MerchantDashboard = () => {
     },
     {
       icon: dollar,
-      title: "Total Transactions",
+      title: "Referral Points",
       value: "12,432",
       changeText: "+0.892",
       changeColor: "text-green-500",
@@ -54,7 +54,17 @@ const MerchantDashboard = () => {
     },
     {
       icon: clock,
-      title: "Merchant Approvals",
+      title: "Pending Transaction",
+      value: "45",
+      changeText: "+0.892",
+      changeColor: "text-green-500",
+      subtitle: "Increased",
+      chartColor: "#3B82F6", // blue
+      chartData: [6, 8, 7, 9, 8, 10, 9],
+    },
+    {
+      icon: clock,
+      title: "Community Member",
       value: "45",
       changeText: "+0.892",
       changeColor: "text-green-500",
@@ -75,14 +85,14 @@ const MerchantDashboard = () => {
           ))}
         </div>
       </div>
-      <div className="mt-6 grid grid-cols-1 lg:grid-cols-4 gap-4">
+      {/* <div className="mt-6 grid grid-cols-1 lg:grid-cols-4 gap-4">
         <div className="lg:col-span-3">
           <RealTimeTransactions />
         </div>
         <div className="lg:col-span-1">
           <PurchasedVsRedeemed />
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
