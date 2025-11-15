@@ -12,6 +12,8 @@ import MerchantStaff from "../pages/merchant/MerchantStaff/MerchantStaff";
 import MerchantStaffCreate from "../pages/merchant/MerchantStaff/MerchantStaffCreate";
 import MerchantStaffDetails from "../pages/merchant/MerchantStaff/MerchantStaffDetails";
 import MerchantStaffUpdate from "../pages/merchant/MerchantStaff/MerchantStaffUpdate";
+import VoucherPurchaseForm from "../pages/merchant/VoucherPurchase/VoucherPurchaseForm";
+import VoucherPurchaseDetails from "../pages/merchant/VoucherPurchase/VoucherPurchaseDetails";
 
 export const merchantRoute = [
   {
@@ -53,6 +55,14 @@ export const merchantRoute = [
   {
     path: "voucher-purchase",
     element: <VoucherPurchase />,
+  },
+  {
+    path: "add",
+    element: <VoucherPurchaseForm />,
+  },
+  {
+    path: "voucher-details/:id",
+    element: <VoucherPurchaseDetails />,
   },
   {
     path: "reports/member-transactions",

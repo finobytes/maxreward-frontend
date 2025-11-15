@@ -44,7 +44,7 @@ const voucherSchema = z.object({
     ),
 });
 
-const VoucherForm = () => {
+const VoucherPurchaseForm = () => {
   const {
     denominations,
     denomLoading,
@@ -147,7 +147,7 @@ const VoucherForm = () => {
       <PageBreadcrumb
         items={[
           { label: "Home", to: "/" },
-          { label: "Voucher Purchase", to: "/member/purchase-voucher" },
+          { label: "Voucher Purchase", to: "/merchant/voucher-purchase" },
           { label: "Voucher Purchase Form" },
         ]}
       />
@@ -410,4 +410,4 @@ const VoucherForm = () => {
   );
 };
 
-export default VoucherForm;
+export default VoucherPurchaseForm;

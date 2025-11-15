@@ -22,7 +22,6 @@ const MerchantDetails = () => {
   const [currentTab, setCurrentTab] = useState("statements");
   const { id } = useParams();
   const { data, isLoading } = useGetMerchantByIdQuery(id);
-  console.log("Merchant Data:", data?.data);
   if (isLoading) return <MerchantDetailsSkeleton />;
   return (
     <div>
@@ -67,7 +66,10 @@ const MerchantDetails = () => {
               setCurrentTab={setCurrentTab}
             />
             <div className="">
-              <MerchantProfileTabsContent currentTab={currentTab} />
+              <MerchantProfileTabsContent
+                currentTab={currentTab}
+                merchantData={data?.data}
+              />
             </div>
           </ComponentCard>
         </div>

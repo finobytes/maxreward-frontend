@@ -56,7 +56,7 @@ const MerchantDashboard = () => {
     {
       icon: clock,
       title: "Pending Transaction",
-      value: wallet.pending_transactions || "0",
+      value: data.total_pending_purchase || "0",
       changeText: "+0.892",
       changeColor: "text-green-500",
       subtitle: "Increased",
@@ -66,7 +66,7 @@ const MerchantDashboard = () => {
     {
       icon: users,
       title: "Community Member",
-      value: wallet.community_members || "0",
+      value: data.community_members || "0",
       changeText: "+0.892",
       changeColor: "text-green-500",
       subtitle: "Increased",

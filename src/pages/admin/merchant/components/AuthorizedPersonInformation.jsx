@@ -9,6 +9,10 @@ const AuthorizedPersonInformation = ({ merchantData }) => {
         : "-- No Data --",
     },
     {
+      key: "Designation:",
+      value: merchantData ? merchantData.designation : "-- No Designation --",
+    },
+    {
       key: "Phone:",
       value: merchantData ? merchantData.phone : "-- No Phone --",
     },
