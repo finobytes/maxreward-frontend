@@ -22,6 +22,7 @@ const MerchantDetails = () => {
   const [currentTab, setCurrentTab] = useState("statements");
   const { id } = useParams();
   const { data, isLoading } = useGetMerchantByIdQuery(id);
+  console.log("merchant details data", data?.data);
   if (isLoading) return <MerchantDetailsSkeleton />;
   return (
     <div>
@@ -39,16 +40,16 @@ const MerchantDetails = () => {
         <div className="space-y-4">
           {/* Profile Card */}
           <ComponentCard>
-            <MerchantProfileCard merchant={data?.data} />
+            <MerchantProfileCard merchantData={data?.data?.merchant} />
           </ComponentCard>
 
           {/* Owner Info  */}
           <div>
-            <BusinessInformation merchantData={data?.data} />
+            <BusinessInformation merchantData={data?.data?.merchant} />
           </div>
 
           <div>
-            <AuthorizedPersonInformation merchantData={data?.data} />
+            <AuthorizedPersonInformation merchantData={data?.data?.merchant} />
           </div>
 
           {/* Transaction Activity */}
@@ -68,7 +69,7 @@ const MerchantDetails = () => {
             <div className="">
               <MerchantProfileTabsContent
                 currentTab={currentTab}
-                merchantData={data?.data}
+                merchantData={data?.data?.merchant}
               />
             </div>
           </ComponentCard>

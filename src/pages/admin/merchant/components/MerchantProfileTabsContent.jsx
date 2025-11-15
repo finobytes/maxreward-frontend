@@ -10,9 +10,9 @@ const MerchantProfileTabsContent = ({ currentTab, merchantData }) => {
     case "statements":
       return <Statements merchantData={merchantData} />;
     case "staff":
-      return <Staff />;
+      return <Staff merchantData={merchantData} />;
     case "referredMember":
-      return <ReferredMember />;
+      return <ReferredMember merchantData={merchantData} />;
     default:
       return null;
   }

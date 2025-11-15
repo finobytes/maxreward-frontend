@@ -48,8 +48,6 @@ export default function UserDropdown({ user, role }) {
   function closeDropdown() {
     setIsOpen(false);
   }
-
-  console.log("UserDropdown user:", user);
   return (
     <div className="relative">
       <button
