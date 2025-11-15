@@ -23,22 +23,26 @@ export const useVoucherForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const state = useSelector((s) => s.voucherForm);
+  const { user } = useSelector((state) => state.auth);
+  const role = user?.role || "member"; // admin | merchant | member
 
-  const { data: verifyData, isLoading: verifying } = useVerifyMeQuery();
+  const { data: verifyData, isLoading: verifying } = useVerifyMeQuery(role);
   const { data: denomData, isLoading: denomLoading } =
     useGetAllDenominationsQuery();
   const { data: settingsData, isLoading: settingsLoading } =
     useGetCurrentSettingsQuery();
   const [createVoucher, { isLoading: creating }] = useCreateVoucherMutation();
-
   useEffect(() => {
     const memberId =
-      verifyData?.id || verifyData?.data?.id || verifyData?.member?.id;
+      verifyData?.merchant?.corporate_member?.id || // corporate member
+      verifyData?.merchant?.corporate_member_id || // direct corporate member id
+      verifyData?.member?.id || // member id
+      verifyData?.data?.id || // fallback
+      verifyData?.id; // fallback
     if (memberId && memberId !== state.memberId) {
       dispatch(setMemberId(memberId));
     }
   }, [verifyData, state.memberId, dispatch]);
-
   useEffect(() => {
     const normalizedSettings =
       settingsData?.setting_attribute?.maxreward ||
@@ -59,9 +63,7 @@ export const useVoucherForm = () => {
   }, [settingsData, state.settings, dispatch]);
 
   const denominations =
-    denomData?.data?.denominations ||
-    denomData?.denominations ||
-    [];
+    denomData?.data?.denominations || denomData?.denominations || [];
 
   const handleCreateVoucher = async () => {
     try {
@@ -120,7 +122,11 @@ export const useVoucherForm = () => {
       if (res?.success) {
         toast.success(res.message || "Voucher created successfully!");
         dispatch(resetVoucher());
-        navigate("/member/purchase-voucher");
+        if (role === "member") {
+          navigate("/member/purchase-voucher");
+        } else {
+          navigate("/merchant/voucher-purchase");
+        }
       } else {
         toast.error(res?.message || "Failed to create voucher.");
       }
