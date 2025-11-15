@@ -55,7 +55,7 @@ const MerchantDashboard = () => {
     },
     {
       icon: clock,
-      title: "Pending purchase",
+      title: "Pending Purchase",
       value: data.total_pending_purchase || "0",
       changeText: "+0.892",
       changeColor: "text-green-500",
