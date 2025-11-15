@@ -14,6 +14,8 @@ export const baseApi = createApi({
     "Settings",
     "MerchantTransactions",
     "DashboardStats",
+    "ShopWithMerChant",
+    "MemberPurchases",
   ],
   endpoints: () => ({}),
 });

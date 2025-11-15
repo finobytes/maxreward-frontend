@@ -27,6 +27,41 @@ export const shopWithMerchantApi = baseApi.injectEndpoints({
         body,
       }),
     }),
+
+    getMemberPurchases: builder.query({
+      query: ({ memberId, page = 1, search, status }) => {
+        const params = new URLSearchParams();
+        params.set("page", page);
+        if (search) params.set("search", search);
+        if (status && status !== "all") params.set("status", status);
+
+        const queryString = params.toString();
+
+        return {
+          url: `/members/${memberId}/purchases${
+            queryString ? `?${queryString}` : ""
+          }`,
+          method: "GET",
+        };
+      },
+      transformResponse: (response) => {
+        const payload = response?.data ?? {};
+
+        return {
+          purchases: payload?.data ?? [],
+          pagination: {
+            currentPage: payload?.current_page ?? 1,
+            lastPage: payload?.last_page ?? 1,
+            total: payload?.total ?? payload?.data?.length ?? 0,
+            perPage: payload?.per_page ?? 10,
+          },
+          summary: response?.summary ?? {},
+          success: response?.success ?? false,
+          message: response?.message ?? "",
+        };
+      },
+      providesTags: ["MemberPurchases"],
+    }),
   }),
 });
 
@@ -34,4 +69,5 @@ export const {
   useGetMerchantMutation,
   useCheckMemberRedeemAmountMutation,
   useMakePurchaseForMemberMutation,
+  useGetMemberPurchasesQuery,
 } = shopWithMerchantApi;

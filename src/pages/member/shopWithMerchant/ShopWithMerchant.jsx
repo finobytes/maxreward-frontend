@@ -64,7 +64,11 @@ const ShopWithMerchant = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-gray-200 p-4">
           <h3 className="text-lg font-semibold text-gray-800">Merchant</h3>
-          <PrimaryButton variant="accent" size="md">
+          <PrimaryButton
+            variant="accent"
+            size="md"
+            to="/member/redeem-transactions"
+          >
             Transaction
           </PrimaryButton>
         </div>
