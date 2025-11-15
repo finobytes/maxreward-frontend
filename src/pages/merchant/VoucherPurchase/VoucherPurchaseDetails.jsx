@@ -1,19 +1,19 @@
 import React from "react";
 import { useParams } from "react-router";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
-import { CreditCard, FileText, User } from "lucide-react";
-import VoucherDetailsSkeleton from "../../../components/skeleton/VoucherDetailsSkeleton";
 import { useGetVoucherByIdForMemberQuery } from "../../../redux/features/member/voucherPurchase/voucherApi";
+import {
+  BadgeCheck,
+  CreditCard,
+  DollarSign,
+  FileText,
+  User,
+} from "lucide-react";
+import VoucherDetailsSkeleton from "../../../components/skeleton/VoucherDetailsSkeleton";
 
 const VoucherPurchaseDetails = () => {
   const { id } = useParams();
-  const {
-    data: response,
-    isLoading,
-    isError,
-  } = useGetVoucherByIdForMemberQuery(id);
-
-  const data = response;
+  const { data, isLoading, isError } = useGetVoucherByIdForMemberQuery(id);
 
   if (isLoading) return <VoucherDetailsSkeleton />;
   if (isError)
@@ -52,14 +52,31 @@ const VoucherPurchaseDetails = () => {
           </div>
 
           <div className="p-6 space-y-4">
-            <Info label="Voucher Type" value={`${data.voucher_type} voucher`} />
-            <Info label="Payment Method" value={data.payment_method} />
-            <Info label="Quantity" value={data.quantity} />
-            <Info
-              label="Total Amount"
-              value={`RM ${data.total_amount}`}
-              valueClass="text-green-600 font-bold"
-            />
+            <div className="flex justify-between items-center">
+              <span className="text-gray-500">Voucher Type</span>
+              <span className="font-medium capitalize">
+                {data.voucher_type} voucher
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center">
+              <span className="text-gray-500">Payment Method</span>
+              <span className="font-medium capitalize">
+                {data.payment_method}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center">
+              <span className="text-gray-500">Quantity</span>
+              <span className="font-medium">{data.quantity}</span>
+            </div>
+
+            <div className="flex justify-between items-center">
+              <span className="text-gray-500">Total Amount</span>
+              <span className="font-bold text-lg text-green-600">
+                RM {data.total_amount}
+              </span>
+            </div>
 
             <div className="flex justify-between items-center">
               <span className="text-gray-500">Status</span>
@@ -83,14 +100,14 @@ const VoucherPurchaseDetails = () => {
           <h2 className="text-lg font-semibold flex items-center gap-2 mb-4">
             <User className="text-brand-600" /> Member Information
           </h2>
-
           <ul className="divide-y divide-gray-200">
-            <InfoRow label="Member ID" value={data.member_id} />
-            <InfoRow label="Status" value={data.status} />
-            <InfoRow
-              label="Created At"
-              value={new Date(data.created_at).toLocaleString()}
-            />
+            <InfoRow label="Name" value={data.member?.name} />
+            <InfoRow label="Phone" value={data.member?.phone} />
+            <InfoRow label="Email" value={data.member?.email} />
+            <InfoRow label="Address" value={data.member?.address} />
+            <InfoRow label="Member Type" value={data.member?.member_type} />
+            <InfoRow label="Referral Code" value={data.member?.referral_code} />
+            <InfoRow label="Status" value={data.member?.status} />
           </ul>
         </section>
 
@@ -99,13 +116,13 @@ const VoucherPurchaseDetails = () => {
           <h2 className="text-lg font-semibold flex items-center gap-2 mb-4">
             <CreditCard className="text-brand-600" /> Payment & Denomination
           </h2>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 2xl:gap-20">
-            {/* Left Side */}
             <div className="space-y-3">
               <InfoRow label="Payment Method" value={data.payment_method} />
-              <InfoRow label="Quantity" value={data.quantity} />
-              <InfoRow label="Total Amount" value={`RM ${data.total_amount}`} />
+              <InfoRow
+                label="Created At"
+                value={new Date(data.created_at).toLocaleString()}
+              />
               <div>
                 {/* Denomination Table */}
                 <h3 className="text-lg font-semibold mt-8 mb-3">
@@ -139,7 +156,6 @@ const VoucherPurchaseDetails = () => {
               </div>
             </div>
 
-            {/* Right Side - Payment Proof */}
             <div className="space-y-3">
               <p className="text-gray-600 font-medium mb-2">
                 Manual Payment Proof
@@ -169,14 +185,7 @@ const VoucherPurchaseDetails = () => {
 
 export default VoucherPurchaseDetails;
 
-/* Utility Components */
-const Info = ({ label, value, valueClass = "" }) => (
-  <div className="flex justify-between items-center">
-    <span className="text-gray-500">{label}</span>
-    <span className={`font-medium ${valueClass}`}>{value}</span>
-  </div>
-);
-
+// ---------------- Small Reusable Row Component ----------------
 const InfoRow = ({ label, value }) => (
   <li className="flex justify-between py-2">
     <span className="text-gray-500 text-sm">{label}</span>
