@@ -6,10 +6,12 @@ export const voucherApi = baseApi.injectEndpoints({
 
     // === Member vouchers (no pagination)
     getMemberVouchers: builder.query({
-      query: () => ({
-        url: "/member/vouchers",
+      query: (page = 1) => ({
+        url: `/member/vouchers`,
         method: "GET",
+        params: { page }, // <-- send page
       }),
+
       transformResponse: (response) => {
         if (!response?.success) {
           return {
@@ -17,16 +19,22 @@ export const voucherApi = baseApi.injectEndpoints({
             message: response?.message || "Failed to fetch vouchers",
           };
         }
-        const vouchers = response?.data?.vouchers ?? [];
+
+        const vouchers = response?.data?.vouchers ?? {};
         return { vouchers };
       },
+
       providesTags: (result) =>
         result
           ? [
-              ...result.vouchers.map((v) => ({ type: "Voucher", id: v.id })),
+              ...result.vouchers.data.map((v) => ({
+                type: "Voucher",
+                id: v.id,
+              })),
               { type: "Voucher", id: "LIST" },
             ]
           : [{ type: "Voucher", id: "LIST" }],
+
       keepUnusedDataFor: 60,
     }),
 
