@@ -214,6 +214,10 @@ const MerchantEdit = () => {
                 />
               </div>
               <div>
+                <Label>Designation</Label>
+                <Input {...register("designation")} placeholder="Designation" />
+              </div>
+              <div>
                 <Label>
                   Phone Number (<span className="text-red-500">*</span>)
                 </Label>
@@ -222,10 +226,6 @@ const MerchantEdit = () => {
               <div>
                 <Label>Email Address</Label>
                 <Input {...register("email")} placeholder="Email Address" />
-              </div>
-              <div>
-                <Label>Designation</Label>
-                <Input {...register("designation")} placeholder="Designation" />
               </div>
             </div>
 

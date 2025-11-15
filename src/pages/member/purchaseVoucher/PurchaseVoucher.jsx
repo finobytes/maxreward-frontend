@@ -212,7 +212,7 @@ const PurchaseVoucher = () => {
                       <TableCell>
                         {v?.denomination_history?.map((item, index) => (
                           <div key={index} className="text-sm">
-                            {item.value}, {item.quantity}
+                            {item.value}, Qty {item.quantity}
                           </div>
                         ))}
                       </TableCell>

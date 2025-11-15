@@ -79,11 +79,13 @@ const mockData = [
   },
 ];
 
-const Statements = () => {
+const Statements = ({ merchantData }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage, setEntriesPerPage] = useState("10");
   const [search, setSearch] = useState("");
 
+  console.log("Merchant Data:", merchantData?.corporate_member?.wallet);
+  const wallet = merchantData ? merchantData?.corporate_member?.wallet : {};
   const totalPages = 5;
 
   // Filter by search
@@ -101,7 +103,9 @@ const Statements = () => {
           <div className="flex justify-between">
             <div>
               <p className="text-xs text-gray-500 mb-1">Available Points</p>
-              <p className="text-xl font-semibold text-gray-900">12,432</p>
+              <p className="text-xl font-semibold text-gray-900">
+                {wallet?.available_points}
+              </p>
               <p className="text-xs text-green-500 mt-1">+0.892 Increased</p>
             </div>
             <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
@@ -114,7 +118,9 @@ const Statements = () => {
           <div className="flex justify-between">
             <div>
               <p className="text-xs text-gray-500 mb-1">On Hold Points</p>
-              <p className="text-xl font-semibold text-gray-900">2,540</p>
+              <p className="text-xl font-semibold text-gray-900">
+                {wallet?.onhold_points}
+              </p>
               <p className="text-xs text-orange-500 mt-1">+0.321 Increased</p>
             </div>
             <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
@@ -127,7 +133,9 @@ const Statements = () => {
           <div className="flex justify-between">
             <div>
               <p className="text-xs text-gray-500 mb-1">Refer Points</p>
-              <p className="text-xl font-semibold text-gray-900">1,250</p>
+              <p className="text-xl font-semibold text-gray-900">
+                {wallet?.total_rp}
+              </p>
               <p className="text-xs text-green-500 mt-1">+1.245 Increased</p>
             </div>
             <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
@@ -140,7 +148,9 @@ const Statements = () => {
           <div className="flex justify-between">
             <div>
               <p className="text-xs text-gray-500 mb-1">Community Member</p>
-              <p className="text-xl font-semibold text-gray-900">45</p>
+              <p className="text-xl font-semibold text-gray-900">
+                {merchantData?.community_members}
+              </p>
               <p className="text-xs text-blue-500 mt-1">+0.892 Increased</p>
             </div>
             <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
