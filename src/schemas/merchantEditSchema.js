@@ -1,12 +1,6 @@
 import { z } from "zod";
 
 const optionalText = z.string().optional().or(z.literal(""));
-const optionalPassword = z
-  .union([
-    z.literal(""),
-    z.string().min(6, "Password must be at least 6 characters"),
-  ])
-  .optional();
 
 export const merchantEditSchema = z.object({
   business_name: z.string().min(1, "Business name is required"),
@@ -28,5 +22,4 @@ export const merchantEditSchema = z.object({
     .union([z.literal(""), z.string().email("Invalid email address")])
     .optional(),
   designation: optionalText,
-  merchant_password: optionalPassword,
 });

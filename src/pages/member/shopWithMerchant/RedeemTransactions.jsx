@@ -3,12 +3,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { Eye } from "lucide-react";
 import { Link } from "react-router";
 import {
+  resetFilters,
+  setPage,
   setSearch,
   setStatus,
-  setPage,
-  resetFilters,
-} from "../../../redux/features/admin/memberManagement/memberManagementSlice";
-import { useMembers } from "../../../redux/features/admin/memberManagement/useMembers";
+} from "../../../redux/features/member/shopWithMerchant/purchaseManagementSlice";
 import SearchInput from "../../../components/form/form-elements/SearchInput";
 import DropdownSelect from "../../../components/ui/dropdown/DropdownSelect";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
@@ -24,6 +23,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useMemberPurchases } from "../../../redux/features/member/shopWithMerchant/useMemberPurchases";
+import { toast } from "sonner";
+import BulkActionBar from "../../../components/table/BulkActionBar";
 
 const useDebounced = (value, delay = 400) => {
   const [v, setV] = useState(value);
@@ -35,21 +37,65 @@ const useDebounced = (value, delay = 400) => {
 };
 
 const RedeemTransactions = () => {
+  const [selected, setSelected] = useState([]);
   const dispatch = useDispatch();
-  const { search, status } = useSelector((s) => s.memberManagement);
+  const {
+    search = "",
+    status = "all",
+    page = 1,
+  } = useSelector((s) => s.purchaseManagement || {});
 
   // local input for immediate typing (debounced into redux search)
   const [localSearch, setLocalSearch] = useState(search || "");
   const debouncedSearch = useDebounced(localSearch, 450);
 
   useEffect(() => {
-    // update redux search only when debounced value changes
     dispatch(setSearch(debouncedSearch));
   }, [debouncedSearch, dispatch]);
 
-  const { members, meta, isLoading, isError } = useMembers();
+  useEffect(() => {
+    setLocalSearch(search || "");
+  }, [search]);
 
-  console.log("Members:", members, "Meta:", meta);
+  const { purchases, pagination, isLoading, isError } = useMemberPurchases();
+
+  const statusOptions = [
+    { label: "All", value: "all" },
+    { label: "Pending", value: "pending" },
+    { label: "Approved", value: "approved" },
+    { label: "Rejected", value: "rejected" },
+  ];
+
+  const currentPage = pagination?.currentPage || page || 1;
+  const totalPages = pagination?.lastPage || 1;
+
+  const formatCurrency = (value) => `RM ${Number(value || 0).toFixed(2)}`;
+  const formatPoints = (value) =>
+    Number(value || 0).toLocaleString(undefined, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    });
+  const formatDate = (value) =>
+    value ? new Date(value).toLocaleDateString() : "-";
+
+  const handleClear = () => {
+    setLocalSearch("");
+    dispatch(resetFilters());
+    setSelected([]);
+  };
+  const toggleSelectAll = (checked) => {
+    setSelected(checked ? purchases.map((v) => v.id) : []);
+  };
+
+  const toggleSelect = (id) => {
+    setSelected((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  const bulkUpdateStatus = (newStatus) => {
+    toast.warning(`Bulk update to ${newStatus} (not implemented yet)`);
+  };
 
   return (
     <div>
@@ -69,41 +115,49 @@ const RedeemTransactions = () => {
             <SearchInput
               value={localSearch}
               onChange={(e) => setLocalSearch(e.target.value)}
-              placeholder="Search by name, phone, username..."
+              placeholder="Search by transaction or merchant..."
             />
             <DropdownSelect
               value={status}
               onChange={(val) => dispatch(setStatus(val))}
-              options={[
-                { label: "All", value: "all" },
-                { label: "Active", value: "active" },
-                { label: "Blocked", value: "blocked" },
-                { label: "Suspended", value: "suspended" },
-              ]}
+              options={statusOptions}
             />
 
-            <PrimaryButton
-              variant="secondary"
-              onClick={() => dispatch(resetFilters())}
-            >
+            <PrimaryButton variant="secondary" onClick={handleClear}>
               Clear
             </PrimaryButton>
           </div>
         </div>
 
+        {/* Bulk Actions */}
+        {selected.length > 0 && (
+          <BulkActionBar
+            selectedCount={selected.length}
+            actions={[
+              {
+                label: "Export",
+                icon: "export",
+                variant: "success",
+                onClick: () => bulkUpdateStatus("export"),
+              },
+            ]}
+          />
+        )}
         {/* Table */}
         <div className="mt-4 relative overflow-x-auto">
-          {/* Overlay spinner on interactions */}
-          {/* {isLoading && (
-            <div className="absolute inset-0 z-10 bg-white/50 backdrop-blur-sm flex items-center justify-center">
-              <Loader className="w-8 h-8 animate-spin text-gray-400" />
-            </div>
-          )} */}
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead className="p-4">
-                  <input type="checkbox" className="w-4 h-4 rounded" />
+                  <input
+                    type="checkbox"
+                    checked={
+                      purchases.length > 0 &&
+                      selected.length === purchases.length
+                    }
+                    onChange={(e) => toggleSelectAll(e.target.checked)}
+                    className="w-4 h-4 rounded"
+                  />
                 </TableHead>
 
                 <TableHead>Redemption ID</TableHead>
@@ -119,19 +173,10 @@ const RedeemTransactions = () => {
 
             <TableBody>
               {/* Skeleton Loading */}
-              {isLoading && !members?.length ? (
+              {isLoading && !purchases?.length ? (
                 [...Array(6)].map((_, i) => (
                   <TableRow key={i}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Skeleton className="w-10 h-10 rounded-full" />
-                        <div className="space-y-1">
-                          <Skeleton className="h-4 w-32" />
-                          <Skeleton className="h-3 w-16" />
-                        </div>
-                      </div>
-                    </TableCell>
-                    {[...Array(7)].map((_, j) => (
+                    {[...Array(9)].map((_, j) => (
                       <TableCell key={j}>
                         <Skeleton className="h-4 w-20" />
                       </TableCell>
@@ -141,38 +186,58 @@ const RedeemTransactions = () => {
               ) : isError ? (
                 <TableRow>
                   <TableCell colSpan={10} className="text-center text-red-500">
-                    Failed to load members.
+                    Failed to load purchases.
                   </TableCell>
                 </TableRow>
-              ) : members?.length === 0 ? (
+              ) : purchases?.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={10} className="text-center text-gray-500">
-                    No members found.
+                    No purchases found.
                   </TableCell>
                 </TableRow>
               ) : (
-                members.map((m) => (
+                purchases.map((purchase) => (
                   <TableRow
-                    key={m.id}
+                    key={purchase?.id || purchase?.transaction_id}
                     className="hover:bg-gray-50 transition-colors"
                   >
                     <TableCell className="p-4">
-                      <input type="checkbox" className="w-4 h-4 rounded" />
+                      <input
+                        type="checkbox"
+                        checked={selected.includes(purchase.id)}
+                        onChange={() => toggleSelect(purchase.id)}
+                        className="w-4 h-4 rounded"
+                      />
                     </TableCell>
-                    <TableCell>{m?.user_name}</TableCell>
+                    <TableCell>
+                      {purchase?.transaction_id || `#${purchase?.id}`}
+                    </TableCell>
                     <TableCell className="py-3">
-                      <div className="font-medium text-gray-900">{m?.name}</div>
+                      <div className="font-medium text-gray-900">
+                        {purchase?.merchant?.business_name || "N/A"}
+                      </div>
                     </TableCell>
 
-                    <TableCell>{m?.phone}</TableCell>
-                    <TableCell>{m?.wallet?.total_referrals ?? "N/A"}</TableCell>
-                    <TableCell>{m?.wallet?.total_referrals ?? "N/A"}</TableCell>
                     <TableCell>
-                      <StatusBadge status={m?.status} />
+                      {purchase?.merchant?.unique_number ||
+                        purchase?.merchant_id ||
+                        "N/A"}
                     </TableCell>
                     <TableCell>
-                      {new Date(m?.created_at).toLocaleDateString()}
+                      {formatPoints(purchase?.redeem_amount)} pts
                     </TableCell>
+                    <TableCell>
+                      {formatCurrency(
+                        purchase?.cash_redeem_amount ??
+                          purchase?.transaction_amount
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <StatusBadge status={purchase?.status}>
+                        {purchase?.status || "N/A"}
+                      </StatusBadge>
+                    </TableCell>
+                    <TableCell>{formatDate(purchase?.created_at)}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Link
@@ -193,8 +258,8 @@ const RedeemTransactions = () => {
         {/* Pagination (server) */}
         <div className="mt-4">
           <Pagination
-            currentPage={meta.current_page}
-            totalPages={meta.last_page}
+            currentPage={currentPage}
+            totalPages={totalPages}
             onPageChange={(p) => dispatch(setPage(p))}
           />
         </div>
