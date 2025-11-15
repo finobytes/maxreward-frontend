@@ -9,6 +9,10 @@ const AuthorizedPersonInformation = ({ userInfo }) => {
       value: userInfo?.merchant?.authorized_person_name || "N/A",
     },
     {
+      key: "Designation:",
+      value: userInfo?.merchant?.designation || "N/A",
+    },
+    {
       key: "Phone:",
       value: userInfo?.merchant?.phone || "N/A",
     },

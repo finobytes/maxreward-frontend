@@ -1,7 +1,7 @@
 import React from "react";
 import { useParams } from "react-router";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
-import { useGetVoucherByIdQuery } from "../../../redux/features/member/voucherPurchase/voucherApi";
+import { useGetVoucherByIdForMemberQuery } from "../../../redux/features/member/voucherPurchase/voucherApi";
 import {
   BadgeCheck,
   CreditCard,
@@ -13,7 +13,7 @@ import VoucherDetailsSkeleton from "../../../components/skeleton/VoucherDetailsS
 
 const VoucherDetails = () => {
   const { id } = useParams();
-  const { data, isLoading, isError } = useGetVoucherByIdQuery(id);
+  const { data, isLoading, isError } = useGetVoucherByIdForMemberQuery(id);
 
   if (isLoading) return <VoucherDetailsSkeleton />;
   if (isError)
