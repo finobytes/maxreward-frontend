@@ -104,7 +104,7 @@ const VoucherPurchase = () => {
             />
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
-              <PrimaryButton variant="primary" size="md" to="/member/add">
+              <PrimaryButton variant="primary" size="md" to="/merchant/add">
                 <Plus size={18} />
                 Add Voucher
               </PrimaryButton>
