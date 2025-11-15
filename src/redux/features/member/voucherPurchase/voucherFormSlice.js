@@ -4,7 +4,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   selectedDenominations: [],
   paymentMethod: "manual",
-  voucherType: "max",
+  voucherType: "",
   manualPaymentDocs: null,
   totalAmount: 0,
   totalAmountWithRm: 0,

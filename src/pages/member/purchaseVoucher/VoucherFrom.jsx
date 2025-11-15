@@ -76,7 +76,7 @@ const VoucherForm = () => {
     resolver: zodResolver(voucherSchema),
     defaultValues: {
       paymentMethod: paymentMethod || "manual",
-      voucherType: voucherType || "max",
+      voucherType: "",
       manualDocs: null,
     },
   });
@@ -264,8 +264,9 @@ const VoucherForm = () => {
                 <Label className="text-sm font-medium mb-2 block">
                   Voucher Type
                 </Label>
+
                 <Select
-                  value={selectedVoucherType || undefined}
+                  value={selectedVoucherType || ""}
                   onValueChange={handleVoucherType}
                 >
                   <SelectTrigger>
@@ -276,6 +277,7 @@ const VoucherForm = () => {
                     <SelectItem value="refer">Refer</SelectItem>
                   </SelectContent>
                 </Select>
+
                 {errors.voucherType && (
                   <p className="text-red-500 text-sm mt-1">
                     {errors.voucherType.message}
