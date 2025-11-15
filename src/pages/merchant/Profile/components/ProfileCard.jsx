@@ -36,16 +36,18 @@ const ProfileCard = ({ userInfo }) => {
       </div>
       <div className=" block 2xl:flex gap-4 2xl:justify-between relative -top-8">
         <div className="ml-2">
-          <h3 className="text-xl font-semibold">{userInfo?.name}</h3>
+          <h3 className="text-xl font-semibold">
+            {userInfo?.merchant?.business_name}
+          </h3>
           <p className="text-sm mt-2 text-gray-400 font-medium">
-            {userInfo?.designation}
+            Unique Number: {userInfo?.merchant?.unique_number}
           </p>
-          <div className="flex gap-4 mt-1">
+          {/* <div className="flex gap-4 mt-1">
             <div className="flex gap-1">
               <img src={locationIcon} alt="icon" />
               <span className="text-sm text-gray-400">{userInfo?.address}</span>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>

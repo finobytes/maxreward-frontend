@@ -17,6 +17,11 @@ export default function UserDropdown({ user, role }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const userName = user?.merchant?.business_name || user?.name || "User";
+  const profileImage =
+    user?.merchant?.business_logo || user?.image || userImage;
+  const email = user?.merchant?.email || user?.email || "Email not available";
+
   const handleLogout = async () => {
     try {
       // call backend logout endpoint
@@ -43,6 +48,8 @@ export default function UserDropdown({ user, role }) {
   function closeDropdown() {
     setIsOpen(false);
   }
+
+  console.log("UserDropdown user:", user);
   return (
     <div className="relative">
       <button
@@ -50,12 +57,10 @@ export default function UserDropdown({ user, role }) {
         className="flex items-center text-gray-700 dropdown-toggle"
       >
         <span className="mr-3 overflow-hidden rounded-full h-8 w-8">
-          <img src={user?.image || userImage} alt="User" />
+          <img src={profileImage} alt="User" />
         </span>
 
-        <span className="block mr-1 font-medium text-theme-sm">
-          {user?.name}
-        </span>
+        <span className="block mr-1 font-medium text-theme-sm">{userName}</span>
         <svg
           className={`stroke-gray-500 transition-transform duration-200 ${
             isOpen ? "rotate-180" : ""
@@ -83,10 +88,10 @@ export default function UserDropdown({ user, role }) {
       >
         <div>
           <span className="block font-medium text-gray-700 text-theme-sm ">
-            {user?.name}
+            {userName}
           </span>
           <span className="mt-0.5 block text-theme-xs text-gray-500 ">
-            {user?.email}
+            {email}
           </span>
         </div>
 
