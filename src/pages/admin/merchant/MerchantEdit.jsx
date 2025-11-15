@@ -33,7 +33,7 @@ const MerchantEdit = () => {
   });
 
   const [updateMerchant, { isLoading }] = useUpdateMerchantMutation();
-
+  console.log("merchant data:", merchantData);
   const {
     register,
     handleSubmit,
@@ -45,8 +45,8 @@ const MerchantEdit = () => {
 
   // Populate existing merchant data into form
   useEffect(() => {
-    if (merchantData?.data) {
-      reset(merchantData.data);
+    if (merchantData?.data?.merchant) {
+      reset(merchantData.data.merchant);
     }
   }, [merchantData, reset]);
 
@@ -167,19 +167,6 @@ const MerchantEdit = () => {
                   {...register("reward_budget")}
                   placeholder="Reward Budget (%)"
                 />
-              </div>
-              <div>
-                <Label>Password</Label>
-                <Input
-                  type="password"
-                  {...register("merchant_password")}
-                  placeholder="Password"
-                />
-                {errors.merchant_password && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.merchant_password.message}
-                  </p>
-                )}
               </div>
             </div>
 
