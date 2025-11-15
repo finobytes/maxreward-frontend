@@ -8,7 +8,9 @@ const BusinessInformation = ({ merchantData }) => {
     },
     {
       key: "Company Address:",
-      value: merchantData ? merchantData.company_address : "-- No Address --",
+      value: merchantData
+        ? merchantData.company_address || merchantData.address
+        : "-- No Address --",
     },
     {
       key: "Product / Service:",
