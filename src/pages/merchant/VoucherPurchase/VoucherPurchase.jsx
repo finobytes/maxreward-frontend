@@ -25,22 +25,24 @@ const VoucherPurchase = () => {
   const [statusFilter, setStatusFilter] = useState("All");
   const [selected, setSelected] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 10;
 
-  // Fetch vouchers
+  // Fetch vouchers from backend pagination
   const {
     data: apiResponse,
     isLoading,
     isFetching,
     isError,
-  } = useGetMemberVouchersQuery();
+  } = useGetMemberVouchersQuery(currentPage); // ⭐ page passed here
+  console.log("response from backend with pagination:", apiResponse);
+  const vouchers = apiResponse?.vouchers?.data ?? [];
+  const pagination = apiResponse?.vouchers;
 
-  const vouchers = apiResponse?.vouchers ?? [];
+  const backendCurrentPage = pagination?.current_page ?? 1;
+  const backendTotalPages = pagination?.last_page ?? 1;
+
   const errorMessage = apiResponse?.message || "Vouchers not found";
   console.log("api response", apiResponse);
-  console.log("Voucher Data:", vouchers);
-
-  // === Filtering
+  // === Filtering (works only on current page data)
   const filteredData = useMemo(() => {
     return vouchers.filter((v) => {
       const type = v.voucher_type?.toLowerCase() || "";
@@ -61,11 +63,8 @@ const VoucherPurchase = () => {
     });
   }, [search, statusFilter, vouchers]);
 
-  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * rowsPerPage,
-    currentPage * rowsPerPage
-  );
+  // Backend pagination — filtered data does NOT affect pagination
+  const paginatedData = filteredData; // ⭐ No slicing anymore
 
   const toggleSelectAll = (checked) => {
     setSelected(checked ? paginatedData.map((v) => v.id) : []);
@@ -105,7 +104,7 @@ const VoucherPurchase = () => {
             />
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
-              <PrimaryButton variant="primary" size="md" to="/merchant/add">
+              <PrimaryButton variant="primary" size="md" to="/member/add">
                 <Plus size={18} />
                 Add Voucher
               </PrimaryButton>
@@ -243,9 +242,12 @@ const VoucherPurchase = () => {
 
             {/* Manual local pagination */}
             <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
+              currentPage={backendCurrentPage}
+              totalPages={backendTotalPages}
+              onPageChange={(page) => {
+                setCurrentPage(page); // ⭐ Backend will fetch next page automatically
+                setSelected([]); // Clear selections on page change
+              }}
             />
           </div>
         </div>
