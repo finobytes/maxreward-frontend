@@ -24,6 +24,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useMemberPurchases } from "../../../redux/features/member/shopWithMerchant/useMemberPurchases";
+import { toast } from "sonner";
+import BulkActionBar from "../../../components/table/BulkActionBar";
 
 const useDebounced = (value, delay = 400) => {
   const [v, setV] = useState(value);
@@ -35,9 +37,13 @@ const useDebounced = (value, delay = 400) => {
 };
 
 const RedeemTransactions = () => {
+  const [selected, setSelected] = useState([]);
   const dispatch = useDispatch();
-  const { search = "", status = "all", page = 1 } =
-    useSelector((s) => s.purchaseManagement || {});
+  const {
+    search = "",
+    status = "all",
+    page = 1,
+  } = useSelector((s) => s.purchaseManagement || {});
 
   // local input for immediate typing (debounced into redux search)
   const [localSearch, setLocalSearch] = useState(search || "");
@@ -75,6 +81,20 @@ const RedeemTransactions = () => {
   const handleClear = () => {
     setLocalSearch("");
     dispatch(resetFilters());
+    setSelected([]);
+  };
+  const toggleSelectAll = (checked) => {
+    setSelected(checked ? purchases.map((v) => v.id) : []);
+  };
+
+  const toggleSelect = (id) => {
+    setSelected((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  const bulkUpdateStatus = (newStatus) => {
+    toast.warning(`Bulk update to ${newStatus} (not implemented yet)`);
   };
 
   return (
@@ -109,13 +129,35 @@ const RedeemTransactions = () => {
           </div>
         </div>
 
+        {/* Bulk Actions */}
+        {selected.length > 0 && (
+          <BulkActionBar
+            selectedCount={selected.length}
+            actions={[
+              {
+                label: "Export",
+                icon: "export",
+                variant: "success",
+                onClick: () => bulkUpdateStatus("export"),
+              },
+            ]}
+          />
+        )}
         {/* Table */}
         <div className="mt-4 relative overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead className="p-4">
-                  <input type="checkbox" className="w-4 h-4 rounded" />
+                  <input
+                    type="checkbox"
+                    checked={
+                      purchases.length > 0 &&
+                      selected.length === purchases.length
+                    }
+                    onChange={(e) => toggleSelectAll(e.target.checked)}
+                    className="w-4 h-4 rounded"
+                  />
                 </TableHead>
 
                 <TableHead>Redemption ID</TableHead>
@@ -160,7 +202,12 @@ const RedeemTransactions = () => {
                     className="hover:bg-gray-50 transition-colors"
                   >
                     <TableCell className="p-4">
-                      <input type="checkbox" className="w-4 h-4 rounded" />
+                      <input
+                        type="checkbox"
+                        checked={selected.includes(purchase.id)}
+                        onChange={() => toggleSelect(purchase.id)}
+                        className="w-4 h-4 rounded"
+                      />
                     </TableCell>
                     <TableCell>
                       {purchase?.transaction_id || `#${purchase?.id}`}
