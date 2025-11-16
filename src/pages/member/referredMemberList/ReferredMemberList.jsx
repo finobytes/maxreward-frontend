@@ -144,7 +144,7 @@ const ReferredMemberList = () => {
                     className="w-4 h-4 rounded"
                   />
                 </TableHead>
-                <TableHead>ID</TableHead>
+                <TableHead>S/N</TableHead>
                 <TableHead>Full Name</TableHead>
                 <TableHead>Phone</TableHead>
                 <TableHead>Email</TableHead>
@@ -160,7 +160,7 @@ const ReferredMemberList = () => {
 
             <TableBody>
               {members.length > 0 ? (
-                members.map((member) => (
+                members.map((member, idx) => (
                   <TableRow key={member.id}>
                     <TableCell>
                       <input
@@ -170,7 +170,12 @@ const ReferredMemberList = () => {
                         className="w-4 h-4 rounded"
                       />
                     </TableCell>
-                    <TableCell>{member.id}</TableCell>
+                    <TableCell>
+                      {(pagination?.current_page - 1) *
+                        (pagination?.per_page || 0) +
+                        idx +
+                        1}
+                    </TableCell>
                     <TableCell>{member.name}</TableCell>
                     <TableCell>{member.phone}</TableCell>
                     <TableCell>{member.email}</TableCell>

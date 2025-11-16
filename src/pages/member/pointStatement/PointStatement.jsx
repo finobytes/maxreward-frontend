@@ -151,7 +151,9 @@ const PointStatement = () => {
 
                   return (
                     <TableRow key={item?.id}>
-                      <TableCell>{idx + 1}</TableCell>
+                      <TableCell>
+                        {(currentPage - 1) * meta?.perPage + idx + 1}
+                      </TableCell>
 
                       {/* Date/Time */}
                       <TableCell>{formatDateTime(item?.created_at)}</TableCell>

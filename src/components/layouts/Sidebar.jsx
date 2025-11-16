@@ -6,7 +6,10 @@ import { useSidebar } from "../../context/SidebarContext";
 import { logo, MaxReward } from "../../assets/assets";
 import { useDispatch, useSelector } from "react-redux";
 import { logout as logoutAction } from "../../redux/features/auth/authSlice";
-import { useLogoutMutation } from "../../redux/features/auth/authApi";
+import {
+  useLogoutMutation,
+  useVerifyMeQuery,
+} from "../../redux/features/auth/authApi";
 import { toast } from "sonner";
 import { NAV_CONFIG } from "../../config/navConfig";
 import { baseApi } from "../../redux/api/baseApi";
@@ -49,6 +52,12 @@ const Sidebar = () => {
 
   const { user } = useSelector((state) => state.auth);
   const role = user?.role;
+
+  const { data, refetch } = useVerifyMeQuery(role);
+
+  const userType = data?.member_type;
+
+  console.log("userType:", userType);
 
   const items = useMemo(() => NAV_CONFIG[role] || [], [role]);
   const isActive = useCallback(
