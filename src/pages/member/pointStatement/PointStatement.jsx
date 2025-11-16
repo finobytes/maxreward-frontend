@@ -12,6 +12,8 @@ import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import Pagination from "../../../components/table/Pagination";
 import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
 import { usePointStatementMember } from "../../../redux/features/member/pointStatement/usePointStatementMember";
+import { Eye } from "lucide-react";
+import { Link } from "react-router";
 
 // 🔥 1️⃣ Pick Member ID
 const pickMemberId = (profile) =>
@@ -106,14 +108,16 @@ const PointStatement = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Transaction ID</TableHead>
-                <TableHead>Point Type</TableHead>
-                <TableHead>Name</TableHead>
+                <TableHead>S/N</TableHead>
                 <TableHead>Date & Time</TableHead>
+                <TableHead>Point Type</TableHead>
+                {/* <TableHead>Name</TableHead> */}
                 <TableHead className="text-center">Total Points</TableHead>
                 <TableHead className="text-center">Status</TableHead>
                 <TableHead>Reason</TableHead>
                 <TableHead className="text-center">Balance</TableHead>
+
+                <TableHead className="text-center">Action</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -140,24 +144,22 @@ const PointStatement = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                transactions.map((item) => {
+                transactions.map((item, idx) => {
                   const isDebit = item?.points_type === "debited";
 
                   return (
                     <TableRow key={item?.id}>
-                      {/* Transaction ID */}
-                      <TableCell>{item?.id ?? "-"}</TableCell>
+                      <TableCell>{idx + 1}</TableCell>
 
+                      {/* Date/Time */}
+                      <TableCell>{formatDateTime(item?.created_at)}</TableCell>
                       {/* Full Point Type */}
                       <TableCell>
                         {typeMapping[item?.transaction_type] ?? "-"}
                       </TableCell>
 
                       {/* Member Name */}
-                      <TableCell>{item?.member?.name ?? "-"}</TableCell>
-
-                      {/* Date/Time */}
-                      <TableCell>{formatDateTime(item?.created_at)}</TableCell>
+                      {/* <TableCell>{item?.member?.name ?? "-"}</TableCell> */}
 
                       {/* Total Points */}
                       <TableCell className="text-center">
@@ -175,6 +177,15 @@ const PointStatement = () => {
                       {/* Available Balance */}
                       <TableCell className="text-center">
                         {item?.member?.wallet?.available_points ?? "-"}
+                      </TableCell>
+
+                      <TableCell className="text-center">
+                        <Link
+                          to=""
+                          className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500 inline-block"
+                        >
+                          <Eye size={18} />
+                        </Link>
                       </TableCell>
                     </TableRow>
                   );
