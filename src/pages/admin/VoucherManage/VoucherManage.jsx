@@ -285,7 +285,7 @@ const VoucherManage = () => {
                     <TableCell>
                       {v?.denomination_history?.map((item, index) => (
                         <div key={index} className="text-sm">
-                          {item.value}, {item.quantity}
+                          {item.value}, Qty {item.quantity}
                         </div>
                       ))}
                     </TableCell>
@@ -300,33 +300,37 @@ const VoucherManage = () => {
                       <StatusBadge status={v.status}>{v.status}</StatusBadge>
                     </TableCell>
 
-                    <TableCell className="flex gap-2">
-                      {v.status === "pending" && (
-                        <>
-                          <button
-                            onClick={() => handleStatusUpdate(v.id, "approved")}
-                            disabled={updatingId === v.id}
-                            className="px-3 py-1 bg-green-100 text-green-600 rounded-md"
-                          >
-                            Approve
-                          </button>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        {v.status === "pending" && (
+                          <>
+                            <button
+                              onClick={() =>
+                                handleStatusUpdate(v.id, "approved")
+                              }
+                              disabled={updatingId === v.id}
+                              className="px-3 py-1 bg-green-100 text-green-600 rounded-md"
+                            >
+                              Approve
+                            </button>
 
-                          <button
-                            onClick={() => openRejectDialog(v)}
-                            disabled={updatingId === v.id}
-                            className="px-3 py-1 bg-red-100 text-red-600 rounded-md"
-                          >
-                            Reject
-                          </button>
-                        </>
-                      )}
+                            <button
+                              onClick={() => openRejectDialog(v)}
+                              disabled={updatingId === v.id}
+                              className="px-3 py-1 bg-red-100 text-red-600 rounded-md"
+                            >
+                              Reject
+                            </button>
+                          </>
+                        )}
 
-                      <Link
-                        to={`/admin/vouchers/${v.id}`}
-                        className="p-2 bg-indigo-100 rounded-md text-indigo-600"
-                      >
-                        <Eye size={16} />
-                      </Link>
+                        <Link
+                          to={`/admin/vouchers/${v.id}`}
+                          className="p-2 bg-indigo-100 rounded-md text-indigo-600"
+                        >
+                          <Eye size={16} />
+                        </Link>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
