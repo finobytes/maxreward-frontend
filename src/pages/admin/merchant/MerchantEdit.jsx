@@ -128,10 +128,7 @@ const MerchantEdit = () => {
               </div>
               <div>
                 <Label>Company Address</Label>
-                <Input
-                  {...register("company_address")}
-                  placeholder="Company Address"
-                />
+                <Input {...register("address")} placeholder="Company Address" />
               </div>
               <div>
                 <Label>State</Label>
