@@ -14,7 +14,14 @@ export const pointStatementMemberApi = baseApi.injectEndpoints({
       },
       keepUnusedDataFor: 0,
     }),
+    getTransactionDetails: builder.query({
+      query: (transactionId) => ({
+        url: `/transactions/${transactionId}`,
+      }),
+      keepUnusedDataFor: 0,
+    }),
   }),
 });
 
-export const { useGetPointStatementQuery } = pointStatementMemberApi;
+export const { useGetPointStatementQuery, useGetTransactionDetailsQuery } =
+  pointStatementMemberApi;

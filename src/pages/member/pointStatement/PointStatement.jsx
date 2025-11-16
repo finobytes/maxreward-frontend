@@ -81,6 +81,8 @@ const PointStatement = () => {
   const { data: memberProfile, isLoading: memberLoading } = useVerifyMeQuery();
   const memberId = pickMemberId(memberProfile);
 
+  console.log("memberProfile", memberProfile);
+
   const { transactions, meta, isLoading, isFetching, error, changePage } =
     usePointStatementMember(memberId);
 
@@ -181,8 +183,9 @@ const PointStatement = () => {
 
                       <TableCell className="text-center">
                         <Link
-                          to=""
-                          className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500 inline-block"
+                          to={`/member/point-statement/${item?.id}`}
+                          className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500 inline-block transition-colors"
+                          title="View transaction details"
                         >
                           <Eye size={18} />
                         </Link>
