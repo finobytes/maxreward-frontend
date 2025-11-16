@@ -115,13 +115,12 @@ const MerchantRegistrationForm = () => {
       navigate("/admin/merchant/pending-merchant");
     } catch (err) {
       console.error("Create Error:", err);
-      if (err?.data?.errors) {
-        Object.entries(err.data.errors).forEach(([field, messages]) => {
-          toast.error(`${field}: ${messages.join(", ")}`);
-        });
-      } else {
-        toast.error("Failed to create merchant!");
-      }
+      toast.error(err?.data?.message || "Failed to create merchant!");
+      // if (err) {
+      //   toast.error(err.message);
+      // } else {
+      //   toast.error("Failed to create merchant!");
+      // }
     }
   };
 
@@ -248,6 +247,40 @@ const MerchantRegistrationForm = () => {
             </div>
           </div>
         </ComponentCard>
+
+        {/* Authorized Person Information */}
+        <div className="mt-6">
+          <ComponentCard title="Authorized Person Information">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <Label>Authorized Person Name</Label>
+                <Input
+                  {...register("authorized_person_name")}
+                  placeholder="Authorized Person Name"
+                />
+              </div>
+              <div>
+                <Label>Designation</Label>
+                <Input {...register("designation")} placeholder="Designation" />
+              </div>
+              <div>
+                <Label>
+                  Phone Number (<span className="text-red-500">*</span>)
+                </Label>
+                <Input {...register("phone")} placeholder="Phone Number" />
+                {errors.phone && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.phone.message}
+                  </p>
+                )}
+              </div>
+              <div>
+                <Label>Email Address</Label>
+                <Input {...register("email")} placeholder="Email Address" />
+              </div>
+            </div>
+          </ComponentCard>
+        </div>
         {/* Referral Info */}
         <div className="mt-8">
           <ComponentCard title="Referral Information">
@@ -311,39 +344,6 @@ const MerchantRegistrationForm = () => {
                     value={isError ? "Invalid" : memberData?.status || ""}
                   />
                 )}
-              </div>
-            </div>
-          </ComponentCard>
-        </div>
-        {/* Authorized Person Information */}
-        <div className="mt-6">
-          <ComponentCard title="Authorized Person Information">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div>
-                <Label>Authorized Person Name</Label>
-                <Input
-                  {...register("authorized_person_name")}
-                  placeholder="Authorized Person Name"
-                />
-              </div>
-              <div>
-                <Label>Designation</Label>
-                <Input {...register("designation")} placeholder="Designation" />
-              </div>
-              <div>
-                <Label>
-                  Phone Number (<span className="text-red-500">*</span>)
-                </Label>
-                <Input {...register("phone")} placeholder="Phone Number" />
-                {errors.phone && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.phone.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <Label>Email Address</Label>
-                <Input {...register("email")} placeholder="Email Address" />
               </div>
             </div>
             <div className="mt-8 flex gap-4">
