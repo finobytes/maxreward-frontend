@@ -39,15 +39,17 @@ const ProfileCard = ({ userInfo }) => {
           <h3 className="text-xl font-semibold">
             {userInfo?.merchant?.business_name}
           </h3>
-          <p className="text-sm mt-2 text-gray-400 font-medium">
+          <p className="text-sm mt-2 text-gray-600 font-medium">
             Unique Number: {userInfo?.merchant?.unique_number}
           </p>
-          {/* <div className="flex gap-4 mt-1">
+          <div className="flex gap-4 mt-1">
             <div className="flex gap-1">
-              <img src={locationIcon} alt="icon" />
-              <span className="text-sm text-gray-400">{userInfo?.address}</span>
+              {/* <img src={locationIcon} alt="icon" /> */}
+              <span className="text-sm text-gray-600">
+                Username: {userInfo?.user_name}
+              </span>
             </div>
-          </div> */}
+          </div>
         </div>
       </div>
     </section>
