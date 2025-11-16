@@ -32,6 +32,9 @@ const StaffManage = () => {
     filters: { debouncedSearch, status },
   } = useAdminStaff();
 
+  const backendCurrentPage = pagination?.current_page ?? 1;
+  const backendPerPage = pagination?.per_page ?? staffs.length;
+
   const [deleteStaff, { isLoading: isDeleting }] =
     useDeleteAdminStaffMutation();
   const [selected, setSelected] = useState([]);
@@ -139,9 +142,7 @@ const StaffManage = () => {
                     className="w-4 h-4 rounded"
                   />
                 </TableHead>
-                <TableHead className="text-gray-700 font-medium">
-                  Staff ID
-                </TableHead>
+                <TableHead className="text-gray-700 font-medium">S/N</TableHead>
                 <TableHead className="text-gray-700 font-medium">
                   Full Name
                 </TableHead>
@@ -179,7 +180,7 @@ const StaffManage = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                staffs.map((staff) => (
+                staffs.map((staff, idx) => (
                   <TableRow
                     key={staff.id}
                     className={`transition ${
@@ -196,7 +197,9 @@ const StaffManage = () => {
                         className="w-4 h-4 rounded"
                       />
                     </TableCell>
-                    <TableCell>{staff.id}</TableCell>
+                    <TableCell>
+                      {(backendCurrentPage - 1) * backendPerPage + (idx + 1)}
+                    </TableCell>
 
                     {/* FIX 1: Added classes here to make the name wrap */}
                     <TableCell className="whitespace-normal break-words">

@@ -67,6 +67,11 @@ const MemberManage = () => {
     (s) => s.memberManagement
   );
 
+  const { members, meta, isLoading, isFetching, isError } = useMembers();
+
+  const backendCurrentPage = meta?.current_page ?? 1;
+  const backendPerPage = meta?.per_page ?? members.length;
+
   const [localSearch, setLocalSearch] = useState(search || "");
   const debouncedSearch = useDebounced(localSearch, 450);
 
@@ -74,7 +79,6 @@ const MemberManage = () => {
     dispatch(setSearch(debouncedSearch));
   }, [debouncedSearch, dispatch]);
 
-  const { members, meta, isLoading, isFetching, isError } = useMembers();
   const [updateStatus] = useUpdateStatusMutation();
   const [blockOrSuspendMember] = useBlockOrSuspendMemberMutation();
 
@@ -303,8 +307,9 @@ const MemberManage = () => {
                       className="w-4 h-4 rounded"
                     />
                   </TableHead>
-                  <TableHead>Member ID</TableHead>
+                  <TableHead>S/N</TableHead>
                   <TableHead>Full Name</TableHead>
+                  <TableHead>Type</TableHead>
                   <TableHead>Phone Number</TableHead>
                   <TableHead>Total Referrals</TableHead>
                   <TableHead>Available Points</TableHead>
@@ -316,7 +321,7 @@ const MemberManage = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {members.map((m) => {
+                {members.map((m, idx) => {
                   const normalizedStatus = (m.status || "").toLowerCase();
                   const isBlocked = normalizedStatus === "blocked";
                   const isSuspended = normalizedStatus === "suspended";
@@ -326,85 +331,94 @@ const MemberManage = () => {
                       <TableCell>
                         <input
                           type="checkbox"
-                        checked={selected.includes(m.id)}
-                        onChange={() => toggleSelect(m.id)}
-                        className="w-4 h-4 rounded"
-                      />
-                    </TableCell>
-                    <TableCell>{m.id}</TableCell>
-                    <TableCell className="whitespace-normal break-words">
-                      {m.name}
-                    </TableCell>
-                    <TableCell>{m.phone}</TableCell>
-                    <TableCell>{m.wallet?.total_referrals ?? "N/A"}</TableCell>
-                    <TableCell>{m.wallet?.available_points ?? "N/A"}</TableCell>
-                    <TableCell>
-                      {m.wallet?.lifetime_purchase_amount ?? "N/A"}
-                    </TableCell>
-                    <TableCell>
-                      {new Date(m.created_at).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      <img
-                        src={memberQR}
-                        alt="QR Code"
-                        className="w-12 h-12 object-contain"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge status={m.status} />
-                    </TableCell>
-                    <TableCell className="whitespace-normal break-words">
-                      <div className="flex gap-2">
-                        <Link
-                          to={`/admin/member-manage/details/${m.id}`}
-                          className="p-2 rounded-md bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
-                        >
-                          <Eye size={16} />
-                        </Link>
-                        <Link
-                          to={`/admin/member-manage/edit/${m.id}`}
-                          className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200"
-                        >
-                          <PencilLine size={16} />
-                        </Link>
-                        {isBlocked ? (
-                          <button
-                            onClick={() => handleStatusChange(m.id, "active")}
-                            disabled={updatingId === m.id}
-                            className="px-2 rounded-md bg-green-100 text-green-700 hover:bg-green-200 disabled:opacity-50"
+                          checked={selected.includes(m.id)}
+                          onChange={() => toggleSelect(m.id)}
+                          className="w-4 h-4 rounded"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        {(backendCurrentPage - 1) * backendPerPage + (idx + 1)}
+                      </TableCell>
+                      <TableCell className="whitespace-normal break-words">
+                        {m.name}
+                      </TableCell>
+                      <TableCell>{m.member_type}</TableCell>
+                      <TableCell>{m.phone}</TableCell>
+                      <TableCell>
+                        {m.wallet?.total_referrals ?? "N/A"}
+                      </TableCell>
+                      <TableCell>
+                        {m.wallet?.available_points ?? "N/A"}
+                      </TableCell>
+                      <TableCell>
+                        {m.wallet?.lifetime_purchase_amount ?? "N/A"}
+                      </TableCell>
+                      <TableCell>
+                        {new Date(m.created_at).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        <img
+                          src={memberQR}
+                          alt="QR Code"
+                          className="w-12 h-12 object-contain"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge status={m.status} />
+                      </TableCell>
+                      <TableCell className="whitespace-normal break-words">
+                        <div className="flex gap-2">
+                          <Link
+                            to={`/admin/member-manage/details/${m.id}`}
+                            className="p-2 rounded-md bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
                           >
-                            {updatingId === m.id ? "Updating..." : "Unblock"}
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => openActionDialog(m, "block")}
-                            disabled={updatingId === m.id}
-                            className="px-2 rounded-md bg-red-100 text-red-700 hover:bg-red-200 disabled:opacity-50"
+                            <Eye size={16} />
+                          </Link>
+                          <Link
+                            to={`/admin/member-manage/edit/${m.id}`}
+                            className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200"
                           >
-                            {updatingId === m.id ? "Updating..." : "Block"}
-                          </button>
-                        )}
+                            <PencilLine size={16} />
+                          </Link>
+                          {isBlocked ? (
+                            <button
+                              onClick={() => handleStatusChange(m.id, "active")}
+                              disabled={updatingId === m.id}
+                              className="px-2 rounded-md bg-green-100 text-green-700 hover:bg-green-200 disabled:opacity-50"
+                            >
+                              {updatingId === m.id ? "Updating..." : "Unblock"}
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => openActionDialog(m, "block")}
+                              disabled={updatingId === m.id}
+                              className="px-2 rounded-md bg-red-100 text-red-700 hover:bg-red-200 disabled:opacity-50"
+                            >
+                              {updatingId === m.id ? "Updating..." : "Block"}
+                            </button>
+                          )}
 
-                        {isSuspended ? (
-                          <button
-                            onClick={() => handleStatusChange(m.id, "active")}
-                            disabled={updatingId === m.id}
-                            className="px-2 rounded-md bg-green-100 text-green-700 hover:bg-green-200 disabled:opacity-50"
-                          >
-                            {updatingId === m.id ? "Updating..." : "Unsuspend"}
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => openActionDialog(m, "suspend")}
-                            disabled={updatingId === m.id}
-                            className="px-2 rounded-md bg-yellow-100 text-gray-700 hover:bg-yellow-200 disabled:opacity-50"
-                          >
-                            {updatingId === m.id ? "Updating..." : "Suspend"}
-                          </button>
-                        )}
-                      </div>
-                    </TableCell>
+                          {isSuspended ? (
+                            <button
+                              onClick={() => handleStatusChange(m.id, "active")}
+                              disabled={updatingId === m.id}
+                              className="px-2 rounded-md bg-green-100 text-green-700 hover:bg-green-200 disabled:opacity-50"
+                            >
+                              {updatingId === m.id
+                                ? "Updating..."
+                                : "Unsuspend"}
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => openActionDialog(m, "suspend")}
+                              disabled={updatingId === m.id}
+                              className="px-2 rounded-md bg-yellow-100 text-gray-700 hover:bg-yellow-200 disabled:opacity-50"
+                            >
+                              {updatingId === m.id ? "Updating..." : "Suspend"}
+                            </button>
+                          )}
+                        </div>
+                      </TableCell>
                     </TableRow>
                   );
                 })}

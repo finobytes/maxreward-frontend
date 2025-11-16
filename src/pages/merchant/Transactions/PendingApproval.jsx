@@ -1,10 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
+import { Link } from "react-router";
 import { Eye, Loader2 } from "lucide-react";
-import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
-import SearchInput from "../../../components/form/form-elements/SearchInput";
-import PrimaryButton from "../../../components/ui/PrimaryButton";
-import Pagination from "../../../components/table/Pagination";
-import StatusBadge from "../../../components/table/StatusBadge";
+import { toast } from "sonner";
 import {
   Table,
   TableBody,
@@ -14,8 +11,23 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
+
+import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
+import SearchInput from "../../../components/form/form-elements/SearchInput";
+import Pagination from "../../../components/table/Pagination";
+import StatusBadge from "../../../components/table/StatusBadge";
+import PrimaryButton from "../../../components/ui/PrimaryButton";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../../../components/ui/dialog";
+
 import { useTransactions } from "../../../redux/features/merchant/transactions/useTransaction";
-import { Link } from "react-router";
+import { useRejectPurchaseMutation } from "../../../redux/features/merchant/transactions/transactionsApi";
 
 const currency = (value) =>
   `RM ${Number(value ?? 0).toLocaleString(undefined, {
@@ -23,10 +35,15 @@ const currency = (value) =>
     maximumFractionDigits: 2,
   })}`;
 
-const formatDateTime = (value) =>
-  value ? new Date(value).toLocaleString() : "—";
-
 const PendingApproval = () => {
+  const [updatingId, setUpdatingId] = useState(null);
+  const [rejectDialog, setRejectDialog] = useState({
+    open: false,
+    purchase: null,
+    reason: "",
+    error: "",
+  });
+
   const {
     transactions,
     meta,
@@ -40,11 +57,14 @@ const PendingApproval = () => {
     setPage,
     refresh,
     approvePurchase,
-    approving,
     approvingId,
     reset,
   } = useTransactions("pending");
 
+  const [rejectPurchase, { isLoading: rejecting }] =
+    useRejectPurchaseMutation();
+
+  // Search
   const handleSearchChange = (eventOrValue) => {
     const nextValue =
       typeof eventOrValue === "string"
@@ -58,6 +78,68 @@ const PendingApproval = () => {
     setPerPage(value);
   };
 
+  // APPROVE
+  const handleApprove = async (purchaseId) => {
+    setUpdatingId(purchaseId);
+    try {
+      const response = await approvePurchase(purchaseId);
+
+      // toast.success(response?.message || "Purchase approved successfully!");
+      refresh();
+      return true;
+    } catch (err) {
+      console.error(err);
+      toast.error(
+        err?.data?.message || "Failed to approve purchase. Please try again."
+      );
+      return false;
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  // REJECT
+  const handleReject = async (purchaseId, reason) => {
+    setUpdatingId(purchaseId);
+    try {
+      const response = await rejectPurchase({
+        id: purchaseId,
+        status: "rejected",
+        reason,
+      }).unwrap();
+
+      toast.success(response?.message || "Purchase rejected successfully!");
+      refresh();
+      return true;
+    } catch (err) {
+      console.error(err);
+      toast.error(err?.data?.message || "Failed to reject");
+      return false;
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  // Reject Dialog Open/Close
+  const openRejectDialog = (purchase) =>
+    setRejectDialog({ open: true, purchase, reason: "", error: "" });
+
+  const closeRejectDialog = () =>
+    setRejectDialog({ open: false, purchase: null, reason: "", error: "" });
+
+  // Reject Submit
+  const submitRejectDialog = async () => {
+    const reason = rejectDialog.reason.trim();
+    if (!reason) {
+      setRejectDialog((prev) => ({ ...prev, error: "Reason is required." }));
+      return;
+    }
+
+    const purchaseId = rejectDialog.purchase?.id;
+    const ok = await handleReject(purchaseId, reason);
+    if (ok) closeRejectDialog();
+  };
+
   return (
     <div className="space-y-6">
       <PageBreadcrumb
@@ -69,6 +151,7 @@ const PendingApproval = () => {
       />
 
       <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
+        {/* Top Controls */}
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <SearchInput
             value={searchValue}
@@ -85,9 +168,7 @@ const PendingApproval = () => {
                 className="rounded-md border border-gray-200 bg-white px-2 py-1 text-sm focus:border-brand-500 focus:outline-none"
               >
                 {[5, 10, 20, 50].map((size) => (
-                  <option key={size} value={size}>
-                    {size}
-                  </option>
+                  <option key={size}>{size}</option>
                 ))}
               </select>
             </label>
@@ -98,10 +179,7 @@ const PendingApproval = () => {
               disabled={isFetching}
             >
               {isFetching ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Refreshing
-                </>
+                <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 "Refresh"
               )}
@@ -113,13 +191,14 @@ const PendingApproval = () => {
                 setSearchValue("");
                 reset();
               }}
-              disabled={isFetching || approving}
+              disabled={isFetching}
             >
               Clear Filters
             </PrimaryButton>
           </div>
         </div>
 
+        {/* Table */}
         <div className="relative overflow-x-auto">
           {isFetching && !isLoading && (
             <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 backdrop-blur-sm">
@@ -173,83 +252,129 @@ const PendingApproval = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                transactions.map((txn) => (
-                  <TableRow key={txn.id}>
-                    <TableCell className="font-medium text-gray-900">
-                      {txn.transaction_id}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-gray-800">
-                          {txn.member?.name || "—"}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell> {txn.member?.phone || "—"}</TableCell>
-                    <TableCell className="">
-                      {currency(txn.transaction_amount)}
-                    </TableCell>
-                    <TableCell className="">
-                      {currency(txn.redeem_amount)}
-                    </TableCell>
-                    <TableCell className="">
-                      {currency(txn.cash_redeem_amount)}
-                    </TableCell>
-                    <TableCell className="capitalize">
-                      {txn.payment_method || "—"}
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge status={txn.status}>
-                        {txn.status}
-                      </StatusBadge>
-                    </TableCell>
-                    {/* <TableCell>{formatDateTime(txn.created_at)}</TableCell> */}
-                    <TableCell className="text-right flex items-center gap-2">
-                      <Link
-                        to=""
-                        className="p-2 rounded-md bg-indigo-100 text-indigo-600 hover:bg-indigo-200 inline-block"
-                      >
-                        <Eye size={16} />
-                      </Link>
-                      <PrimaryButton
-                        variant="success"
-                        size="sm"
-                        onClick={() => approvePurchase(txn.id)}
-                        disabled={approving || approvingId === txn.id}
-                      >
-                        {approvingId === txn.id ? (
-                          <>
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                            Approving
-                          </>
-                        ) : (
-                          "Approve"
-                        )}
-                      </PrimaryButton>
+                transactions.map((txn) => {
+                  const rowUpdating = updatingId === txn.id;
 
-                      <PrimaryButton variant="danger" size="sm">
-                        Reject
-                      </PrimaryButton>
-                    </TableCell>
-                  </TableRow>
-                ))
+                  return (
+                    <TableRow key={txn.id}>
+                      <TableCell>{txn.transaction_id}</TableCell>
+                      <TableCell>{txn.member?.name || "N/A"}</TableCell>
+                      <TableCell>{txn.member?.phone}</TableCell>
+                      <TableCell>{currency(txn.transaction_amount)}</TableCell>
+                      <TableCell>{currency(txn.redeem_amount)}</TableCell>
+                      <TableCell>{currency(txn.cash_redeem_amount)}</TableCell>
+                      <TableCell>{txn.payment_method}</TableCell>
+                      <TableCell>
+                        <StatusBadge status={txn.status}>
+                          {txn.status}
+                        </StatusBadge>
+                      </TableCell>
+
+                      <TableCell className="flex items-center gap-2">
+                        <Link className="p-2 rounded-md bg-indigo-100 text-indigo-600">
+                          <Eye size={16} />
+                        </Link>
+
+                        <PrimaryButton
+                          variant="success"
+                          size="sm"
+                          onClick={() => handleApprove(txn.id)}
+                          disabled={rowUpdating}
+                        >
+                          {rowUpdating ? (
+                            <>
+                              <Loader2 className="h-4 w-4 animate-spin" />{" "}
+                              Approving…
+                            </>
+                          ) : (
+                            "Approve"
+                          )}
+                        </PrimaryButton>
+
+                        <PrimaryButton
+                          variant="danger"
+                          size="sm"
+                          onClick={() => openRejectDialog(txn)}
+                          disabled={rowUpdating || rejecting}
+                        >
+                          Reject
+                        </PrimaryButton>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>
         </div>
 
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        {/* Pagination */}
+        <div className="flex items-center justify-between">
           <p className="text-sm text-gray-500">
-            Showing page {meta.currentPage} of {meta.lastPage} · Total{" "}
+            Showing page {meta.currentPage} of {meta.lastPage} — Total{" "}
             {meta.total} records
           </p>
           <Pagination
             currentPage={meta.currentPage}
-            totalPages={Math.max(meta.lastPage, 1)}
+            totalPages={meta.lastPage}
             onPageChange={setPage}
           />
         </div>
       </div>
+
+      {/* Reject Dialog */}
+      <Dialog
+        open={rejectDialog.open}
+        onOpenChange={(o) => !o && closeRejectDialog()}
+      >
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Reject Purchase</DialogTitle>
+            <DialogDescription>
+              Provide a reason for rejecting purchase #
+              {rejectDialog.purchase?.id}.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Reason</label>
+            <textarea
+              rows={4}
+              className="w-full rounded-md border px-3 py-2 text-sm"
+              placeholder="Explain reason..."
+              value={rejectDialog.reason}
+              onChange={(e) =>
+                setRejectDialog((prev) => ({
+                  ...prev,
+                  reason: e.target.value,
+                  error: "",
+                }))
+              }
+            />
+            {rejectDialog.error && (
+              <p className="text-sm text-red-500">{rejectDialog.error}</p>
+            )}
+          </div>
+
+          <DialogFooter className="gap-3">
+            <button
+              className="px-4 py-2 text-sm rounded-md border text-gray-600"
+              onClick={closeRejectDialog}
+              disabled={rejecting}
+            >
+              Cancel
+            </button>
+            <PrimaryButton
+              variant="danger"
+              size="md"
+              onClick={submitRejectDialog}
+              disabled={rejecting}
+            >
+              {rejecting ? "Submitting..." : "Submit"}
+            </PrimaryButton>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -1,8 +1,37 @@
 import React from "react";
 import PrimaryButton from "../../../../components/ui/PrimaryButton";
 import ComponentCard from "../../../../components/common/ComponentCard";
+import { useLogoutMutation } from "../../../../redux/features/auth/authApi";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router";
+import { baseApi } from "../../../../redux/api/baseApi";
+import { logout } from "../../../../redux/features/auth/authSlice";
+import { toast } from "sonner";
 
 const OwnerInfoCard = ({ userInfo }) => {
+  const { user } = useSelector((state) => state.auth);
+  const role = user?.role || "member"; // admin | merchant | member
+  const [logoutApi, { isLoading }] = useLogoutMutation();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+    try {
+      // call backend logout endpoint
+      const res = await logoutApi(role).unwrap();
+      dispatch(baseApi.util.resetApiState());
+      // clear local Redux state & localStorage
+      dispatch(logout());
+      toast.success(res?.message || "Logged out successfully ");
+      // redirect to login
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      toast.error("Logout failed ");
+      dispatch(baseApi.util.resetApiState());
+      dispatch(logout());
+      navigate("/login");
+    }
+  };
   const people = [
     {
       key: "Name:",
@@ -64,7 +93,8 @@ const OwnerInfoCard = ({ userInfo }) => {
               type="button"
               variant="primary"
               size="md"
-              to="/member/merchant-application"
+              onClick={handleLogout}
+              disabled={isLoading}
             >
               Login To Merchant
             </PrimaryButton>

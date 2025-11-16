@@ -75,6 +75,30 @@ export const transactionsApi = baseApi.injectEndpoints({
         { type: "MerchantTransactions", id: "ALL" },
       ],
     }),
+    //  Merchant: Reject purchase
+    rejectPurchase: builder.mutation({
+      query: ({ id, status, reason }) => ({
+        url: `merchants/rejected/purchase`,
+        method: "POST",
+        body: {
+          purchase_id: id,
+          status: status ?? "rejected",
+          reason,
+        },
+      }),
+      transformResponse: (response) => {
+        return {
+          message: response.message,
+          data: response.data,
+        };
+      },
+      invalidatesTags: (result, err, { id }) => [
+        { type: "MerchantTransactions", id },
+        { type: "MerchantTransactions", id: "PENDING" },
+        { type: "MerchantTransactions", id: "ALL" },
+        { type: "MemberPurchases" },
+      ],
+    }),
   }),
 });
 
@@ -82,4 +106,5 @@ export const {
   useGetPendingPurchasesQuery,
   useGetPurchasesQuery,
   useApprovePurchaseMutation,
+  useRejectPurchaseMutation,
 } = transactionsApi;

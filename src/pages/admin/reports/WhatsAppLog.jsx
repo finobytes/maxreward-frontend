@@ -15,7 +15,6 @@ import { toast } from "sonner";
 import BulkActionBar from "../../../components/table/BulkActionBar";
 import { useGetAllWhatsAppLogsQuery } from "../../../redux/features/admin/reports/WhatsAppLog/whatsappLogApi";
 
-// Debounce Hook
 const useDebounced = (value, delay = 400) => {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
@@ -55,7 +54,12 @@ const WhatsAppLog = () => {
     );
   };
 
-  // Placeholder for bulk export/delete
+  // S/N logic ✔✔
+  const currentPage = pagination?.currentPage ?? 1;
+  const perPage = pagination?.perPage ?? 15;
+
+  const serialNumber = (idx) => (currentPage - 1) * perPage + (idx + 1);
+
   const bulkAction = (action) => {
     toast.warning(`Bulk ${action} not implemented yet`);
   };
@@ -73,7 +77,6 @@ const WhatsAppLog = () => {
           </div>
         )}
 
-        {/* Search Bar */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
           <SearchInput
             value={search}
@@ -82,7 +85,6 @@ const WhatsAppLog = () => {
           />
         </div>
 
-        {/* Bulk Actions */}
         {selected.length > 0 && (
           <BulkActionBar
             selectedCount={selected.length}
@@ -97,7 +99,6 @@ const WhatsAppLog = () => {
           />
         )}
 
-        {/* Table */}
         <div className="overflow-x-auto">
           {isLoading ? (
             <div className="p-6 text-center text-gray-500">
@@ -119,13 +120,13 @@ const WhatsAppLog = () => {
                     <input
                       type="checkbox"
                       checked={
-                        logs?.length > 0 && selected.length === logs?.length
+                        logs.length > 0 && selected.length === logs.length
                       }
                       onChange={(e) => toggleSelectAll(e.target.checked)}
                       className="w-4 h-4 rounded"
                     />
                   </TableHead>
-                  <TableHead>ID</TableHead>
+                  <TableHead>S/N</TableHead>
                   <TableHead>Phone Number</TableHead>
                   <TableHead>Message Type</TableHead>
                   <TableHead>Status</TableHead>
@@ -134,8 +135,9 @@ const WhatsAppLog = () => {
                   <TableHead>Sent At</TableHead>
                 </TableRow>
               </TableHeader>
+
               <TableBody>
-                {logs.map((log) => (
+                {logs.map((log, idx) => (
                   <TableRow key={log.id}>
                     <TableCell>
                       <input
@@ -145,7 +147,10 @@ const WhatsAppLog = () => {
                         className="w-4 h-4 rounded"
                       />
                     </TableCell>
-                    <TableCell>{log.id}</TableCell>
+
+                    {/* S/N Column ✔✔ */}
+                    <TableCell>{serialNumber(idx)}</TableCell>
+
                     <TableCell>{log.phone_number || "—"}</TableCell>
                     <TableCell className="capitalize">
                       {log.message_type || "—"}
@@ -159,11 +164,12 @@ const WhatsAppLog = () => {
                     >
                       {log.status}
                     </TableCell>
-                    <TableCell className="">
+
+                    <TableCell>
                       {log.sent_by_member ? (
                         <div className="space-y-2">
                           <p className="font-medium">
-                            {log.sent_by_member.name || "—"}
+                            {log.sent_by_member.name}
                           </p>
                           <p className="text-xs text-gray-500">
                             {log.sent_by_member.phone}
@@ -173,12 +179,11 @@ const WhatsAppLog = () => {
                         "—"
                       )}
                     </TableCell>
+
                     <TableCell>
                       {log.member ? (
                         <div className="space-y-2">
-                          <p className="font-medium">
-                            {log.member.name || "—"}
-                          </p>
+                          <p className="font-medium">{log.member.name}</p>
                           <p className="text-xs text-gray-500">
                             {log.member.phone}
                           </p>
@@ -187,6 +192,7 @@ const WhatsAppLog = () => {
                         "—"
                       )}
                     </TableCell>
+
                     <TableCell>
                       {log.sent_at
                         ? new Date(log.sent_at).toLocaleString("en-GB")
@@ -199,7 +205,6 @@ const WhatsAppLog = () => {
           )}
         </div>
 
-        {/* Pagination */}
         {pagination.totalPages > 1 && (
           <Pagination
             currentPage={pagination.currentPage}

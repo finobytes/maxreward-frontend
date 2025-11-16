@@ -1,7 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCreateMerchantMutation } from "@/redux/features/admin/merchantManagement/merchantManagementApi";
+import { z } from "zod";
+import { toast } from "sonner";
+import { useNavigate, useSearchParams } from "react-router";
+import { useSelector } from "react-redux";
+
 import PageBreadcrumb from "@/components/common/PageBreadcrumb";
 import ComponentCard from "@/components/common/ComponentCard";
 import Label from "@/components/form/Label";
@@ -9,23 +13,46 @@ import Input from "@/components/form/input/InputField";
 import Select from "@/components/form/Select";
 import PrimaryButton from "@/components/ui/PrimaryButton";
 import Dropzone from "@/components/form/form-elements/Dropzone";
-import { toast } from "sonner";
-import { useNavigate } from "react-router";
 import { useGetAllBusinessTypesQuery } from "@/redux/features/admin/businessType/businessTypeApi";
-import { merchantSchema } from "../../../schemas/merchantSchema";
-import { useSelector } from "react-redux";
+import { useCreateMerchantMutation } from "@/redux/features/admin/merchantManagement/merchantManagementApi";
 import { companyLogoPlaceholder } from "../../../assets/assets";
-import { useSearchParams } from "react-router";
+import { merchantSchema } from "../../../schemas/merchantSchema";
+import SkeletonField from "../../../components/skeleton/SkeletonField";
+import { useGetMemberByReferralQuery } from "../../../redux/features/admin/memberManagement/memberManagementApi";
+
+const merchantRegistrationSchema = merchantSchema.extend({
+  referralCode: z.string().min(3, {
+    message: "Referral code is required and must be at least 3 characters",
+  }),
+});
 
 const MerchantRegistrationForm = () => {
   const { user } = useSelector((state) => state.auth);
   const role = user?.role;
 
-  console.log(role);
+  const [referralInput, setReferralInput] = useState("");
+  const [debouncedReferral, setDebouncedReferral] = useState("");
+  // Debounce referral input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedReferral(referralInput.trim());
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [referralInput]);
+
+  // Fetch member info by referral code
+  const {
+    data: memberData,
+    isFetching,
+    isError,
+  } = useGetMemberByReferralQuery(debouncedReferral, {
+    skip: !debouncedReferral || debouncedReferral.length < 3,
+  });
 
   const [businessLogo, setBusinessLogo] = useState(null);
 
-  const [createMerchant, { isLoading }] = useCreateMerchantMutation();
+  const [createMerchant, { isLoading: isCreating }] =
+    useCreateMerchantMutation();
   const navigate = useNavigate();
   const {
     data: businessTypes,
@@ -37,23 +64,40 @@ const MerchantRegistrationForm = () => {
     register,
     handleSubmit,
     reset,
+    setError,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(merchantSchema),
+    resolver: zodResolver(merchantRegistrationSchema),
     defaultValues: {
       status: "approved",
+      referralCode: "",
     },
   });
 
   const onSubmit = async (data) => {
     try {
-      data.merchant_created_by = role === "admin" ? "admin" : "general_member";
+      if (!memberData?.id || isError) {
+        setError("referralCode", {
+          type: "manual",
+          message: "Valid referral is required to register a merchant",
+        });
+        toast.error("Please provide a valid referral code or phone number.");
+        return;
+      }
+
+      const referralValue = referralInput.trim();
+      const payload = {
+        ...data,
+        referralCode: referralValue || data.referralCode,
+        merchant_created_by: role === "admin" ? "admin" : "general_member",
+        member_id: memberData.id,
+      };
       const formData = new FormData();
 
       //  Append all text fields
-      Object.keys(data).forEach((key) => {
-        if (data[key] !== undefined && data[key] !== null) {
-          formData.append(key, data[key]);
+      Object.keys(payload).forEach((key) => {
+        if (payload[key] !== undefined && payload[key] !== null) {
+          formData.append(key, payload[key]);
         }
       });
 
@@ -62,20 +106,21 @@ const MerchantRegistrationForm = () => {
         formData.append("business_logo", businessLogo);
       }
 
-      const response = await createMerchant(formData).unwrap();
+      await createMerchant(formData).unwrap();
 
       toast.success("Merchant created successfully!");
       reset();
+      setReferralInput("");
+      setDebouncedReferral("");
       navigate("/admin/merchant/pending-merchant");
     } catch (err) {
       console.error("Create Error:", err);
-      if (err?.data?.errors) {
-        Object.entries(err.data.errors).forEach(([field, messages]) => {
-          toast.error(`${field}: ${messages.join(", ")}`);
-        });
-      } else {
-        toast.error("Failed to create merchant!");
-      }
+      toast.error(err?.data?.message || "Failed to create merchant!");
+      // if (err) {
+      //   toast.error(err.message);
+      // } else {
+      //   toast.error("Failed to create merchant!");
+      // }
     }
   };
 
@@ -117,6 +162,11 @@ const MerchantRegistrationForm = () => {
               <div>
                 <Label>Company Address</Label>
                 <Input {...register("address")} placeholder="Company Address" />
+                {errors.address && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.address.message}
+                  </p>
+                )}
               </div>
               <div>
                 <Label>State</Label>
@@ -176,6 +226,11 @@ const MerchantRegistrationForm = () => {
                   {...register("merchant_password")}
                   placeholder="Password"
                 />
+                {errors.merchant_password && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.merchant_password.message}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -224,9 +279,76 @@ const MerchantRegistrationForm = () => {
                 <Input {...register("email")} placeholder="Email Address" />
               </div>
             </div>
+          </ComponentCard>
+        </div>
+        {/* Referral Info */}
+        <div className="mt-8">
+          <ComponentCard title="Referral Information">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Referral Code */}
+              <div>
+                <Label htmlFor="referralCode">
+                  Referral Code / Phone Number (
+                  <span className="text-red-500">*</span>)
+                </Label>
+                <Input
+                  id="referralCode"
+                  placeholder="Enter referral code / Phone Number"
+                  {...register("referralCode")}
+                  value={referralInput}
+                  onChange={(e) => setReferralInput(e.target.value)}
+                  error={!!errors.referralCode}
+                  hint={errors.referralCode?.message}
+                />
+                {referralInput && referralInput.length < 3 && (
+                  <p className="text-xs text-gray-400 mt-1">
+                    Type at least 3 characters...
+                  </p>
+                )}
+                {isError && (
+                  <p className="text-xs text-red-500 mt-1">
+                    Invalid referral - please check the code or phone number.
+                  </p>
+                )}
+              </div>
+
+              {/* Referred By */}
+              <div>
+                <Label htmlFor="referredBy">Referred By</Label>
+                {isFetching ? (
+                  <>
+                    <SkeletonField />
+                  </>
+                ) : (
+                  <Input
+                    id="referredBy"
+                    disabled
+                    readOnly
+                    value={
+                      isError ? "Referral Not Found" : memberData?.name || ""
+                    }
+                  />
+                )}
+              </div>
+
+              {/* Referral Status */}
+              <div>
+                <Label htmlFor="referralStatus">Referral Status</Label>
+                {isFetching ? (
+                  <SkeletonField />
+                ) : (
+                  <Input
+                    id="referralStatus"
+                    disabled
+                    readOnly
+                    value={isError ? "Invalid" : memberData?.status || ""}
+                  />
+                )}
+              </div>
+            </div>
             <div className="mt-8 flex gap-4">
-              <PrimaryButton type="submit" disabled={isLoading}>
-                {isLoading ? "Submitting..." : "Submit"}
+              <PrimaryButton type="submit" disabled={isCreating}>
+                {isCreating ? "Submitting..." : "Submit"}
               </PrimaryButton>
               <PrimaryButton
                 variant="secondary"

@@ -4,6 +4,7 @@ import MaxRedeemMall from "../pages/member/maxRedeemMall/MaxRedeemMall";
 import MemberDashboard from "../pages/member/memberDashboard/MemberDashboard";
 import MerchantApplication from "../pages/member/merchantApplication/MerchantApplication";
 import PointStatement from "../pages/member/pointStatement/PointStatement";
+import TransactionDetails from "../pages/member/pointStatement/TransactionDetails";
 import Profile from "../pages/member/profile/Profile";
 import PurchaseVoucher from "../pages/member/purchaseVoucher/PurchaseVoucher";
 import VoucherDetailsForMember from "../pages/member/purchaseVoucher/VoucherDetailsForMember";
@@ -32,6 +33,10 @@ export const memberRoutes = [
   {
     path: "point-statement",
     element: <PointStatement />,
+  },
+  {
+    path: "point-statement/:id",
+    element: <TransactionDetails />,
   },
   {
     path: "max-redeem-mall",

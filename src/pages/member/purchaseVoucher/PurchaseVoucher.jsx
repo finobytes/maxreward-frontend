@@ -176,7 +176,7 @@ const PurchaseVoucher = () => {
                         className="w-4 h-4 rounded"
                       />
                     </TableHead>
-                    <TableHead>Voucher ID</TableHead>
+                    <TableHead>S/N</TableHead>
                     <TableHead>Voucher Type</TableHead>
                     <TableHead>Denomination</TableHead>
                     <TableHead>Quantity</TableHead>
@@ -189,7 +189,7 @@ const PurchaseVoucher = () => {
                 </TableHeader>
 
                 <TableBody>
-                  {paginatedData.map((v) => (
+                  {paginatedData.map((v, idx) => (
                     <TableRow
                       key={v.id}
                       className="hover:bg-gray-50 transition"
@@ -202,7 +202,12 @@ const PurchaseVoucher = () => {
                           className="w-4 h-4 rounded"
                         />
                       </TableCell>
-                      <TableCell>{v.id}</TableCell>
+                      <TableCell>
+                        {(backendCurrentPage - 1) *
+                          (pagination?.per_page || 0) +
+                          idx +
+                          1}
+                      </TableCell>
                       <TableCell>
                         <StatusBadge status={v.voucher_type}>
                           {v.voucher_type}

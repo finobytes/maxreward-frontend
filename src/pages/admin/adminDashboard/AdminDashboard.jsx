@@ -20,6 +20,7 @@ const AdminDashboard = () => {
     total_merchants: data?.approved_merchants ?? 0,
     total_transactions: data?.total_transactions ?? 0,
     pending_merchants: data?.pending_merchants ?? 0,
+    total_pending_vouchers: data?.total_pending_vouchers ?? 0,
   };
 
   const cardsData = [
@@ -66,7 +67,7 @@ const AdminDashboard = () => {
     {
       icon: clock,
       title: "Pending Voucher",
-      value: 18,
+      value: stats.total_pending_vouchers.toLocaleString(),
       changeText: "+0.892",
       changeColor: "text-green-500",
       subtitle: "Increased",

@@ -23,13 +23,17 @@ export const useVouchers = () => {
     }
   );
 
-  const vouchersContainer = data;
-  console.log("Vouchers Container ", vouchersContainer);
-  const vouchers = vouchersContainer?.vouchers;
-  const meta = {
-    current_page: vouchersContainer?.meta?.current_page ?? 1,
-    last_page: vouchersContainer?.meta?.last_page ?? 1,
+  return {
+    vouchers: data?.vouchers ?? [],
+    meta: data?.meta ?? {
+      current_page: 1,
+      last_page: 1,
+      per_page: 15,
+      total: 0,
+    },
+    isLoading,
+    isFetching,
+    isError,
+    refetch,
   };
-
-  return { vouchers, meta, isLoading, isFetching, isError, refetch };
 };

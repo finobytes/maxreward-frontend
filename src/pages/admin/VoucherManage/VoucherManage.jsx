@@ -53,6 +53,8 @@ const VoucherManage = () => {
   const { vouchers, meta, isLoading, isFetching, isError, refetch } =
     useVouchers();
 
+  const backendCurrentPage = meta?.current_page ?? 1;
+  const backendPerPage = meta?.per_page ?? vouchers?.length ?? 10;
   const [selected, setSelected] = useState([]);
   const [updatingId, setUpdatingId] = useState(null);
   const [rejectDialog, setRejectDialog] = useState({
@@ -240,7 +242,7 @@ const VoucherManage = () => {
                     className="w-4 h-4 rounded"
                   />
                 </TableHead>
-                <TableHead>Voucher ID</TableHead>
+                <TableHead>S/N</TableHead>
                 <TableHead>Voucher Type</TableHead>
                 <TableHead>Purchased By</TableHead>
                 <TableHead>Denomination</TableHead>
@@ -265,7 +267,7 @@ const VoucherManage = () => {
                   No vouchers found
                 </div>
               ) : (
-                vouchers.map((v) => (
+                vouchers.map((v, idx) => (
                   <TableRow key={v.id} className="hover:bg-gray-50 transition">
                     <TableCell>
                       <input
@@ -275,7 +277,9 @@ const VoucherManage = () => {
                         className="w-4 h-4 rounded"
                       />
                     </TableCell>
-                    <TableCell>{v.id}</TableCell>
+                    <TableCell>
+                      {(backendCurrentPage - 1) * backendPerPage + (idx + 1)}
+                    </TableCell>
                     <TableCell>
                       <StatusBadge status={v.voucher_type}>
                         {v.voucher_type} voucher
@@ -285,7 +289,7 @@ const VoucherManage = () => {
                     <TableCell>
                       {v?.denomination_history?.map((item, index) => (
                         <div key={index} className="text-sm">
-                          {item.value}, {item.quantity}
+                          {item.value}, Qty {item.quantity}
                         </div>
                       ))}
                     </TableCell>
@@ -300,33 +304,37 @@ const VoucherManage = () => {
                       <StatusBadge status={v.status}>{v.status}</StatusBadge>
                     </TableCell>
 
-                    <TableCell className="flex gap-2">
-                      {v.status === "pending" && (
-                        <>
-                          <button
-                            onClick={() => handleStatusUpdate(v.id, "approved")}
-                            disabled={updatingId === v.id}
-                            className="px-3 py-1 bg-green-100 text-green-600 rounded-md"
-                          >
-                            Approve
-                          </button>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        {v.status === "pending" && (
+                          <>
+                            <button
+                              onClick={() =>
+                                handleStatusUpdate(v.id, "approved")
+                              }
+                              disabled={updatingId === v.id}
+                              className="px-3 py-1 bg-green-100 text-green-600 rounded-md"
+                            >
+                              Approve
+                            </button>
 
-                          <button
-                            onClick={() => openRejectDialog(v)}
-                            disabled={updatingId === v.id}
-                            className="px-3 py-1 bg-red-100 text-red-600 rounded-md"
-                          >
-                            Reject
-                          </button>
-                        </>
-                      )}
+                            <button
+                              onClick={() => openRejectDialog(v)}
+                              disabled={updatingId === v.id}
+                              className="px-3 py-1 bg-red-100 text-red-600 rounded-md"
+                            >
+                              Reject
+                            </button>
+                          </>
+                        )}
 
-                      <Link
-                        to={`/admin/vouchers/${v.id}`}
-                        className="p-2 bg-indigo-100 rounded-md text-indigo-600"
-                      >
-                        <Eye size={16} />
-                      </Link>
+                        <Link
+                          to={`/admin/vouchers/${v.id}`}
+                          className="p-2 bg-indigo-100 rounded-md text-indigo-600"
+                        >
+                          <Eye size={16} />
+                        </Link>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))

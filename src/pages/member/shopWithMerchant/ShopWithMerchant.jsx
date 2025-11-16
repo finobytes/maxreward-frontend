@@ -120,13 +120,13 @@ const ShopWithMerchant = () => {
       </div>
 
       {/* Recent Merchants */}
-      <ComponentCard title="Recent Registered Merchants" className="mt-6">
+      {/* <ComponentCard title="Recent Registered Merchants" className="mt-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {merchantInfo.map((merchant, index) => (
             <MerchantCard key={index} merchant={merchant} />
           ))}
         </div>
-      </ComponentCard>
+      </ComponentCard> */}
     </div>
   );
 };

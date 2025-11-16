@@ -87,12 +87,12 @@ const ProfileCard = ({ userInfo, onEditClick = () => {} }) => {
                 {userInfo?.email ?? "Member"}
               </p>
 
-              <div className="flex gap-3 mt-1 items-center">
+              {/* <div className="flex gap-3 mt-1 items-center">
                 <img src={locationIcon} alt="icon" className="w-4 h-4" />
                 <span className="text-sm text-gray-400">
                   {userInfo?.address ?? "N/A"}
                 </span>
-              </div>
+              </div> */}
             </div>
             <button
               type="button"
