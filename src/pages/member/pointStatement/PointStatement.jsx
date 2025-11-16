@@ -13,6 +13,7 @@ import Pagination from "../../../components/table/Pagination";
 import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
 import { usePointStatementMember } from "../../../redux/features/member/pointStatement/usePointStatementMember";
 
+// 🔥 1️⃣ Pick Member ID
 const pickMemberId = (profile) =>
   profile?.member_id ||
   profile?.memberId ||
@@ -23,38 +24,67 @@ const pickMemberId = (profile) =>
   profile?.id ||
   null;
 
-const formatDate = (value) => {
+// 🔥 2️⃣ Format Date + Time
+const formatDateTime = (value) => {
   if (!value) return "-";
   const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? "-" : date.toLocaleDateString();
+  if (isNaN(date.getTime())) return "-";
+
+  return date.toLocaleString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 };
+
+// 🔥 3️⃣ Transaction Type Full Form
+const typeMapping = {
+  pp: "Personal Points",
+  rp: "Referral Points",
+  cp: "Community Points",
+  cr: "Company Reserve",
+  dp: "Deducted Points",
+  ap: "Added Points",
+  vrp: "Voucher Referral Points",
+  vap: "Voucher Available Points",
+};
+
+// 🔥 4️⃣ Total Points Badge
+const renderPointsBadge = (value, isDebit) => (
+  <span
+    className={`inline-flex rounded-full px-3 py-1 text-sm font-medium ${
+      isDebit ? "bg-red-100 text-red-600" : "bg-blue-100 text-blue-600"
+    }`}
+  >
+    {isDebit ? `-${value}` : `+${value}`}
+  </span>
+);
+
+// 🔥 5️⃣ Status Badge
+const renderStatusBadge = (status) => (
+  <span
+    className={`inline-flex rounded-full px-3 py-1 text-sm font-medium ${
+      status === "debited"
+        ? "bg-red-100 text-red-600"
+        : "bg-green-100 text-green-600"
+    }`}
+  >
+    {status.charAt(0).toUpperCase() + status.slice(1)}
+  </span>
+);
 
 const PointStatement = () => {
   const { data: memberProfile, isLoading: memberLoading } = useVerifyMeQuery();
   const memberId = pickMemberId(memberProfile);
 
-  const {
-    transactions,
-    meta,
-    isLoading,
-    isFetching,
-    error,
-    changePage,
-  } = usePointStatementMember(memberId);
+  const { transactions, meta, isLoading, isFetching, error, changePage } =
+    usePointStatementMember(memberId);
 
   const loading = isLoading || memberLoading;
   const currentPage = meta?.currentPage || 1;
   const totalPages = meta?.lastPage || 1;
-
-  const renderStatusBadge = (label, isDebit) => (
-    <span
-      className={`inline-flex rounded-full px-3 py-1 text-sm ${
-        isDebit ? "bg-red-100 text-red-600" : "bg-green-100 text-green-600"
-      }`}
-    >
-      {label ?? "-"}
-    </span>
-  );
 
   return (
     <div>
@@ -77,12 +107,12 @@ const PointStatement = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Transaction ID</TableHead>
-                <TableHead>Transaction Type</TableHead>
-                <TableHead>User Type</TableHead>
+                <TableHead>Point Type</TableHead>
                 <TableHead>Name</TableHead>
+                <TableHead>Date & Time</TableHead>
                 <TableHead className="text-center">Total Points</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead className="text-center">Point Type</TableHead>
+                <TableHead className="text-center">Status</TableHead>
+                <TableHead>Reason</TableHead>
                 <TableHead className="text-center">Balance</TableHead>
               </TableRow>
             </TableHeader>
@@ -103,15 +133,6 @@ const PointStatement = () => {
                     {error?.data?.message || "Failed to load transactions."}
                   </TableCell>
                 </TableRow>
-              ) : !memberId ? (
-                <TableRow>
-                  <TableCell
-                    colSpan="8"
-                    className="py-6 text-center text-red-500"
-                  >
-                    Unable to determine member information.
-                  </TableCell>
-                </TableRow>
               ) : transactions.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan="8" className="py-6 text-center">
@@ -123,20 +144,35 @@ const PointStatement = () => {
                   const isDebit = item?.points_type === "debited";
 
                   return (
-                    <TableRow
-                      key={item?.id ?? `${item?.transaction_type}-${item?.created_at}`}
-                    >
+                    <TableRow key={item?.id}>
+                      {/* Transaction ID */}
                       <TableCell>{item?.id ?? "-"}</TableCell>
-                      <TableCell>{item?.transaction_type ?? "-"}</TableCell>
-                      <TableCell>Member</TableCell>
+
+                      {/* Full Point Type */}
+                      <TableCell>
+                        {typeMapping[item?.transaction_type] ?? "-"}
+                      </TableCell>
+
+                      {/* Member Name */}
                       <TableCell>{item?.member?.name ?? "-"}</TableCell>
+
+                      {/* Date/Time */}
+                      <TableCell>{formatDateTime(item?.created_at)}</TableCell>
+
+                      {/* Total Points */}
                       <TableCell className="text-center">
-                        {renderStatusBadge(item?.transaction_points, isDebit)}
+                        {renderPointsBadge(item?.transaction_points, isDebit)}
                       </TableCell>
-                      <TableCell>{formatDate(item?.created_at)}</TableCell>
+
+                      {/* Status */}
                       <TableCell className="text-center">
-                        {renderStatusBadge(item?.points_type, isDebit)}
+                        {renderStatusBadge(item?.points_type)}
                       </TableCell>
+
+                      {/* Reason */}
+                      <TableCell>{item?.transaction_reason ?? "-"}</TableCell>
+
+                      {/* Available Balance */}
                       <TableCell className="text-center">
                         {item?.member?.wallet?.available_points ?? "-"}
                       </TableCell>
