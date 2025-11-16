@@ -113,9 +113,7 @@ const MerchantStaff = () => {
                     className="w-4 h-4 rounded"
                   />
                 </TableHead>
-                <TableHead className="text-gray-700 font-medium">
-                  Staff ID
-                </TableHead>
+                <TableHead className="text-gray-700 font-medium">S/N</TableHead>
                 <TableHead className="text-gray-700 font-medium">
                   Full Name
                 </TableHead>
@@ -144,7 +142,7 @@ const MerchantStaff = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                staffs.map((staff) => (
+                staffs.map((staff, idx) => (
                   <TableRow
                     key={staff.id}
                     className={`transition ${
@@ -161,7 +159,13 @@ const MerchantStaff = () => {
                         className="w-4 h-4 rounded"
                       />
                     </TableCell>
-                    <TableCell>{staff.staffId || staff.id}</TableCell>
+                    <TableCell>
+                      {(pagination?.current_page
+                        ? pagination.current_page - 1
+                        : 0) *
+                        (pagination?.per_page || staffs.length) +
+                        (idx + 1)}
+                    </TableCell>
                     <TableCell>{staff.name}</TableCell>
                     <TableCell>{staff.phone}</TableCell>
                     <TableCell>{staff.email}</TableCell>
@@ -205,8 +209,8 @@ const MerchantStaff = () => {
 
           {/* Pagination */}
           <Pagination
-            currentPage={pagination.currentPage}
-            totalPages={pagination.totalPages}
+            currentPage={pagination?.current_page}
+            totalPages={pagination?.last_page}
             onPageChange={setCurrentPage}
           />
         </div>
