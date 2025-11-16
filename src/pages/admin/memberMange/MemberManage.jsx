@@ -67,6 +67,11 @@ const MemberManage = () => {
     (s) => s.memberManagement
   );
 
+  const { members, meta, isLoading, isFetching, isError } = useMembers();
+
+  const backendCurrentPage = meta?.current_page ?? 1;
+  const backendPerPage = meta?.per_page ?? members.length;
+
   const [localSearch, setLocalSearch] = useState(search || "");
   const debouncedSearch = useDebounced(localSearch, 450);
 
@@ -74,7 +79,6 @@ const MemberManage = () => {
     dispatch(setSearch(debouncedSearch));
   }, [debouncedSearch, dispatch]);
 
-  const { members, meta, isLoading, isFetching, isError } = useMembers();
   const [updateStatus] = useUpdateStatusMutation();
   const [blockOrSuspendMember] = useBlockOrSuspendMemberMutation();
 
@@ -303,7 +307,7 @@ const MemberManage = () => {
                       className="w-4 h-4 rounded"
                     />
                   </TableHead>
-                  <TableHead>Member ID</TableHead>
+                  <TableHead>S/N</TableHead>
                   <TableHead>Full Name</TableHead>
                   <TableHead>Type</TableHead>
                   <TableHead>Phone Number</TableHead>
@@ -317,7 +321,7 @@ const MemberManage = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {members.map((m) => {
+                {members.map((m, idx) => {
                   const normalizedStatus = (m.status || "").toLowerCase();
                   const isBlocked = normalizedStatus === "blocked";
                   const isSuspended = normalizedStatus === "suspended";
@@ -332,7 +336,9 @@ const MemberManage = () => {
                           className="w-4 h-4 rounded"
                         />
                       </TableCell>
-                      <TableCell>{m.id}</TableCell>
+                      <TableCell>
+                        {(backendCurrentPage - 1) * backendPerPage + (idx + 1)}
+                      </TableCell>
                       <TableCell className="whitespace-normal break-words">
                         {m.name}
                       </TableCell>

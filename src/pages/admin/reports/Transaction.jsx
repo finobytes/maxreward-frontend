@@ -39,6 +39,10 @@ const Transaction = () => {
   const transactions = data?.transactions || [];
   const pagination = data?.pagination || {};
   // const stats = data?.statistics || {};
+  const currentPage = pagination?.currentPage ?? 1;
+  const perPage = pagination?.perPage ?? 10;
+
+  const serialNumber = (idx) => (currentPage - 1) * perPage + (idx + 1);
 
   const [selected, setSelected] = useState([]);
 
@@ -145,7 +149,7 @@ const Transaction = () => {
                       className="w-4 h-4 rounded"
                     />
                   </TableHead>
-                  <TableHead>Transaction ID</TableHead>
+                  <TableHead>S/N</TableHead>
                   <TableHead>Merchant Name</TableHead>
                   <TableHead>Transaction Type</TableHead>
                   <TableHead>Buyer Name</TableHead>
@@ -155,7 +159,7 @@ const Transaction = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {transactions.map((tx) => (
+                {transactions.map((tx, idx) => (
                   <TableRow key={tx.id}>
                     <TableCell>
                       <input
@@ -165,7 +169,7 @@ const Transaction = () => {
                         className="w-4 h-4 rounded"
                       />
                     </TableCell>
-                    <TableCell>{tx.id}</TableCell>
+                    <TableCell>{serialNumber(idx)}</TableCell>
                     <TableCell>{tx?.merchant_name || "N/A"}</TableCell>
                     <TableCell>{tx.transaction_type?.toUpperCase()}</TableCell>
                     <TableCell>{tx?.buyer_name || "N/A"}</TableCell>

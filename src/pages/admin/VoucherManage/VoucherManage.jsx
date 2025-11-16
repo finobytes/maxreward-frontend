@@ -53,6 +53,8 @@ const VoucherManage = () => {
   const { vouchers, meta, isLoading, isFetching, isError, refetch } =
     useVouchers();
 
+  const backendCurrentPage = meta?.current_page ?? 1;
+  const backendPerPage = meta?.per_page ?? vouchers?.length ?? 10;
   const [selected, setSelected] = useState([]);
   const [updatingId, setUpdatingId] = useState(null);
   const [rejectDialog, setRejectDialog] = useState({
@@ -240,7 +242,7 @@ const VoucherManage = () => {
                     className="w-4 h-4 rounded"
                   />
                 </TableHead>
-                <TableHead>Voucher ID</TableHead>
+                <TableHead>S/N</TableHead>
                 <TableHead>Voucher Type</TableHead>
                 <TableHead>Purchased By</TableHead>
                 <TableHead>Denomination</TableHead>
@@ -265,7 +267,7 @@ const VoucherManage = () => {
                   No vouchers found
                 </div>
               ) : (
-                vouchers.map((v) => (
+                vouchers.map((v, idx) => (
                   <TableRow key={v.id} className="hover:bg-gray-50 transition">
                     <TableCell>
                       <input
@@ -275,7 +277,9 @@ const VoucherManage = () => {
                         className="w-4 h-4 rounded"
                       />
                     </TableCell>
-                    <TableCell>{v.id}</TableCell>
+                    <TableCell>
+                      {(backendCurrentPage - 1) * backendPerPage + (idx + 1)}
+                    </TableCell>
                     <TableCell>
                       <StatusBadge status={v.voucher_type}>
                         {v.voucher_type} voucher

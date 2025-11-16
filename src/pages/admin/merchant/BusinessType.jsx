@@ -196,14 +196,14 @@ const BusinessType = () => {
                       className="w-4 h-4 rounded"
                     />
                   </TableHead>
-                  <TableHead>ID</TableHead>
+                  <TableHead>S/N</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Created At</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {businessTypes?.data?.map((b) => (
+                {businessTypes?.data?.map((b, idx) => (
                   <TableRow key={b.id}>
                     <TableCell>
                       <input
@@ -213,7 +213,7 @@ const BusinessType = () => {
                         className="w-4 h-4 rounded"
                       />
                     </TableCell>
-                    <TableCell>{b.id}</TableCell>
+                    <TableCell>{idx + 1}</TableCell>
                     <TableCell className="capitalize">{b.name}</TableCell>
                     <TableCell>
                       {new Date(b.created_at).toLocaleDateString()}

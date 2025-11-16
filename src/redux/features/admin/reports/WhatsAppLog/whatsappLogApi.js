@@ -2,7 +2,7 @@ import { baseApi } from "../../../../api/baseApi";
 
 export const whatsappLogApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    // ✅ Get All WhatsApp Logs with pagination & search
+    // Get All WhatsApp Logs with pagination & search
     getAllWhatsAppLogs: builder.query({
       query: ({ page = 1, search = "" } = {}) => {
         let url = `/whatsapp-logs?page=${page}`;
@@ -15,9 +15,10 @@ export const whatsappLogApi = baseApi.injectEndpoints({
           currentPage: response?.data?.current_page || 1,
           totalPages: response?.data?.last_page || 1,
           total: response?.data?.total || 0,
-          perPage: response?.data?.per_page || 10,
+          perPage: response?.data?.per_page || 15, // Laravel default
         },
       }),
+
       providesTags: ["WhatsAppLogs"],
     }),
   }),
