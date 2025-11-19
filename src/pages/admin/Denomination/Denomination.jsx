@@ -200,7 +200,7 @@ const Denomination = () => {
                       className="w-4 h-4 rounded"
                     />
                   </TableHead>
-                  <TableHead>ID</TableHead>
+                  <TableHead>S/N</TableHead>
                   <TableHead>Title</TableHead>
                   <TableHead>Value</TableHead>
                   <TableHead>Created At</TableHead>
@@ -210,7 +210,7 @@ const Denomination = () => {
               <TableBody>
                 {denominations?.data
                   ?.slice(0, 3) //
-                  ?.map((item) => (
+                  ?.map((item, idx) => (
                     <TableRow key={item.id}>
                       <TableCell>
                         <input
@@ -220,7 +220,7 @@ const Denomination = () => {
                           className="w-4 h-4 rounded"
                         />
                       </TableCell>
-                      <TableCell>{item.id}</TableCell>
+                      <TableCell>{idx + 1}</TableCell>
                       <TableCell>{item.title}</TableCell>
                       <TableCell>{item.value}</TableCell>
                       <TableCell>

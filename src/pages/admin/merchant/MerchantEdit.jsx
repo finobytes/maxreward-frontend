@@ -16,6 +16,7 @@ import Dropzone from "@/components/form/form-elements/Dropzone";
 import { toast } from "sonner";
 import { useNavigate, useParams } from "react-router";
 import { companyLogoPlaceholder } from "../../../assets/assets";
+import SkeletonField from "../../../components/skeleton/SkeletonField";
 
 const MerchantEdit = () => {
   const [businessLogo, setBusinessLogo] = useState(null);
@@ -33,7 +34,10 @@ const MerchantEdit = () => {
   });
 
   const [updateMerchant, { isLoading }] = useUpdateMerchantMutation();
-  console.log("merchant data:", merchantData);
+  console.log(
+    "merchant data:",
+    merchantData?.data?.merchant?.corporate_member?.referral_code
+  );
   const {
     register,
     handleSubmit,
@@ -212,21 +216,74 @@ const MerchantEdit = () => {
                 <Input {...register("email")} placeholder="Email Address" />
               </div>
             </div>
-
-            <div className="mt-8 flex gap-4">
-              <PrimaryButton type="submit" disabled={isLoading}>
-                {isLoading ? "Updating..." : "Update Merchant"}
-              </PrimaryButton>
-              <PrimaryButton
-                variant="secondary"
-                type="button"
-                onClick={() => navigate(-1)}
-              >
-                Back
-              </PrimaryButton>
-            </div>
           </ComponentCard>
         </div>
+
+        <ComponentCard className="mt-6" title="Referral Information">
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <Label>Referral Code</Label>
+                <SkeletonField />
+              </div>
+              <div>
+                <Label>Referred By</Label>
+                <SkeletonField />
+              </div>
+              <div>
+                <Label>Referral Status</Label>
+                <SkeletonField />
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <Label>Referral Code</Label>
+                <Input
+                  disabled
+                  value={
+                    merchantData?.data?.merchant?.corporate_member
+                      ?.referral_code || ""
+                  }
+                  readOnly
+                />
+              </div>
+              <div>
+                <Label>Referred By</Label>
+                <Input
+                  disabled
+                  value={
+                    merchantData?.data?.merchant?.corporate_member?.name || ""
+                  }
+                  readOnly
+                />
+              </div>
+              <div>
+                <Label>Referral Status</Label>
+                <Input
+                  disabled
+                  value={
+                    merchantData?.data?.merchant?.corporate_member?.status || ""
+                  }
+                  readOnly
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="mt-8 flex gap-4">
+            <PrimaryButton type="submit" disabled={isLoading}>
+              {isLoading ? "Updating..." : "Update Merchant"}
+            </PrimaryButton>
+            <PrimaryButton
+              variant="secondary"
+              type="button"
+              onClick={() => navigate(-1)}
+            >
+              Back
+            </PrimaryButton>
+          </div>
+        </ComponentCard>
       </form>
     </div>
   );
