@@ -29,8 +29,14 @@ const DashboardCard = ({
       {/* Left Content */}
       <div>
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100">
-            <img src={icon} alt={title} className="w-10 h-10" />
+          <div
+            className="w-10 h-10 flex items-center justify-center rounded-xl"
+            style={{
+              backgroundColor: `${chartColor}20`, // light tint background
+              color: chartColor, // icon color matches chartColor
+            }}
+          >
+            <div className="text-[18px]">{icon}</div>
           </div>
         </div>
 
