@@ -14,6 +14,7 @@ import shopWithMerchantReducer from "./features/member/shopWithMerchant/shopWith
 import purchaseManagementReducer from "./features/member/shopWithMerchant/purchaseManagementSlice";
 import transactionsReducer from "./features/merchant/transactions/transactionsSlice";
 import pointStatementMemberReducer from "./features/member/pointStatement/pointStatementMemberSlice";
+import cpTransactionMemberReducer from "./features/member/cpTransaction/cpTransactionMemberSlice";
 import { baseApi } from "./api/baseApi";
 
 export const store = configureStore({
@@ -33,6 +34,7 @@ export const store = configureStore({
     purchaseManagement: purchaseManagementReducer,
     transactions: transactionsReducer,
     pointStatementMember: pointStatementMemberReducer,
+    cpTransactionMember: cpTransactionMemberReducer,
     [baseApi.reducerPath]: baseApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>

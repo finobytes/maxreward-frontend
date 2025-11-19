@@ -169,6 +169,11 @@ export const NAV_CONFIG = {
       path: "/member/point-statement",
     },
     {
+      icon: <ChartArea />,
+      name: "CP Transaction",
+      path: "/member/cp-transaction",
+    },
+    {
       icon: <ShoppingBag />,
       name: "Max Redeem Mall",
       path: "/member/max-redeem-mall",
