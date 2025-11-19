@@ -12,101 +12,33 @@ import {
 import Pagination from "./../../../../components/table/Pagination";
 import PrimaryButton from "../../../../components/ui/PrimaryButton";
 import SearchInput from "../../../../components/form/form-elements/SearchInput";
-
-// ✅ Updated mock data
-const mockData = [
-  {
-    id: 1,
-    date: "01-Sept-25",
-    point_types: "Voucher",
-    total_points: "+1000",
-    status: "Available",
-  },
-  {
-    id: 2,
-    date: "02-Sept-25",
-    point_types: "Referral",
-    total_points: "+250",
-    status: "On Hold",
-  },
-  {
-    id: 3,
-    date: "03-Sept-25",
-    point_types: "Personal",
-    total_points: "-950",
-    status: "Redeemed",
-  },
-  {
-    id: 4,
-    date: "04-Sept-25",
-    point_types: "Referral",
-    total_points: "+250",
-    status: "Available",
-  },
-  {
-    id: 5,
-    date: "05-Sept-25",
-    point_types: "Voucher",
-    total_points: "+1000",
-    status: "Available",
-  },
-  {
-    id: 6,
-    date: "06-Sept-25",
-    point_types: "Community",
-    total_points: "-1000",
-    status: "On Hold",
-  },
-  {
-    id: 7,
-    date: "07-Sept-25",
-    point_types: "Referral",
-    total_points: "+250",
-    status: "Available",
-  },
-  {
-    id: 8,
-    date: "08-Sept-25",
-    point_types: "Personal",
-    total_points: "-1000",
-    status: "Redeemed",
-  },
-  {
-    id: 9,
-    date: "09-Sept-25",
-    point_types: "Community",
-    total_points: "-500",
-    status: "Redeemed",
-  },
-  {
-    id: 10,
-    date: "10-Sept-25",
-    point_types: "Referral",
-    total_points: "+250",
-    status: "Referred",
-  },
-];
+import { usePointStatementMember } from "../../../../redux/features/member/pointStatement/usePointStatementMember";
 
 const Statements = ({ member }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage, setEntriesPerPage] = useState("10");
   const [search, setSearch] = useState("");
 
-  console.log("Member in Statements:", member?.wallet);
-  const wallet = member?.wallet;
-  const totalPages = 5;
+  // Fetch API Data
+  const { transactions, meta, isLoading, error, changePage } =
+    usePointStatementMember(member?.id);
 
-  // ✅ Filter search
-  const filteredData = mockData.filter(
-    (item) =>
-      item.point_types.toLowerCase().includes(search.toLowerCase()) ||
-      item.status.toLowerCase().includes(search.toLowerCase()) ||
-      item.date.toLowerCase().includes(search.toLowerCase())
-  );
+  const wallet = member?.wallet;
+
+  // Search Filter (API DATA)
+  const filteredData =
+    transactions?.filter((item) => {
+      const text = search.toLowerCase();
+      return (
+        item?.transaction_type?.toLowerCase().includes(text) ||
+        item?.points_type?.toLowerCase().includes(text) ||
+        item?.created_at?.toLowerCase().includes(text)
+      );
+    }) || [];
 
   return (
     <div>
-      {/* ✅ Stats Section */}
+      {/* 🟦 Stats Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
         <div className="bg-white border-0 shadow-sm p-2 rounded-b-sm">
           <div className="flex justify-between">
@@ -169,7 +101,7 @@ const Statements = ({ member }) => {
         </div>
       </div>
 
-      {/* ✅ User Statement Table */}
+      {/* 🟧 User Statement */}
       <div className="mt-6 p-4">
         <div className="lg:flex lg:items-center lg:justify-between">
           <h2 className="font-semibold text-gray-900">User Statement</h2>
@@ -194,6 +126,7 @@ const Statements = ({ member }) => {
               </SelectContent>
             </Select>
           </div>
+
           <div className="relative mt-4 lg:mt-0">
             <SearchInput
               value={search}
@@ -203,13 +136,13 @@ const Statements = ({ member }) => {
           </div>
         </div>
 
-        {/* ✅ Table */}
+        {/* Table */}
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200">
                 <th className="text-left py-3 px-4 text-gray-700 text-sm">
-                  ID
+                  S/N
                 </th>
                 <th className="text-left py-3 px-4 text-gray-700 text-sm">
                   Date
@@ -225,56 +158,97 @@ const Statements = ({ member }) => {
                 </th>
               </tr>
             </thead>
+
             <tbody>
-              {filteredData.map((transaction) => (
-                <tr
-                  key={transaction.id}
-                  className="border-b border-gray-100 hover:bg-gray-50"
-                >
-                  <td className="py-3 px-4 text-xs text-gray-900">
-                    {transaction.id}
-                  </td>
-                  <td className="py-3 px-4 text-xs text-gray-900">
-                    {transaction.date}
-                  </td>
-                  <td className="py-3 px-4 text-xs text-gray-900">
-                    {transaction.point_types}
-                  </td>
-                  <td
-                    className={`py-3 px-4 text-xs font-medium ${
-                      transaction.total_points.startsWith("+")
-                        ? "text-green-600"
-                        : "text-red-600"
-                    }`}
-                  >
-                    {transaction.total_points}
-                  </td>
-                  <td className="py-3 px-4">
-                    <Badge
-                      className={`text-xs ${
-                        transaction.status === "Available"
-                          ? "bg-green-100 text-green-700"
-                          : transaction.status === "On Hold"
-                          ? "bg-yellow-100 text-yellow-700"
-                          : transaction.status === "Redeemed"
-                          ? "bg-red-100 text-red-700"
-                          : "bg-blue-100 text-blue-700"
-                      }`}
-                    >
-                      {transaction.status}
-                    </Badge>
+              {isLoading ? (
+                <tr>
+                  <td colSpan="5" className="py-6 text-center text-gray-500">
+                    Loading...
                   </td>
                 </tr>
-              ))}
+              ) : error ? (
+                <tr>
+                  <td colSpan="5" className="py-6 text-center text-red-500">
+                    {error?.data?.message || "Failed to load transactions."}
+                  </td>
+                </tr>
+              ) : filteredData?.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="py-6 text-center">
+                    No data found.
+                  </td>
+                </tr>
+              ) : (
+                filteredData.map((item, index) => {
+                  const isNegative = item?.points_type === "debited";
+
+                  return (
+                    <tr
+                      key={item?.id}
+                      className="border-b border-gray-100 hover:bg-gray-50"
+                    >
+                      {/* S/N */}
+                      <td className="py-3 px-4 text-xs text-gray-900">
+                        {(currentPage - 1) * Number(entriesPerPage) +
+                          (index + 1)}
+                      </td>
+
+                      {/* Date */}
+                      <td className="py-3 px-4 text-xs text-gray-900">
+                        {new Date(item?.created_at).toLocaleDateString(
+                          "en-US",
+                          {
+                            month: "short",
+                            day: "2-digit",
+                            year: "numeric",
+                          }
+                        )}
+                      </td>
+
+                      {/* Point Type */}
+                      <td className="py-3 px-4 text-xs text-gray-900">
+                        {item?.transaction_type?.toUpperCase() || "-"}
+                      </td>
+
+                      {/* Total Points */}
+                      <td
+                        className={`py-3 px-4 text-xs font-medium ${
+                          isNegative ? "text-red-600" : "text-green-600"
+                        }`}
+                      >
+                        {isNegative
+                          ? `-${item?.transaction_points}`
+                          : `+${item?.transaction_points}`}
+                      </td>
+
+                      {/* Status */}
+                      <td className="py-3 px-4">
+                        <Badge
+                          className={`text-xs ${
+                            item.points_type === "debited"
+                              ? "bg-red-100 text-red-700"
+                              : "bg-green-100 text-green-700"
+                          }`}
+                        >
+                          {item.points_type}
+                        </Badge>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
 
         {/* Pagination */}
         <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
+          currentPage={meta?.current_page || 1}
+          totalPages={meta?.last_page || 1}
+          onPageChange={(page) => {
+            setCurrentPage(page);
+            changePage(page);
+          }}
         />
       </div>
     </div>

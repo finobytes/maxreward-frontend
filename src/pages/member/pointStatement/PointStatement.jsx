@@ -15,7 +15,7 @@ import { usePointStatementMember } from "../../../redux/features/member/pointSta
 import { Eye } from "lucide-react";
 import { Link } from "react-router";
 
-// 🔥 1️⃣ Pick Member ID
+// Pick Member ID
 const pickMemberId = (profile) =>
   profile?.member_id ||
   profile?.memberId ||
@@ -26,7 +26,7 @@ const pickMemberId = (profile) =>
   profile?.id ||
   null;
 
-// 🔥 2️⃣ Format Date + Time
+// Format Date + Time
 const formatDateTime = (value) => {
   if (!value) return "-";
   const date = new Date(value);
@@ -41,7 +41,7 @@ const formatDateTime = (value) => {
   });
 };
 
-// 🔥 3️⃣ Transaction Type Full Form
+// Transaction Type Full Form
 const typeMapping = {
   pp: "Personal Points",
   rp: "Referral Points",
@@ -53,7 +53,7 @@ const typeMapping = {
   vap: "Voucher Available Points",
 };
 
-// 🔥 4️⃣ Total Points Badge
+// Total Points Badge
 const renderPointsBadge = (value, isDebit) => (
   <span
     className={`inline-flex rounded-full px-3 py-1 text-sm font-medium ${
@@ -64,7 +64,7 @@ const renderPointsBadge = (value, isDebit) => (
   </span>
 );
 
-// 🔥 5️⃣ Status Badge
+// Status Badge
 const renderStatusBadge = (status) => (
   <span
     className={`inline-flex rounded-full px-3 py-1 text-sm font-medium ${
