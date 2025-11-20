@@ -26,6 +26,12 @@ export const NAV_CONFIG = {
     { icon: <LayoutDashboard />, name: "Dashboard", path: "/admin" },
     { name: "Member Manage", icon: <Users />, path: "/admin/member-manage" },
     { name: "Staff Manage", icon: <UserCog />, path: "/admin/staff-manage" },
+
+    {
+      icon: <ChartArea />,
+      name: "CP Transaction",
+      path: "/admin/cp-transaction",
+    },
     {
       name: "Merchant Manage",
       icon: <ShoppingBag />,
