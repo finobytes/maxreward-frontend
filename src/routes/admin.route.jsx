@@ -32,6 +32,7 @@ import WhatsAppLog from "../pages/admin/reports/WhatsAppLog";
 import VoucherDetails from "../pages/admin/VoucherManage/VoucherDetails";
 import ReferralList from "../pages/admin/memberMange/ReferralLIst";
 import CpTransaction from "../pages/admin/cpTransaction/CpTransaction";
+import CpTransactionDetails from "../pages/admin/cpTransaction/CpTransactionDetails";
 
 export const adminRoutes = [
   {
@@ -65,6 +66,10 @@ export const adminRoutes = [
   {
     path: "cp-transaction",
     element: <CpTransaction />,
+  },
+  {
+    path: "cp-transaction/:id",
+    element: <CpTransactionDetails />,
   },
   {
     path: "staff-manage/create",
