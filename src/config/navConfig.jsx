@@ -33,6 +33,11 @@ export const NAV_CONFIG = {
       path: "/admin/cp-transaction",
     },
     {
+      icon: <ChartArea />,
+      name: "CP Unlock History",
+      path: "/admin/cp-unlock-history",
+    },
+    {
       name: "Merchant Manage",
       icon: <ShoppingBag />,
       subItems: [

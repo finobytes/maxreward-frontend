@@ -33,6 +33,8 @@ import VoucherDetails from "../pages/admin/VoucherManage/VoucherDetails";
 import ReferralList from "../pages/admin/memberMange/ReferralLIst";
 import CpTransaction from "../pages/admin/cpTransaction/CpTransaction";
 import CpTransactionDetails from "../pages/admin/cpTransaction/CpTransactionDetails";
+import CpUnlockHistory from "../pages/admin/cpUnlockHistory/CpUnlockHistory";
+import CpUnlockHistoryDetails from "../pages/admin/cpUnlockHistory/CpUnlockHistoryDetails";
 
 export const adminRoutes = [
   {
@@ -70,6 +72,14 @@ export const adminRoutes = [
   {
     path: "cp-transaction/:id",
     element: <CpTransactionDetails />,
+  },
+  {
+    path: "cp-unlock-history",
+    element: <CpUnlockHistory />,
+  },
+  {
+    path: "cp-unlock-history/:id",
+    element: <CpUnlockHistoryDetails />,
   },
   {
     path: "staff-manage/create",
