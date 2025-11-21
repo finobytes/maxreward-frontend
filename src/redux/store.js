@@ -17,6 +17,7 @@ import pointStatementMemberReducer from "./features/member/pointStatement/pointS
 import cpTransactionMemberReducer from "./features/member/cpTransaction/cpTransactionMemberSlice";
 import cpTransactionAdminReducer from "./features/admin/cpTransaction/cpTransactionAdminSlice";
 import cpUnlockHistoryAdminReducer from "./features/admin/cpUnlockHistory/cpUnlockHistoryAdminSlice";
+import cpUnlockHistoryMemberReducer from "./features/member/cpUnlockHistory/cpUnlockHistoryMemberSlice";
 import { baseApi } from "./api/baseApi";
 
 export const store = configureStore({
@@ -39,6 +40,7 @@ export const store = configureStore({
     cpTransactionMember: cpTransactionMemberReducer,
     cpTransactionAdmin: cpTransactionAdminReducer,
     cpUnlockHistoryAdmin: cpUnlockHistoryAdminReducer,
+    cpUnlockHistoryMember: cpUnlockHistoryMemberReducer,
     [baseApi.reducerPath]: baseApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>

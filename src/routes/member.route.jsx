@@ -1,5 +1,7 @@
 import Community from "../pages/member/community/Community";
 import CpTransaction from "../pages/member/cpTransaction/CpTransaction";
+import CpUnlockHistory from "../pages/member/cpUnlockHistory/CpUnlockHistory";
+import CpUnlockHistoryDetails from "../pages/member/cpUnlockHistory/CpUnlockHistoryDetails";
 import DataPrivacyPolicy from "../pages/member/dataPrivacyPolicy/DataPrivacyPolicy";
 import MaxRedeemMall from "../pages/member/maxRedeemMall/MaxRedeemMall";
 import MemberDashboard from "../pages/member/memberDashboard/MemberDashboard";
@@ -46,6 +48,14 @@ export const memberRoutes = [
   {
     path: "cp-transaction/:id",
     element: <TransactionDetails />,
+  },
+  {
+    path: "cp-unlock-history",
+    element: <CpUnlockHistory />,
+  },
+  {
+    path: "cp-unlock-history/:id",
+    element: <CpUnlockHistoryDetails />,
   },
   {
     path: "max-redeem-mall",
