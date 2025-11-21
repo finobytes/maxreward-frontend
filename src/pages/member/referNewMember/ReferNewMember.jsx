@@ -75,20 +75,47 @@ const ReferNewMember = () => {
               />
             </div>
 
-            {/* Phone Number */}
+            {/* Country Code */}
+            <div>
+              <Label htmlFor="countryCode">
+                Country Code (<span className="text-red-500">*</span>)
+              </Label>
+              <Input
+                id="countryCode"
+                placeholder="+880"
+                {...register("countryCode")}
+                error={!!errors.countryCode}
+                hint={errors.countryCode?.message}
+              />
+            </div>
+
+            {/* Updated Phone Number */}
             <div>
               <Label htmlFor="phoneNumber">
                 Phone Number (<span className="text-red-500">*</span>)
               </Label>
               <Input
                 id="phoneNumber"
-                placeholder="Enter phone number"
+                placeholder="e.g. 1712345678"
                 {...register("phoneNumber")}
                 error={!!errors.phoneNumber}
                 hint={errors.phoneNumber?.message}
               />
             </div>
 
+            {/* Nationality */}
+            <div>
+              <Label htmlFor="nationality">
+                Nationality (<span className="text-red-500">*</span>)
+              </Label>
+              <Input
+                id="nationality"
+                placeholder="Bangladeshi"
+                {...register("nationality")}
+                error={!!errors.nationality}
+                hint={errors.nationality?.message}
+              />
+            </div>
             {/* Email */}
             <div>
               <Label htmlFor="email">Email Address</Label>

@@ -196,7 +196,7 @@ export const NAV_CONFIG = {
     },
     {
       icon: <ShoppingCart />,
-      name: "Shop With Merchant",
+      name: "Shop At Merchant",
       path: "/member/shop-with-merchant",
     },
     {
