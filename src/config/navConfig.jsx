@@ -34,6 +34,11 @@ export const NAV_CONFIG = {
     },
     {
       icon: <ChartArea />,
+      name: "Community Point",
+      path: "/admin/community-point",
+    },
+    {
+      icon: <ChartArea />,
       name: "CP Unlock History",
       path: "/admin/cp-unlock-history",
     },
