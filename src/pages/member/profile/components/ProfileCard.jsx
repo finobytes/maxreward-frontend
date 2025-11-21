@@ -126,26 +126,26 @@ const ProfileCard = ({ userInfo, onEditClick = () => {} }) => {
               color="amber"
             />
 
-            <InfoBox
+            {/* <InfoBox
               icon={<Award className="w-5 h-5 text-emerald-600" />}
               label="Community Points"
               value={walletInfo.total_cp ?? 0}
               color="emerald"
-            />
+            /> */}
 
-            <InfoBox
+            {/* <InfoBox
               icon={<Medal className="w-5 h-5 text-purple-600" />}
               label="Personal Points"
               value={walletInfo.total_pp ?? 0}
               color="purple"
-            />
+            /> */}
 
-            <InfoBox
+            {/* <InfoBox
               icon={<ShieldCheck className="w-5 h-5 text-indigo-600" />}
               label="Total Points"
               value={walletInfo.total_points ?? 0}
               color="indigo"
-            />
+            /> */}
 
             <InfoBox
               icon={<Users className="w-5 h-5 text-rose-600" />}
@@ -158,7 +158,7 @@ const ProfileCard = ({ userInfo, onEditClick = () => {} }) => {
             <div className="flex flex-col items-start gap-1 px-4 py-3 bg-orange-50 border border-orange-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
               <div className="flex items-center gap-2">
                 <Star className="w-5 h-5 text-orange-600" />
-                <p className="text-sm font-medium text-gray-700">Star Level</p>
+                <p className="text-sm font-medium text-gray-700">Status</p>
               </div>
 
               {/* Star Icons */}

@@ -107,13 +107,13 @@ const ShopWithMerchant = () => {
                     <Label>Merchant Name / Unique Number</Label>
                     <Input
                       placeholder="Enter merchant unique number or Name"
-                      {...register("simpleCode", {
+                      {...register("merchantNameOrUniqueNumber", {
                         required: "Merchant code is required",
                       })}
                     />
                     {errors.simpleCode && (
                       <p className="text-red-500 text-sm mt-1">
-                        {errors.simpleCode.message}
+                        {errors.merchantNameOrUniqueNumber.message}
                       </p>
                     )}
                   </div>
