@@ -70,7 +70,7 @@ const ShopWithMerchant = () => {
   return (
     <div>
       <PageBreadcrumb
-        items={[{ label: "Home", to: "/" }, { label: "Shop With Merchants" }]}
+        items={[{ label: "Home", to: "/" }, { label: "Shop At Merchants" }]}
       />
 
       {/* Search Card */}

@@ -102,7 +102,7 @@ const RedeemTransactions = () => {
       <PageBreadcrumb
         items={[
           { label: "Home", to: "/" },
-          { label: "Shop With Merchant", to: "/member/shop-with-merchant" },
+          { label: "Shop At Merchant", to: "/member/shop-with-merchant" },
           { label: "Redeem Transactions" },
         ]}
       />
