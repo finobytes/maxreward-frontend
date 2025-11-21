@@ -123,15 +123,19 @@ const MemberDashboard = () => {
   return (
     <div>
       <h1 className="text-xl font-semibold text-gray-600 pb-4">Dashboard</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
+      <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4">
+        {/* Membership Card should take 1 column on all screens, stays the same */}
+        <div className="2xl:col-span-1">
           <MembershipCard data={data} />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4">
-          {cardsData.map((card, index) => (
-            <DashboardCard key={index} {...card} />
-          ))}
+        {/* Dashboard Cards wrapper should take 2 columns on 2XL screens */}
+        <div className="2xl:col-span-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4">
+            {cardsData.map((card, index) => (
+              <DashboardCard key={index} {...card} />
+            ))}
+          </div>
         </div>
       </div>
     </div>
