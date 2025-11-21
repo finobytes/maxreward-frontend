@@ -14,6 +14,8 @@ import MerchantStaffDetails from "../pages/merchant/MerchantStaff/MerchantStaffD
 import MerchantStaffUpdate from "../pages/merchant/MerchantStaff/MerchantStaffUpdate";
 import VoucherPurchaseForm from "../pages/merchant/VoucherPurchase/VoucherPurchaseForm";
 import VoucherPurchaseDetails from "../pages/merchant/VoucherPurchase/VoucherPurchaseDetails";
+import ReferredMemberList from "../pages/merchant/ReferredMemberList/ReferredMemberList";
+import PointStatement from "../pages/merchant/PointStatement/PointStatement";
 
 export const merchantRoute = [
   {
@@ -63,6 +65,15 @@ export const merchantRoute = [
   {
     path: "voucher-details/:id",
     element: <VoucherPurchaseDetails />,
+  },
+
+  {
+    path: "referred-member-list",
+    element: <ReferredMemberList />,
+  },
+  {
+    path: "point-statement",
+    element: <PointStatement />,
   },
   {
     path: "reports/member-transactions",

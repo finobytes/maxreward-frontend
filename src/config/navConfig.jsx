@@ -136,9 +136,19 @@ export const NAV_CONFIG = {
       path: "/merchant/redeem-mall",
     },
     {
-      icon: <ChartArea />,
+      icon: <DollarSign />,
       name: "Voucher Purchase",
       path: "/merchant/voucher-purchase",
+    },
+    {
+      icon: <ChartArea />,
+      name: "Point Statement",
+      path: "/merchant/point-statement",
+    },
+    {
+      icon: <List />,
+      name: "Referred Member List",
+      path: "/merchant/referred-member-list",
     },
     {
       icon: <ChartLine />,
@@ -184,7 +194,7 @@ export const NAV_CONFIG = {
       name: "CP Transaction",
       path: "/member/cp-transaction",
     },
-      {
+    {
       icon: <ChartArea />,
       name: "CP Unlock History",
       path: "/member/cp-unlock-history",
