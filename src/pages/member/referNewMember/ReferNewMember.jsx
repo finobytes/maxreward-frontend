@@ -14,6 +14,8 @@ import { useState } from "react";
 import ReferSuccessDialog from "./components/ReferSuccessDialog";
 import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
 import SkeletonField from "../../../components/skeleton/SkeletonField";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
 
 const ReferNewMember = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -28,6 +30,8 @@ const ReferNewMember = () => {
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(referNewMemberSchema),
@@ -75,32 +79,28 @@ const ReferNewMember = () => {
               />
             </div>
 
-            {/* Country Code */}
-            <div>
-              <Label htmlFor="countryCode">
-                Country Code (<span className="text-red-500">*</span>)
-              </Label>
-              <Input
-                id="countryCode"
-                placeholder="+880"
-                {...register("countryCode")}
-                error={!!errors.countryCode}
-                hint={errors.countryCode?.message}
-              />
-            </div>
-
             {/* Updated Phone Number */}
             <div>
               <Label htmlFor="phoneNumber">
                 Phone Number (<span className="text-red-500">*</span>)
               </Label>
-              <Input
-                id="phoneNumber"
-                placeholder="e.g. 1712345678"
-                {...register("phoneNumber")}
-                error={!!errors.phoneNumber}
-                hint={errors.phoneNumber?.message}
+              <PhoneInput
+                country={"bd"} // default country (Bangladesh)
+                value={watch("phoneNumber")}
+                onChange={(phone) => setValue("phoneNumber", phone)}
+                inputProps={{
+                  name: "phoneNumber",
+                  required: true,
+                  autoFocus: true,
+                }}
+                inputStyle={{ width: "100%" }}
+                specialLabel=""
               />
+              {errors.phoneNumber && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.phoneNumber.message}
+                </p>
+              )}
             </div>
 
             {/* Nationality */}
