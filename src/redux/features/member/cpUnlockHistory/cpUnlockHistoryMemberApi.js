@@ -16,7 +16,7 @@ export const cpUnlockHistoryMemberApi = baseApi.injectEndpoints({
     }),
     getMemberCpUnlockHistoryDetails: builder.query({
       query: (historyId) => ({
-        url: `/unlock-history/${historyId}`,
+        url: `/member/unlock-history/${historyId}`,
       }),
       keepUnusedDataFor: 0,
     }),
