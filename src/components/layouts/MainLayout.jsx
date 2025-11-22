@@ -7,7 +7,6 @@ import Header from "./Header";
 
 const LayoutContent = () => {
   const { isExpanded, isHovered, isMobileOpen, isMobile } = useSidebar();
-  console.log("if is mobile ", isMobile);
 
   // Sidebar width determine
   const sidebarWidth = isExpanded || isHovered ? "240px" : "74px";

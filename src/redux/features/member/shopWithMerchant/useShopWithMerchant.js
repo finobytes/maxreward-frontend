@@ -16,6 +16,7 @@ import {
   useCheckMemberRedeemAmountMutation,
   useMakePurchaseForMemberMutation,
 } from "./shopWihtMerchantApi";
+import { useVerifyMeQuery } from "../../auth/authApi";
 
 const normalizeSettings = (rawSettings) => {
   if (!rawSettings) return null;
@@ -30,7 +31,7 @@ const normalizeSettings = (rawSettings) => {
 export const useShopWithMerchant = () => {
   const dispatch = useDispatch();
   const state = useSelector((s) => s.shopWithMerchant);
-
+  const { data: verifyData, isLoading: verifyingMember } = useVerifyMeQuery();
   const { data: rawSettings, isLoading: settingsLoading } =
     useGetCurrentSettingsQuery();
 
@@ -38,6 +39,9 @@ export const useShopWithMerchant = () => {
     useCheckMemberRedeemAmountMutation();
   const [makePurchaseForMember, { isLoading: submittingPurchase }] =
     useMakePurchaseForMemberMutation();
+
+  console.log("availablePoints:", verifyData?.wallet?.available_points);
+  console.log("verifying Member:", verifyingMember);
 
   // hydrate settings (rm_points and friends)
   useEffect(() => {
@@ -179,6 +183,7 @@ export const useShopWithMerchant = () => {
     ...state,
     settingsLoading,
     verifyingAmount,
+    verifyData,
     submittingPurchase,
     setMerchantContext: handleMerchantContext,
     setTransactionAmount: updateTransactionAmount,
