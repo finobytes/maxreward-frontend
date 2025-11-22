@@ -57,8 +57,6 @@ const Sidebar = () => {
 
   const userType = data?.member_type;
 
-  console.log("userType:", userType);
-
   const items = useMemo(() => {
     let navItems = NAV_CONFIG[role] || [];
 
