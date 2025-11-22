@@ -180,7 +180,7 @@ const PointStatement = () => {
 
                       {/* Available Balance */}
                       <TableCell className="text-center">
-                        {item?.member?.wallet?.available_points ?? "-"}
+                        {item?.balance ?? ""}
                       </TableCell>
 
                       <TableCell className="text-center">
