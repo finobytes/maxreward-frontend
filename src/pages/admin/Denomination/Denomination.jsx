@@ -126,26 +126,14 @@ const Denomination = () => {
         )}
 
         {/* Filters */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="flex flex-col items-end">
           <div className="flex flex-wrap items-center gap-3">
             <PrimaryButton variant="primary" onClick={openCreateModal}>
               <Plus size={16} /> Create
             </PrimaryButton>
           </div>
         </div>
-        {/* Bulk Actions */}
-        {selected.length > 0 && (
-          <BulkActionBar
-            selectedCount={selected.length}
-            actions={[
-              {
-                label: "Delete",
-                variant: "danger",
-                onClick: () => bulkUpdateStatus("delete"),
-              },
-            ]}
-          />
-        )}
+
         {/* Table */}
         <div className="mt-4 overflow-x-auto">
           {isLoading ? (
@@ -162,17 +150,6 @@ const Denomination = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>
-                    <input
-                      type="checkbox"
-                      checked={
-                        denominations?.data?.length > 0 &&
-                        selected.length === denominations?.data?.length
-                      }
-                      onChange={(e) => toggleSelectAll(e.target.checked)}
-                      className="w-4 h-4 rounded"
-                    />
-                  </TableHead>
                   <TableHead>S/N</TableHead>
                   <TableHead>Title</TableHead>
                   <TableHead>Value</TableHead>
@@ -185,14 +162,6 @@ const Denomination = () => {
                   ?.slice(0, 3) //
                   ?.map((item, idx) => (
                     <TableRow key={item.id}>
-                      <TableCell>
-                        <input
-                          type="checkbox"
-                          checked={selected.includes(item.id)}
-                          onChange={() => toggleSelect(item.id)}
-                          className="w-4 h-4 rounded"
-                        />
-                      </TableCell>
                       <TableCell>{idx + 1}</TableCell>
                       <TableCell>{item.title}</TableCell>
                       <TableCell>{item.value}</TableCell>
