@@ -23,14 +23,11 @@ const RedeemWithMerchant = () => {
     redeemPoints,
     balanceToPay,
     rmPoints,
-    verified,
-    verifyingAmount,
     submittingPurchase,
     setMerchantContext,
     setTransactionAmount,
     setRedeemAmount,
     submitRedemption,
-    verifyRedeemAmount,
     resetShopWithMerchant,
     verifyData,
   } = useShopWithMerchant();
@@ -88,11 +85,6 @@ const RedeemWithMerchant = () => {
   const handlePrimaryAction = async () => {
     if (!validateInputs()) return;
 
-    if (!verified) {
-      await verifyRedeemAmount();
-      return;
-    }
-
     const success = await submitRedemption({
       merchantId: activeMerchant?.id,
       merchantSelectionType: selectionType,
@@ -103,13 +95,9 @@ const RedeemWithMerchant = () => {
     }
   };
 
-  const primaryLabel = verified
-    ? submittingPurchase
-      ? "Submitting..."
-      : "Submit Redemption"
-    : verifyingAmount
-    ? "Verifying..."
-    : "Verify Purchase";
+  const primaryLabel = submittingPurchase
+    ? "Submitting..."
+    : "Submit Redemption";
 
   const formatCurrency = (value) => `RM ${Number(value ?? 0).toFixed(2)}`;
 
@@ -222,15 +210,10 @@ const RedeemWithMerchant = () => {
                   variant="primary"
                   size="md"
                   type="submit"
-                  disabled={verifyingAmount || submittingPurchase}
+                  disabled={submittingPurchase}
                 >
                   {primaryLabel}
                 </PrimaryButton>
-                {!verified && (
-                  <p className="text-sm text-gray-500">
-                    Verification is required before submitting.
-                  </p>
-                )}
               </div>
             </form>
           </div>

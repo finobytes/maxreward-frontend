@@ -10,12 +10,8 @@ import {
   setRedeemAmount,
   setSettings,
   setTransactionAmount,
-  setVerified,
 } from "./shopWithMerchantSlice";
-import {
-  useCheckMemberRedeemAmountMutation,
-  useMakePurchaseForMemberMutation,
-} from "./shopWihtMerchantApi";
+import { useMakePurchaseForMemberMutation } from "./shopWihtMerchantApi";
 import { useVerifyMeQuery } from "../../auth/authApi";
 
 const normalizeSettings = (rawSettings) => {
@@ -35,8 +31,8 @@ export const useShopWithMerchant = () => {
   const { data: rawSettings, isLoading: settingsLoading } =
     useGetCurrentSettingsQuery();
 
-  const [checkRedeemAmount, { isLoading: verifyingAmount }] =
-    useCheckMemberRedeemAmountMutation();
+  // const [checkRedeemAmount, { isLoading: verifyingAmount }] =
+  //   useCheckMemberRedeemAmountMutation();
   const [makePurchaseForMember, { isLoading: submittingPurchase }] =
     useMakePurchaseForMemberMutation();
 
@@ -89,36 +85,36 @@ export const useShopWithMerchant = () => {
     [dispatch]
   );
 
-  const verifyRedeemAmount = useCallback(async () => {
-    if (!state.redeemAmountValue) {
-      toast.error("Enter redeem amount before verifying.");
-      return false;
-    }
+  // const verifyRedeemAmount = useCallback(async () => {
+  //   if (!state.redeemAmountValue) {
+  //     toast.error("Enter redeem amount before verifying.");
+  //     return false;
+  //   }
 
-    const formData = new FormData();
-    formData.append("redeem_amount", state.redeemAmountValue);
+  //   const formData = new FormData();
+  //   formData.append("redeem_amount", state.redeemAmountValue);
 
-    try {
-      const res = await checkRedeemAmount(formData).unwrap();
+  //   try {
+  //     const res = await checkRedeemAmount(formData).unwrap();
 
-      if (res?.success) {
-        toast.success(res?.message || "You have sufficient points!");
-        dispatch(setVerified(true));
-        return true;
-      }
+  //     if (res?.success) {
+  //       toast.success(res?.message || "You have sufficient points!");
+  //       dispatch(setVerified(true));
+  //       return true;
+  //     }
 
-      toast.error(res?.message || "Insufficient points for redemption.");
-      dispatch(setVerified(false));
-      return false;
-    } catch (error) {
-      toast.error(
-        error?.data?.message ||
-          "Unable to verify redeem amount. Please try again."
-      );
-      dispatch(setVerified(false));
-      return false;
-    }
-  }, [checkRedeemAmount, dispatch, state.redeemAmountValue]);
+  //     toast.error(res?.message || "Insufficient points for redemption.");
+  //     dispatch(setVerified(false));
+  //     return false;
+  //   } catch (error) {
+  //     toast.error(
+  //       error?.data?.message ||
+  //         "Unable to verify redeem amount. Please try again."
+  //     );
+  //     dispatch(setVerified(false));
+  //     return false;
+  //   }
+  // }, [checkRedeemAmount, dispatch, state.redeemAmountValue]);
 
   const submitRedemption = useCallback(
     async ({
@@ -138,10 +134,10 @@ export const useShopWithMerchant = () => {
         return false;
       }
 
-      if (!state.verified) {
-        toast.error("Verify the redeem amount before submitting.");
-        return false;
-      }
+      // if (!state.verified) {
+      //   toast.error("Verify the redeem amount before submitting.");
+      //   return false;
+      // }
 
       const payload = {
         merchant_id: effectiveMerchantId,
@@ -175,21 +171,21 @@ export const useShopWithMerchant = () => {
       state.paymentMethod,
       state.redeemAmountValue,
       state.transactionAmountValue,
-      state.verified,
+      // state.verified,
     ]
   );
 
   return {
     ...state,
     settingsLoading,
-    verifyingAmount,
+    // verifyingAmount,
     verifyData,
     submittingPurchase,
     setMerchantContext: handleMerchantContext,
     setTransactionAmount: updateTransactionAmount,
     setRedeemAmount: updateRedeemAmount,
     setPaymentMethod: updatePaymentMethod,
-    verifyRedeemAmount,
+    // verifyRedeemAmount,
     submitRedemption,
     resetShopWithMerchant: resetState,
   };

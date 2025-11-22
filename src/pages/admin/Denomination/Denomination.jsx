@@ -127,36 +127,9 @@ const Denomination = () => {
 
         {/* Filters */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <SearchInput
-            value={localSearch}
-            onChange={(e) => setLocalSearch(e.target.value)}
-            placeholder="Search denomination..."
-          />
-
           <div className="flex flex-wrap items-center gap-3">
             <PrimaryButton variant="primary" onClick={openCreateModal}>
               <Plus size={16} /> Create
-            </PrimaryButton>
-
-            <DropdownSelect
-              value={per_page}
-              onChange={(val) => handlePerPageChange(Number(val))}
-              options={[
-                { label: "10", value: 10 },
-                { label: "20", value: 20 },
-                { label: "50", value: 50 },
-              ]}
-            />
-
-            <PrimaryButton
-              variant="secondary"
-              onClick={() => {
-                dispatch(resetAllFilters());
-                setLocalSearch("");
-                setSelected([]);
-              }}
-            >
-              Clear
             </PrimaryButton>
           </div>
         </div>
