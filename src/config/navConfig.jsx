@@ -34,7 +34,7 @@ export const NAV_CONFIG = {
     },
     {
       icon: <ChartArea />,
-      name: "Community Point",
+      name: "Member Community Point",
       path: "/admin/community-point",
     },
     {

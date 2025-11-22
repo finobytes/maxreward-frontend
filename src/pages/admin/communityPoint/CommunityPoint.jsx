@@ -78,7 +78,7 @@ const CommunityPoint = () => {
   return (
     <div>
       <PageBreadcrumb
-        items={[{ label: "Home", to: "/admin" }, { label: "Community Point" }]}
+        items={[{ label: "Home", to: "/admin" }, { label: "Member Community Point" }]}
       />
 
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white p-4">
