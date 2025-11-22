@@ -189,7 +189,12 @@ export const NAV_CONFIG = {
       name: "CP Transaction",
       path: "/member/cp-transaction",
     },
-      {
+    {
+      icon: <ChartArea />,
+      name: "Community Point",
+      path: "/member/community-point",
+    },
+    {
       icon: <ChartArea />,
       name: "CP Unlock History",
       path: "/member/cp-unlock-history",
