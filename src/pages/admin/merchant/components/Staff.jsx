@@ -19,7 +19,7 @@ const Staff = ({ staffData }) => {
   // staff list
   const staffList = staffData?.data || [];
 
-  // 🔍 Filter by search
+  // Filter by search
   const filteredStaff = useMemo(() => {
     return staffList.filter((item) => {
       const s = search.toLowerCase();
