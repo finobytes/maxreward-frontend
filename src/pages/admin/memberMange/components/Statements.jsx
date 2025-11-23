@@ -35,6 +35,17 @@ const Statements = ({ member }) => {
         item?.created_at?.toLowerCase().includes(text)
       );
     }) || [];
+  // Transaction Type Full Form
+  const typeMapping = {
+    pp: "Personal Points",
+    rp: "Referral Points",
+    cp: "Community Points",
+    cr: "Company Reserve",
+    dp: "Deducted Points",
+    ap: "Added Points",
+    vrp: "Voucher Referral Points",
+    vap: "Voucher Available Points",
+  };
 
   return (
     <div>
@@ -195,19 +206,20 @@ const Statements = ({ member }) => {
 
                       {/* Date */}
                       <td className="py-3 px-4 text-xs text-gray-900">
-                        {new Date(item?.created_at).toLocaleDateString(
-                          "en-US",
-                          {
-                            month: "short",
-                            day: "2-digit",
-                            year: "numeric",
-                          }
-                        )}
+                        {new Date(item?.created_at).toLocaleString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "2-digit",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                       </td>
 
                       {/* Point Type */}
                       <td className="py-3 px-4 text-xs text-gray-900">
-                        {item?.transaction_type?.toUpperCase() || "-"}
+                        {typeMapping[item?.transaction_type] ||
+                          item?.transaction_type?.toUpperCase() ||
+                          "-"}
                       </td>
 
                       {/* Total Points */}

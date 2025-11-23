@@ -5,93 +5,53 @@ import { CreditCard, Hand, Users, UserCheck } from "lucide-react";
 import Pagination from "../../../../components/table/Pagination";
 import PrimaryButton from "../../../../components/ui/PrimaryButton";
 import SearchInput from "../../../../components/form/form-elements/SearchInput";
+import { usePointStatementMember } from "../../../../redux/features/member/pointStatement/usePointStatementMember";
 
-const mockData = [
-  {
-    id: 1,
-    date: "01-Sept-25",
-    point_types: "Voucher",
-    total_points: "+1000",
-    status: "Available",
-  },
-  {
-    id: 2,
-    date: "02-Sept-25",
-    point_types: "Referral",
-    total_points: "+250",
-    status: "On Hold",
-  },
-  {
-    id: 3,
-    date: "03-Sept-25",
-    point_types: "Personal",
-    total_points: "-950",
-    status: "Redeemed",
-  },
-  {
-    id: 4,
-    date: "04-Sept-25",
-    point_types: "Referral",
-    total_points: "+250",
-    status: "Available",
-  },
-  {
-    id: 5,
-    date: "05-Sept-25",
-    point_types: "Voucher",
-    total_points: "+1000",
-    status: "Available",
-  },
-  {
-    id: 6,
-    date: "06-Sept-25",
-    point_types: "Community",
-    total_points: "-1000",
-    status: "On Hold",
-  },
-  {
-    id: 7,
-    date: "07-Sept-25",
-    point_types: "Referral",
-    total_points: "+250",
-    status: "Available",
-  },
-  {
-    id: 8,
-    date: "08-Sept-25",
-    point_types: "Personal",
-    total_points: "-1000",
-    status: "Redeemed",
-  },
-  {
-    id: 9,
-    date: "09-Sept-25",
-    point_types: "Community",
-    total_points: "-500",
-    status: "Redeemed",
-  },
-  {
-    id: 10,
-    date: "10-Sept-25",
-    point_types: "Referral",
-    total_points: "+250",
-    status: "Referred",
-  },
-];
+// Format Date + Time
+const formatDateTime = (value) => {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (isNaN(date.getTime())) return "-";
+
+  return date.toLocaleString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+// Transaction Type Full Form
+const typeMapping = {
+  pp: "Personal Points",
+  rp: "Referral Points",
+  cp: "Community Points",
+  cr: "Company Reserve",
+  dp: "Deducted Points",
+  ap: "Added Points",
+  vrp: "Voucher Referral Points",
+  vap: "Voucher Available Points",
+};
 
 const Statements = ({ merchantData }) => {
-  const [currentPage, setCurrentPage] = useState(1);
+  const memberId = merchantData?.data?.merchant?.corporate_member?.id;
+
   const [entriesPerPage, setEntriesPerPage] = useState("10");
   const [search, setSearch] = useState("");
 
-  console.log("Merchant Data:", merchantData?.corporate_member?.wallet);
+  const { transactions, meta, isLoading, isFetching, error, changePage } =
+    usePointStatementMember(memberId);
+
+  const currentPage = meta?.currentPage || 1;
+  const totalPages = meta?.lastPage || 1;
+
   const wallet = merchantData ? merchantData?.corporate_member?.wallet : {};
-  const totalPages = 5;
 
   // Filter by search
-  const filteredData = mockData.filter((item) =>
+  const filteredTransactions = transactions.filter((item) =>
     Object.values(item).some((value) =>
-      value.toString().toLowerCase().includes(search.toLowerCase())
+      value?.toString().toLowerCase().includes(search.toLowerCase())
     )
   );
 
@@ -99,14 +59,13 @@ const Statements = ({ merchantData }) => {
     <div>
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
-        <div className="bg-white border-0 shadow-sm p-2 rounded-b-sm">
+        <div className="bg-white shadow-sm p-2 rounded-md">
           <div className="flex justify-between">
             <div>
               <p className="text-xs text-gray-500 mb-1">Available Points</p>
-              <p className="text-xl font-semibold text-gray-900">
+              <p className="text-xl font-semibold">
                 {wallet?.available_points}
               </p>
-              <p className="text-xs text-green-500 mt-1">+0.892 Increased</p>
             </div>
             <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
               <CreditCard className="w-4 h-4 text-purple-600" />
@@ -114,14 +73,11 @@ const Statements = ({ merchantData }) => {
           </div>
         </div>
 
-        <div className="bg-white border-0 shadow-sm p-2 rounded-b-sm">
+        <div className="bg-white shadow-sm p-2 rounded-md">
           <div className="flex justify-between">
             <div>
               <p className="text-xs text-gray-500 mb-1">On Hold Points</p>
-              <p className="text-xl font-semibold text-gray-900">
-                {wallet?.onhold_points}
-              </p>
-              <p className="text-xs text-orange-500 mt-1">+0.321 Increased</p>
+              <p className="text-xl font-semibold">{wallet?.onhold_points}</p>
             </div>
             <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
               <Hand className="w-4 h-4 text-orange-600" />
@@ -129,14 +85,11 @@ const Statements = ({ merchantData }) => {
           </div>
         </div>
 
-        <div className="bg-white border-0 shadow-sm p-2 rounded-b-sm">
+        <div className="bg-white shadow-sm p-2 rounded-md">
           <div className="flex justify-between">
             <div>
               <p className="text-xs text-gray-500 mb-1">Refer Points</p>
-              <p className="text-xl font-semibold text-gray-900">
-                {wallet?.total_rp}
-              </p>
-              <p className="text-xs text-green-500 mt-1">+1.245 Increased</p>
+              <p className="text-xl font-semibold">{wallet?.total_rp}</p>
             </div>
             <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
               <Users className="w-4 h-4 text-green-600" />
@@ -144,14 +97,13 @@ const Statements = ({ merchantData }) => {
           </div>
         </div>
 
-        <div className="bg-white border-0 shadow-sm p-2 rounded-b-sm">
+        <div className="bg-white shadow-sm p-2 rounded-md">
           <div className="flex justify-between">
             <div>
-              <p className="text-xs text-gray-500 mb-1">Community Member</p>
-              <p className="text-xl font-semibold text-gray-900">
+              <p className="text-xs text-gray-500 mb-1">Community Members</p>
+              <p className="text-xl font-semibold">
                 {merchantData?.community_members}
               </p>
-              <p className="text-xs text-blue-500 mt-1">+0.892 Increased</p>
             </div>
             <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
               <UserCheck className="w-4 h-4 text-blue-600" />
@@ -160,31 +112,33 @@ const Statements = ({ merchantData }) => {
         </div>
       </div>
 
-      {/* User Statement Section */}
-      <div className="mt-6 p-4">
+      {/* Statement Section */}
+      <div className="mt-6 p-4 bg-white rounded-lg shadow-sm border">
         <div className="lg:flex lg:items-center lg:justify-between">
           <h2 className="font-semibold text-gray-900">Merchant Statement</h2>
+
           <div className="flex gap-2 mt-2 lg:mt-0">
-            <PrimaryButton>Export as CSV</PrimaryButton>
-            <PrimaryButton variant="secondary">Export as PDF</PrimaryButton>
+            <PrimaryButton>Export CSV</PrimaryButton>
+            <PrimaryButton variant="secondary">Export PDF</PrimaryButton>
           </div>
         </div>
 
-        {/* Controls */}
-        <div className="mt-10 lg:flex lg:items-center lg:justify-between mb-4">
+        {/* Filters */}
+        <div className="mt-10 flex flex-col lg:flex-row items-start lg:items-center justify-between mb-4 gap-4">
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-600">Show</span>
             <select
               value={entriesPerPage}
               onChange={(e) => setEntriesPerPage(e.target.value)}
-              className="border border-gray-300 rounded-md px-2 py-1 text-sm"
+              className="border rounded-md px-2 py-1 text-sm"
             >
               <option value="10">10</option>
               <option value="25">25</option>
               <option value="50">50</option>
             </select>
           </div>
-          <div className="relative mt-4 lg:mt-0">
+
+          <div className="w-full lg:w-auto">
             <SearchInput
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -198,54 +152,79 @@ const Statements = ({ merchantData }) => {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4 text-gray-700">ID</th>
-                <th className="text-left py-3 px-4 text-gray-700">Date</th>
-                <th className="text-left py-3 px-4 text-gray-700">
-                  Point Types
-                </th>
-                <th className="text-left py-3 px-4 text-gray-700">
-                  Total Points
-                </th>
-                <th className="text-left py-3 px-4 text-gray-700">Status</th>
+                <th className="py-3 px-4">S/N</th>
+                <th className="py-3 px-4">Date</th>
+                <th className="py-3 px-4">Point Type</th>
+                <th className="py-3 px-4">Total Points</th>
+                <th className="py-3 px-4">Status</th>
               </tr>
             </thead>
+
             <tbody>
-              {filteredData.map((item) => (
-                <tr
-                  key={item.id}
-                  className="border-b border-gray-100 hover:bg-gray-50 transition"
-                >
-                  <td className="py-3 px-4 text-gray-900">{item.id}</td>
-                  <td className="py-3 px-4 text-gray-900">{item.date}</td>
-                  <td className="py-3 px-4 text-gray-900">
-                    {item.point_types}
-                  </td>
-                  <td
-                    className={`py-3 px-4 font-medium ${
-                      item.total_points.startsWith("+")
-                        ? "text-green-600"
-                        : "text-red-600"
-                    }`}
-                  >
-                    {item.total_points}
-                  </td>
-                  <td className="py-3 px-4">
-                    <Badge
-                      className={
-                        item.status === "Available"
-                          ? "bg-green-100 text-green-800"
-                          : item.status === "On Hold"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : item.status === "Redeemed"
-                          ? "bg-red-100 text-red-800"
-                          : "bg-blue-100 text-blue-800"
-                      }
-                    >
-                      {item.status}
-                    </Badge>
+              {isLoading ? (
+                <tr>
+                  <td colSpan={5} className="text-center py-6">
+                    Loading Transactions...
                   </td>
                 </tr>
-              ))}
+              ) : error ? (
+                <tr>
+                  <td colSpan={5} className="text-center py-6 text-red-500">
+                    {error?.data?.message || "Failed to load data"}
+                  </td>
+                </tr>
+              ) : filteredTransactions.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="text-center py-6">
+                    No transactions found.
+                  </td>
+                </tr>
+              ) : (
+                filteredTransactions.map((item, idx) => {
+                  const isDebit = item?.points_type === "debited";
+
+                  return (
+                    <tr
+                      key={item?.id}
+                      className="border-b border-gray-100 hover:bg-gray-50 transition"
+                    >
+                      <td className="py-3 px-4">
+                        {(currentPage - 1) * meta?.perPage + idx + 1}
+                      </td>
+
+                      <td className="py-3 px-4">
+                        {formatDateTime(item?.created_at)}
+                      </td>
+
+                      <td className="py-3 px-4">
+                        {typeMapping[item?.transaction_type] ?? "-"}
+                      </td>
+
+                      <td
+                        className={`py-3 px-4 font-medium ${
+                          isDebit ? "text-red-600" : "text-green-600"
+                        }`}
+                      >
+                        {isDebit
+                          ? `-${item?.transaction_points}`
+                          : `+${item?.transaction_points}`}
+                      </td>
+
+                      <td className="py-3 px-4">
+                        <Badge
+                          className={
+                            item?.points_type === "debited"
+                              ? "bg-red-100 text-red-800"
+                              : "bg-green-100 text-green-800"
+                          }
+                        >
+                          {item?.points_type}
+                        </Badge>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
@@ -254,7 +233,7 @@ const Statements = ({ merchantData }) => {
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
-          onPageChange={setCurrentPage}
+          onPageChange={changePage}
         />
       </div>
     </div>
