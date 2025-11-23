@@ -24,10 +24,10 @@ const Staff = ({ staffData }) => {
     return staffList.filter((item) => {
       const s = search.toLowerCase();
       return (
-        item.name.toLowerCase().includes(s) ||
-        item.email?.toLowerCase().includes(s) ||
-        item.phone?.toLowerCase().includes(s) ||
-        item.user_name?.toLowerCase().includes(s)
+        (item.name || "-").toLowerCase().includes(s) ||
+        (item.email || "-").toLowerCase().includes(s) ||
+        (item.phone || "-").toLowerCase().includes(s) ||
+        (item.user_name || "-").toLowerCase().includes(s)
       );
     });
   }, [staffList, search]);
