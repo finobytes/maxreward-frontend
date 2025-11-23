@@ -13,7 +13,7 @@ const initialState = {
   merchant: null,
   merchantId: null,
   merchantSelectionType: "merchant_name",
-  paymentMethod: "offline",
+  paymentMethod: "manual",
   // verified: false,
 };
 
@@ -72,7 +72,7 @@ const shopWithMerchantSlice = createSlice({
     },
 
     setPaymentMethod: (state, action) => {
-      state.paymentMethod = action.payload || "offline";
+      state.paymentMethod = action.payload || "manual";
     },
 
     setSettings: (state, action) => {

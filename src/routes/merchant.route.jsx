@@ -16,6 +16,7 @@ import VoucherPurchaseForm from "../pages/merchant/VoucherPurchase/VoucherPurcha
 import VoucherPurchaseDetails from "../pages/merchant/VoucherPurchase/VoucherPurchaseDetails";
 import ReferredMemberList from "../pages/merchant/ReferredMemberList/ReferredMemberList";
 import PointStatement from "../pages/merchant/PointStatement/PointStatement";
+import TransactionDetails from "../pages/merchant/PointStatement/TransactionDetails";
 
 export const merchantRoute = [
   {
@@ -74,6 +75,10 @@ export const merchantRoute = [
   {
     path: "point-statement",
     element: <PointStatement />,
+  },
+  {
+    path: "point-statement/:id",
+    element: <TransactionDetails />,
   },
   {
     path: "reports/member-transactions",
