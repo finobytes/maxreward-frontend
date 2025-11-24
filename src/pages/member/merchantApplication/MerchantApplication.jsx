@@ -147,7 +147,7 @@ const MerchantApplication = () => {
           toast.error(`${field}: ${messages.join(", ")}`);
         });
       } else {
-        toast.error("Failed to create merchant!");
+        toast.error(err?.data?.message || "Failed to create merchant!");
       }
     }
   };

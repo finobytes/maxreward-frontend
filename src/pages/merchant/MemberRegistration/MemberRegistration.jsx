@@ -15,6 +15,7 @@ import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
 import SkeletonField from "../../../components/skeleton/SkeletonField";
 import ReferSuccessDialog from "../../member/referNewMember/components/ReferSuccessDialog";
 import { useSelector } from "react-redux";
+import { useGetMemberByReferralQuery } from "../../../redux/features/admin/memberManagement/memberManagementApi";
 
 const MemberRegistration = () => {
   const { user } = useSelector((state) => state.auth);
@@ -24,8 +25,17 @@ const MemberRegistration = () => {
     useReferNewMember();
 
   const { data, isLoading } = useVerifyMeQuery(user?.role);
-  // const user = data || {};
-  console.log("merchant data", data);
+
+  const {
+    data: memberData,
+    isFetching,
+    isError,
+  } = useGetMemberByReferralQuery(
+    data?.merchant?.corporate_member?.referral_code,
+    {
+      skip: !data?.merchant?.corporate_member?.referral_code,
+    }
+  );
 
   const {
     register,
@@ -139,7 +149,10 @@ const MemberRegistration = () => {
                 <Label>Referred By</Label>
                 <Input
                   disabled
-                  value={data?.merchant?.corporate_member?.name || ""}
+                  value={
+                    memberData?.sponsored_member_info?.sponsor_member?.name ||
+                    ""
+                  }
                   readOnly
                 />
               </div>
@@ -147,7 +160,10 @@ const MemberRegistration = () => {
                 <Label>Referral Status</Label>
                 <Input
                   disabled
-                  value={data?.merchant?.corporate_member?.status || ""}
+                  value={
+                    memberData?.sponsored_member_info?.sponsor_member?.status ||
+                    ""
+                  }
                   readOnly
                 />
               </div>
