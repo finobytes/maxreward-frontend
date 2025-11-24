@@ -20,9 +20,5 @@ export const referNewMemberSchema = z.object({
     .optional()
     .or(z.literal("")),
 
-  gender: z.enum(["male", "female", "other"], {
-    required_error: "Please select a gender",
-  }),
-
   address: z.string().optional().or(z.literal("")),
 });

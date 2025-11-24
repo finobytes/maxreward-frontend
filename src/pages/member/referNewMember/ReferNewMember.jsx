@@ -7,7 +7,7 @@ import ComponentCard from "../../../components/common/ComponentCard";
 import Label from "../../../components/form/Label";
 import Input from "../../../components/form/input/InputField";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
-
+import Select from "@/components/form/Select";
 import { useReferNewMember } from "../../../redux/features/member/referNewMember/useReferNewMember";
 import { referNewMemberSchema } from "../../../schemas/referNewMember.schema";
 import { useEffect, useState } from "react";
@@ -17,6 +17,7 @@ import SkeletonField from "../../../components/skeleton/SkeletonField";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { useGetMemberByReferralQuery } from "../../../redux/features/admin/memberManagement/memberManagementApi";
+import { useGetCountriesQuery } from "../../../redux/features/countries/countriesApi";
 
 const ReferNewMember = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -34,11 +35,10 @@ const ReferNewMember = () => {
   } = useGetMemberByReferralQuery(user?.referral_code, {
     skip: !user?.referral_code,
   });
+  const { data: countries, isLoading: countriesLoading } =
+    useGetCountriesQuery();
 
-  console.log(
-    "member referral Data",
-    memberData?.sponsored_member_info?.sponsor_member?.name
-  );
+  console.log("countries", countries);
   const {
     register,
     handleSubmit,
@@ -52,7 +52,6 @@ const ReferNewMember = () => {
       fullName: "",
       phoneNumber: "",
       email: "",
-      gender: "male",
       address: "",
     },
   });
@@ -119,16 +118,33 @@ const ReferNewMember = () => {
             {/* Nationality */}
             <div>
               <Label htmlFor="nationality">
-                Nationality (<span className="text-red-500">*</span>)
+                Nationality <span className="text-red-500">*</span>
               </Label>
-              <Input
-                id="nationality"
-                placeholder="Bangladeshi"
-                {...register("nationality")}
-                error={!!errors.nationality}
-                hint={errors.nationality?.message}
-              />
+
+              {countriesLoading ? (
+                <div className="animate-pulse h-11 bg-gray-200 rounded-lg"></div>
+              ) : (
+                <Select
+                  id="nationality"
+                  placeholder="Select Nationality"
+                  error={errors.nationality}
+                  {...register("nationality")}
+                  options={
+                    countries?.data?.map((item) => ({
+                      label: item.country,
+                      value: item.country,
+                    })) ?? []
+                  }
+                />
+              )}
+
+              {errors.nationality && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.nationality.message}
+                </p>
+              )}
             </div>
+
             {/* Email */}
             <div>
               <Label htmlFor="email">Email Address</Label>
