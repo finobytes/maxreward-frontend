@@ -32,7 +32,6 @@ const referNewMemberSchema = z.object({
     .email({ message: "Invalid email address" })
     .optional()
     .or(z.literal("").transform(() => undefined)), // optional field
-  gender: z.enum(["male", "female"], { message: "Gender is required" }),
   address: z.string().optional(),
   referralCode: z.string().min(3, {
     message: "Referral code is required and must be at least 3 characters",
@@ -81,7 +80,6 @@ const MemberRegistration = () => {
       fullName: "",
       phoneNumber: "",
       email: "",
-      gender: "male",
       address: "",
       referralCode: "",
     },

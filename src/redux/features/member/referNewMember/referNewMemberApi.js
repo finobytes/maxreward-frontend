@@ -9,7 +9,6 @@ export const referNewMemberApi = baseApi.injectEndpoints({
           name: data.fullName,
           phone: data.phoneNumber,
           email: data.email,
-          gender_type: data.gender || "male",
           address: data.address || "N/A",
         };
 
