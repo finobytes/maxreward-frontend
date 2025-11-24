@@ -153,11 +153,23 @@ const ReferNewMember = () => {
               </div>
               <div>
                 <Label>Referred By</Label>
-                <Input disabled value={user?.name || ""} readOnly />
+                <Input
+                  disabled
+                  value={
+                    user?.sponsored_member_info?.sponsor_member?.name || ""
+                  }
+                  readOnly
+                />
               </div>
               <div>
                 <Label>Referral Status</Label>
-                <Input disabled value={user?.status || ""} readOnly />
+                <Input
+                  disabled
+                  value={
+                    user?.sponsored_member_info?.sponsor_member?.status || ""
+                  }
+                  readOnly
+                />
               </div>
             </div>
           )}

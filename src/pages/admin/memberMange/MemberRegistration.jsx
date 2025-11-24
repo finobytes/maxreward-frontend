@@ -63,7 +63,10 @@ const MemberRegistration = () => {
   } = useGetMemberByReferralQuery(debouncedReferral, {
     skip: !debouncedReferral || debouncedReferral.length < 3,
   });
-
+  console.log(
+    "memberData",
+    memberData?.sponsored_member_info?.sponsor_member?.name
+  );
   // Form setup
   const {
     register,
@@ -242,7 +245,10 @@ const MemberRegistration = () => {
                     disabled
                     readOnly
                     value={
-                      isError ? "Referral Not Found" : memberData?.name || ""
+                      isError
+                        ? "Referral Not Found"
+                        : memberData?.sponsored_member_info?.sponsor_member
+                            ?.name || ""
                     }
                   />
                 )}
@@ -258,7 +264,12 @@ const MemberRegistration = () => {
                     id="referralStatus"
                     disabled
                     readOnly
-                    value={isError ? "Invalid" : memberData?.status || ""}
+                    value={
+                      isError
+                        ? "Invalid"
+                        : memberData?.sponsored_member_info?.sponsor_member
+                            ?.status || ""
+                    }
                   />
                 )}
               </div>

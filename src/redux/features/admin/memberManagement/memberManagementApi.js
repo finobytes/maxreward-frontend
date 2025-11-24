@@ -161,6 +161,12 @@ export const memberApi = baseApi.injectEndpoints({
         };
       },
     }),
+
+    getCorporateMemberReferralCode: builder.query({
+      query: () => ({
+        url: `/member/maxreward-corporate-1`,
+      }),
+    }),
   }),
 });
 
@@ -177,4 +183,5 @@ export const {
   useGetReferralTreeQuery,
   useGetReferralMemberListQuery,
   useGetUpLineMemberQuery,
+  useGetCorporateMemberReferralCodeQuery,
 } = memberApi;

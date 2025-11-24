@@ -325,7 +325,10 @@ const MerchantRegistrationForm = () => {
                     disabled
                     readOnly
                     value={
-                      isError ? "Referral Not Found" : memberData?.name || ""
+                      isError
+                        ? "Referral Not Found"
+                        : memberData?.sponsored_member_info?.sponsor_member
+                            ?.name || ""
                     }
                   />
                 )}
@@ -341,7 +344,12 @@ const MerchantRegistrationForm = () => {
                     id="referralStatus"
                     disabled
                     readOnly
-                    value={isError ? "Invalid" : memberData?.status || ""}
+                    value={
+                      isError
+                        ? "Invalid"
+                        : memberData?.sponsored_member_info?.sponsor_member
+                            ?.status || ""
+                    }
                   />
                 )}
               </div>
