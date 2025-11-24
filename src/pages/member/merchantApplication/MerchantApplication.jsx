@@ -38,11 +38,6 @@ const MerchantApplication = () => {
   const { data: corporateReferralCode } =
     useGetCorporateMemberReferralCodeQuery();
 
-  console.log(
-    "corporateReferralCode",
-    corporateReferralCode?.data?.referral_code
-  );
-
   // -----------------------------
   // REFERRAL STATE + DEBOUNCE LOGIC
   // -----------------------------
@@ -65,6 +60,8 @@ const MerchantApplication = () => {
   } = useGetMemberByReferralQuery(debouncedReferral, {
     skip: !debouncedReferral || debouncedReferral.length < 3,
   });
+
+  // Fetch current user's referral code
   const { data, isLoading } = useVerifyMeQuery();
 
   // -----------------------------

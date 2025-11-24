@@ -10,12 +10,13 @@ import PrimaryButton from "../../../components/ui/PrimaryButton";
 
 import { useReferNewMember } from "../../../redux/features/member/referNewMember/useReferNewMember";
 import { referNewMemberSchema } from "../../../schemas/referNewMember.schema";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ReferSuccessDialog from "./components/ReferSuccessDialog";
 import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
 import SkeletonField from "../../../components/skeleton/SkeletonField";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import { useGetMemberByReferralQuery } from "../../../redux/features/admin/memberManagement/memberManagementApi";
 
 const ReferNewMember = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -25,7 +26,19 @@ const ReferNewMember = () => {
 
   const { data, isLoading } = useVerifyMeQuery();
   const user = data || {};
+  // Fetch referral info
+  const {
+    data: memberData,
+    isFetching,
+    isError,
+  } = useGetMemberByReferralQuery(user?.referral_code, {
+    skip: !user?.referral_code,
+  });
 
+  console.log(
+    "member referral Data",
+    memberData?.sponsored_member_info?.sponsor_member?.name
+  );
   const {
     register,
     handleSubmit,
@@ -156,7 +169,8 @@ const ReferNewMember = () => {
                 <Input
                   disabled
                   value={
-                    user?.sponsored_member_info?.sponsor_member?.name || ""
+                    memberData?.sponsored_member_info?.sponsor_member?.name ||
+                    ""
                   }
                   readOnly
                 />
@@ -166,7 +180,8 @@ const ReferNewMember = () => {
                 <Input
                   disabled
                   value={
-                    user?.sponsored_member_info?.sponsor_member?.status || ""
+                    memberData?.sponsored_member_info?.sponsor_member?.status ||
+                    ""
                   }
                   readOnly
                 />
