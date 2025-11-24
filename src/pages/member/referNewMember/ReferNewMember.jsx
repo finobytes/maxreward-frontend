@@ -105,6 +105,7 @@ const ReferNewMember = () => {
                   required: true,
                   autoFocus: true,
                 }}
+                countryCodeEditable={false}
                 inputStyle={{ width: "100%" }}
                 specialLabel=""
               />
