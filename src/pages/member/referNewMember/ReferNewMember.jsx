@@ -115,13 +115,11 @@ const ReferNewMember = () => {
                 Phone Number (<span className="text-red-500">*</span>)
               </Label>
               <PhoneInput
-                country={"bd"} // default country (Bangladesh)
+                country={"bd"}
                 value={watch("phone")}
                 onChange={(phone, countryData) => {
                   const numeric = phone.replace("+", "");
                   setValue("phone", numeric);
-
-                  // Set country_code from phone input
                   setValue("country_code", countryData?.dialCode);
                 }}
                 inputProps={{
@@ -129,12 +127,26 @@ const ReferNewMember = () => {
                   required: true,
                 }}
                 countryCodeEditable={false}
+                // Demo-style
+                enableSearch={true}
+                autocompleteSearch={true}
+                searchPlaceholder="search"
+                // Remove + sign
+                prefix=""
+                // Demo-style
                 inputStyle={{ width: "100%" }}
-                specialLabel=""
+                buttonStyle={{}}
+                dropdownStyle={{ maxHeight: "250px" }}
+                searchStyle={{
+                  width: "100%",
+                  padding: "8px",
+                  boxSizing: "border-box",
+                }}
               />
-              {errors.phoneNumber && (
+
+              {errors.phone && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.phoneNumber.message}
+                  {errors.phone.message}
                 </p>
               )}
             </div>
