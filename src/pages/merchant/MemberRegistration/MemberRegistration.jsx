@@ -15,7 +15,9 @@ import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
 import SkeletonField from "../../../components/skeleton/SkeletonField";
 import ReferSuccessDialog from "../../member/referNewMember/components/ReferSuccessDialog";
 import { useSelector } from "react-redux";
-import { useGetMemberByReferralQuery } from "../../../redux/features/admin/memberManagement/memberManagementApi";
+import { useGetCountriesQuery } from "../../../redux/features/countries/countriesApi";
+import PhoneInput from "react-phone-input-2";
+import Select from "@/components/form/Select";
 
 const MemberRegistration = () => {
   const { user } = useSelector((state) => state.auth);
@@ -25,31 +27,23 @@ const MemberRegistration = () => {
     useReferNewMember();
 
   const { data, isLoading } = useVerifyMeQuery(user?.role);
-
-  const {
-    data: memberData,
-    isFetching,
-    isError,
-  } = useGetMemberByReferralQuery(
-    data?.merchant?.corporate_member?.referral_code,
-    {
-      skip: !data?.merchant?.corporate_member?.referral_code,
-    }
-  );
-
+  const { data: countries, isLoading: countriesLoading } =
+    useGetCountriesQuery();
   const {
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(referNewMemberSchema),
     defaultValues: {
       fullName: "",
-      phoneNumber: "",
+      phone: "",
       email: "",
-      gender: "male",
-      address: "",
+      country_id: "", // country_id
+      country_code: "", // phoneInput
     },
   });
 
@@ -78,6 +72,77 @@ const MemberRegistration = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <ComponentCard title="Member Information">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Nationality */}
+            <div>
+              <Label htmlFor="citizenship">
+                Citizenship <span className="text-red-500">*</span>
+              </Label>
+
+              {countriesLoading ? (
+                <div className="animate-pulse h-11 bg-gray-200 rounded-lg"></div>
+              ) : (
+                <Select
+                  id="citizenship"
+                  placeholder="Select Citizenship"
+                  error={errors.cityzenship}
+                  {...register("country_id")}
+                  options={
+                    countries?.data?.map((item) => ({
+                      label: item.country,
+                      value: item.id,
+                    })) ?? []
+                  }
+                />
+              )}
+
+              {errors.nationality && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.nationality.message}
+                </p>
+              )}
+            </div>
+            {/* Updated Phone Number */}
+            <div>
+              <Label htmlFor="phoneNumber">
+                Phone Number (<span className="text-red-500">*</span>)
+              </Label>
+              <PhoneInput
+                country={"my"}
+                value={watch("phone")}
+                onChange={(phone, countryData) => {
+                  const numeric = phone.replace("+", "");
+                  setValue("phone", numeric);
+                  setValue("country_code", countryData?.dialCode);
+                }}
+                inputProps={{
+                  name: "phoneNumber",
+                  required: true,
+                }}
+                countryCodeEditable={false}
+                // Demo-style
+                enableSearch={true}
+                autocompleteSearch={true}
+                searchPlaceholder="search"
+                // Remove + sign
+                prefix=""
+                // Demo-style
+                inputStyle={{ width: "100%" }}
+                buttonStyle={{}}
+                dropdownStyle={{ maxHeight: "250px" }}
+                searchStyle={{
+                  width: "100%",
+                  padding: "8px",
+                  boxSizing: "border-box",
+                }}
+              />
+
+              {errors.phone && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.phone.message}
+                </p>
+              )}
+            </div>
+
             {/* Full Name */}
             <div>
               <Label htmlFor="fullName">
@@ -86,23 +151,9 @@ const MemberRegistration = () => {
               <Input
                 id="fullName"
                 placeholder="Enter member full name"
-                {...register("fullName")}
-                error={!!errors.fullName}
-                hint={errors.fullName?.message}
-              />
-            </div>
-
-            {/* Phone Number */}
-            <div>
-              <Label htmlFor="phoneNumber">
-                Phone Number (<span className="text-red-500">*</span>)
-              </Label>
-              <Input
-                id="phoneNumber"
-                placeholder="Enter phone number"
-                {...register("phoneNumber")}
-                error={!!errors.phoneNumber}
-                hint={errors.phoneNumber?.message}
+                {...register("name")}
+                error={!!errors.name}
+                hint={errors.name?.message}
               />
             </div>
 
@@ -149,10 +200,7 @@ const MemberRegistration = () => {
                 <Label>Referred By</Label>
                 <Input
                   disabled
-                  value={
-                    memberData?.sponsored_member_info?.sponsor_member?.name ||
-                    ""
-                  }
+                  value={data?.merchant?.corporate_member?.name || ""}
                   readOnly
                 />
               </div>
@@ -160,10 +208,7 @@ const MemberRegistration = () => {
                 <Label>Referral Status</Label>
                 <Input
                   disabled
-                  value={
-                    memberData?.sponsored_member_info?.sponsor_member?.status ||
-                    ""
-                  }
+                  value={data?.merchant?.corporate_member?.status || ""}
                   readOnly
                 />
               </div>
