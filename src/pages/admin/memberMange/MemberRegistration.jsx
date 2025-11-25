@@ -9,30 +9,22 @@ import ComponentCard from "../../../components/common/ComponentCard";
 import Label from "../../../components/form/Label";
 import Input from "../../../components/form/input/InputField";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
+import Select from "@/components/form/Select";
 
 import { useReferNewMember } from "../../../redux/features/member/referNewMember/useReferNewMember";
 import { useGetMemberByReferralQuery } from "../../../redux/features/admin/memberManagement/memberManagementApi";
 import ReferSuccessDialog from "../../member/referNewMember/components/ReferSuccessDialog";
 import { z } from "zod";
 import SkeletonField from "../../../components/skeleton/SkeletonField";
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
+import { useGetCountriesQuery } from "../../../redux/features/countries/countriesApi";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+import { referNewMemberSchema } from "../../../schemas/referNewMember.schema";
+import { useNavigate } from "react-router";
 
-const referNewMemberSchema = z.object({
-  fullName: z
-    .string()
-    .min(3, { message: "Full name must be at least 3 characters long" }),
-  phoneNumber: z
-    .string()
-    .transform((value) => value.replace(/[\s-]/g, "")) // space & dash remove
-    .refine((value) => /^\d{10,11}$/.test(value), {
-      message: "Invalid phone number",
-    }),
-  email: z
-    .string()
-    .email({ message: "Invalid email address" })
-    .optional()
-    .or(z.literal("").transform(() => undefined)), // optional field
-  address: z.string().optional(),
+// Extend the shared schema to include referralCode
+const adminMemberRegistrationSchema = referNewMemberSchema.extend({
   referralCode: z.string().min(3, {
     message: "Referral code is required and must be at least 3 characters",
   }),
@@ -41,9 +33,9 @@ const referNewMemberSchema = z.object({
 const MemberRegistration = () => {
   const [referralInput, setReferralInput] = useState("");
   const [debouncedReferral, setDebouncedReferral] = useState("");
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [response, setResponse] = useState(null);
-  const { user } = useSelector((state) => state.auth);
+  // const { user } = useSelector((state) => state.auth); // Unused
+
+  const navigate = useNavigate();
   const { handleRefer, loading, resetState } = useReferNewMember();
 
   // Debounce referral input
@@ -62,32 +54,42 @@ const MemberRegistration = () => {
   } = useGetMemberByReferralQuery(debouncedReferral, {
     skip: !debouncedReferral || debouncedReferral.length < 3,
   });
-  console.log(
-    "memberData",
-    memberData?.sponsored_member_info?.sponsor_member?.name
-  );
-  // Form setup
+
+  const { data: countries, isLoading: countriesLoading } =
+    useGetCountriesQuery();
+
   const {
     register,
     handleSubmit,
     reset,
-    resetField,
+    watch,
+    setValue,
     setError,
+    resetField,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(referNewMemberSchema),
+    resolver: zodResolver(adminMemberRegistrationSchema),
     defaultValues: {
-      fullName: "",
-      phoneNumber: "",
+      name: "",
+      phone: "",
       email: "",
-      address: "",
+      country_id: "",
+      country_code: "",
       referralCode: "",
     },
   });
+
+  // Sync referralInput with form state
+  useEffect(() => {
+    setValue("referralCode", referralInput);
+    if (referralInput === "") {
+      resetField("referralCode");
+    }
+  }, [referralInput, setValue, resetField]);
+
   useEffect(() => {
     if (isError || !debouncedReferral) {
-      // clear cached referral data
-      resetField("referralCode");
+      // If error or empty, we might want to clear related fields or just let the user know
     }
   }, [isError, debouncedReferral]);
 
@@ -96,22 +98,17 @@ const MemberRegistration = () => {
     try {
       const payload = { ...formData };
 
-      if (user?.role === "admin") {
-        if (memberData && memberData.id && !isError) {
-          payload.member_id = memberData.id;
-        } else {
-          toast.error("Invalid referral — member not found!");
-          return;
-        }
+      // Admin logic: must have a valid member_id from the referral lookup
+      if (memberData && memberData.id && !isError) {
+        payload.member_id = memberData.id;
       } else {
-        // non-admin should never send member_id
-        delete payload.member_id;
+        toast.error("Invalid referral — member not found!");
+        return;
       }
 
       const res = await handleRefer(payload);
-      setResponse(res);
-      setDialogOpen(true);
       toast.success(res?.message || "Member referred successfully!");
+      navigate("/admin/member-manage");
       reset();
       setReferralInput("");
       resetState();
@@ -124,7 +121,7 @@ const MemberRegistration = () => {
         Object.entries(backendErrors).forEach(([field, messages]) => {
           const fieldName =
             field === "phone"
-              ? "phoneNumber"
+              ? "phone" // Schema uses 'phone'
               : field === "referral"
               ? "referralCode"
               : field;
@@ -157,6 +154,77 @@ const MemberRegistration = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <ComponentCard title="Member Information">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Nationality */}
+            <div>
+              <Label htmlFor="citizenship">
+                Citizenship <span className="text-red-500">*</span>
+              </Label>
+
+              {countriesLoading ? (
+                <div className="animate-pulse h-11 bg-gray-200 rounded-lg"></div>
+              ) : (
+                <Select
+                  id="citizenship"
+                  placeholder="Select Citizenship"
+                  error={errors.country_id}
+                  {...register("country_id")}
+                  options={
+                    countries?.data?.map((item) => ({
+                      label: item.country,
+                      value: item.id,
+                    })) ?? []
+                  }
+                />
+              )}
+
+              {errors.country_id && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.country_id.message}
+                </p>
+              )}
+            </div>
+            {/* Updated Phone Number */}
+            <div>
+              <Label htmlFor="phoneNumber">
+                Phone Number (<span className="text-red-500">*</span>)
+              </Label>
+              <PhoneInput
+                country={"my"}
+                value={watch("phone")}
+                onChange={(phone, countryData) => {
+                  const numeric = phone.replace("+", "");
+                  setValue("phone", numeric);
+                  setValue("country_code", countryData?.dialCode);
+                }}
+                inputProps={{
+                  name: "phoneNumber",
+                  required: true,
+                }}
+                countryCodeEditable={false}
+                // Demo-style
+                enableSearch={true}
+                autocompleteSearch={true}
+                searchPlaceholder="search"
+                // Remove + sign
+                prefix=""
+                // Demo-style
+                inputStyle={{ width: "100%" }}
+                buttonStyle={{}}
+                dropdownStyle={{ maxHeight: "250px" }}
+                searchStyle={{
+                  width: "100%",
+                  padding: "8px",
+                  boxSizing: "border-box",
+                }}
+              />
+
+              {errors.phone && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.phone.message}
+                </p>
+              )}
+            </div>
+
             {/* Full Name */}
             <div>
               <Label htmlFor="fullName">
@@ -165,23 +233,9 @@ const MemberRegistration = () => {
               <Input
                 id="fullName"
                 placeholder="Enter member full name"
-                {...register("fullName")}
-                error={!!errors.fullName}
-                hint={errors.fullName?.message}
-              />
-            </div>
-
-            {/* Phone Number */}
-            <div>
-              <Label htmlFor="phoneNumber">
-                Phone Number (<span className="text-red-500">*</span>)
-              </Label>
-              <Input
-                id="phoneNumber"
-                placeholder="Enter phone number"
-                {...register("phoneNumber")}
-                error={!!errors.phoneNumber}
-                hint={errors.phoneNumber?.message}
+                {...register("name")}
+                error={!!errors.name}
+                hint={errors.name?.message}
               />
             </div>
 
@@ -190,7 +244,7 @@ const MemberRegistration = () => {
               <Label htmlFor="email">Email Address</Label>
               <Input
                 id="email"
-                placeholder="Enter email address"
+                placeholder="Enter email"
                 {...register("email")}
                 error={!!errors.email}
                 hint={errors.email?.message}
@@ -212,9 +266,16 @@ const MemberRegistration = () => {
                 <Input
                   id="referralCode"
                   placeholder="Enter referral code / Phone Number"
+                  // We handle value via state and sync it to form, but we can also register it for validation
+                  // However, since we have a custom onChange for debounce, we need to be careful.
+                  // Best approach: Bind value to state, and in useEffect set value in form.
+                  // We still register it to track errors.
                   {...register("referralCode")}
                   value={referralInput}
-                  onChange={(e) => setReferralInput(e.target.value)}
+                  onChange={(e) => {
+                    setReferralInput(e.target.value);
+                    // setValue("referralCode", e.target.value, { shouldValidate: true }); // Handled in useEffect
+                  }}
                   error={!!errors.referralCode}
                   hint={errors.referralCode?.message}
                 />
@@ -292,12 +353,6 @@ const MemberRegistration = () => {
           </ComponentCard>
         </div>
       </form>
-
-      <ReferSuccessDialog
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-        response={response}
-      />
     </div>
   );
 };
