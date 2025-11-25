@@ -11,13 +11,12 @@ import PrimaryButton from "../../../components/ui/PrimaryButton";
 import Select from "@/components/form/Select";
 import { useReferNewMember } from "../../../redux/features/member/referNewMember/useReferNewMember";
 import { referNewMemberSchema } from "../../../schemas/referNewMember.schema";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ReferSuccessDialog from "./components/ReferSuccessDialog";
 import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
 import SkeletonField from "../../../components/skeleton/SkeletonField";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import { useGetMemberByReferralQuery } from "../../../redux/features/admin/memberManagement/memberManagementApi";
 import { useGetCountriesQuery } from "../../../redux/features/countries/countriesApi";
 
 const ReferNewMember = () => {
@@ -28,14 +27,6 @@ const ReferNewMember = () => {
 
   const { data, isLoading } = useVerifyMeQuery();
   const user = data || {};
-  // Fetch referral info
-  const {
-    data: memberData,
-    isFetching,
-    isError,
-  } = useGetMemberByReferralQuery(user?.referral_code, {
-    skip: !user?.referral_code,
-  });
   const { data: countries, isLoading: countriesLoading } =
     useGetCountriesQuery();
 
@@ -115,7 +106,7 @@ const ReferNewMember = () => {
                 Phone Number (<span className="text-red-500">*</span>)
               </Label>
               <PhoneInput
-                country={"bd"}
+                country={"my"}
                 value={watch("phone")}
                 onChange={(phone, countryData) => {
                   const numeric = phone.replace("+", "");
@@ -202,25 +193,11 @@ const ReferNewMember = () => {
               </div>
               <div>
                 <Label>Referred By</Label>
-                <Input
-                  disabled
-                  value={
-                    memberData?.sponsored_member_info?.sponsor_member?.name ||
-                    ""
-                  }
-                  readOnly
-                />
+                <Input disabled value={user?.name || ""} readOnly />
               </div>
               <div>
                 <Label>Referral Status</Label>
-                <Input
-                  disabled
-                  value={
-                    memberData?.sponsored_member_info?.sponsor_member?.status ||
-                    ""
-                  }
-                  readOnly
-                />
+                <Input disabled value={user?.status || ""} readOnly />
               </div>
             </div>
           )}
