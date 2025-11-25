@@ -36,6 +36,7 @@ import CpTransactionDetails from "../pages/admin/cpTransaction/CpTransactionDeta
 import CpUnlockHistory from "../pages/admin/cpUnlockHistory/CpUnlockHistory";
 import CpUnlockHistoryDetails from "../pages/admin/cpUnlockHistory/CpUnlockHistoryDetails";
 import CommunityPoint from "../pages/admin/communityPoint/CommunityPoint";
+import CommunityPointDetails from "../pages/admin/communityPoint/CommunityPointDetails";
 
 export const adminRoutes = [
   {
@@ -85,6 +86,10 @@ export const adminRoutes = [
   {
     path: "community-point",
     element: <CommunityPoint />,
+  },
+  {
+    path: "community-point/details/:memberId",
+    element: <CommunityPointDetails />,
   },
   {
     path: "staff-manage/create",
