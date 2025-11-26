@@ -7,14 +7,15 @@ import PrimaryButton from "../../../components/ui/PrimaryButton";
 import Label from "../../../components/form/Label";
 import Input from "../../../components/form/input/InputField";
 import { QrCode } from "lucide-react";
-import { merchant1, merchant2, merchant3, qr } from "../../../assets/assets";
+import { qr } from "../../../assets/assets";
 import ComponentCard from "../../../components/common/ComponentCard";
 import MerchantCard from "./components/MerchantCard";
-import { useGetMerchantMutation } from "../../../redux/features/member/shopWithMerchant/shopWihtMerchantApi";
+import {
+  useGetMerchantMutation,
+  useLocateMerchantsQuery,
+} from "../../../redux/features/member/shopWithMerchant/shopWihtMerchantApi";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-
-import Select from "@/components/form/Select";
 import { useGetAllBusinessTypesQuery } from "@/redux/features/admin/businessType/businessTypeApi";
 import SearchableSelect from "../../../components/form/SearchableSelect";
 
@@ -26,14 +27,27 @@ const ShopWithMerchant = () => {
     isLoading: isBusinessTypeLoading,
     isError: isBusinessTypeError,
   } = useGetAllBusinessTypesQuery();
+
+  // Separate forms for Simple and Advanced search
   const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-    watch,
+    register: registerSimple,
+    handleSubmit: handleSubmitSimple,
+    formState: { errors: simpleErrors },
   } = useForm();
 
+  const {
+    register: registerAdvanced,
+    handleSubmit: handleSubmitAdvanced,
+    formState: { errors: advancedErrors },
+    setValue: setAdvancedValue,
+    watch: watchAdvanced,
+  } = useForm();
+
+  const [filters, setFilters] = React.useState(null);
+  const { data: advancedResult, isFetching: isFilterLoading } =
+    useLocateMerchantsQuery(filters, { skip: !filters });
+
+  // Simple Search
   const onSubmitSimple = async (data) => {
     try {
       const code = data.merchantNameOrUniqueNumber?.trim();
@@ -58,17 +72,16 @@ const ShopWithMerchant = () => {
     }
   };
 
-  const onSubmitAdvanced = async (data) => {
-    toast.info("Advanced search filter applied!", data);
-    // Implement your advanced filter search API here
+  // Advanced Search
+  const onSubmitAdvanced = (data) => {
+    const payload = {
+      state: data.state || "",
+      town: data.town || "",
+      company_address: data.area || "",
+      business_type_id: data.business_type_id || "",
+    };
+    setFilters(payload);
   };
-
-  const merchantInfo = [
-    { name: "Starbucks", image: merchant1, distance: "1.2km away" },
-    { name: "Dunkin'", image: merchant2, distance: "2.5km away" },
-    { name: "Eleven", image: merchant3, distance: "3.1km away" },
-    { name: "KKV", image: merchant2, distance: "4.0km away" },
-  ];
 
   return (
     <div>
@@ -103,20 +116,20 @@ const ShopWithMerchant = () => {
               {/* SIMPLE SEARCH */}
               <TabsContent value="simple">
                 <form
-                  onSubmit={handleSubmit(onSubmitSimple)}
+                  onSubmit={handleSubmitSimple(onSubmitSimple)}
                   className="space-y-4"
                 >
                   <div className="max-w-[350px]">
                     <Label>Merchant Name / Unique Number</Label>
                     <Input
                       placeholder="Enter merchant unique number or Name"
-                      {...register("merchantNameOrUniqueNumber", {
+                      {...registerSimple("merchantNameOrUniqueNumber", {
                         required: "Merchant code is required",
                       })}
                     />
-                    {errors.simpleCode && (
+                    {simpleErrors.merchantNameOrUniqueNumber && (
                       <p className="text-red-500 text-sm mt-1">
-                        {errors.merchantNameOrUniqueNumber.message}
+                        {simpleErrors.merchantNameOrUniqueNumber.message}
                       </p>
                     )}
                   </div>
@@ -134,32 +147,35 @@ const ShopWithMerchant = () => {
               {/* ADVANCED SEARCH */}
               <TabsContent value="advanced">
                 <form
-                  onSubmit={handleSubmit(onSubmitAdvanced)}
+                  onSubmit={handleSubmitAdvanced(onSubmitAdvanced)}
                   className="grid grid-cols-1 md:grid-cols-2 gap-4"
                 >
-                  {/* STATE */}
                   <div>
                     <Label>State</Label>
-                    <Input placeholder="Enter state" {...register("state")} />
+                    <Input
+                      placeholder="Enter state"
+                      {...registerAdvanced("state")}
+                    />
                   </div>
 
-                  {/* TOWN */}
                   <div>
                     <Label>Town</Label>
-                    <Input placeholder="Enter town" {...register("town")} />
+                    <Input
+                      placeholder="Enter town"
+                      {...registerAdvanced("town")}
+                    />
                   </div>
 
-                  {/* AREA */}
                   <div>
                     <Label>Area</Label>
-                    <Input placeholder="Enter area" {...register("area")} />
+                    <Input
+                      placeholder="Enter area"
+                      {...registerAdvanced("area")}
+                    />
                   </div>
 
-                  {/* PRODUCT / SERVICE */}
-
                   <div>
-                    <Label>Product/Service</Label>
-
+                    <Label>Product / Service</Label>
                     {isBusinessTypeLoading ? (
                       <div className="animate-pulse space-y-2">
                         <div className="h-4 bg-gray-200 rounded w-3/4"></div>
@@ -170,41 +186,28 @@ const ShopWithMerchant = () => {
                         Failed to load product/service type
                       </p>
                     ) : (
-                      // <Select
-                      //   defaultValue=""
-                      //   {...register("business_type_id")}
-                      //   options={[
-                      //     ...(businessTypes?.data?.business_types?.map(
-                      //       (type) => ({
-                      //         value: type.id,
-                      //         label: type.name,
-                      //       })
-                      //     ) || []),
-                      //   ]}
-                      //   placeholder="Select Product/Service Type"
-                      // />
                       <SearchableSelect
-                        value={watch("business_type_id")}
-                        onChange={(val) => setValue("business_type_id", val)}
-                        options={businessTypes?.data?.business_types}
+                        value={watchAdvanced("business_type_id")}
+                        onChange={(val) =>
+                          setAdvancedValue("business_type_id", val)
+                        }
+                        options={businessTypes?.data?.business_types || []}
                         placeholder="Select Product/Service Type"
                       />
                     )}
-
-                    {errors.business_type_id && (
+                    {advancedErrors.business_type_id && (
                       <p className="text-red-500 text-xs mt-1">
-                        {errors.business_type_id.message}
+                        {advancedErrors.business_type_id.message}
                       </p>
                     )}
                   </div>
 
-                  {/* Submit Button */}
                   <div className="col-span-full mt-2">
                     <Button
                       className="bg-brand-200 hover:bg-brand-200"
                       type="submit"
                     >
-                      Redeem
+                      Search Merchant
                     </Button>
                   </div>
                 </form>
@@ -229,14 +232,21 @@ const ShopWithMerchant = () => {
         </div>
       </div>
 
-      {/* Recent Merchants */}
-      {/* <ComponentCard title="Recent Registered Merchants" className="mt-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {merchantInfo.map((merchant, index) => (
-            <MerchantCard key={index} merchant={merchant} />
-          ))}
-        </div>
-      </ComponentCard> */}
+      {filters && (
+        <ComponentCard title="Search Results" className="mt-6">
+          {isFilterLoading ? (
+            <p className="text-gray-600">Searching merchants...</p>
+          ) : advancedResult?.merchants?.length ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {advancedResult.merchants.map((m) => (
+                <MerchantCard key={m.id} merchant={m} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-red-500 mt-2">No merchants found.</p>
+          )}
+        </ComponentCard>
+      )}
     </div>
   );
 };
