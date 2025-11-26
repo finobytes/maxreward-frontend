@@ -39,9 +39,8 @@ const renderCpBadge = (amount, type) => {
 
   return (
     <span
-      className={`inline-flex rounded-full px-3 py-1 text-sm font-medium ${
-        colors[type] || "bg-gray-100 text-gray-600"
-      }`}
+      className={`inline-flex rounded-full px-3 py-1 text-sm font-medium ${colors[type] || "bg-gray-100 text-gray-600"
+        }`}
     >
       {amount}
     </span>
@@ -52,9 +51,8 @@ const renderCpBadge = (amount, type) => {
 const renderLockStatusBadge = (isLocked) => {
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-medium ${
-        isLocked ? "bg-red-100 text-red-600" : "bg-green-100 text-green-600"
-      }`}
+      className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-medium ${isLocked ? "bg-red-100 text-red-600" : "bg-green-100 text-green-600"
+        }`}
     >
       {isLocked ? (
         <>
@@ -164,12 +162,12 @@ const CommunityPoint = () => {
 
                       {/* Total CP */}
                       <TableCell className="text-center">
-                        {renderCpBadge(item?.total_cp, "total")}
+                        {renderCpBadge(Number(item?.total_cp).toFixed(2), "total")}
                       </TableCell>
 
                       {/* Available CP */}
                       <TableCell className="text-center">
-                        {renderCpBadge(item?.available_cp, "available")}
+                        {renderCpBadge(Number(item?.available_cp).toFixed(2), "total")}
                       </TableCell>
 
                       {/* On-Hold CP */}
