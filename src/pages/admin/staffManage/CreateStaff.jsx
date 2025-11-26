@@ -81,7 +81,7 @@ const CreateAdminStaff = () => {
 
       // Prepare FormData
       const formDataToSend = new FormData();
-      formDataToSend.append("user_name", `A${Date.now()}`);
+      formDataToSend.append("staffUsername", `A${Date.now()}`);
       formDataToSend.append("name", formData.name);
       formDataToSend.append("phone", formData.phone);
       formDataToSend.append("email", formData.email);
