@@ -341,7 +341,7 @@ const MerchantRegistrationForm = () => {
         </div>
         {/* Referral Info */}
         <div className="mt-8">
-          <ComponentCard title="Referral Information">
+          <ComponentCard title="Nominate Referral">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* Referral Code */}
               <div>
