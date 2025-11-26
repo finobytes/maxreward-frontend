@@ -37,6 +37,7 @@ const ReferNewMember = () => {
     reset,
     watch,
     setValue,
+    setError,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(referNewMemberSchema),
@@ -58,7 +59,17 @@ const ReferNewMember = () => {
       // toast.success(res.message || "Member referred successfully!");
       reset();
     } catch (err) {
-      toast.error(err?.data?.message || "Something went wrong");
+      if (err?.data?.errors) {
+        Object.keys(err.data.errors).forEach((key) => {
+          setError(key, {
+            type: "server",
+            message: err.data.errors[key][0],
+          });
+        });
+        toast.error("Validation failed. Please check the form.");
+      } else {
+        toast.error(err?.data?.message || "Something went wrong");
+      }
     }
   };
 
