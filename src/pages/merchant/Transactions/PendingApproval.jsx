@@ -88,9 +88,11 @@ const PendingApproval = () => {
       refresh();
       return true;
     } catch (err) {
-      console.error(err);
+      console.log(err);
       toast.error(
-        err?.data?.message || "Failed to approve purchase. Please try again."
+        err?.data?.error ||
+          err?.error ||
+          "Failed to approve purchase. Please try again."
       );
       return false;
     } finally {
@@ -112,8 +114,9 @@ const PendingApproval = () => {
       refresh();
       return true;
     } catch (err) {
+      console.log(err.error);
       console.error(err);
-      toast.error(err?.data?.message || "Failed to reject");
+      toast.error(err?.error || "Failed to reject");
       return false;
     } finally {
       setUpdatingId(null);
