@@ -14,6 +14,12 @@ import shopWithMerchantReducer from "./features/member/shopWithMerchant/shopWith
 import purchaseManagementReducer from "./features/member/shopWithMerchant/purchaseManagementSlice";
 import transactionsReducer from "./features/merchant/transactions/transactionsSlice";
 import pointStatementMemberReducer from "./features/member/pointStatement/pointStatementMemberSlice";
+import cpTransactionMemberReducer from "./features/member/cpTransaction/cpTransactionMemberSlice";
+import cpTransactionAdminReducer from "./features/admin/cpTransaction/cpTransactionAdminSlice";
+import cpUnlockHistoryAdminReducer from "./features/admin/cpUnlockHistory/cpUnlockHistoryAdminSlice";
+import cpUnlockHistoryMemberReducer from "./features/member/cpUnlockHistory/cpUnlockHistoryMemberSlice";
+import communityPointAdminReducer from "./features/admin/communityPoint/communityPointAdminSlice";
+import communityPointMemberReducer from "./features/member/communityPoint/communityPointMemberSlice";
 import { baseApi } from "./api/baseApi";
 
 export const store = configureStore({
@@ -33,6 +39,12 @@ export const store = configureStore({
     purchaseManagement: purchaseManagementReducer,
     transactions: transactionsReducer,
     pointStatementMember: pointStatementMemberReducer,
+    cpTransactionMember: cpTransactionMemberReducer,
+    cpTransactionAdmin: cpTransactionAdminReducer,
+    cpUnlockHistoryAdmin: cpUnlockHistoryAdminReducer,
+    cpUnlockHistoryMember: cpUnlockHistoryMemberReducer,
+    communityPointAdmin: communityPointAdminReducer,
+    communityPointMember: communityPointMemberReducer,
     [baseApi.reducerPath]: baseApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>

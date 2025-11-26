@@ -15,7 +15,7 @@ import { usePointStatementMember } from "../../../redux/features/member/pointSta
 import { Eye } from "lucide-react";
 import { Link } from "react-router";
 
-// 🔥 1️⃣ Pick Member ID
+// Pick Member ID
 const pickMemberId = (profile) =>
   profile?.member_id ||
   profile?.memberId ||
@@ -26,7 +26,7 @@ const pickMemberId = (profile) =>
   profile?.id ||
   null;
 
-// 🔥 2️⃣ Format Date + Time
+// Format Date + Time
 const formatDateTime = (value) => {
   if (!value) return "-";
   const date = new Date(value);
@@ -41,7 +41,7 @@ const formatDateTime = (value) => {
   });
 };
 
-// 🔥 3️⃣ Transaction Type Full Form
+// Transaction Type Full Form
 const typeMapping = {
   pp: "Personal Points",
   rp: "Referral Points",
@@ -53,7 +53,7 @@ const typeMapping = {
   vap: "Voucher Available Points",
 };
 
-// 🔥 4️⃣ Total Points Badge
+// Total Points Badge
 const renderPointsBadge = (value, isDebit) => (
   <span
     className={`inline-flex rounded-full px-3 py-1 text-sm font-medium ${
@@ -64,7 +64,7 @@ const renderPointsBadge = (value, isDebit) => (
   </span>
 );
 
-// 🔥 5️⃣ Status Badge
+// Status Badge
 const renderStatusBadge = (status) => (
   <span
     className={`inline-flex rounded-full px-3 py-1 text-sm font-medium ${
@@ -117,7 +117,9 @@ const PointStatement = () => {
                 <TableHead className="text-center">Total Points</TableHead>
                 <TableHead className="text-center">Status</TableHead>
                 <TableHead>Reason</TableHead>
-                <TableHead className="text-center">Balance</TableHead>
+                <TableHead className="text-center">BAP</TableHead>
+                <TableHead className="text-center">BRP</TableHead>
+                <TableHead className="text-center">BOP</TableHead>
 
                 <TableHead className="text-center">Action</TableHead>
               </TableRow>
@@ -178,9 +180,17 @@ const PointStatement = () => {
                       {/* Reason */}
                       <TableCell>{item?.transaction_reason ?? "-"}</TableCell>
 
-                      {/* Available Balance */}
+                      {/*  Balance Available point*/}
                       <TableCell className="text-center">
-                        {item?.member?.wallet?.available_points ?? "-"}
+                        {item?.bap ?? ""}
+                      </TableCell>
+                      {/*  Balance onhold point*/}
+                      <TableCell className="text-center">
+                        {item?.brp ?? ""}
+                      </TableCell>
+                      {/*  Balance referral point*/}
+                      <TableCell className="text-center">
+                        {item?.bop ?? ""}
                       </TableCell>
 
                       <TableCell className="text-center">

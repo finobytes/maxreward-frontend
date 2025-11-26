@@ -69,7 +69,7 @@ const MerchantDetails = () => {
             <div className="">
               <MerchantProfileTabsContent
                 currentTab={currentTab}
-                merchantData={data?.data?.merchant}
+                merchantData={data}
               />
             </div>
           </ComponentCard>

@@ -14,6 +14,10 @@ import MerchantStaffDetails from "../pages/merchant/MerchantStaff/MerchantStaffD
 import MerchantStaffUpdate from "../pages/merchant/MerchantStaff/MerchantStaffUpdate";
 import VoucherPurchaseForm from "../pages/merchant/VoucherPurchase/VoucherPurchaseForm";
 import VoucherPurchaseDetails from "../pages/merchant/VoucherPurchase/VoucherPurchaseDetails";
+import ReferredMemberList from "../pages/merchant/ReferredMemberList/ReferredMemberList";
+import PointStatement from "../pages/merchant/PointStatement/PointStatement";
+import TransactionDetails from "../pages/merchant/PointStatement/TransactionDetails";
+import DailyTransaction from "../pages/merchant/Transactions/DailyTransaction";
 
 export const merchantRoute = [
   {
@@ -49,6 +53,10 @@ export const merchantRoute = [
     element: <AllTransactions />,
   },
   {
+    path: "transactions/daily-transactions",
+    element: <DailyTransaction />,
+  },
+  {
     path: "redeem-mall",
     element: <RedeemMall />,
   },
@@ -63,6 +71,19 @@ export const merchantRoute = [
   {
     path: "voucher-details/:id",
     element: <VoucherPurchaseDetails />,
+  },
+
+  {
+    path: "referred-member-list",
+    element: <ReferredMemberList />,
+  },
+  {
+    path: "point-statement",
+    element: <PointStatement />,
+  },
+  {
+    path: "point-statement/:id",
+    element: <TransactionDetails />,
   },
   {
     path: "reports/member-transactions",

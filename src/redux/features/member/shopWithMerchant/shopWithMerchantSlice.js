@@ -13,8 +13,8 @@ const initialState = {
   merchant: null,
   merchantId: null,
   merchantSelectionType: "merchant_name",
-  paymentMethod: "offline",
-  verified: false,
+  paymentMethod: "manual",
+  // verified: false,
 };
 
 const normalizeNumber = (value) => {
@@ -50,13 +50,13 @@ const shopWithMerchantSlice = createSlice({
   reducers: {
     setTransactionAmount: (state, action) => {
       state.transactionAmount = action.payload ?? "";
-      state.verified = false;
+      // state.verified = false;
       calculateBreakdown(state);
     },
 
     setRedeemAmount: (state, action) => {
       state.redeemAmount = action.payload ?? "";
-      state.verified = false;
+      // state.verified = false;
       calculateBreakdown(state);
     },
 
@@ -64,7 +64,7 @@ const shopWithMerchantSlice = createSlice({
       const merchant = action.payload || null;
       state.merchant = merchant;
       state.merchantId = merchant?.id ?? null;
-      state.verified = false;
+      // state.verified = false;
     },
 
     setMerchantSelectionType: (state, action) => {
@@ -72,7 +72,7 @@ const shopWithMerchantSlice = createSlice({
     },
 
     setPaymentMethod: (state, action) => {
-      state.paymentMethod = action.payload || "offline";
+      state.paymentMethod = action.payload || "manual";
     },
 
     setSettings: (state, action) => {
@@ -81,9 +81,9 @@ const shopWithMerchantSlice = createSlice({
       calculateBreakdown(state);
     },
 
-    setVerified: (state, action) => {
-      state.verified = Boolean(action.payload);
-    },
+    // setVerified: (state, action) => {
+    //   state.verified = Boolean(action.payload);
+    // },
 
     resetShopWithMerchant: () => ({ ...initialState }),
   },
@@ -96,7 +96,7 @@ export const {
   setMerchantSelectionType,
   setPaymentMethod,
   setSettings,
-  setVerified,
+  // setVerified,
   resetShopWithMerchant,
 } = shopWithMerchantSlice.actions;
 

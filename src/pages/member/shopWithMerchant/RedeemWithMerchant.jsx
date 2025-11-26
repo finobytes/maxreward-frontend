@@ -22,20 +22,18 @@ const RedeemWithMerchant = () => {
     redeemAmountValue,
     redeemPoints,
     balanceToPay,
-    cashRedeemAmount,
     rmPoints,
-    verified,
-    verifyingAmount,
     submittingPurchase,
     setMerchantContext,
     setTransactionAmount,
     setRedeemAmount,
-    verifyRedeemAmount,
     submitRedemption,
     resetShopWithMerchant,
+    verifyData,
   } = useShopWithMerchant();
 
   const activeMerchant = merchant || merchantFromRoute;
+  const availablePoints = verifyData?.wallet?.available_points ?? 0;
 
   useEffect(() => {
     if (merchantFromRoute) {
@@ -74,10 +72,10 @@ const RedeemWithMerchant = () => {
     }
 
     if (!redeemAmountValue) {
-      nextErrors.redeemAmount = "Redeem amount is required";
-    } else if (redeemAmountValue > transactionAmountValue) {
+      nextErrors.redeemAmount = "Points to redeem is required";
+    } else if (redeemAmountValue > availablePoints) {
       nextErrors.redeemAmount =
-        "Redeem amount cannot exceed the transaction amount";
+        "Points to Redeem cannot exceed Available Points";
     }
 
     setFieldErrors(nextErrors);
@@ -86,11 +84,6 @@ const RedeemWithMerchant = () => {
 
   const handlePrimaryAction = async () => {
     if (!validateInputs()) return;
-
-    if (!verified) {
-      await verifyRedeemAmount();
-      return;
-    }
 
     const success = await submitRedemption({
       merchantId: activeMerchant?.id,
@@ -102,13 +95,9 @@ const RedeemWithMerchant = () => {
     }
   };
 
-  const primaryLabel = verified
-    ? submittingPurchase
-      ? "Submitting..."
-      : "Submit Redemption"
-    : verifyingAmount
-    ? "Verifying..."
-    : "Verify Purchase";
+  const primaryLabel = submittingPurchase
+    ? "Submitting..."
+    : "Submit Redemption";
 
   const formatCurrency = (value) => `RM ${Number(value ?? 0).toFixed(2)}`;
 
@@ -159,16 +148,38 @@ const RedeemWithMerchant = () => {
                 />
               </div>
 
+              {/* NEW FIELD — Available Points */}
               <div className="mt-6">
-                <Label htmlFor="redeem-amount">Redeem Amount (RM)</Label>
+                <Label>Available Points</Label>
+                <Input value={availablePoints} disabled />
+              </div>
+
+              {/* Updated Field — Points to Redeem */}
+              <div className="mt-6">
+                <Label htmlFor="redeem-amount">Points to Redeem</Label>
                 <Input
                   id="redeem-amount"
                   type="number"
-                  step="0.01"
                   min="0"
                   value={redeemAmount}
-                  onChange={(e) => setRedeemAmount(e.target.value)}
-                  placeholder="0.00"
+                  onChange={(e) => {
+                    const value = Number(e.target.value);
+
+                    if (value > availablePoints) {
+                      setFieldErrors((prev) => ({
+                        ...prev,
+                        redeemAmount: "Points cannot exceed available balance",
+                      }));
+                    } else {
+                      setFieldErrors((prev) => ({
+                        ...prev,
+                        redeemAmount: null,
+                      }));
+                    }
+
+                    setRedeemAmount(value);
+                  }}
+                  placeholder="0"
                   error={!!fieldErrors.redeemAmount}
                   hint={fieldErrors.redeemAmount}
                 />
@@ -192,14 +203,6 @@ const RedeemWithMerchant = () => {
                     disabled
                   />
                 </div>
-                {/* <div>
-                  <Label htmlFor="cash-to-pay">Cash Payment</Label>
-                  <Input
-                    id="cash-to-pay"
-                    value={formatCurrency(cashRedeemAmount)}
-                    disabled
-                  />
-                </div> */}
               </div>
 
               <div className="mt-8 flex flex-col gap-3">
@@ -207,15 +210,10 @@ const RedeemWithMerchant = () => {
                   variant="primary"
                   size="md"
                   type="submit"
-                  disabled={verifyingAmount || submittingPurchase}
+                  disabled={submittingPurchase}
                 >
                   {primaryLabel}
                 </PrimaryButton>
-                {!verified && (
-                  <p className="text-sm text-gray-500">
-                    Verification is required before submitting.
-                  </p>
-                )}
               </div>
             </form>
           </div>

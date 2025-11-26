@@ -17,7 +17,7 @@ const MembershipCard = ({ data }) => {
       </div>
       <div className="bg-white flex justify-between items-center px-4 py-2 text-brand-500 font-bold text-lg sm:text-xl md:text-2xl">
         <span className="truncate max-w-[50%]">{data?.phone}</span>
-        <span className="truncate text-right max-w-[45%]">{data?.name}</span>
+        <span className="truncate text-right max-w-[55%]">{data?.name}</span>
       </div>
     </div>
   );

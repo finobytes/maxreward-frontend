@@ -1,19 +1,23 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { Controller } from "react-hook-form";
 
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import ComponentCard from "../../../components/common/ComponentCard";
 import Label from "../../../components/form/Label";
 import Input from "../../../components/form/input/InputField";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
-
+import SearchableSelect from "@/components/form/SearchableSelect";
 import { useReferNewMember } from "../../../redux/features/member/referNewMember/useReferNewMember";
 import { referNewMemberSchema } from "../../../schemas/referNewMember.schema";
 import { useState } from "react";
 import ReferSuccessDialog from "./components/ReferSuccessDialog";
 import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
 import SkeletonField from "../../../components/skeleton/SkeletonField";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+import { useGetCountriesQuery } from "../../../redux/features/countries/countriesApi";
 
 const ReferNewMember = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -23,24 +27,32 @@ const ReferNewMember = () => {
 
   const { data, isLoading } = useVerifyMeQuery();
   const user = data || {};
+  const { data: countries, isLoading: countriesLoading } =
+    useGetCountriesQuery();
 
+  console.log("countries", countries);
   const {
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
+    setError,
+    control,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(referNewMemberSchema),
     defaultValues: {
       fullName: "",
-      phoneNumber: "",
+      phone: "",
       email: "",
-      gender: "male",
-      address: "",
+      country_id: "", // country_id
+      country_code: "", // phoneInput
     },
   });
 
   const onSubmit = async (data) => {
+    console.log("form data", data);
     try {
       const res = await handleRefer(data);
       setResponse(res);
@@ -48,7 +60,17 @@ const ReferNewMember = () => {
       // toast.success(res.message || "Member referred successfully!");
       reset();
     } catch (err) {
-      toast.error(err?.data?.message || "Something went wrong");
+      if (err?.data?.errors) {
+        Object.keys(err.data.errors).forEach((key) => {
+          setError(key, {
+            type: "server",
+            message: err.data.errors[key][0],
+          });
+        });
+        toast.error("Validation failed. Please check the form.");
+      } else {
+        toast.error(err?.data?.message || "Something went wrong");
+      }
     }
   };
 
@@ -61,6 +83,83 @@ const ReferNewMember = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <ComponentCard title="Member Information">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Nationality */}
+            <div>
+              <Label htmlFor="citizenship">
+                Citizenship <span className="text-red-500">*</span>
+              </Label>
+
+              {countriesLoading ? (
+                <div className="animate-pulse h-11 bg-gray-200 rounded-lg"></div>
+              ) : (
+                <Controller
+                  name="country_id"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchableSelect
+                      id="citizenship"
+                      placeholder="Select Citizenship"
+                      error={errors.country_id}
+                      {...field}
+                      options={
+                        countries?.data?.map((item) => ({
+                          label: item.country,
+                          value: item.id,
+                        })) ?? []
+                      }
+                    />
+                  )}
+                />
+              )}
+
+              {errors.country_id && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.country_id.message}
+                </p>
+              )}
+            </div>
+            {/* Updated Phone Number */}
+            <div>
+              <Label htmlFor="phoneNumber">
+                Phone Number (<span className="text-red-500">*</span>)
+              </Label>
+              <PhoneInput
+                country={"my"}
+                value={watch("phone")}
+                onChange={(phone, countryData) => {
+                  const numeric = phone.replace("+", "");
+                  setValue("phone", numeric);
+                  setValue("country_code", countryData?.dialCode);
+                }}
+                inputProps={{
+                  name: "phoneNumber",
+                  required: true,
+                }}
+                countryCodeEditable={false}
+                // Demo-style
+                enableSearch={true}
+                autocompleteSearch={true}
+                searchPlaceholder="search"
+                // Remove + sign
+                prefix=""
+                // Demo-style
+                inputStyle={{ width: "100%" }}
+                buttonStyle={{}}
+                dropdownStyle={{ maxHeight: "250px" }}
+                searchStyle={{
+                  width: "100%",
+                  padding: "8px",
+                  boxSizing: "border-box",
+                }}
+              />
+
+              {errors.phone && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.phone.message}
+                </p>
+              )}
+            </div>
+
             {/* Full Name */}
             <div>
               <Label htmlFor="fullName">
@@ -69,23 +168,9 @@ const ReferNewMember = () => {
               <Input
                 id="fullName"
                 placeholder="Enter member full name"
-                {...register("fullName")}
-                error={!!errors.fullName}
-                hint={errors.fullName?.message}
-              />
-            </div>
-
-            {/* Phone Number */}
-            <div>
-              <Label htmlFor="phoneNumber">
-                Phone Number (<span className="text-red-500">*</span>)
-              </Label>
-              <Input
-                id="phoneNumber"
-                placeholder="Enter phone number"
-                {...register("phoneNumber")}
-                error={!!errors.phoneNumber}
-                hint={errors.phoneNumber?.message}
+                {...register("name")}
+                error={!!errors.name}
+                hint={errors.name?.message}
               />
             </div>
 

@@ -63,7 +63,7 @@ export const transactionsApi = baseApi.injectEndpoints({
     }),
 
     approvePurchase: builder.mutation({
-      query: ({ merchantId, purchaseId }) => ({
+      query: ({ purchaseId }) => ({
         url: `/merchants/${purchaseId}/approve/purchase`,
         method: "POST",
         body: {
@@ -99,6 +99,28 @@ export const transactionsApi = baseApi.injectEndpoints({
         { type: "MemberPurchases" },
       ],
     }),
+
+    getDailyPurchase: builder.query({
+      query: ({ merchantId, page = 1, perPage = 10, search }) => ({
+        url: `/merchants/${merchantId}/purchases/daily`,
+        params: {
+          page,
+          per_page: perPage,
+          search: search || undefined,
+        },
+      }),
+      transformResponse: normalizePaginatedResponse,
+      providesTags: (result) =>
+        result?.rows?.length
+          ? [
+              ...result.rows.map(({ id }) => ({
+                type: "MerchantTransactions",
+                id,
+              })),
+              { type: "MerchantTransactions", id: "DAILY" },
+            ]
+          : [{ type: "MerchantTransactions", id: "DAILY" }],
+    }),
   }),
 });
 
@@ -107,4 +129,5 @@ export const {
   useGetPurchasesQuery,
   useApprovePurchaseMutation,
   useRejectPurchaseMutation,
+  useGetDailyPurchaseQuery,
 } = transactionsApi;

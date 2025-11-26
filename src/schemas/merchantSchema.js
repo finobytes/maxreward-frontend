@@ -35,4 +35,7 @@ export const merchantSchema = z.object({
     .min(6, "Password must be at least 6 characters"),
 
   status: z.string().min(1, "Status is required"),
+  town: z.string().optional(),
+  country_id: z.union([z.string(), z.number()]).optional(),
+  country_code: z.string().optional(),
 });

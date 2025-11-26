@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { useNavigate, useParams } from "react-router";
 import { companyLogoPlaceholder } from "../../../assets/assets";
 import SkeletonField from "../../../components/skeleton/SkeletonField";
+import { useGetMemberByReferralQuery } from "../../../redux/features/admin/memberManagement/memberManagementApi";
 
 const MerchantEdit = () => {
   const [businessLogo, setBusinessLogo] = useState(null);
@@ -25,11 +26,7 @@ const MerchantEdit = () => {
   const navigate = useNavigate();
 
   // Load existing merchant data by ID
-  const {
-    data: merchantData,
-    isFetching,
-    isError,
-  } = useGetMerchantByIdQuery(id, {
+  const { data: merchantData } = useGetMerchantByIdQuery(id, {
     skip: !id,
   });
 
@@ -37,6 +34,16 @@ const MerchantEdit = () => {
   console.log(
     "merchant data:",
     merchantData?.data?.merchant?.corporate_member?.referral_code
+  );
+  const {
+    data: memberData,
+    isFetching,
+    isError,
+  } = useGetMemberByReferralQuery(
+    merchantData?.data?.merchant?.corporate_member?.referral_code,
+    {
+      skip: !merchantData?.data?.merchant?.corporate_member?.referral_code,
+    }
   );
   const {
     register,
@@ -253,7 +260,8 @@ const MerchantEdit = () => {
                 <Input
                   disabled
                   value={
-                    merchantData?.data?.merchant?.corporate_member?.name || ""
+                    memberData?.sponsored_member_info?.sponsor_member?.name ||
+                    ""
                   }
                   readOnly
                 />
@@ -263,7 +271,8 @@ const MerchantEdit = () => {
                 <Input
                   disabled
                   value={
-                    merchantData?.data?.merchant?.corporate_member?.status || ""
+                    memberData?.sponsored_member_info?.sponsor_member?.status ||
+                    ""
                   }
                   readOnly
                 />

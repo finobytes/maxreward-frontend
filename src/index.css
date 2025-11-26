@@ -377,3 +377,12 @@ layer(base);
     -webkit-appearance: none;
   }
 }
+.react-tel-input .form-control {
+  height: 44px !important;
+  /* padding-left: 58px !important;
+  font-size: 14px; */
+  border-radius: 12px !important;
+}
+.flag-dropdown {
+  border-radius: 10px 0 0 10px !important;
+}

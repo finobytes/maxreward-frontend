@@ -57,9 +57,19 @@ const Sidebar = () => {
 
   const userType = data?.member_type;
 
-  console.log("userType:", userType);
+  const items = useMemo(() => {
+    let navItems = NAV_CONFIG[role] || [];
 
-  const items = useMemo(() => NAV_CONFIG[role] || [], [role]);
+    // hide Merchant Application if member_type === 'corporate'
+    if (role === "member" && userType === "corporate") {
+      navItems = navItems.filter(
+        (item) => item.name !== "Merchant Application"
+      );
+    }
+
+    return navItems;
+  }, [role, userType]);
+
   const isActive = useCallback(
     (path) => location.pathname === path,
     [location.pathname]

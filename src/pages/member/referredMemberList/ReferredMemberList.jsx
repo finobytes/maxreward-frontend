@@ -34,33 +34,6 @@ const ReferredMemberList = () => {
   const members = data?.data?.sponsored?.data || [];
   const pagination = data?.data?.sponsored;
 
-  const [selected, setSelected] = useState([]);
-
-  const toggleSelectAll = (checked) => {
-    if (checked) {
-      setSelected(members.map((m) => m.id));
-    } else {
-      setSelected([]);
-    }
-  };
-
-  const toggleSelect = (id) => {
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
-  };
-
-  const bulkUpdateStatus = (newStatus) => {
-    toast.warning(`Bulk update to ${newStatus} (not implemented yet)`);
-  };
-
-  const handleSearchClear = () => {
-    setSearch("");
-    setStatusFilter("All");
-    setSelected([]);
-    setCurrentPage(1);
-  };
-
   if (isLoading) return <p>Loading...</p>;
   if (isError) return <p className="text-red-500">Error fetching data</p>;
 
@@ -81,80 +54,18 @@ const ReferredMemberList = () => {
             }}
             placeholder="Search..."
           />
-          <div className="flex gap-3 items-center">
-            <DropdownSelect
-              value={statusFilter}
-              onChange={(value) => {
-                setStatusFilter(value);
-                setCurrentPage(1);
-              }}
-              options={[
-                { label: "All", value: "All" },
-                { label: "Active", value: "active" },
-                { label: "Inactive", value: "inactive" },
-                { label: "Suspend", value: "suspend" },
-              ]}
-            />
-            <PrimaryButton
-              variant="secondary"
-              size="md"
-              onClick={handleSearchClear}
-            >
-              Clear
-            </PrimaryButton>
-          </div>
         </div>
-
-        {/* ⚙️ Bulk Actions */}
-        {selected.length > 0 && (
-          <BulkActionBar
-            selectedCount={selected.length}
-            actions={[
-              {
-                label: "Active",
-                variant: "success",
-                onClick: () => bulkUpdateStatus("active"),
-              },
-              {
-                label: "Inactive",
-                variant: "warning",
-                onClick: () => bulkUpdateStatus("inactive"),
-              },
-              {
-                label: "Suspend",
-                variant: "danger",
-                onClick: () => bulkUpdateStatus("suspend"),
-              },
-            ]}
-          />
-        )}
 
         {/* 📋 Table */}
         <div className="mt-4 overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>
-                  <input
-                    type="checkbox"
-                    checked={
-                      members.length > 0 && selected.length === members.length
-                    }
-                    onChange={(e) => toggleSelectAll(e.target.checked)}
-                    className="w-4 h-4 rounded"
-                  />
-                </TableHead>
                 <TableHead>S/N</TableHead>
+                <TableHead>Registration Date</TableHead>
                 <TableHead>Full Name</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Created At</TableHead>
-                <TableHead className="text-center">Available Points</TableHead>
-                <TableHead className="text-center">
-                  LifeTime Purchases
-                </TableHead>
-                <TableHead className="text-center">Actions</TableHead>
+                <TableHead>Phone Number</TableHead>
+                <TableHead className="text-center">No of Referral</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -163,43 +74,19 @@ const ReferredMemberList = () => {
                 members.map((member, idx) => (
                   <TableRow key={member.id}>
                     <TableCell>
-                      <input
-                        type="checkbox"
-                        checked={selected.includes(member.id)}
-                        onChange={() => toggleSelect(member.id)}
-                        className="w-4 h-4 rounded"
-                      />
-                    </TableCell>
-                    <TableCell>
                       {(pagination?.current_page - 1) *
                         (pagination?.per_page || 0) +
                         idx +
                         1}
                     </TableCell>
-                    <TableCell>{member.name}</TableCell>
-                    <TableCell>{member.phone}</TableCell>
-                    <TableCell>{member.email}</TableCell>
-                    <TableCell>
-                      <StatusBadge status={member.status} />
-                    </TableCell>
+
                     <TableCell>
                       {new Date(member.created_at).toLocaleDateString()}
                     </TableCell>
+                    <TableCell>{member.name}</TableCell>
+                    <TableCell>{member.phone}</TableCell>
                     <TableCell className="text-center">
-                      {member.wallet?.available_points ?? "N/A"}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {member.wallet?.life_time_purchase ?? "N/A"}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <div className="flex justify-center items-center">
-                        <Link
-                          to="#"
-                          className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500"
-                        >
-                          <Eye size={18} />
-                        </Link>
-                      </div>
+                      {member.wallet?.total_referrals ?? "N/A"}
                     </TableCell>
                   </TableRow>
                 ))

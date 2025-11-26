@@ -1,7 +1,4 @@
-import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useState, useMemo } from "react";
 import {
   Select,
   SelectContent,
@@ -9,114 +6,49 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import {
-  CreditCard,
-  Hand,
-  Users,
-  UserCheck,
-  ChevronDown,
-  Search,
-  UserSquare2,
-} from "lucide-react";
-
-import Pagination from "./../../../../components/table/Pagination";
 import PrimaryButton from "../../../../components/ui/PrimaryButton";
 import SearchInput from "../../../../components/form/form-elements/SearchInput";
+import Pagination from "./../../../../components/table/Pagination";
+import { UserSquare2 } from "lucide-react";
 
-const mockData = [
-  {
-    date: "01-Sept-25",
-    method: "Manual",
-    description: "Voucher Purchase (RM-10)",
-    status: "Approved",
-    points: "+1,000",
-  },
-  {
-    date: "02-Sept-25",
-    method: "QR",
-    description: "Referral Bonus",
-    status: "Pending",
-    points: "+250",
-  },
-  {
-    date: "03-Sept-25",
-    method: "QR",
-    description: "Product Purchase-ID72364",
-    status: "Approved",
-    points: "-950",
-  },
-  {
-    date: "04-Sept-25",
-    method: "QR",
-    description: "Referral Bonus",
-    status: "Approved",
-    points: "+250",
-  },
-  {
-    date: "05-Sept-25",
-    method: "Online",
-    description: "Voucher Purchase (RM-10)",
-    status: "Approved",
-    points: "+1,000",
-  },
-  {
-    date: "06-Sept-25",
-    method: "Bank",
-    description: "Product Purchase-ID72366",
-    status: "Pending",
-    points: "-1,000",
-  },
-  {
-    date: "07-Sept-25",
-    method: "QR",
-    description: "Referral Bonus",
-    status: "Approved",
-    points: "+250",
-  },
-  {
-    date: "08-Sept-25",
-    method: "Bank",
-    description: "Withdrawal (RM-10)",
-    status: "Approved",
-    points: "-1000",
-  },
-  {
-    date: "09-Sept-25",
-    method: "QR",
-    description: "Product Purchase-ID72364",
-    status: "Approved",
-    points: "-500",
-  },
-  {
-    date: "10-Sept-25",
-    method: "Bank",
-    description: "Referral Bonus",
-    status: "Approved",
-    points: "+250",
-  },
-];
-
-const Staff = () => {
+const Staff = ({ staffData }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage, setEntriesPerPage] = useState("10");
   const [search, setSearch] = useState("");
 
-  const totalPages = 5;
+  // staff list
+  const staffList = staffData?.data || [];
+
+  // Filter by search
+  const filteredStaff = useMemo(() => {
+    return staffList.filter((item) => {
+      const s = search.toLowerCase();
+      return (
+        (item.name || "-").toLowerCase().includes(s) ||
+        (item.email || "-").toLowerCase().includes(s) ||
+        (item.phone || "-").toLowerCase().includes(s) ||
+        (item.user_name || "-").toLowerCase().includes(s)
+      );
+    });
+  }, [staffList, search]);
+
+  const totalPages = 1;
+  const startIndex = (currentPage - 1) * Number(entriesPerPage);
+
   return (
     <div>
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
         <div className="bg-white border-0 shadow-sm p-2 rounded-b-sm">
-          <div className="">
-            <div className="flex justify-between">
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Total Staff</p>
-                <p className="text-xl font-semibold text-gray-900">45</p>
-              </div>
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <UserSquare2 className="w-4 h-4 text-blue-600" />
-              </div>
+          <div className="flex justify-between">
+            <div>
+              <p className="text-xs text-gray-500 mb-1">Total Staff</p>
+              <p className="text-xl font-semibold text-gray-900">
+                {filteredStaff.length}
+              </p>
+            </div>
+            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+              <UserSquare2 className="w-4 h-4 text-blue-600" />
             </div>
           </div>
         </div>
@@ -147,8 +79,8 @@ const Staff = () => {
                 <SelectItem value="50">50</SelectItem>
               </SelectContent>
             </Select>
-            {/* <span className="text-sm text-gray-600">entries</span> */}
           </div>
+
           <div className="relative mt-4 lg:mt-0">
             <SearchInput
               value={search}
@@ -161,68 +93,80 @@ const Staff = () => {
         {/* Table */}
         <div className="overflow-x-auto">
           <table className="w-full">
-            {/* <thead>
+            <thead>
               <tr className="border-b border-gray-200">
                 <th className="text-left py-3 px-4 text-gray-700 text-sm">
-                  <div className="">Date</div>
+                  S/N
                 </th>
                 <th className="text-left py-3 px-4 text-gray-700 text-sm">
-                  Method
+                  Name
                 </th>
                 <th className="text-left py-3 px-4 text-gray-700 text-sm">
-                  Description
+                  Username
+                </th>
+                <th className="text-left py-3 px-4 text-gray-700 text-sm">
+                  Email
+                </th>
+                <th className="text-left py-3 px-4 text-gray-700 text-sm">
+                  Phone
+                </th>
+                <th className="text-left py-3 px-4 text-gray-700 text-sm">
+                  Type
                 </th>
                 <th className="text-left py-3 px-4 text-gray-700 text-sm">
                   Status
                 </th>
-                <th className="text-left py-3 px-4 text-gray-700 text-sm">
-                  Points
-                </th>
               </tr>
             </thead>
+
             <tbody>
-              {mockData.map((transaction, index) => (
-                <tr
-                  key={index}
-                  className="border-b border-gray-100 hover:bg-gray-50"
-                >
-                  <td className="py-3 text-xs px-4 text-gray-900">
-                    {transaction.date}
-                  </td>
-                  <td className="py-3 px-4 text-xs text-gray-900">
-                    {transaction.method}
-                  </td>
-                  <td className="py-3 px-4 text-xs text-gray-900">
-                    {transaction.description}
-                  </td>
-                  <td className="py-3 px-4">
-                    <Badge
-                      variant={
-                        transaction.status === "Approved"
-                          ? "default"
-                          : "secondary"
-                      }
-                      className={
-                        transaction.status === "Approved"
-                          ? "bg-green-100 text-green-800 hover:bg-green-100"
-                          : "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
-                      }
-                    >
-                      {transaction.status}
-                    </Badge>
-                  </td>
-                  <td
-                    className={`py-3 px-4 text-xs ${
-                      transaction.points.startsWith("+")
-                        ? "text-green-600"
-                        : "text-red-600"
-                    }`}
-                  >
-                    {transaction.points}
+              {filteredStaff.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="text-center py-6 text-gray-500">
+                    No staff found
                   </td>
                 </tr>
-              ))}
-            </tbody> */}
+              ) : (
+                filteredStaff
+                  .slice(startIndex, startIndex + Number(entriesPerPage))
+                  .map((item, index) => (
+                    <tr
+                      key={item.id}
+                      className="border-b border-gray-100 hover:bg-gray-50"
+                    >
+                      <td className="py-3 px-4 text-sm text-gray-900">
+                        {startIndex + index + 1}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-gray-900">
+                        {item.name}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-gray-900">
+                        {item.user_name}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-gray-900">
+                        {item.email}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-gray-900">
+                        {item.phone}
+                      </td>
+                      <td className="py-3 px-4 text-sm capitalize text-gray-900">
+                        {item.type}
+                      </td>
+                      <td className="py-3 px-4 text-sm">
+                        <span
+                          className={`px-2 py-1 text-xs rounded ${
+                            item.status === "active"
+                              ? "bg-green-100 text-green-700"
+                              : "bg-red-100 text-red-700"
+                          }`}
+                        >
+                          {item.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+              )}
+            </tbody>
           </table>
         </div>
 

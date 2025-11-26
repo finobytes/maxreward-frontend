@@ -29,7 +29,16 @@ import Notification from "../pages/admin/Notification/Notification";
 import NotificationDetails from "../pages/admin/Notification/NotificationDetails";
 import VoucherManage from "../pages/admin/VoucherManage/VoucherManage";
 import WhatsAppLog from "../pages/admin/reports/WhatsAppLog";
+import EmailLog from "../pages/admin/reports/EmailLog";
 import VoucherDetails from "../pages/admin/VoucherManage/VoucherDetails";
+import CpTransaction from "../pages/admin/cpTransaction/CpTransaction";
+import CpTransactionDetails from "../pages/admin/cpTransaction/CpTransactionDetails";
+import CpUnlockHistory from "../pages/admin/cpUnlockHistory/CpUnlockHistory";
+import CpUnlockHistoryDetails from "../pages/admin/cpUnlockHistory/CpUnlockHistoryDetails";
+import CommunityPoint from "../pages/admin/communityPoint/CommunityPoint";
+import CommunityPointDetails from "../pages/admin/communityPoint/CommunityPointDetails";
+import MerchantTransaction from "../pages/admin/Transaction/MerchanTransaction";
+import MerchantTransactionDetails from "../pages/admin/Transaction/MerchantTransactionDetails";
 import ReferralList from "../pages/admin/memberMange/ReferralList";
 
 export const adminRoutes = [
@@ -60,6 +69,30 @@ export const adminRoutes = [
   {
     path: "staff-manage",
     element: <StaffManage />,
+  },
+  {
+    path: "cp-transaction",
+    element: <CpTransaction />,
+  },
+  {
+    path: "cp-transaction/:id",
+    element: <CpTransactionDetails />,
+  },
+  {
+    path: "cp-unlock-history",
+    element: <CpUnlockHistory />,
+  },
+  {
+    path: "cp-unlock-history/:id",
+    element: <CpUnlockHistoryDetails />,
+  },
+  {
+    path: "community-point",
+    element: <CommunityPoint />,
+  },
+  {
+    path: "community-point/details/:memberId",
+    element: <CommunityPointDetails />,
   },
   {
     path: "staff-manage/create",
@@ -122,6 +155,10 @@ export const adminRoutes = [
     element: <WhatsAppLog />,
   },
   {
+    path: "reports/email-log",
+    element: <EmailLog />,
+  },
+  {
     path: "reports/member-points-report",
     element: <MemberPointsReport />,
   },
@@ -132,6 +169,16 @@ export const adminRoutes = [
   {
     path: "reports/redemption",
     element: <Redemption />,
+  },
+
+  {
+    path: "merchant-transaction",
+    element: <MerchantTransaction />,
+  },
+
+  {
+    path: "merchant-transaction/:id",
+    element: <MerchantTransactionDetails />,
   },
   {
     path: "merchant/business-type",

@@ -58,7 +58,7 @@ const ReferSuccessDialog = ({ open, onClose, response }) => {
               <strong>Password:</strong> {credentials?.password}
             </p>
             <p className="text-xs text-gray-500 mt-1">
-              (Sent via WhatsApp: {credentials?.message})
+              ({credentials?.message})
             </p>
           </div>
 

@@ -44,7 +44,7 @@ const VoucherDetails = () => {
         <section className="bg-white shadow-md border border-gray-100 rounded-2xl overflow-hidden">
           <div className="bg-gradient-to-r from-brand-500 to-purple-600 p-5 text-white">
             <h2 className="text-2xl font-semibold flex items-center gap-2">
-              <FileText className="w-6 h-6 " /> Voucher ID#{data.id}
+              <FileText className="w-6 h-6 " /> Voucher ID# {data.voucher_id}
             </h2>
             <p className="text-sm opacity-90 mt-1">
               Purchase Date {new Date(data.created_at).toLocaleString()}

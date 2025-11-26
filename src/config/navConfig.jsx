@@ -19,6 +19,10 @@ import {
   Settings,
   Bell,
   TicketCheck,
+  Send,
+  BanknoteArrowDown,
+  History,
+  Wallet,
 } from "lucide-react";
 
 export const NAV_CONFIG = {
@@ -26,6 +30,7 @@ export const NAV_CONFIG = {
     { icon: <LayoutDashboard />, name: "Dashboard", path: "/admin" },
     { name: "Member Manage", icon: <Users />, path: "/admin/member-manage" },
     { name: "Staff Manage", icon: <UserCog />, path: "/admin/staff-manage" },
+
     {
       name: "Merchant Manage",
       icon: <ShoppingBag />,
@@ -41,11 +46,6 @@ export const NAV_CONFIG = {
         },
       ],
     },
-    // {
-    //   name: "Voucher Manage",
-    //   icon: <TicketCheck />,
-    //   path: "/admin/voucher-manage",
-    // },
     {
       name: "Accounts",
       icon: <ChartArea />,
@@ -60,8 +60,8 @@ export const NAV_CONFIG = {
       name: "Reports",
       icon: <ChartLine />,
       subItems: [
-        { name: "Transaction", path: "/admin/reports/transaction" },
-        { name: "WhatsApp Log", path: "/admin/reports/whatsapp-log" },
+        // { name: "WhatsApp Log", path: "/admin/reports/whatsapp-log" },
+        { name: "Email Log", path: "/admin/reports/email-log" },
         {
           name: "Point Statement",
           path: "/admin/reports/member-points-report",
@@ -70,11 +70,33 @@ export const NAV_CONFIG = {
         { name: "Redeem Mall Transaction", path: "/admin/reports/redemption" },
       ],
     },
-    // {
-    //   name: "Company Info",
-    //   icon: <Building />,
-    //   path: "/admin/company-info",
-    // },
+    {
+      name: "CP History",
+      icon: <History />,
+      subItems: [
+        {
+          name: "CP Transaction",
+          path: "/admin/cp-transaction",
+        },
+        {
+          name: "Member Community Point",
+          path: "/admin/community-point",
+        },
+        {
+          name: "CP Unlock History",
+          path: "/admin/cp-unlock-history",
+        },
+      ],
+    },
+
+    {
+      name: "Transaction",
+      icon: <Wallet />,
+      subItems: [
+        { name: "Transaction", path: "/admin/reports/transaction" },
+        { name: "Merchants transaction", path: "/admin/merchant-transaction" },
+      ],
+    },
     {
       name: "Denomination",
       icon: <DollarSign />,
@@ -106,12 +128,16 @@ export const NAV_CONFIG = {
       path: "/merchant/merchant-staff",
     },
     {
-      icon: <ChartArea />,
+      icon: <Wallet />,
       name: "Transactions",
       subItems: [
         {
           name: "Pending Approval",
           path: "/merchant/transactions/pending-approval",
+        },
+        {
+          name: "Daily Transactions",
+          path: "/merchant/transactions/daily-transactions",
         },
         {
           name: "All Transactions",
@@ -125,9 +151,19 @@ export const NAV_CONFIG = {
       path: "/merchant/redeem-mall",
     },
     {
-      icon: <ChartArea />,
+      icon: <DollarSign />,
       name: "Voucher Purchase",
       path: "/merchant/voucher-purchase",
+    },
+    {
+      icon: <ChartArea />,
+      name: "Point Statement",
+      path: "/merchant/point-statement",
+    },
+    {
+      icon: <List />,
+      name: "Referred Member List",
+      path: "/merchant/referred-member-list",
     },
     {
       icon: <ChartLine />,
@@ -169,6 +205,16 @@ export const NAV_CONFIG = {
       path: "/member/point-statement",
     },
     {
+      icon: <ChartArea />,
+      name: "CP Transaction",
+      path: "/member/cp-transaction",
+    },
+    {
+      icon: <ChartArea />,
+      name: "CP Unlock History",
+      path: "/member/cp-unlock-history",
+    },
+    {
       icon: <ShoppingBag />,
       name: "Max Redeem Mall",
       path: "/member/max-redeem-mall",
@@ -180,7 +226,7 @@ export const NAV_CONFIG = {
     },
     {
       icon: <ShoppingCart />,
-      name: "Shop With Merchant",
+      name: "Shop At Merchant",
       path: "/member/shop-with-merchant",
     },
     {

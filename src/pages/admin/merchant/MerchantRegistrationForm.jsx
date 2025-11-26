@@ -19,7 +19,10 @@ import { companyLogoPlaceholder } from "../../../assets/assets";
 import { merchantSchema } from "../../../schemas/merchantSchema";
 import SkeletonField from "../../../components/skeleton/SkeletonField";
 import { useGetMemberByReferralQuery } from "../../../redux/features/admin/memberManagement/memberManagementApi";
-
+import { useGetCorporateMemberReferralCodeQuery } from "../../../redux/features/admin/memberManagement/memberManagementApi";
+import { useGetCountriesQuery } from "../../../redux/features/countries/countriesApi";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
 const merchantRegistrationSchema = merchantSchema.extend({
   referralCode: z.string().min(3, {
     message: "Referral code is required and must be at least 3 characters",
@@ -54,6 +57,12 @@ const MerchantRegistrationForm = () => {
   const [createMerchant, { isLoading: isCreating }] =
     useCreateMerchantMutation();
   const navigate = useNavigate();
+  const { data: corporateReferralCode } =
+    useGetCorporateMemberReferralCodeQuery();
+
+  const { data: countries, isLoading: countriesLoading } =
+    useGetCountriesQuery();
+
   const {
     data: businessTypes,
     isLoading: isBusinessTypeLoading,
@@ -66,13 +75,31 @@ const MerchantRegistrationForm = () => {
     reset,
     setError,
     formState: { errors },
+    watch,
+    setValue,
   } = useForm({
     resolver: zodResolver(merchantRegistrationSchema),
     defaultValues: {
       status: "approved",
       referralCode: "",
+      town: "",
+      country_code: "",
     },
   });
+
+  const annualSalesTurnover = watch("annual_sales_turnover");
+
+  useEffect(() => {
+    const turnover = Number(annualSalesTurnover);
+
+    if (turnover >= 1000000) {
+      const corpRef = corporateReferralCode?.data?.referral_code;
+      if (corpRef) {
+        setReferralInput(corpRef);
+        setValue("referralCode", corpRef);
+      }
+    }
+  }, [annualSalesTurnover, corporateReferralCode, setValue]);
 
   const onSubmit = async (data) => {
     try {
@@ -115,12 +142,14 @@ const MerchantRegistrationForm = () => {
       navigate("/admin/merchant/pending-merchant");
     } catch (err) {
       console.error("Create Error:", err);
-      toast.error(err?.data?.message || "Failed to create merchant!");
-      // if (err) {
-      //   toast.error(err.message);
-      // } else {
-      //   toast.error("Failed to create merchant!");
-      // }
+
+      if (err?.data?.errors) {
+        Object.entries(err.data.errors).forEach(([field, messages]) => {
+          toast.error(`${field}: ${messages.join(", ")}`);
+        });
+      } else {
+        toast.error(err?.data?.message || "Failed to create merchant!");
+      }
     }
   };
 
@@ -171,6 +200,10 @@ const MerchantRegistrationForm = () => {
               <div>
                 <Label>State</Label>
                 <Input {...register("state")} placeholder="State" />
+              </div>
+              <div>
+                <Label>Town</Label>
+                <Input {...register("town")} placeholder="Town" />
               </div>
               <div>
                 <Label>Product/Service</Label>
@@ -267,7 +300,32 @@ const MerchantRegistrationForm = () => {
                 <Label>
                   Phone Number (<span className="text-red-500">*</span>)
                 </Label>
-                <Input {...register("phone")} placeholder="Phone Number" />
+                <PhoneInput
+                  country={"my"}
+                  value={watch("phone")}
+                  onChange={(phone, countryData) => {
+                    const numeric = phone.replace("+", "");
+                    setValue("phone", numeric);
+                    setValue("country_code", countryData?.dialCode);
+                  }}
+                  inputProps={{
+                    name: "phone",
+                    required: true,
+                  }}
+                  countryCodeEditable={false}
+                  enableSearch={true}
+                  autocompleteSearch={true}
+                  searchPlaceholder="search"
+                  prefix=""
+                  inputStyle={{ width: "100%" }}
+                  buttonStyle={{}}
+                  dropdownStyle={{ maxHeight: "250px" }}
+                  searchStyle={{
+                    width: "100%",
+                    padding: "8px",
+                    boxSizing: "border-box",
+                  }}
+                />
                 {errors.phone && (
                   <p className="text-red-500 text-xs mt-1">
                     {errors.phone.message}
@@ -283,7 +341,7 @@ const MerchantRegistrationForm = () => {
         </div>
         {/* Referral Info */}
         <div className="mt-8">
-          <ComponentCard title="Referral Information">
+          <ComponentCard title="Nominate Referral">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* Referral Code */}
               <div>
@@ -296,7 +354,15 @@ const MerchantRegistrationForm = () => {
                   placeholder="Enter referral code / Phone Number"
                   {...register("referralCode")}
                   value={referralInput}
-                  onChange={(e) => setReferralInput(e.target.value)}
+                  onChange={(e) => {
+                    if (Number(annualSalesTurnover) < 1000000) {
+                      setReferralInput(e.target.value);
+                    }
+                  }}
+                  readOnly={Number(annualSalesTurnover) >= 1000000}
+                  className={
+                    Number(annualSalesTurnover) >= 1000000 ? "bg-gray-100" : ""
+                  }
                   error={!!errors.referralCode}
                   hint={errors.referralCode?.message}
                 />
@@ -325,7 +391,10 @@ const MerchantRegistrationForm = () => {
                     disabled
                     readOnly
                     value={
-                      isError ? "Referral Not Found" : memberData?.name || ""
+                      isError
+                        ? "Referral Not Found"
+                        : memberData?.sponsored_member_info?.sponsor_member
+                            ?.name || ""
                     }
                   />
                 )}
@@ -341,7 +410,12 @@ const MerchantRegistrationForm = () => {
                     id="referralStatus"
                     disabled
                     readOnly
-                    value={isError ? "Invalid" : memberData?.status || ""}
+                    value={
+                      isError
+                        ? "Invalid"
+                        : memberData?.sponsored_member_info?.sponsor_member
+                            ?.status || ""
+                    }
                   />
                 )}
               </div>

@@ -31,4 +31,6 @@ export const merchantStaffSchema = z.object({
   status: z.enum(["active", "inactive"], {
     errorMap: () => ({ message: "Please select a status" }),
   }),
+  town: z.string().optional(),
+  country_code: z.string().optional(),
 });

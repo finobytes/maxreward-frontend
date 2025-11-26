@@ -7,9 +7,18 @@ import {
   userCommunity,
   users,
 } from "../../../assets/assets";
+import {
+  Wallet,
+  HandCoins,
+  UsersRound,
+  Users,
+  ShoppingCart,
+  Award,
+  Star,
+} from "lucide-react";
+
 import DashboardCard from "./components/DashboardCard";
 import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
-import { Star } from "lucide-react";
 import MemberDashboardSkeleton from "../../../components/skeleton/MemberDashboardSkeleton";
 import MembershipCard from "../../../components/common/MembershipCard";
 
@@ -54,7 +63,7 @@ const MemberDashboard = () => {
   // Dashboard cards
   const cardsData = [
     {
-      icon: dollar,
+      icon: <Wallet size={22} />,
       title: "Available Points",
       value: wallet.available_points ?? "0",
       subtitle: "Increased",
@@ -62,15 +71,15 @@ const MemberDashboard = () => {
       chartData: [10, 14, 12, 18, 16, 20, 17],
     },
     {
-      icon: hand,
+      icon: <HandCoins size={22} />,
       title: "On Hold Points",
-      value: wallet.onhold_points ?? "8,221",
+      value: wallet.onhold_points ?? "0",
       subtitle: "Increased",
       chartColor: "#10B981",
       chartData: [8, 10, 9, 13, 11, 15, 14],
     },
     {
-      icon: users,
+      icon: <UsersRound size={22} />,
       title: "Referral Points",
       value: wallet.total_rp ?? "0",
       subtitle: "Increased",
@@ -78,7 +87,7 @@ const MemberDashboard = () => {
       chartData: [5, 7, 9, 12, 11, 9, 10],
     },
     {
-      icon: userCommunity,
+      icon: <Users size={22} />,
       title: "Community Members",
       value: data.community_members ?? "0",
       subtitle: "Increased",
@@ -86,7 +95,7 @@ const MemberDashboard = () => {
       chartData: [6, 8, 7, 9, 8, 10, 9],
     },
     {
-      icon: purchase,
+      icon: <ShoppingCart size={22} />,
       title: "Lifetime Purchase",
       value: data.lifetime_purchase ?? "0",
       subtitle: "Increased",
@@ -94,10 +103,18 @@ const MemberDashboard = () => {
       chartData: [6, 8, 7, 9, 8, 10, 9],
     },
     {
-      icon: star,
+      icon: <Award size={22} />,
+      title: "Community Points",
+      value: wallet.total_cp ?? "0",
+      subtitle: "Increased",
+      chartColor: "#8B5CF6",
+      chartData: [6, 8, 7, 9, 8, 10, 9],
+    },
+    {
+      icon: <Star className="text-yellow-400" size={22} />,
       title: "Star Level",
-      value: starLabel, // "1 Star" / "2 Stars" / etc.
-      subtitle: starDisplay, // Star icons
+      value: starLabel,
+      subtitle: starDisplay,
       chartColor: "#FFD700",
       chartData: [1, 2, 3, 4, 5, starCount],
     },
@@ -106,15 +123,19 @@ const MemberDashboard = () => {
   return (
     <div>
       <h1 className="text-xl font-semibold text-gray-600 pb-4">Dashboard</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
+      <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4">
+        {/* Membership Card should take 1 column on all screens, stays the same */}
+        <div className="2xl:col-span-1">
           <MembershipCard data={data} />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4">
-          {cardsData.map((card, index) => (
-            <DashboardCard key={index} {...card} />
-          ))}
+        {/* Dashboard Cards wrapper should take 2 columns on 2XL screens */}
+        <div className="2xl:col-span-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4">
+            {cardsData.map((card, index) => (
+              <DashboardCard key={index} {...card} />
+            ))}
+          </div>
         </div>
       </div>
     </div>

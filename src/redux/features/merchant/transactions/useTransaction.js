@@ -112,7 +112,9 @@ export const useTransactions = (view = "pending") => {
         return true;
       } catch (err) {
         toast.error(
-          err?.data?.message || "Failed to approve purchase. Please try again."
+          err?.data?.error ||
+            err?.error ||
+            "Failed to approve purchase. Please try again."
         );
         return false;
       } finally {
