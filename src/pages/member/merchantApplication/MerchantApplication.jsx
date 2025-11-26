@@ -66,7 +66,10 @@ const MerchantApplication = () => {
   } = useGetMemberByReferralQuery(debouncedReferral, {
     skip: !debouncedReferral || debouncedReferral.length < 3,
   });
-
+  console.log(
+    "memberData",
+    memberData?.sponsored_member_info?.sponsor_member?.id
+  );
   // Fetch current user's referral code
   const { data, isLoading } = useVerifyMeQuery();
 
@@ -137,8 +140,11 @@ const MerchantApplication = () => {
       }
 
       // Add referral sponsor ID if exists
-      if (!isError && memberData?.id) {
-        formData.append("sponsor_member_id", memberData.id);
+      if (!isError && memberData) {
+        formData.append(
+          "member_id",
+          memberData?.sponsored_member_info?.sponsor_member?.id
+        );
       }
 
       // gather other form fields as necessary
