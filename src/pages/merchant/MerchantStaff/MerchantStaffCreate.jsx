@@ -11,6 +11,8 @@ import { useCreateStaffMutation } from "../../../redux/features/merchant/merchan
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
 
 const MerchantStaffCreate = () => {
   const [createStaff, { isLoading }] = useCreateStaffMutation();
@@ -22,6 +24,8 @@ const MerchantStaffCreate = () => {
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
+    watch,
   } = useForm({
     resolver: zodResolver(merchantStaffSchema),
     defaultValues: {
@@ -31,6 +35,8 @@ const MerchantStaffCreate = () => {
       password: "",
       gender_type: "male",
       status: "active",
+      town: "",
+      country_code: "",
     },
   });
 
@@ -44,6 +50,8 @@ const MerchantStaffCreate = () => {
         password: formData.password,
         gender_type: formData.gender_type,
         status: formData.status,
+        town: formData.town,
+        country_code: formData.country_code,
       };
 
       console.log(" Payload:", payload); // debug
@@ -89,14 +97,37 @@ const MerchantStaffCreate = () => {
             {/* Phone */}
             <div>
               <Label htmlFor="phone">Phone Number</Label>
-              <Input
-                type="text"
-                id="phone"
-                placeholder="Enter phone number"
-                {...register("phone")}
-                error={!!errors.phone}
-                hint={errors.phone?.message}
+              <PhoneInput
+                country={"my"}
+                value={watch("phone")}
+                onChange={(phone, countryData) => {
+                  const numeric = phone.replace("+", "");
+                  setValue("phone", numeric);
+                  setValue("country_code", countryData?.dialCode);
+                }}
+                inputProps={{
+                  name: "phone",
+                  required: true,
+                }}
+                countryCodeEditable={false}
+                enableSearch={true}
+                autocompleteSearch={true}
+                searchPlaceholder="search"
+                prefix=""
+                inputStyle={{ width: "100%" }}
+                buttonStyle={{}}
+                dropdownStyle={{ maxHeight: "250px" }}
+                searchStyle={{
+                  width: "100%",
+                  padding: "8px",
+                  boxSizing: "border-box",
+                }}
               />
+              {errors.phone && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.phone.message}
+                </p>
+              )}
             </div>
 
             {/* Email */}
@@ -147,6 +178,19 @@ const MerchantStaffCreate = () => {
                   { value: "active", label: "Active" },
                   { value: "inactive", label: "Inactive" },
                 ]}
+              />
+            </div>
+
+            {/* Town */}
+            <div>
+              <Label htmlFor="town">Town</Label>
+              <Input
+                type="text"
+                id="town"
+                placeholder="Enter town"
+                {...register("town")}
+                error={!!errors.town}
+                hint={errors.town?.message}
               />
             </div>
           </div>
