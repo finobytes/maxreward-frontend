@@ -31,7 +31,7 @@ import VoucherManage from "../pages/admin/VoucherManage/VoucherManage";
 import WhatsAppLog from "../pages/admin/reports/WhatsAppLog";
 import EmailLog from "../pages/admin/reports/EmailLog";
 import VoucherDetails from "../pages/admin/VoucherManage/VoucherDetails";
-import ReferralList from "../pages/admin/memberMange/ReferralLIst";
+import ReferralList from "../pages/admin/memberMange/ReferralList";
 import CpTransaction from "../pages/admin/cpTransaction/CpTransaction";
 import CpTransactionDetails from "../pages/admin/cpTransaction/CpTransactionDetails";
 import CpUnlockHistory from "../pages/admin/cpUnlockHistory/CpUnlockHistory";
