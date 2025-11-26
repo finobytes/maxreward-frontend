@@ -19,6 +19,10 @@ import {
   Settings,
   Bell,
   TicketCheck,
+  Send,
+  BanknoteArrowDown,
+  History,
+  Wallet,
 } from "lucide-react";
 
 export const NAV_CONFIG = {
@@ -27,21 +31,6 @@ export const NAV_CONFIG = {
     { name: "Member Manage", icon: <Users />, path: "/admin/member-manage" },
     { name: "Staff Manage", icon: <UserCog />, path: "/admin/staff-manage" },
 
-    {
-      icon: <ChartArea />,
-      name: "CP Transaction",
-      path: "/admin/cp-transaction",
-    },
-    {
-      icon: <ChartArea />,
-      name: "Member Community Point",
-      path: "/admin/community-point",
-    },
-    {
-      icon: <ChartArea />,
-      name: "CP Unlock History",
-      path: "/admin/cp-unlock-history",
-    },
     {
       name: "Merchant Manage",
       icon: <ShoppingBag />,
@@ -57,11 +46,6 @@ export const NAV_CONFIG = {
         },
       ],
     },
-    // {
-    //   name: "Voucher Manage",
-    //   icon: <TicketCheck />,
-    //   path: "/admin/voucher-manage",
-    // },
     {
       name: "Accounts",
       icon: <ChartArea />,
@@ -76,7 +60,6 @@ export const NAV_CONFIG = {
       name: "Reports",
       icon: <ChartLine />,
       subItems: [
-        { name: "Transaction", path: "/admin/reports/transaction" },
         { name: "WhatsApp Log", path: "/admin/reports/whatsapp-log" },
         {
           name: "Point Statement",
@@ -86,11 +69,33 @@ export const NAV_CONFIG = {
         { name: "Redeem Mall Transaction", path: "/admin/reports/redemption" },
       ],
     },
-    // {
-    //   name: "Company Info",
-    //   icon: <Building />,
-    //   path: "/admin/company-info",
-    // },
+    {
+      name: "CP History",
+      icon: <History />,
+      subItems: [
+        {
+          name: "CP Transaction",
+          path: "/admin/cp-transaction",
+        },
+        {
+          name: "Member Community Point",
+          path: "/admin/community-point",
+        },
+        {
+          name: "CP Unlock History",
+          path: "/admin/cp-unlock-history",
+        },
+      ],
+    },
+
+    {
+      name: "Transaction",
+      icon: <Wallet />,
+      subItems: [
+        { name: "Transaction", path: "/admin/reports/transaction" },
+        { name: "Merchants transaction", path: "/admin/merchant-transaction" },
+      ],
+    },
     {
       name: "Denomination",
       icon: <DollarSign />,
@@ -199,7 +204,7 @@ export const NAV_CONFIG = {
       name: "CP Transaction",
       path: "/member/cp-transaction",
     },
-      {
+    {
       icon: <ChartArea />,
       name: "CP Unlock History",
       path: "/member/cp-unlock-history",
