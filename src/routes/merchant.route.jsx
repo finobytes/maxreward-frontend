@@ -17,6 +17,7 @@ import VoucherPurchaseDetails from "../pages/merchant/VoucherPurchase/VoucherPur
 import ReferredMemberList from "../pages/merchant/ReferredMemberList/ReferredMemberList";
 import PointStatement from "../pages/merchant/PointStatement/PointStatement";
 import TransactionDetails from "../pages/merchant/PointStatement/TransactionDetails";
+import DailyTransaction from "../pages/merchant/Transactions/DailyTransaction";
 
 export const merchantRoute = [
   {
@@ -50,6 +51,10 @@ export const merchantRoute = [
   {
     path: "transactions/all-transactions",
     element: <AllTransactions />,
+  },
+  {
+    path: "transactions/daily-transactions",
+    element: <DailyTransaction />,
   },
   {
     path: "redeem-mall",

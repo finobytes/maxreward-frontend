@@ -135,6 +135,10 @@ export const NAV_CONFIG = {
           path: "/merchant/transactions/pending-approval",
         },
         {
+          name: "Daily Transactions",
+          path: "/merchant/transactions/daily-transactions",
+        },
+        {
           name: "All Transactions",
           path: "/merchant/transactions/all-transactions",
         },
