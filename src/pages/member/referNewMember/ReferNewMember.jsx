@@ -8,7 +8,7 @@ import ComponentCard from "../../../components/common/ComponentCard";
 import Label from "../../../components/form/Label";
 import Input from "../../../components/form/input/InputField";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
-import Select from "@/components/form/Select";
+import SearchableSelect from "@/components/form/SearchableSelect";
 import { useReferNewMember } from "../../../redux/features/member/referNewMember/useReferNewMember";
 import { referNewMemberSchema } from "../../../schemas/referNewMember.schema";
 import { useState } from "react";
@@ -38,6 +38,7 @@ const ReferNewMember = () => {
     watch,
     setValue,
     setError,
+    control,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(referNewMemberSchema),
@@ -91,23 +92,29 @@ const ReferNewMember = () => {
               {countriesLoading ? (
                 <div className="animate-pulse h-11 bg-gray-200 rounded-lg"></div>
               ) : (
-                <Select
-                  id="citizenship"
-                  placeholder="Select Citizenship"
-                  error={errors.cityzenship}
-                  {...register("country_id")}
-                  options={
-                    countries?.data?.map((item) => ({
-                      label: item.country,
-                      value: item.id,
-                    })) ?? []
-                  }
+                <Controller
+                  name="country_id"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchableSelect
+                      id="citizenship"
+                      placeholder="Select Citizenship"
+                      error={errors.country_id}
+                      {...field}
+                      options={
+                        countries?.data?.map((item) => ({
+                          label: item.country,
+                          value: item.id,
+                        })) ?? []
+                      }
+                    />
+                  )}
                 />
               )}
 
-              {errors.nationality && (
+              {errors.country_id && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.nationality.message}
+                  {errors.country_id.message}
                 </p>
               )}
             </div>
