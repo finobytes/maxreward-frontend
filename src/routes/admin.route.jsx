@@ -38,6 +38,7 @@ import CpUnlockHistoryDetails from "../pages/admin/cpUnlockHistory/CpUnlockHisto
 import CommunityPoint from "../pages/admin/communityPoint/CommunityPoint";
 import CommunityPointDetails from "../pages/admin/communityPoint/CommunityPointDetails";
 import MerchantTransaction from "../pages/admin/Transaction/MerchanTransaction";
+import MerchantTransactionDetails from "../pages/admin/Transaction/MerchantTransactionDetails";
 
 export const adminRoutes = [
   {
@@ -168,6 +169,11 @@ export const adminRoutes = [
   {
     path: "merchant-transaction",
     element: <MerchantTransaction />,
+  },
+
+  {
+    path: "merchant-transaction/:id",
+    element: <MerchantTransactionDetails />,
   },
   {
     path: "merchant/business-type",

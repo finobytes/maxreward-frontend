@@ -127,7 +127,7 @@ export const NAV_CONFIG = {
       path: "/merchant/merchant-staff",
     },
     {
-      icon: <ChartArea />,
+      icon: <Wallet />,
       name: "Transactions",
       subItems: [
         {
