@@ -94,7 +94,7 @@ const ShopWithMerchant = () => {
             <Tabs defaultValue="simple" className="w-full">
               <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="simple">Name / Unique Number</TabsTrigger>
-                <TabsTrigger value="advanced">Advanced Filters</TabsTrigger>
+                <TabsTrigger value="advanced">Locate Merchant</TabsTrigger>
               </TabsList>
 
               {/* SIMPLE SEARCH */}
