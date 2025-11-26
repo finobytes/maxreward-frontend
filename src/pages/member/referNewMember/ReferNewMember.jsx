@@ -97,10 +97,8 @@ const ReferNewMember = () => {
                   control={control}
                   render={({ field }) => (
                     <SearchableSelect
-                      id="citizenship"
-                      placeholder="Select Citizenship"
-                      error={errors.country_id}
                       {...field}
+                      onChange={(val) => field.onChange(String(val))}
                       options={
                         countries?.data?.map((item) => ({
                           label: item.country,
