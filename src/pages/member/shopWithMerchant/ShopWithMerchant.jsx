@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 
 import Select from "@/components/form/Select";
 import { useGetAllBusinessTypesQuery } from "@/redux/features/admin/businessType/businessTypeApi";
+import SearchableSelect from "../../../components/form/SearchableSelect";
 
 const ShopWithMerchant = () => {
   const navigate = useNavigate();
@@ -29,6 +30,8 @@ const ShopWithMerchant = () => {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
+    watch,
   } = useForm();
 
   const onSubmitSimple = async (data) => {
@@ -167,17 +170,23 @@ const ShopWithMerchant = () => {
                         Failed to load product/service type
                       </p>
                     ) : (
-                      <Select
-                        defaultValue=""
-                        {...register("business_type_id")}
-                        options={[
-                          ...(businessTypes?.data?.business_types?.map(
-                            (type) => ({
-                              value: type.id,
-                              label: type.name,
-                            })
-                          ) || []),
-                        ]}
+                      // <Select
+                      //   defaultValue=""
+                      //   {...register("business_type_id")}
+                      //   options={[
+                      //     ...(businessTypes?.data?.business_types?.map(
+                      //       (type) => ({
+                      //         value: type.id,
+                      //         label: type.name,
+                      //       })
+                      //     ) || []),
+                      //   ]}
+                      //   placeholder="Select Product/Service Type"
+                      // />
+                      <SearchableSelect
+                        value={watch("business_type_id")}
+                        onChange={(val) => setValue("business_type_id", val)}
+                        options={businessTypes?.data?.business_types}
                         placeholder="Select Product/Service Type"
                       />
                     )}
