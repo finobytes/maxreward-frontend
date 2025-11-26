@@ -62,22 +62,16 @@ const ReferredMembers = ({ referredMemberData }) => {
             <tr className="border-b border-gray-200 bg-gray-50">
               <th className="py-2 px-4 text-left text-sm text-gray-700">S/N</th>
               <th className="py-2 px-4 text-left text-sm text-gray-700">
-                Name
+                Registration Date
               </th>
               <th className="py-2 px-4 text-left text-sm text-gray-700">
-                Phone
+                Full Name
               </th>
               <th className="py-2 px-4 text-left text-sm text-gray-700">
-                Email
+                Phone Number
               </th>
               <th className="py-2 px-4 text-left text-sm text-gray-700">
-                Type
-              </th>
-              <th className="py-2 px-4 text-left text-sm text-gray-700">
-                Points
-              </th>
-              <th className="py-2 px-4 text-left text-sm text-gray-700">
-                Status
+                No of Referral
               </th>
             </tr>
           </thead>
@@ -100,6 +94,10 @@ const ReferredMembers = ({ referredMemberData }) => {
                   </td>
 
                   <td className="py-2 px-4 text-sm text-gray-900">
+                    {new Date(item.created_at).toLocaleDateString()}
+                  </td>
+
+                  <td className="py-2 px-4 text-sm text-gray-900">
                     {item.name}
                   </td>
 
@@ -107,28 +105,8 @@ const ReferredMembers = ({ referredMemberData }) => {
                     {item.phone}
                   </td>
 
-                  <td className="py-2 px-4 text-sm text-gray-900">
-                    {item.email}
-                  </td>
-
                   <td className="py-2 px-4 text-sm capitalize text-gray-900">
-                    {item.member_type}
-                  </td>
-
-                  <td className="py-2 px-4 text-sm text-gray-900">
-                    {item.wallet?.total_points}
-                  </td>
-
-                  <td className="py-2 px-4 text-sm">
-                    <span
-                      className={`px-2 py-1 text-xs rounded ${
-                        item.status === "active"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
-                      }`}
-                    >
-                      {item.status}
-                    </span>
+                    {item.wallet?.total_referrals}
                   </td>
                 </tr>
               ))

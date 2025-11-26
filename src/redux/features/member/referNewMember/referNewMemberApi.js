@@ -6,14 +6,13 @@ export const referNewMemberApi = baseApi.injectEndpoints({
     referNewMember: builder.mutation({
       query: (data) => {
         const payload = {
-          name: data.fullName,
-          phone: data.phoneNumber,
+          name: data.name,
+          phone: data.phone,
           email: data.email,
-          gender_type: data.gender || "male",
-          address: data.address || "N/A",
+          country_id: data.country_id,
+          country_code: data.country_code,
         };
 
-        // if admin add → member_id
         if (data.member_id) {
           payload.member_id = data.member_id;
         }
@@ -24,7 +23,6 @@ export const referNewMemberApi = baseApi.injectEndpoints({
           body: payload,
         };
       },
-      invalidatesTags: ["Member"],
     }),
 
     // 2️⃣ Get referred members

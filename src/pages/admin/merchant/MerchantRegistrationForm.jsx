@@ -115,12 +115,14 @@ const MerchantRegistrationForm = () => {
       navigate("/admin/merchant/pending-merchant");
     } catch (err) {
       console.error("Create Error:", err);
-      toast.error(err?.data?.message || "Failed to create merchant!");
-      // if (err) {
-      //   toast.error(err.message);
-      // } else {
-      //   toast.error("Failed to create merchant!");
-      // }
+
+      if (err?.data?.errors) {
+        Object.entries(err.data.errors).forEach(([field, messages]) => {
+          toast.error(`${field}: ${messages.join(", ")}`);
+        });
+      } else {
+        toast.error(err?.data?.message || "Failed to create merchant!");
+      }
     }
   };
 
@@ -325,7 +327,10 @@ const MerchantRegistrationForm = () => {
                     disabled
                     readOnly
                     value={
-                      isError ? "Referral Not Found" : memberData?.name || ""
+                      isError
+                        ? "Referral Not Found"
+                        : memberData?.sponsored_member_info?.sponsor_member
+                            ?.name || ""
                     }
                   />
                 )}
@@ -341,7 +346,12 @@ const MerchantRegistrationForm = () => {
                     id="referralStatus"
                     disabled
                     readOnly
-                    value={isError ? "Invalid" : memberData?.status || ""}
+                    value={
+                      isError
+                        ? "Invalid"
+                        : memberData?.sponsored_member_info?.sponsor_member
+                            ?.status || ""
+                    }
                   />
                 )}
               </div>

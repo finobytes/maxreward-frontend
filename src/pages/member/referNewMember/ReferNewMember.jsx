@@ -1,13 +1,14 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { Controller } from "react-hook-form";
 
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import ComponentCard from "../../../components/common/ComponentCard";
 import Label from "../../../components/form/Label";
 import Input from "../../../components/form/input/InputField";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
-
+import Select from "@/components/form/Select";
 import { useReferNewMember } from "../../../redux/features/member/referNewMember/useReferNewMember";
 import { referNewMemberSchema } from "../../../schemas/referNewMember.schema";
 import { useState } from "react";
@@ -16,6 +17,7 @@ import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
 import SkeletonField from "../../../components/skeleton/SkeletonField";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import { useGetCountriesQuery } from "../../../redux/features/countries/countriesApi";
 
 const ReferNewMember = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -25,7 +27,10 @@ const ReferNewMember = () => {
 
   const { data, isLoading } = useVerifyMeQuery();
   const user = data || {};
+  const { data: countries, isLoading: countriesLoading } =
+    useGetCountriesQuery();
 
+  console.log("countries", countries);
   const {
     register,
     handleSubmit,
@@ -37,14 +42,15 @@ const ReferNewMember = () => {
     resolver: zodResolver(referNewMemberSchema),
     defaultValues: {
       fullName: "",
-      phoneNumber: "",
+      phone: "",
       email: "",
-      gender: "male",
-      address: "",
+      country_id: "", // country_id
+      country_code: "", // phoneInput
     },
   });
 
   const onSubmit = async (data) => {
+    console.log("form data", data);
     try {
       const res = await handleRefer(data);
       setResponse(res);
@@ -65,6 +71,77 @@ const ReferNewMember = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <ComponentCard title="Member Information">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Nationality */}
+            <div>
+              <Label htmlFor="citizenship">
+                Citizenship <span className="text-red-500">*</span>
+              </Label>
+
+              {countriesLoading ? (
+                <div className="animate-pulse h-11 bg-gray-200 rounded-lg"></div>
+              ) : (
+                <Select
+                  id="citizenship"
+                  placeholder="Select Citizenship"
+                  error={errors.cityzenship}
+                  {...register("country_id")}
+                  options={
+                    countries?.data?.map((item) => ({
+                      label: item.country,
+                      value: item.id,
+                    })) ?? []
+                  }
+                />
+              )}
+
+              {errors.nationality && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.nationality.message}
+                </p>
+              )}
+            </div>
+            {/* Updated Phone Number */}
+            <div>
+              <Label htmlFor="phoneNumber">
+                Phone Number (<span className="text-red-500">*</span>)
+              </Label>
+              <PhoneInput
+                country={"my"}
+                value={watch("phone")}
+                onChange={(phone, countryData) => {
+                  const numeric = phone.replace("+", "");
+                  setValue("phone", numeric);
+                  setValue("country_code", countryData?.dialCode);
+                }}
+                inputProps={{
+                  name: "phoneNumber",
+                  required: true,
+                }}
+                countryCodeEditable={false}
+                // Demo-style
+                enableSearch={true}
+                autocompleteSearch={true}
+                searchPlaceholder="search"
+                // Remove + sign
+                prefix=""
+                // Demo-style
+                inputStyle={{ width: "100%" }}
+                buttonStyle={{}}
+                dropdownStyle={{ maxHeight: "250px" }}
+                searchStyle={{
+                  width: "100%",
+                  padding: "8px",
+                  boxSizing: "border-box",
+                }}
+              />
+
+              {errors.phone && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.phone.message}
+                </p>
+              )}
+            </div>
+
             {/* Full Name */}
             <div>
               <Label htmlFor="fullName">
@@ -73,49 +150,12 @@ const ReferNewMember = () => {
               <Input
                 id="fullName"
                 placeholder="Enter member full name"
-                {...register("fullName")}
-                error={!!errors.fullName}
-                hint={errors.fullName?.message}
+                {...register("name")}
+                error={!!errors.name}
+                hint={errors.name?.message}
               />
             </div>
 
-            {/* Updated Phone Number */}
-            <div>
-              <Label htmlFor="phoneNumber">
-                Phone Number (<span className="text-red-500">*</span>)
-              </Label>
-              <PhoneInput
-                country={"bd"} // default country (Bangladesh)
-                value={watch("phoneNumber")}
-                onChange={(phone) => setValue("phoneNumber", phone)}
-                inputProps={{
-                  name: "phoneNumber",
-                  required: true,
-                  autoFocus: true,
-                }}
-                inputStyle={{ width: "100%" }}
-                specialLabel=""
-              />
-              {errors.phoneNumber && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.phoneNumber.message}
-                </p>
-              )}
-            </div>
-
-            {/* Nationality */}
-            <div>
-              <Label htmlFor="nationality">
-                Nationality (<span className="text-red-500">*</span>)
-              </Label>
-              <Input
-                id="nationality"
-                placeholder="Bangladeshi"
-                {...register("nationality")}
-                error={!!errors.nationality}
-                hint={errors.nationality?.message}
-              />
-            </div>
             {/* Email */}
             <div>
               <Label htmlFor="email">Email Address</Label>
