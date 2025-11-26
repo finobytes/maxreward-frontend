@@ -182,11 +182,11 @@ const PointStatement = () => {
                       </TableCell>
                       {/*  Balance onhold point*/}
                       <TableCell className="text-center">
-                        {item?.bop ?? ""}
+                        {item?.brp ?? ""}
                       </TableCell>
                       {/*  Balance referral point*/}
                       <TableCell className="text-center">
-                        {item?.brp ?? ""}
+                        {item?.bop ?? ""}
                       </TableCell>
 
                       <TableCell className="text-center">
