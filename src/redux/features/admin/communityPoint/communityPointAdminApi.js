@@ -14,7 +14,16 @@ export const communityPointAdminApi = baseApi.injectEndpoints({
       },
       keepUnusedDataFor: 0,
     }),
+    getMemberCommunityPointDetails: builder.mutation({
+      query: (memberId) => ({
+        url: `/admin/community-points/member/${memberId}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useGetAdminCommunityPointQuery } = communityPointAdminApi;
+export const {
+  useGetAdminCommunityPointQuery,
+  useGetMemberCommunityPointDetailsMutation
+} = communityPointAdminApi;

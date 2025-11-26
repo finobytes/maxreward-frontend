@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router";
 
 import {
   Table,
@@ -11,7 +12,7 @@ import {
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import Pagination from "../../../components/table/Pagination";
 import { useCommunityPointAdmin } from "../../../redux/features/admin/communityPoint/useCommunityPointAdmin";
-import { Lock, Unlock } from "lucide-react";
+import { Lock, Unlock, Eye } from "lucide-react";
 
 // Format Date + Time
 const formatDateTime = (value) => {
@@ -71,9 +72,17 @@ const renderLockStatusBadge = (isLocked) => {
 const CommunityPoint = () => {
   const { communityPoints, meta, isLoading, isFetching, error, changePage } =
     useCommunityPointAdmin();
+  const navigate = useNavigate();
 
   const currentPage = meta?.currentPage || 1;
   const totalPages = meta?.lastPage || 1;
+
+  const handleViewDetails = (memberId) => {
+    navigate(`/admin/community-point/details/${memberId}`);
+  };
+
+
+  // console.log("communityPoints::::", communityPoints);
 
   return (
     <div>
@@ -94,12 +103,13 @@ const CommunityPoint = () => {
               <TableRow>
                 <TableHead>S/N</TableHead>
                 <TableHead>Member</TableHead>
-                <TableHead className="text-center">Level</TableHead>
+                {/* <TableHead className="text-center">Level</TableHead> */}
                 <TableHead className="text-center">Total CP</TableHead>
                 <TableHead className="text-center">Available CP</TableHead>
                 <TableHead className="text-center">On-Hold CP</TableHead>
-                <TableHead className="text-center">Lock Status</TableHead>
-                <TableHead>Created At</TableHead>
+                {/* <TableHead className="text-center">Lock Status</TableHead>
+                <TableHead>Created At</TableHead> */}
+                <TableHead className="text-center">Action</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -146,11 +156,11 @@ const CommunityPoint = () => {
                       </TableCell>
 
                       {/* Level */}
-                      <TableCell className="text-center">
+                      {/* <TableCell className="text-center">
                         <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-purple-100 text-purple-600 font-semibold">
                           {item?.level ?? "-"}
                         </span>
-                      </TableCell>
+                      </TableCell> */}
 
                       {/* Total CP */}
                       <TableCell className="text-center">
@@ -168,12 +178,23 @@ const CommunityPoint = () => {
                       </TableCell>
 
                       {/* Lock Status */}
-                      <TableCell className="text-center">
+                      {/* <TableCell className="text-center">
                         {renderLockStatusBadge(item?.is_locked)}
-                      </TableCell>
+                      </TableCell> */}
 
                       {/* Created At */}
-                      <TableCell>{formatDateTime(item?.created_at)}</TableCell>
+                      {/* <TableCell>{formatDateTime(item?.created_at)}</TableCell> */}
+
+                      {/* Action */}
+                      <TableCell className="text-center">
+                        <button
+                          onClick={() => handleViewDetails(item?.member?.id)}
+                          className="inline-flex items-center justify-center rounded-lg bg-blue-500 p-2 text-white transition-colors hover:bg-blue-600"
+                          title="View Details"
+                        >
+                          <Eye size={18} />
+                        </button>
+                      </TableCell>
                     </TableRow>
                   );
                 })
