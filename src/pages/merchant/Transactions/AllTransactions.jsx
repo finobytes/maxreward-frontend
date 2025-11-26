@@ -137,6 +137,8 @@ const AllTransactions = () => {
                 <TableHead className="">Total Transaction</TableHead>
                 <TableHead className="">Points Redeemed</TableHead>
                 <TableHead>Balance Paid</TableHead>
+                <TableHead>Reward Fee</TableHead>
+                <TableHead>Balance</TableHead>
                 <TableHead>Payment Method</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="">Actions</TableHead>
@@ -195,6 +197,10 @@ const AllTransactions = () => {
                     <TableCell className="">
                       {currency(txn.cash_redeem_amount)}
                     </TableCell>
+                    <TableCell className="">
+                      {currency(txn.reward_fee)}
+                    </TableCell>
+                    <TableCell className="">{currency(txn.balance)}</TableCell>
                     <TableCell className="capitalize">
                       {txn.payment_method || "—"}
                     </TableCell>
