@@ -117,7 +117,9 @@ const PointStatement = () => {
                 <TableHead className="text-center">Total Points</TableHead>
                 <TableHead className="text-center">Status</TableHead>
                 <TableHead>Reason</TableHead>
-                <TableHead className="text-center">Balance</TableHead>
+                <TableHead className="text-center">BAP</TableHead>
+                <TableHead className="text-center">BRP</TableHead>
+                <TableHead className="text-center">BOP</TableHead>
 
                 <TableHead className="text-center">Action</TableHead>
               </TableRow>
@@ -178,9 +180,17 @@ const PointStatement = () => {
                       {/* Reason */}
                       <TableCell>{item?.transaction_reason ?? "-"}</TableCell>
 
-                      {/* Available Balance */}
+                      {/*  Balance Available point*/}
                       <TableCell className="text-center">
-                        {item?.balance ?? ""}
+                        {item?.bap ?? ""}
+                      </TableCell>
+                      {/*  Balance onhold point*/}
+                      <TableCell className="text-center">
+                        {item?.brp ?? ""}
+                      </TableCell>
+                      {/*  Balance referral point*/}
+                      <TableCell className="text-center">
+                        {item?.bop ?? ""}
                       </TableCell>
 
                       <TableCell className="text-center">
