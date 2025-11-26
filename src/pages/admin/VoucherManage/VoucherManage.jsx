@@ -243,6 +243,7 @@ const VoucherManage = () => {
                   />
                 </TableHead>
                 <TableHead>S/N</TableHead>
+                <TableHead>Voucher ID</TableHead>
                 <TableHead>Voucher Type</TableHead>
                 <TableHead>Purchased By</TableHead>
                 <TableHead>Denomination</TableHead>
@@ -280,6 +281,7 @@ const VoucherManage = () => {
                     <TableCell>
                       {(backendCurrentPage - 1) * backendPerPage + (idx + 1)}
                     </TableCell>
+                    <TableCell>{v.voucher_id}</TableCell>
                     <TableCell>
                       <StatusBadge status={v.voucher_type}>
                         {v.voucher_type} voucher

@@ -286,8 +286,10 @@ const VoucherPurchaseForm = () => {
               </div>
 
               {/* Totals */}
-              <div className="mt-6 grid gap-4 max-w-[350px]">
-                <div>
+
+              {/* Totals */}
+              {/* <div className="mt-6 grid gap-4 max-w-[350px]"> */}
+              {/* <div>
                   <Label className="text-sm font-medium mb-2 block">
                     Total Quantity
                   </Label>
@@ -297,23 +299,36 @@ const VoucherPurchaseForm = () => {
                     placeholder="Quantity"
                     className="bg-gray-100"
                   />
-                </div>
-                <div>
-                  <Label className="text-sm font-medium mb-2 block">
-                    Equivalent Points
-                  </Label>
-                  <Input
-                    readOnly
-                    value={String(totalAmount || 0)}
-                    placeholder="Points / Price"
-                    className="bg-gray-100"
-                  />
-                  {totalAmountWithRm && totalAmountWithRm !== totalAmount ? (
-                    <p className="text-xs text-gray-500 mt-1">
-                      After RM points: {totalAmountWithRm}
-                    </p>
-                  ) : null}
-                </div>
+                </div> */}
+              <div className="mt-6 max-w-[350px]">
+                <Label className="text-sm font-medium mb-2 block">
+                  Total voucher amount
+                </Label>
+                <Input
+                  readOnly
+                  value={String(totalAmount || 0)}
+                  placeholder="Points / Price"
+                  className="bg-gray-100"
+                />
+                {totalAmountWithRm && totalAmountWithRm !== totalAmount ? (
+                  <p className="text-xs text-gray-500 mt-1">
+                    After RM points: {totalAmountWithRm}
+                  </p>
+                ) : null}
+              </div>
+              {/* </div> */}
+
+              <div className="mt-8 flex gap-4">
+                <PrimaryButton type="submit" disabled={creating}>
+                  {creating ? "Processing..." : "Submit"}
+                </PrimaryButton>
+                <PrimaryButton
+                  variant="secondary"
+                  type="button"
+                  to="/member/referred-member"
+                >
+                  Back
+                </PrimaryButton>
               </div>
             </div>
 
@@ -391,18 +406,6 @@ const VoucherPurchaseForm = () => {
                 </div>
               </div>
             )}
-          </div>
-          <div className="mt-8 flex gap-4">
-            <PrimaryButton type="submit" disabled={creating}>
-              {creating ? "Processing..." : "Submit"}
-            </PrimaryButton>
-            <PrimaryButton
-              variant="secondary"
-              type="button"
-              to="/member/referred-member"
-            >
-              Back
-            </PrimaryButton>
           </div>
         </ComponentCard>
       </form>

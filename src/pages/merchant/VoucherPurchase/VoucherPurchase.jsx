@@ -177,6 +177,7 @@ const VoucherPurchase = () => {
                       />
                     </TableHead>
                     <TableHead>S/N</TableHead>
+                    <TableHead>Voucher ID</TableHead>
                     <TableHead>Voucher Type</TableHead>
                     <TableHead>Denomination</TableHead>
                     <TableHead>Quantity</TableHead>
@@ -208,6 +209,7 @@ const VoucherPurchase = () => {
                           idx +
                           1}
                       </TableCell>
+                      <TableCell>{v.voucher_id}</TableCell>
                       <TableCell>
                         <StatusBadge status={v.voucher_type}>
                           {v.voucher_type}
