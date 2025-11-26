@@ -101,6 +101,15 @@ const CommunityPointDetails = () => {
             <ArrowLeft size={18} />
             Back
           </button>
+
+          <div>
+            <h3 className="text-lg font-medium text-gray-900">
+              {
+                memberDetails?.data[0]?.member?.name ??
+                memberDetails?.data[0]?.member?.name
+              }
+            </h3>
+          </div>
         </div>
 
         {isLoading ? (
@@ -115,7 +124,7 @@ const CommunityPointDetails = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>SL</TableHead>
-                  <TableHead>Member</TableHead>
+                  {/* <TableHead>Member</TableHead> */}
                   <TableHead className="text-center">Level</TableHead>
                   <TableHead className="text-center">Total CP</TableHead>
                   <TableHead className="text-center">Available CP</TableHead>
@@ -130,7 +139,7 @@ const CommunityPointDetails = () => {
                     <TableCell>{idx + 1}</TableCell>
 
                     {/* Member */}
-                    <TableCell>
+                    {/* <TableCell>
                       <div className="flex flex-col">
                         <span className="font-medium text-gray-900">
                           {item?.member?.name ?? "-"}
@@ -139,7 +148,7 @@ const CommunityPointDetails = () => {
                           {item?.member?.user_name ?? ""}
                         </span>
                       </div>
-                    </TableCell>
+                    </TableCell> */}
 
                     {/* Level */}
                     <TableCell className="text-center">
