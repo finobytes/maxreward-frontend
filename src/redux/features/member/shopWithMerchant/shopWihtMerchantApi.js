@@ -62,6 +62,41 @@ export const shopWithMerchantApi = baseApi.injectEndpoints({
       },
       providesTags: ["MemberPurchases"],
     }),
+    // Get merchant list using filters (state, town, address, business type)
+    locateMerchants: builder.query({
+      query: (filters) => {
+        const params = new URLSearchParams();
+
+        if (filters?.state) params.set("state", filters.state);
+        if (filters?.town) params.set("town", filters.town);
+        if (filters?.company_address)
+          params.set("company_address", filters.company_address);
+        if (filters?.business_type_id)
+          params.set("business_type_id", filters.business_type_id);
+
+        return {
+          url: `merchants/locate-merchants?${params.toString()}`,
+          method: "GET",
+        };
+      },
+
+      transformResponse: (response) => {
+        const payload = response?.data ?? {};
+        return {
+          merchants: payload?.data ?? [],
+          pagination: {
+            currentPage: payload?.current_page ?? 1,
+            lastPage: payload?.last_page ?? 1,
+            total: payload?.total ?? payload?.data?.length ?? 0,
+            perPage: payload?.per_page ?? 10,
+          },
+          success: response?.success,
+          message: response?.message,
+        };
+      },
+
+      providesTags: ["LocateMerchants"],
+    }),
   }),
 });
 
@@ -70,4 +105,5 @@ export const {
   useCheckMemberRedeemAmountMutation,
   useMakePurchaseForMemberMutation,
   useGetMemberPurchasesQuery,
+  useLocateMerchantsQuery,
 } = shopWithMerchantApi;
