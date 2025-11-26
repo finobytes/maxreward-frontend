@@ -29,6 +29,7 @@ import Notification from "../pages/admin/Notification/Notification";
 import NotificationDetails from "../pages/admin/Notification/NotificationDetails";
 import VoucherManage from "../pages/admin/VoucherManage/VoucherManage";
 import WhatsAppLog from "../pages/admin/reports/WhatsAppLog";
+import EmailLog from "../pages/admin/reports/EmailLog";
 import VoucherDetails from "../pages/admin/VoucherManage/VoucherDetails";
 import ReferralList from "../pages/admin/memberMange/ReferralLIst";
 import CpTransaction from "../pages/admin/cpTransaction/CpTransaction";
@@ -152,6 +153,10 @@ export const adminRoutes = [
   {
     path: "reports/whatsapp-log",
     element: <WhatsAppLog />,
+  },
+  {
+    path: "reports/email-log",
+    element: <EmailLog />,
   },
   {
     path: "reports/member-points-report",

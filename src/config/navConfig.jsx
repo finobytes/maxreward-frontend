@@ -60,7 +60,8 @@ export const NAV_CONFIG = {
       name: "Reports",
       icon: <ChartLine />,
       subItems: [
-        { name: "WhatsApp Log", path: "/admin/reports/whatsapp-log" },
+        // { name: "WhatsApp Log", path: "/admin/reports/whatsapp-log" },
+        { name: "Email Log", path: "/admin/reports/email-log" },
         {
           name: "Point Statement",
           path: "/admin/reports/member-points-report",
