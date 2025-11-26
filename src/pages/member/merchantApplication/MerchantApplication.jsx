@@ -20,6 +20,9 @@ import SkeletonField from "@/components/skeleton/SkeletonField";
 import { useGetMemberByReferralQuery } from "@/redux/features/admin/memberManagement/memberManagementApi";
 import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
 import { useGetCorporateMemberReferralCodeQuery } from "../../../redux/features/admin/memberManagement/memberManagementApi";
+import { useGetCountriesQuery } from "../../../redux/features/countries/countriesApi";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
 
 const MerchantApplication = () => {
   const { user } = useSelector((state) => state.auth);
@@ -37,6 +40,9 @@ const MerchantApplication = () => {
 
   const { data: corporateReferralCode } =
     useGetCorporateMemberReferralCodeQuery();
+
+  const { data: countries, isLoading: countriesLoading } =
+    useGetCountriesQuery();
 
   // -----------------------------
   // REFERRAL STATE + DEBOUNCE LOGIC
@@ -80,6 +86,8 @@ const MerchantApplication = () => {
     defaultValues: {
       status: "pending",
       referralCode: "",
+      town: "",
+      country_code: "",
     },
   });
 
@@ -132,6 +140,8 @@ const MerchantApplication = () => {
       if (!isError && memberData?.id) {
         formData.append("sponsor_member_id", memberData.id);
       }
+
+      // gather other form fields as necessary
 
       await createMerchant(formData).unwrap();
 
@@ -196,8 +206,12 @@ const MerchantApplication = () => {
               </div>
 
               <div>
-                <Label>Product/Service</Label>
+                <Label>Town</Label>
+                <Input {...register("town")} placeholder="Town" />
+              </div>
 
+              <div>
+                <Label>Product/Service</Label>
                 {isBusinessTypeLoading ? (
                   <div className="animate-pulse space-y-2">
                     <div className="h-4 bg-gray-200 rounded w-3/4"></div>
@@ -294,7 +308,32 @@ const MerchantApplication = () => {
                 <Label>
                   Phone Number (<span className="text-red-500">*</span>)
                 </Label>
-                <Input {...register("phone")} placeholder="Phone Number" />
+                <PhoneInput
+                  country={"my"}
+                  value={watch("phone")}
+                  onChange={(phone, countryData) => {
+                    const numeric = phone.replace("+", "");
+                    setValue("phone", numeric);
+                    setValue("country_code", countryData?.dialCode);
+                  }}
+                  inputProps={{
+                    name: "phone",
+                    required: true,
+                  }}
+                  countryCodeEditable={false}
+                  enableSearch={true}
+                  autocompleteSearch={true}
+                  searchPlaceholder="search"
+                  prefix=""
+                  inputStyle={{ width: "100%" }}
+                  buttonStyle={{}}
+                  dropdownStyle={{ maxHeight: "250px" }}
+                  searchStyle={{
+                    width: "100%",
+                    padding: "8px",
+                    boxSizing: "border-box",
+                  }}
+                />
                 {errors.phone && (
                   <p className="text-red-500 text-xs mt-1">
                     {errors.phone.message}
