@@ -107,12 +107,12 @@ const Login = () => {
           {/* User Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              User Name
+              User ID
             </label>
             <input
-              type="userName"
+              type="text"
               {...register("userName")}
-              placeholder="Enter your user name"
+              placeholder="Enter your user ID"
               className={`mt-1 w-full border rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#FF5A29] ${
                 errors.userName ? "border-red-500" : "border-gray-300"
               }`}
