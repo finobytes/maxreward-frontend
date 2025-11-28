@@ -197,7 +197,7 @@ export const adminRoutes = [
     element: <Notification />,
   },
   {
-    path: "/admin/notification/:id",
+    path: "notification/:id",
     element: <NotificationDetails />,
   },
   {

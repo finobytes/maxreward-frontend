@@ -4,8 +4,21 @@ export const notificationApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // ✅ Get all notifications (with pagination + optional search/filter)
     getAllNotifications: builder.query({
-      query: ({ page = 1, search = "", status = "", type = "" } = {}) => {
-        let url = `/notifications?page=${page}`;
+      query: ({ page = 1, search = "", status = "", type = "", role = "member" } = {}) => {
+        // let url = `/notifications?page=${page}`;
+
+
+        let url;
+
+        if (role === "merchant") {
+          url = `/notifications/merchant/all?page=${page}`;
+        } else if (role === "member") {
+          url = `/notifications/member/all?page=${page}`;
+        } else if (role === "admin") {
+          url = `/notifications?page=${page}`;
+        }
+
+
         if (search) url += `&search=${encodeURIComponent(search)}`;
         if (status) url += `&status=${status}`;
         if (type) url += `&type=${type}`;
@@ -42,10 +55,22 @@ export const notificationApi = baseApi.injectEndpoints({
 
     // ✅ Mark all as read
     markAllNotificationsAsRead: builder.mutation({
-      query: () => ({
-        url: `/notifications/read-all`,
-        method: "PATCH",
-      }),
+      query: (role = "member") => {
+        let endpoint;
+
+        if (role === "merchant") {
+          endpoint = "/notifications/merchant/all";
+        } else if (role === "member") {
+          endpoint = "/notifications/member/all";
+        } else if (role === "admin") {
+          endpoint = "/notifications/all";
+        }
+
+        return {
+          url: endpoint,
+          method: "PATCH",
+        };
+      },
       invalidatesTags: ["Notifications"],
     }),
   }),

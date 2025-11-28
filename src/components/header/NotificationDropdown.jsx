@@ -8,11 +8,25 @@ import {
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { getIcon } from "../../utils/getIcon";
+import { useSelector } from "react-redux";
 
 const NotificationDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { data } = useGetAllNotificationsQuery({ page: 1 });
+  const { user } = useSelector((state) => state.auth);
+  const role = user?.role || "member"; // admin | merchant | member
+
+
+  console.log("-------------------------------");
+  console.log("role", role);
+
+  const { data } = useGetAllNotificationsQuery({ page: 1, role });
+
+  console.log("data::::", data);
+  
   const [markAllAsRead] = useMarkAllNotificationsAsReadMutation();
+
+
+  // console.log("role", user);
 
   const notifications = data?.notifications?.slice(0, 10) || [];
   const unreadCount = data?.statistics?.total_unread || 0;
@@ -20,7 +34,7 @@ const NotificationDropdown = () => {
   const handleToggle = async () => {
     setIsOpen((prev) => !prev);
     if (!isOpen && unreadCount > 0) {
-      await markAllAsRead();
+      await markAllAsRead(role);
     }
   };
 
@@ -28,7 +42,7 @@ const NotificationDropdown = () => {
 
   return (
     <div className="relative">
-      {/* 🔔 Notification Button */}
+      {/* Notification Button */}
       <button
         className="relative flex items-center justify-center text-gray-500 bg-white border border-gray-200 rounded-full h-11 w-11 hover:bg-gray-100 transition"
         onClick={handleToggle}
@@ -41,7 +55,7 @@ const NotificationDropdown = () => {
         <Bell size={18} />
       </button>
 
-      {/* 🧩 Dropdown */}
+      {/* Dropdown */}
       <Dropdown
         isOpen={isOpen}
         onClose={closeDropdown}
@@ -51,7 +65,7 @@ const NotificationDropdown = () => {
         <div className="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
           <h5 className="text-lg font-semibold text-gray-800">Notifications</h5>
           <button
-            onClick={markAllAsRead}
+            onClick={() => markAllAsRead(role)}
             className="text-sm text-blue-600 hover:underline"
           >
             Mark all as read
@@ -67,7 +81,13 @@ const NotificationDropdown = () => {
           ) : (
             notifications.map((n) => (
               <Link
-                to={`/admin/notification/${n.id}`}
+                to={
+                  role === "member"
+                    ? `/member/notification/${n.id}`
+                    : role === "merchant"
+                    ? `/merchant/notification/${n.id}`
+                    : `/admin/notification/${n.id}`
+                }
                 key={n.id}
                 onClick={closeDropdown}
               >
@@ -98,7 +118,13 @@ const NotificationDropdown = () => {
 
         {/* Footer */}
         <Link
-          to="/admin/notification"
+          to={
+            role === "member"
+              ? "/member/notification"
+              : role === "merchant"
+              ? "/merchant/notification"
+              : "/admin/notification"
+          }
           className="block px-4 py-2 mt-3 text-sm font-medium text-center text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100"
           onClick={closeDropdown}
         >

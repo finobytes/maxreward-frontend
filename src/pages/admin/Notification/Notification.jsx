@@ -10,16 +10,21 @@ import {
   useGetAllNotificationsQuery,
   useMarkNotificationAsReadMutation,
 } from "../../../redux/features/admin/notification/notificationApi";
+import { useSelector } from "react-redux";
 
 const Notification = () => {
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
+  const { user } = useSelector((state) => state.auth);
+  const role = user?.role || "member"; // admin | merchant | member
+
   const { data, isLoading, isFetching } = useGetAllNotificationsQuery({
     page,
     search,
     status: filter === "all" ? "" : filter,
+    role
   });
 
   const [markAsRead] = useMarkNotificationAsReadMutation();
@@ -78,7 +83,13 @@ const Notification = () => {
                 )}
               >
                 <Link
-                  to={`/admin/notification/${n.id}`}
+                  to={
+                    role === "member"
+                      ? `/member/notification/${n.id}`
+                      : role === "merchant"
+                      ? `/merchant/notification/${n.id}`
+                      : `/admin/notification/${n.id}`
+                  }
                   className="flex items-start gap-3 flex-1"
                   onClick={() => handleMarkAsRead(n.id)}
                 >

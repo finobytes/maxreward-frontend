@@ -20,6 +20,8 @@ import RedeemWithMerchant from "../pages/member/shopWithMerchant/RedeemWithMerch
 import ShopWithMerchant from "../pages/member/shopWithMerchant/ShopWithMerchant";
 import ShowQrCode from "../pages/member/showQrCode/ShowQrCode";
 import TermsAndConditions from "../pages/member/termsAndConditions/TermsAndConditions";
+import Notification from "../pages/member/notification/Notification";
+import NotificationDetails from "../pages/member/notification/NotificationDetails";
 
 export const memberRoutes = [
   {
@@ -113,5 +115,13 @@ export const memberRoutes = [
   {
     path: "data-privacy-policy",
     element: <DataPrivacyPolicy />,
+  },
+  {
+    path: "notification",
+    element: <Notification />,
+  },
+  {
+    path: "notification/:id",
+    element: <NotificationDetails />,
   },
 ];

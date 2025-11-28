@@ -18,6 +18,8 @@ import ReferredMemberList from "../pages/merchant/ReferredMemberList/ReferredMem
 import PointStatement from "../pages/merchant/PointStatement/PointStatement";
 import TransactionDetails from "../pages/merchant/PointStatement/TransactionDetails";
 import DailyTransaction from "../pages/merchant/Transactions/DailyTransaction";
+import Notification from "../pages/admin/Notification/Notification";
+import NotificationDetails from "../pages/admin/Notification/NotificationDetails";
 
 export const merchantRoute = [
   {
@@ -100,5 +102,13 @@ export const merchantRoute = [
   {
     path: "profile",
     element: <Profile />,
+  },
+  {
+    path: "notification",
+    element: <Notification />,
+  },
+  {
+    path: "notification/:id",
+    element: <NotificationDetails />,
   },
 ];
