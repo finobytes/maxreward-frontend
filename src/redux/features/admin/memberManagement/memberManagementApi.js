@@ -110,7 +110,7 @@ export const memberApi = baseApi.injectEndpoints({
         }
 
         return {
-          url: "/member/status/block-suspend",
+          url: "/members/status/block-suspend",
           method: "POST",
           body: payload,
         };
