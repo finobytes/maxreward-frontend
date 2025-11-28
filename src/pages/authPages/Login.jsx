@@ -9,8 +9,11 @@ import { useLoginMutation } from "../../redux/features/auth/authApi";
 import { loginSchema } from "../../schemas/auth/loginSchema";
 import { Spinner } from "@/components/ui/spinner.jsx";
 import { toast } from "sonner";
+import { Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
 
 const Login = () => {
+  const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useSelector((state) => state.auth);
@@ -124,18 +127,29 @@ const Login = () => {
             )}
           </div>
           {/* Password */}
-          <div>
+          <div className="relative">
             <label className="block text-sm font-medium text-gray-700">
               Password
             </label>
+
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               {...register("password")}
               placeholder="Enter password"
-              className={`mt-1 w-full border rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#FF5A29] ${
+              className={`mt-1 w-full border rounded-md px-3 py-2 pr-10 text-sm outline-none focus:ring-2 focus:ring-[#FF5A29] ${
                 errors.password ? "border-red-500" : "border-gray-300"
               }`}
             />
+
+            {/* Eye Icon */}
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute top-[34px] right-3 text-gray-500 hover:text-gray-700"
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+
             {errors.password && (
               <p className="text-xs text-red-500 mt-1">
                 {errors.password.message}
