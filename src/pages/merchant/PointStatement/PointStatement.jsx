@@ -123,11 +123,7 @@ const PointStatement = () => {
 
             <TableBody>
               {loading ? (
-                <TableRow>
-                  <TableCell colSpan="8" className="py-6 text-center">
-                    Loading transactions...
-                  </TableCell>
-                </TableRow>
+                <TableRowsSkeleton cols={10} />
               ) : error ? (
                 <TableRow>
                   <TableCell
