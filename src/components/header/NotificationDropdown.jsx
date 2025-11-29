@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { Bell } from "lucide-react";
 import {
   useGetAllNotificationsQuery,
+  useSaveAllUnreadCountMutation,
   useMarkAllNotificationsAsReadMutation,
 } from "../../redux/features/admin/notification/notificationApi";
 import { Dropdown } from "../ui/dropdown/Dropdown";
@@ -16,24 +17,32 @@ const NotificationDropdown = () => {
   const role = user?.role || "member"; // admin | merchant | member
 
 
-  console.log("-------------------------------");
-  console.log("role", role);
+
 
   const { data } = useGetAllNotificationsQuery({ page: 1, role });
 
-  console.log("data::::", data);
-  
+  // console.log("data::::", data);
+
+  const [saveAllUnreadCount] = useSaveAllUnreadCountMutation();
   const [markAllAsRead] = useMarkAllNotificationsAsReadMutation();
 
 
   // console.log("role", user);
 
   const notifications = data?.notifications?.slice(0, 10) || [];
+
+  //   console.log("-------------------------------");
+  // console.log("notificationsL", data);
+
+
   const unreadCount = data?.statistics?.total_unread || 0;
+
+    console.log("notificationsLL", notifications);
 
   const handleToggle = async () => {
     setIsOpen((prev) => !prev);
     if (!isOpen && unreadCount > 0) {
+      await saveAllUnreadCount(role);
       await markAllAsRead(role);
     }
   };
@@ -47,12 +56,14 @@ const NotificationDropdown = () => {
         className="relative flex items-center justify-center text-gray-500 bg-white border border-gray-200 rounded-full h-11 w-11 hover:bg-gray-100 transition"
         onClick={handleToggle}
       >
-        {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 z-10 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white shadow-md">
-            {unreadCount > 9 ? "9+" : unreadCount}
-          </span>
-        )}
-        <Bell size={18} />
+        <div className="relative">
+          {unreadCount > 0 && (
+            <span className="absolute -top-2 -right-3 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-bold text-white">
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
+          )}
+          <Bell size={18} />
+        </div>
       </button>
 
       {/* Dropdown */}
@@ -65,7 +76,10 @@ const NotificationDropdown = () => {
         <div className="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
           <h5 className="text-lg font-semibold text-gray-800">Notifications</h5>
           <button
-            onClick={() => markAllAsRead(role)}
+            onClick={async () => {
+              await saveAllUnreadCount(role);
+              await markAllAsRead(role);
+            }}
             className="text-sm text-blue-600 hover:underline"
           >
             Mark all as read
@@ -92,8 +106,8 @@ const NotificationDropdown = () => {
                 onClick={closeDropdown}
               >
                 <DropdownItem
-                  className={`flex gap-3 rounded-lg border-b border-gray-100 p-3 hover:bg-gray-100 transition ${
-                    n.status === "unread" ? "bg-gray-50" : ""
+                  className={`flex gap-3 rounded-lg border-b border-gray-100 p-3 mb-[2px] hover:bg-gray-100 transition ${
+                    n.is_read === false ? "bg-gray-100" : "bg-white"
                   }`}
                 >
                   <div className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full">
