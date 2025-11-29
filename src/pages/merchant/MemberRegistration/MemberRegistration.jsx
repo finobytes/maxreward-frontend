@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
@@ -10,14 +10,14 @@ import PrimaryButton from "../../../components/ui/PrimaryButton";
 
 import { useReferNewMember } from "../../../redux/features/member/referNewMember/useReferNewMember";
 import { referNewMemberSchema } from "../../../schemas/referNewMember.schema";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
 import SkeletonField from "../../../components/skeleton/SkeletonField";
 import ReferSuccessDialog from "../../member/referNewMember/components/ReferSuccessDialog";
 import { useSelector } from "react-redux";
 import { useGetCountriesQuery } from "../../../redux/features/countries/countriesApi";
 import PhoneInput from "react-phone-input-2";
-import Select from "@/components/form/Select";
+import SearchableSelect from "@/components/form/SearchableSelect";
 
 const MemberRegistration = () => {
   const { user } = useSelector((state) => state.auth);
@@ -35,6 +35,7 @@ const MemberRegistration = () => {
     reset,
     watch,
     setValue,
+    control,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(referNewMemberSchema),
@@ -42,11 +43,19 @@ const MemberRegistration = () => {
       fullName: "",
       phone: "",
       email: "",
-      country_id: "", // country_id
+      country_id: "84", // country_id
       country_code: "", // phoneInput
     },
   });
 
+  useEffect(() => {
+    if (!countriesLoading && countries?.data?.length > 0) {
+      const malaysia = countries.data.find((c) => c.id === 84);
+      if (malaysia) {
+        setValue("country_id", String(malaysia.id));
+      }
+    }
+  }, [countriesLoading, countries, setValue]);
   const onSubmit = async (data) => {
     try {
       const res = await handleRefer(data);
@@ -81,23 +90,27 @@ const MemberRegistration = () => {
               {countriesLoading ? (
                 <div className="animate-pulse h-11 bg-gray-200 rounded-lg"></div>
               ) : (
-                <Select
-                  id="citizenship"
-                  placeholder="Select Citizenship"
-                  error={errors.cityzenship}
-                  {...register("country_id")}
-                  options={
-                    countries?.data?.map((item) => ({
-                      label: item.country,
-                      value: item.id,
-                    })) ?? []
-                  }
+                <Controller
+                  name="country_id"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchableSelect
+                      {...field}
+                      onChange={(val) => field.onChange(String(val))}
+                      options={
+                        countries?.data?.map((item) => ({
+                          label: item.country,
+                          value: item.id,
+                        })) ?? []
+                      }
+                    />
+                  )}
                 />
               )}
 
-              {errors.nationality && (
+              {errors.country_id && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.nationality.message}
+                  {errors.country_id.message}
                 </p>
               )}
             </div>
