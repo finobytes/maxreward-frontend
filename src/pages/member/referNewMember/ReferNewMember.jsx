@@ -11,7 +11,7 @@ import PrimaryButton from "../../../components/ui/PrimaryButton";
 import SearchableSelect from "@/components/form/SearchableSelect";
 import { useReferNewMember } from "../../../redux/features/member/referNewMember/useReferNewMember";
 import { referNewMemberSchema } from "../../../schemas/referNewMember.schema";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ReferSuccessDialog from "./components/ReferSuccessDialog";
 import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
 import SkeletonField from "../../../components/skeleton/SkeletonField";
@@ -46,10 +46,18 @@ const ReferNewMember = () => {
       fullName: "",
       phone: "",
       email: "",
-      country_id: "", // country_id
+      country_id: "84", // country_id
       country_code: "", // phoneInput
     },
   });
+  useEffect(() => {
+    if (!countriesLoading && countries?.data?.length > 0) {
+      const malaysia = countries.data.find((c) => c.id === 84);
+      if (malaysia) {
+        setValue("country_id", String(malaysia.id));
+      }
+    }
+  }, [countriesLoading, countries]);
 
   const onSubmit = async (data) => {
     console.log("form data", data);
