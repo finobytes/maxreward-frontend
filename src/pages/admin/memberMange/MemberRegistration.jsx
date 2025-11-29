@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -9,7 +9,7 @@ import ComponentCard from "../../../components/common/ComponentCard";
 import Label from "../../../components/form/Label";
 import Input from "../../../components/form/input/InputField";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
-import Select from "@/components/form/Select";
+import SearchableSelect from "@/components/form/SearchableSelect";
 
 import { useReferNewMember } from "../../../redux/features/member/referNewMember/useReferNewMember";
 import { useGetMemberByReferralQuery } from "../../../redux/features/admin/memberManagement/memberManagementApi";
@@ -66,6 +66,7 @@ const MemberRegistration = () => {
     setValue,
     setError,
     resetField,
+    control,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(adminMemberRegistrationSchema),
@@ -73,12 +74,19 @@ const MemberRegistration = () => {
       name: "",
       phone: "",
       email: "",
-      country_id: "",
+      country_id: "84",
       country_code: "",
       referralCode: "",
     },
   });
-
+  useEffect(() => {
+    if (!countriesLoading && countries?.data?.length > 0) {
+      const malaysia = countries.data.find((c) => c.id === 84);
+      if (malaysia) {
+        setValue("country_id", String(malaysia.id));
+      }
+    }
+  }, [countriesLoading, countries, setValue]);
   // Sync referralInput with form state
   useEffect(() => {
     setValue("referralCode", referralInput);
@@ -154,7 +162,7 @@ const MemberRegistration = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <ComponentCard title="Member Information">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {/* Nationality */}
+            {/* Citizenship */}
             <div>
               <Label htmlFor="citizenship">
                 Citizenship <span className="text-red-500">*</span>
@@ -163,17 +171,21 @@ const MemberRegistration = () => {
               {countriesLoading ? (
                 <div className="animate-pulse h-11 bg-gray-200 rounded-lg"></div>
               ) : (
-                <Select
-                  id="citizenship"
-                  placeholder="Select Citizenship"
-                  error={errors.country_id}
-                  {...register("country_id")}
-                  options={
-                    countries?.data?.map((item) => ({
-                      label: item.country,
-                      value: item.id,
-                    })) ?? []
-                  }
+                <Controller
+                  name="country_id"
+                  control={control}
+                  render={({ field }) => (
+                    <SearchableSelect
+                      {...field}
+                      onChange={(val) => field.onChange(String(val))}
+                      options={
+                        countries?.data?.map((item) => ({
+                          label: item.country,
+                          value: item.id,
+                        })) ?? []
+                      }
+                    />
+                  )}
                 />
               )}
 
@@ -304,10 +316,7 @@ const MemberRegistration = () => {
                     disabled
                     readOnly
                     value={
-                      isError
-                        ? "Referral Not Found"
-                        : memberData?.sponsored_member_info?.sponsor_member
-                            ?.name || ""
+                      isError ? "Referral Not Found" : memberData?.name || ""
                     }
                   />
                 )}
@@ -323,12 +332,7 @@ const MemberRegistration = () => {
                     id="referralStatus"
                     disabled
                     readOnly
-                    value={
-                      isError
-                        ? "Invalid"
-                        : memberData?.sponsored_member_info?.sponsor_member
-                            ?.status || ""
-                    }
+                    value={isError ? "Invalid" : memberData?.status || ""}
                   />
                 )}
               </div>

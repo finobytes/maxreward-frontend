@@ -1,7 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import Chart from "react-apexcharts";
+import { Dropdown } from "../../../../components/ui/dropdown/Dropdown";
+import { DropdownItem } from "../../../../components/ui/dropdown/DropdownItem";
+import { kebabMenu } from "../../../../assets/assets";
 
 const PointsPurchased = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  function toggleDropdown() {
+    setIsOpen(!isOpen);
+  }
+
+  function closeDropdown() {
+    setIsOpen(false);
+  }
   const max = 18235;
   const refer = 12743;
   const total = max + refer;
@@ -48,16 +60,57 @@ const PointsPurchased = () => {
 
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white relative shadow-md">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4 px-5 pt-5 sm:px-6 sm:pt-6">
-        Points Purchased
-      </h3>
+      <div className="flex items-center justify-between px-4">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4 px-5 pt-5 sm:px-6 sm:pt-6">
+          Voucher Purchased
+        </h3>
+
+        <div className="relative inline-block">
+          <button
+            className="dropdown-toggle cursor-pointer"
+            onClick={toggleDropdown}
+          >
+            <img src={kebabMenu} alt="View Options" className="" />
+          </button>
+          <Dropdown
+            isOpen={isOpen}
+            onClose={closeDropdown}
+            className="w-40 p-2"
+          >
+            <DropdownItem
+              onItemClick={closeDropdown}
+              className="flex w-full font-normal text-left text-gray-500 rounded-lg hover:bg-gray-100 hover:text-gray-700"
+            >
+              Last week
+            </DropdownItem>
+            <DropdownItem
+              onItemClick={closeDropdown}
+              className="flex w-full font-normal text-left text-gray-500 rounded-lg hover:bg-gray-100 hover:text-gray-700"
+            >
+              Last month
+            </DropdownItem>
+            <DropdownItem
+              onItemClick={closeDropdown}
+              className="flex w-full font-normal text-left text-gray-500 rounded-lg hover:bg-gray-100 hover:text-gray-700"
+            >
+              Last year
+            </DropdownItem>
+            <DropdownItem
+              onItemClick={closeDropdown}
+              className="flex w-full font-normal text-left text-gray-500 rounded-lg hover:bg-gray-100 hover:text-gray-700"
+            >
+              All time
+            </DropdownItem>
+          </Dropdown>
+        </div>
+      </div>
 
       {/* Chart */}
       <div className="flex justify-center">
         <Chart options={options} series={series} type="donut" height={280} />
       </div>
       <div className="absolute top-2/5 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-        <h3 className="text-center text-lg">Total Visitors</h3>
+        <h3 className="text-center text-lg">Total Voucher</h3>
         <p className="text-center text-gray-600 text-2xl">
           {total.toLocaleString()}
         </p>

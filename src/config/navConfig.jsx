@@ -146,6 +146,11 @@ export const NAV_CONFIG = {
       ],
     },
     {
+      name: "Notification",
+      icon: <Bell />,
+      path: "/merchant/notification",
+    },
+    {
       icon: <ShoppingBag />,
       name: "Redeem Mall",
       path: "/merchant/redeem-mall",
@@ -241,6 +246,11 @@ export const NAV_CONFIG = {
       path: "/member/merchant-application",
     },
     { icon: <CircleUserRound />, name: "Profile", path: "/member/profile" },
+    {
+      name: "Notification",
+      icon: <Bell />,
+      path: "/member/notification",
+    },
     {
       icon: <ScrollText />,
       name: "Terms & Condition",

@@ -164,7 +164,7 @@ const RedeemTransactions = () => {
                 <TableHead>Merchant Name</TableHead>
                 <TableHead>Merchant ID</TableHead>
                 <TableHead>Points</TableHead>
-                <TableHead>RM Amount</TableHead>
+                {/* <TableHead>RM Amount</TableHead> */}
                 <TableHead>Status</TableHead>
                 <TableHead>Redemption Date</TableHead>
                 <TableHead>Actions</TableHead>
@@ -226,12 +226,12 @@ const RedeemTransactions = () => {
                     <TableCell>
                       {formatPoints(purchase?.redeem_amount)} pts
                     </TableCell>
-                    <TableCell>
+                    {/* <TableCell>
                       {formatCurrency(
                         purchase?.cash_redeem_amount ??
                           purchase?.transaction_amount
                       )}
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell>
                       <StatusBadge status={purchase?.status}>
                         {purchase?.status || "N/A"}

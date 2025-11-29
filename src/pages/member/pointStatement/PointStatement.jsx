@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/table";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import Pagination from "../../../components/table/Pagination";
+import TableRowsSkeleton from "../../../components/skeleton/TableRowsSkeleton";
 import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
 import { usePointStatementMember } from "../../../redux/features/member/pointStatement/usePointStatementMember";
 import { Eye } from "lucide-react";
@@ -127,11 +128,7 @@ const PointStatement = () => {
 
             <TableBody>
               {loading ? (
-                <TableRow>
-                  <TableCell colSpan="8" className="py-6 text-center">
-                    Loading transactions...
-                  </TableCell>
-                </TableRow>
+                <TableRowsSkeleton cols={10} />
               ) : error ? (
                 <TableRow>
                   <TableCell

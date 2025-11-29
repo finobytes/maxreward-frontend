@@ -308,11 +308,11 @@ const VoucherForm = () => {
                   placeholder="Points / Price"
                   className="bg-gray-100"
                 />
-                {totalAmountWithRm && totalAmountWithRm !== totalAmount ? (
+                {/* {totalAmountWithRm && totalAmountWithRm !== totalAmount ? (
                   <p className="text-xs text-gray-500 mt-1">
                     After RM points: {totalAmountWithRm}
                   </p>
-                ) : null}
+                ) : null} */}
               </div>
               {/* </div> */}
 

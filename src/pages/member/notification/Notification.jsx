@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { CheckCircle2, Circle, Loader } from "lucide-react";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
-import PrimaryButton from "../../../components/ui/PrimaryButton";
 import ComponentCard from "../../../components/common/ComponentCard";
 import SearchInput from "../../../components/form/form-elements/SearchInput";
 import { Link } from "react-router";
@@ -10,21 +9,17 @@ import {
   useGetAllNotificationsQuery,
   useMarkNotificationAsReadMutation,
 } from "../../../redux/features/admin/notification/notificationApi";
-import { useSelector } from "react-redux";
 
 const Notification = () => {
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
-  const { user } = useSelector((state) => state.auth);
-  const role = user?.role || "member"; // admin | merchant | member
-
   const { data, isLoading, isFetching } = useGetAllNotificationsQuery({
     page,
     search,
     status: filter === "all" ? "" : filter,
-    role
+    role: "member",
   });
 
   const [markAsRead] = useMarkNotificationAsReadMutation();
@@ -43,7 +38,7 @@ const Notification = () => {
   return (
     <div className="space-y-6">
       <PageBreadcrumb
-        items={[{ label: "Home", to: "/" }, { label: "Notifications" }]}
+        items={[{ label: "Home", to: "/member" }, { label: "Notifications" }]}
       />
 
       <ComponentCard>
@@ -53,15 +48,6 @@ const Notification = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          {/* <div className="flex gap-2">
-            <PrimaryButton onClick={() => setFilter("all")}>All</PrimaryButton>
-            <PrimaryButton onClick={() => setFilter("unread")}>
-              Unread ({unreadCount})
-            </PrimaryButton>
-            <PrimaryButton onClick={() => setFilter("read")}>
-              Read
-            </PrimaryButton>
-          </div> */}
         </div>
 
         {isLoading || isFetching ? (
@@ -83,13 +69,7 @@ const Notification = () => {
                 )}
               >
                 <Link
-                  to={
-                    role === "member"
-                      ? `/member/notification/${n.id}`
-                      : role === "merchant"
-                      ? `/merchant/notification/${n.id}`
-                      : `/admin/notification/${n.id}`
-                  }
+                  to={`/member/notification/${n.id}`}
                   className="flex items-start gap-3 flex-1"
                   onClick={() => handleMarkAsRead(n.id)}
                 >

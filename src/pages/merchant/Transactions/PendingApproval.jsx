@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Skeleton } from "@/components/ui/skeleton";
+import TableRowsSkeleton from "../../../components/skeleton/TableRowsSkeleton";
 
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import SearchInput from "../../../components/form/form-elements/SearchInput";
@@ -226,15 +226,7 @@ const PendingApproval = () => {
 
             <TableBody>
               {isLoading ? (
-                Array.from({ length: 5 }).map((_, index) => (
-                  <TableRow key={index}>
-                    {Array.from({ length: 9 }).map((__, idx) => (
-                      <TableCell key={idx}>
-                        <Skeleton className="h-4 w-full" />
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
+                <TableRowsSkeleton cols={9} />
               ) : error ? (
                 <TableRow>
                   <TableCell

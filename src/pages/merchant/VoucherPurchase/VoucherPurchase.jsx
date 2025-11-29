@@ -181,7 +181,7 @@ const VoucherPurchase = () => {
                     <TableHead>Voucher Type</TableHead>
                     <TableHead>Denomination</TableHead>
                     <TableHead>Quantity</TableHead>
-                    <TableHead>Total Amount</TableHead>
+                    <TableHead>Total Points</TableHead>
                     <TableHead>Payment Method</TableHead>
                     <TableHead>Created Date</TableHead>
                     <TableHead>Status</TableHead>
@@ -223,7 +223,7 @@ const VoucherPurchase = () => {
                         ))}
                       </TableCell>
                       <TableCell>{v.quantity}</TableCell>
-                      <TableCell>RM {v.total_amount}</TableCell>
+                      <TableCell>{v.total_amount}</TableCell>
                       <TableCell className="capitalize">
                         {v.payment_method}
                       </TableCell>

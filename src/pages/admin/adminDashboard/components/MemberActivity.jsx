@@ -57,6 +57,12 @@ const MemberActivity = () => {
             >
               Last year
             </DropdownItem>
+            <DropdownItem
+              onItemClick={closeDropdown}
+              className="flex w-full font-normal text-left text-gray-500 rounded-lg hover:bg-gray-100 hover:text-gray-700"
+            >
+              All time
+            </DropdownItem>
           </Dropdown>
         </div>
       </div>
@@ -69,7 +75,7 @@ const MemberActivity = () => {
                   <img src={visits} alt="Visits" className="" />
                 </div>
                 <div>
-                  <p className="text-ms text-gray-800">Total Visits</p>
+                  <p className="text-ms text-gray-800">Total Active Members</p>
                   <p className="text-xs text-gray-600">
                     Increased by <span className="text-green-500">1.75%</span>
                   </p>
@@ -82,10 +88,10 @@ const MemberActivity = () => {
             <div className=" flex justify-between">
               <div className="flex items-center gap-4 mb-4">
                 <div>
-                  <img src={totalProducts} alt="Total Products" className="" />
+                  <img src={totalIncome} alt="Total Products" className="" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-800">Total Products</p>
+                  <p className="text-sm text-gray-800">Total Points Earned</p>
                   <p className="text-xs text-gray-600">
                     Increased by <span className="text-green-500">1.75%</span>
                   </p>
@@ -101,7 +107,7 @@ const MemberActivity = () => {
                   <img src={totalSales} alt="Total Sales" className="" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-800">Total Sales</p>
+                  <p className="text-sm text-gray-800">Total Visits</p>
                   <p className="text-xs text-gray-600">
                     Increased by <span className="text-green-500">1.75%</span>
                   </p>
@@ -117,7 +123,7 @@ const MemberActivity = () => {
                   <img src={totalRevenue} alt="Total Revenue" className="" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-800">Total Revenue</p>
+                  <p className="text-sm text-gray-800">New Member Joined</p>
                   <p className="text-xs text-gray-600">
                     Increased by <span className="text-green-500">1.75%</span>
                   </p>
@@ -133,7 +139,7 @@ const MemberActivity = () => {
                   <img src={totalProfit} alt="Total Profit" className="" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-800">Total Profit</p>
+                  <p className="text-sm text-gray-800">Total Online Now</p>
                   <p className="text-xs text-gray-600">
                     Increased by <span className="text-green-500">1.75%</span>
                   </p>
@@ -146,10 +152,10 @@ const MemberActivity = () => {
             <div className=" flex justify-between">
               <div className="flex items-center gap-4 mb-4">
                 <div>
-                  <img src={totalIncome} alt="Total Income" className="" />
+                  <img src={totalProducts} alt="Total Income" className="" />
                 </div>
                 <div className="">
-                  <p className="text-sm text-gray-800">Total Income</p>
+                  <p className="text-sm text-gray-800">Total Purchases</p>
                   <p className="text-xs text-gray-600">
                     Increased by <span className="text-green-500">1.75%</span>
                   </p>
