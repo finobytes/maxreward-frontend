@@ -32,6 +32,7 @@ const OwnerInfoCard = ({ userInfo }) => {
       navigate("/login");
     }
   };
+  console.log(userInfo);
   const people = [
     {
       key: "Name:",
@@ -44,6 +45,10 @@ const OwnerInfoCard = ({ userInfo }) => {
     {
       key: "Phone:",
       value: userInfo?.phone || "N/A",
+    },
+    {
+      key: "Referral Code:",
+      value: userInfo?.referral_code || "N/A",
     },
     {
       key: "Address:",
