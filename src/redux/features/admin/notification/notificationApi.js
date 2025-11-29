@@ -32,7 +32,7 @@ export const notificationApi = baseApi.injectEndpoints({
           total: response?.data?.total || 0,
           perPage: response?.data?.per_page || 10,
         },
-        statistics: response?.data?.statistics || {},
+        statistics: response?.statistics || {},
       }),
       providesTags: ["Notifications"],
     }),
@@ -51,6 +51,26 @@ export const notificationApi = baseApi.injectEndpoints({
         method: "PATCH",
       }),
       invalidatesTags: ["Notifications"],
+    }),
+
+    // ✅ Save all unread count
+    saveAllUnreadCount: builder.mutation({
+      query: (role = "member") => {
+        let endpoint;
+
+        if (role === "merchant") {
+          endpoint = "/notifications/merchant/save-count";
+        } else if (role === "member") {
+          endpoint = "/notifications/member/save-count";
+        } else if (role === "admin") {
+          endpoint = "/notifications/save-count";
+        }
+
+        return {
+          url: endpoint,
+          method: "POST",
+        };
+      },
     }),
 
     // ✅ Mark all as read
@@ -80,5 +100,6 @@ export const {
   useGetAllNotificationsQuery,
   useGetNotificationByIdQuery,
   useMarkNotificationAsReadMutation,
+  useSaveAllUnreadCountMutation,
   useMarkAllNotificationsAsReadMutation,
 } = notificationApi;
