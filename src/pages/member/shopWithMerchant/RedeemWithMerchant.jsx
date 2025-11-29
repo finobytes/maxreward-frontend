@@ -133,7 +133,7 @@ const RedeemWithMerchant = () => {
 
               <div className="mt-6">
                 <Label htmlFor="transaction-amount">
-                  Transaction Amount (RM)
+                  Transaction Amount (Points)
                 </Label>
                 <Input
                   id="transaction-amount"
@@ -183,7 +183,7 @@ const RedeemWithMerchant = () => {
                   error={!!fieldErrors.redeemAmount}
                   hint={fieldErrors.redeemAmount}
                 />
-                {redeemAmountValue > 0 && (
+                {/* {redeemAmountValue > 0 && (
                   <p className="mt-2 text-sm text-gray-500">
                     ≈{" "}
                     {redeemPoints.toLocaleString(undefined, {
@@ -191,7 +191,7 @@ const RedeemWithMerchant = () => {
                     })}{" "}
                     pts · 1 RM = {rmPoints} pts
                   </p>
-                )}
+                )} */}
               </div>
 
               <div className="mt-6 space-y-4">
@@ -199,7 +199,7 @@ const RedeemWithMerchant = () => {
                   <Label htmlFor="balance-to-pay">Balance to Pay</Label>
                   <Input
                     id="balance-to-pay"
-                    value={formatCurrency(balanceToPay)}
+                    value={formatCurrency(balanceToPay / rmPoints)}
                     disabled
                   />
                 </div>
