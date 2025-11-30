@@ -18,8 +18,9 @@ const initialState = {
 };
 
 const normalizeNumber = (value) => {
-  const num = parseFloat(value);
-  if (Number.isNaN(num) || num < 0) return 0;
+  if (value === "" || value === null) return 0;
+  const num = Number(value);
+  if (Number.isNaN(num)) return 0;
   return num;
 };
 
@@ -63,8 +64,18 @@ const shopWithMerchantSlice = createSlice({
     },
 
     setRedeemAmount: (state, action) => {
-      state.redeemAmount = action.payload ?? "";
-      // state.verified = false;
+      const raw = action.payload;
+
+      // Keep raw for UI
+      state.redeemAmount = raw;
+
+      // If empty → treat as 0 for calculation
+      if (raw === "") {
+        state.redeemAmountValue = 0;
+        calculateBreakdown(state);
+        return;
+      }
+
       calculateBreakdown(state);
     },
 
