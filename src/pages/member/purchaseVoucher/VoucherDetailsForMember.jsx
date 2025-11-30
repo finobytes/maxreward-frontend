@@ -72,9 +72,9 @@ const VoucherDetailsForMember = () => {
             </div>
 
             <div className="flex justify-between items-center">
-              <span className="text-gray-500">Total Amount</span>
+              <span className="text-gray-500">Total Points</span>
               <span className="font-bold text-lg text-green-600">
-                RM {data.total_amount}
+                {data.total_amount}
               </span>
             </div>
 
