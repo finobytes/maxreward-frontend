@@ -53,7 +53,7 @@ export const notificationApi = baseApi.injectEndpoints({
       invalidatesTags: ["Notifications"],
     }),
 
-    // ✅ Save all unread count
+    // Save all unread count
     saveAllUnreadCount: builder.mutation({
       query: (role = "member") => {
         let endpoint;
@@ -73,7 +73,7 @@ export const notificationApi = baseApi.injectEndpoints({
       },
     }),
 
-    // ✅ Mark all as read
+    // Mark all as read
     markAllNotificationsAsRead: builder.mutation({
       query: (role = "member") => {
         let endpoint;
