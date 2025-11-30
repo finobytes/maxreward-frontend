@@ -24,24 +24,32 @@ const normalizeNumber = (value) => {
 };
 
 const calculateBreakdown = (state) => {
-  const transaction = normalizeNumber(state.transactionAmount);
-  let redeem = normalizeNumber(state.redeemAmount);
-
-  if (transaction === 0) {
-    redeem = 0;
-  } else if (redeem > transaction) {
-    redeem = transaction;
-  }
+  const transaction = normalizeNumber(state.transactionAmount); // RM
+  let redeemPoints = normalizeNumber(state.redeemAmount); // POINTS
 
   const rmPoints =
     Number(state.settings?.rm_points ?? state.rmPoints ?? 1) || 1;
 
+  // Max redeem should be <= available points handled in UI
+  if (redeemPoints < 0) redeemPoints = 0;
+
+  // Convert Points → RM
+  const redeemRM = redeemPoints / rmPoints;
+
+  // Prevent redeeming more RM than transaction
+  const maxRedeemPointsAllowed = transaction * rmPoints;
+  if (redeemPoints > maxRedeemPointsAllowed) {
+    redeemPoints = maxRedeemPointsAllowed;
+  }
+
+  // Final calculations
   state.rmPoints = rmPoints;
   state.transactionAmountValue = transaction;
-  state.redeemAmountValue = redeem;
-  state.redeemPoints = redeem * rmPoints;
-  state.balanceToPay = Math.max(transaction - redeem, 0);
-  state.cashRedeemAmount = Math.max(transaction - redeem, 0);
+  state.redeemAmountValue = redeemPoints;
+
+  state.redeemPoints = redeemPoints; // Points user entered
+  state.balanceToPay = Math.max(transaction - redeemRM, 0);
+  state.cashRedeemAmount = state.balanceToPay;
 };
 
 const shopWithMerchantSlice = createSlice({

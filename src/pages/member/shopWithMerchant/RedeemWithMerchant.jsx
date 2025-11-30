@@ -185,7 +185,8 @@ const RedeemWithMerchant = () => {
                 />
                 {redeemAmountValue > 0 && (
                   <p className="mt-2 text-sm text-gray-500">
-                    {rmPoints} pts = 1 RM
+                    {redeemAmount} pts = RM{" "}
+                    {(redeemAmount / rmPoints).toFixed(2)}{" "}
                   </p>
                 )}
               </div>
