@@ -191,10 +191,7 @@ const MemberUpdate = () => {
                 ) : (
                   <Input
                     value={
-                      isError
-                        ? "Referral Not Found"
-                        : memberData?.sponsored_member_info?.sponsor_member
-                            ?.name ?? ""
+                      isError ? "Referral Not Found" : memberData?.name ?? ""
                     }
                     readOnly
                   />
@@ -205,12 +202,7 @@ const MemberUpdate = () => {
                 id="referralStatus"
                 label="Referral Status"
                 readOnly
-                value={
-                  isError
-                    ? "Invalid"
-                    : memberData?.sponsored_member_info?.sponsor_member
-                        ?.status ?? ""
-                }
+                value={isError ? "Invalid" : memberData?.status ?? ""}
               />
             </div>
 
