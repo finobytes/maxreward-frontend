@@ -84,7 +84,7 @@ const VoucherDetails = () => {
                 className={`px-3 py-1 text-xs font-semibold rounded-full ${
                   data.status === "success"
                     ? "bg-green-100 text-green-700"
-                    : data.status === "failed"
+                    : data.status === "rejected"
                     ? "bg-red-100 text-red-700"
                     : "bg-yellow-100 text-yellow-700"
                 }`}
@@ -92,6 +92,23 @@ const VoucherDetails = () => {
                 {data.status}
               </span>
             </div>
+
+            {data.status === "rejected" && (
+              <div className="flex justify-between items-center">
+                <span className="text-gray-500">Rejected By</span>
+                <span className="text-lg text-red-600">
+                  {data?.rejected_by ?? "N/A"}
+                </span>
+              </div>
+            )}
+            {data.status === "rejected" && (
+              <div className="flex justify-between items-center">
+                <span className="text-gray-500">Rejected Reason</span>
+                <span className="text-lg text-red-600">
+                  {data.rejected_reason}
+                </span>
+              </div>
+            )}
           </div>
         </section>
 

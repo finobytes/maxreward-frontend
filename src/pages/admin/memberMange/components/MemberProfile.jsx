@@ -50,7 +50,7 @@ const MemberProfile = ({ member }) => {
               <p className="mt-2 text-red-500 font-medium">
                 Blocked By: {member?.blocked_by}
               </p>{" "}
-              <p>Reason: {member?.blocked_reason}</p>
+              <p>Reason: {member?.block_reason}</p>
             </>
           ) : null}
           {member.status === "suspended" ? (

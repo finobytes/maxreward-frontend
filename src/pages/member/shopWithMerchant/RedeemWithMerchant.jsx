@@ -159,13 +159,21 @@ const RedeemWithMerchant = () => {
                 <Label htmlFor="redeem-amount">Points to Redeem</Label>
                 <Input
                   id="redeem-amount"
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
                   min="0"
                   value={redeemAmount}
                   onChange={(e) => {
-                    const value = Number(e.target.value);
+                    const raw = e.target.value;
 
-                    if (value > availablePoints) {
+                    // Only digits allow
+                    if (raw === "" || /^\d+$/.test(raw)) {
+                      setRedeemAmount(raw); // raw string
+                    }
+
+                    // Validate inside UI
+                    const numeric = Number(raw);
+                    if (numeric > availablePoints) {
                       setFieldErrors((prev) => ({
                         ...prev,
                         redeemAmount: "Points cannot exceed available balance",
@@ -176,16 +184,16 @@ const RedeemWithMerchant = () => {
                         redeemAmount: null,
                       }));
                     }
-
-                    setRedeemAmount(value);
                   }}
                   placeholder="0"
                   error={!!fieldErrors.redeemAmount}
                   hint={fieldErrors.redeemAmount}
                 />
+
                 {redeemAmountValue > 0 && (
                   <p className="mt-2 text-sm text-gray-500">
-                    {rmPoints} pts = 1 RM
+                    {redeemAmount} pts = RM{" "}
+                    {(redeemAmount / rmPoints).toFixed(2)}{" "}
                   </p>
                 )}
               </div>
