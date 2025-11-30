@@ -297,7 +297,7 @@ const VoucherManage = () => {
                     </TableCell>
 
                     <TableCell>{v.quantity}</TableCell>
-                    <TableCell>RM {v.total_amount}</TableCell>
+                    <TableCell>{v.total_amount}</TableCell>
                     <TableCell>
                       {new Date(v.created_at).toLocaleDateString()}
                     </TableCell>
