@@ -24,6 +24,15 @@ export const settingsApi = baseApi.injectEndpoints({
       transformResponse: (response) => response?.data || response,
       providesTags: ["Settings"],
     }),
+    // BULK UPDATE CP levels
+    bulkUpdateCPLevel: builder.mutation({
+      query: (data) => ({
+        url: "/cp-config/bulk/update",
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["Settings"],
+    }),
 
     // UPDATE CP level
     updateCPLevel: builder.mutation({
@@ -42,4 +51,5 @@ export const {
   useGetCurrentSettingsQuery,
   useGetCPLevelQuery,
   useUpdateCPLevelMutation,
+  useBulkUpdateCPLevelMutation,
 } = settingsApi;

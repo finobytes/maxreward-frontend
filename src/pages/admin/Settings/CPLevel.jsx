@@ -3,7 +3,7 @@ import { RefreshCw } from "lucide-react";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import {
   useGetCPLevelQuery,
-  useUpdateCPLevelMutation,
+  useBulkUpdateCPLevelMutation,
 } from "../../../redux/features/admin/settings/settingsApi";
 import { toast } from "sonner";
 import {
@@ -19,7 +19,8 @@ import Input from "../../../components/form/input/InputField";
 
 const CPLevel = () => {
   const { data, isLoading, isFetching, refetch } = useGetCPLevelQuery();
-  const [updateCPLevel, { isLoading: isUpdating }] = useUpdateCPLevelMutation();
+  const [bulkUpdateCPLevel, { isLoading: isUpdating }] =
+    useBulkUpdateCPLevelMutation();
 
   const [rows, setRows] = useState([]);
 
@@ -65,9 +66,8 @@ const CPLevel = () => {
         })
       ),
     };
-    console.log(payload);
     try {
-      await updateCPLevel(payload).unwrap();
+      await bulkUpdateCPLevel(payload).unwrap();
       toast.success("CP Level updated successfully!");
       refetch();
     } catch (err) {
