@@ -28,6 +28,21 @@ import {
 import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSkeleton";
 import BulkActionBar from "../../../components/table/BulkActionBar";
 import { Link } from "react-router";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "../../../components/ui/dialog";
+
+const initialRejectState = {
+  open: false,
+  merchant: null,
+  reason: "",
+  error: "",
+};
 
 const PendingMerchant = () => {
   const dispatch = useDispatch();
@@ -36,6 +51,7 @@ const PendingMerchant = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const perPage = 10;
   const [selected, setSelected] = useState([]);
+  const [rejectModal, setRejectModal] = useState(initialRejectState);
 
   // Mount global filters
   useEffect(() => {
@@ -76,14 +92,45 @@ const PendingMerchant = () => {
     }
   };
 
-  const handleReject = async (id) => {
+  const openRejectModal = (merchant) => {
+    setRejectModal({
+      open: true,
+      merchant,
+      reason: "",
+      error: "",
+    });
+  };
+
+  const closeRejectModal = () => {
+    setRejectModal({ ...initialRejectState });
+  };
+
+  const handleRejectSubmit = async () => {
+    if (!rejectModal.reason.trim()) {
+      setRejectModal((prev) => ({
+        ...prev,
+        error: "Rejection reason is required.",
+      }));
+      return;
+    }
+
     try {
-      await updateMerchant({ id, status: "rejected" }).unwrap();
+      await updateMerchant({
+        id: rejectModal.merchant.id,
+        status: "rejected",
+        reject_reason: rejectModal.reason.trim(),
+      }).unwrap();
       toast.success("Merchant rejected successfully");
+      closeRejectModal();
       refetch();
     } catch (error) {
       console.error("Reject failed:", error);
-      toast.error("Failed to reject merchant");
+      const message =
+        error?.data?.message || error?.error || "Failed to reject merchant.";
+      setRejectModal((prev) => ({
+        ...prev,
+        error: message,
+      }));
     }
   };
 
@@ -93,7 +140,7 @@ const PendingMerchant = () => {
       refetch();
     }, 500);
     return () => clearTimeout(timeout);
-  }, [search, currentPage]);
+  }, [search, currentPage, refetch]);
 
   const toggleSelectAll = (checked) => {
     if (checked) {
@@ -276,7 +323,7 @@ const PendingMerchant = () => {
                       </button>
 
                       <button
-                        onClick={() => handleReject(merchant.id)}
+                        onClick={() => openRejectModal(merchant)}
                         disabled={isUpdating}
                         className="px-2 rounded-md bg-red-100 hover:bg-red-200 text-red-500 disabled:opacity-50"
                       >
@@ -299,6 +346,68 @@ const PendingMerchant = () => {
           />
         </div>
       </div>
+
+      <Dialog
+        open={rejectModal.open}
+        onOpenChange={(open) => {
+          if (!open) closeRejectModal();
+        }}
+      >
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Reject Merchant</DialogTitle>
+            <DialogDescription>
+              Provide a reason for rejecting{" "}
+              {rejectModal.merchant?.business_name || "this merchant"}.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-2">
+            <label
+              htmlFor="merchant-reject-reason"
+              className="text-sm font-medium text-gray-700"
+            >
+              Reason
+            </label>
+            <textarea
+              id="merchant-reject-reason"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              rows={4}
+              placeholder="Add a brief justification..."
+              value={rejectModal.reason}
+              onChange={(e) =>
+                setRejectModal((prev) => ({
+                  ...prev,
+                  reason: e.target.value,
+                  error: "",
+                }))
+              }
+            />
+            {rejectModal.error && (
+              <p className="text-sm text-red-500">{rejectModal.error}</p>
+            )}
+          </div>
+
+          <DialogFooter className="gap-3">
+            <button
+              type="button"
+              onClick={closeRejectModal}
+              className="px-4 py-2 text-sm rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+              disabled={isUpdating}
+            >
+              Cancel
+            </button>
+            <PrimaryButton
+              variant="danger"
+              size="md"
+              onClick={handleRejectSubmit}
+              disabled={isUpdating}
+            >
+              {isUpdating ? "Submitting..." : "Reject"}
+            </PrimaryButton>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
