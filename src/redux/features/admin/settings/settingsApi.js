@@ -18,8 +18,28 @@ export const settingsApi = baseApi.injectEndpoints({
       transformResponse: (response) => response?.data || response,
       providesTags: ["Settings"],
     }),
+    // GET CP levels
+    getCPLevel: builder.query({
+      query: () => "/cp-config",
+      transformResponse: (response) => response?.data || response,
+      providesTags: ["Settings"],
+    }),
+
+    // UPDATE CP level
+    updateCPLevel: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/cp-config/${id}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["Settings"],
+    }),
   }),
 });
 
-export const { useCreateOrUpdateMutation, useGetCurrentSettingsQuery } =
-  settingsApi;
+export const {
+  useCreateOrUpdateMutation,
+  useGetCurrentSettingsQuery,
+  useGetCPLevelQuery,
+  useUpdateCPLevelMutation,
+} = settingsApi;
