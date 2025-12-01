@@ -141,7 +141,7 @@ const AllTransactions = () => {
                 <TableHead>Balance</TableHead>
                 <TableHead>Payment Method</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="">Actions</TableHead>
+                {/* <TableHead className="">Actions</TableHead> */}
               </TableRow>
             </TableHeader>
 
@@ -210,14 +210,14 @@ const AllTransactions = () => {
                       </StatusBadge>
                     </TableCell>
                     {/* <TableCell>{formatDateTime(txn.created_at)}</TableCell> */}
-                    <TableCell className="text-right flex items-center gap-2">
+                    {/* <TableCell className="text-right flex items-center gap-2">
                       <Link
                         to=""
                         className="p-2 rounded-md bg-indigo-100 text-indigo-600 hover:bg-indigo-200 inline-block"
                       >
                         <Eye size={16} />
                       </Link>
-                    </TableCell>
+                    </TableCell> */}
                   </TableRow>
                 ))
               )}

@@ -96,7 +96,7 @@ export const merchantManagementApi = baseApi.injectEndpoints({
     }),
     suspendMerchant: builder.mutation({
       query: ({ merchantId, status = "suspended", suspendReason }) => ({
-        url: "/merchants/suspend",
+        url: "/admin/merchant-suspend",
         method: "POST",
         body: {
           merchant_id: merchantId,
