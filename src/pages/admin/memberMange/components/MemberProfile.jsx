@@ -56,7 +56,7 @@ const MemberProfile = ({ member }) => {
           {member.status === "suspended" ? (
             <>
               <p className="mt-2 text-red-500 font-medium">
-                Suspended By: {member?.suspended_by}
+                Suspended By: {member?.suspended_by?.name}
               </p>{" "}
               <p>Reason: {member?.suspended_reason}</p>
             </>
