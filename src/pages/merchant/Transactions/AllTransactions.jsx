@@ -31,9 +31,6 @@ const currency = (value) =>
     maximumFractionDigits: 2,
   })}`;
 
-const formatDateTime = (value) =>
-  value ? new Date(value).toLocaleString() : "—";
-
 const AllTransactions = () => {
   const {
     transactions,

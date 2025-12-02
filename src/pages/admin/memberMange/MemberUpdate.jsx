@@ -86,7 +86,6 @@ const MemberUpdate = () => {
       formData.append("name", data.fullName);
       formData.append("phone", data.phoneNumber);
       formData.append("email", data.email);
-      formData.append("referral_code", data.referralCode);
       formData.append("status", "active");
 
       const response = await updateMember({ id, formData }).unwrap();

@@ -109,6 +109,28 @@ export const merchantManagementApi = baseApi.injectEndpoints({
         { type: "Merchant", id: "LIST" },
       ],
     }),
+    blockMerchant: builder.mutation({
+      query: ({ merchantId, id, status = "rejected", rejectReason }) => {
+        const targetId = merchantId ?? id;
+        return {
+          url: "/admin/merchant-rejected",
+          method: "POST",
+          body: {
+            merchant_id: targetId,
+            status,
+            ...(rejectReason && { rejected_reason: rejectReason }),
+          },
+        };
+      },
+      invalidatesTags: (result, error, { merchantId, id }) => {
+        const targetId = merchantId ?? id;
+        const tags = [{ type: "Merchant", id: "LIST" }];
+        if (targetId) {
+          tags.push({ type: "Merchant", id: targetId });
+        }
+        return tags;
+      },
+    }),
   }),
   overrideExisting: false,
 });
@@ -121,4 +143,5 @@ export const {
   useUpdateMerchantMutation,
   useDeleteMerchantMutation,
   useSuspendMerchantMutation,
+  useBlockMerchantMutation,
 } = merchantManagementApi;

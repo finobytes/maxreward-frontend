@@ -3,10 +3,10 @@ import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import SearchInput from "../../../components/form/form-elements/SearchInput";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
 import { Eye, Plus } from "lucide-react";
-import StatusBadge from "../../../components/table/StatusBadge";
 import Pagination from "../../../components/table/Pagination";
 
 import {
+  useBlockMerchantMutation,
   useGetMerchantsQuery,
   useUpdateMerchantMutation,
 } from "../../../redux/features/admin/merchantManagement/merchantManagementApi";
@@ -80,6 +80,8 @@ const PendingMerchant = () => {
   // Update Mutation
   const [updateMerchant, { isLoading: isUpdating }] =
     useUpdateMerchantMutation();
+  const [blockMerchant, { isLoading: isRejecting }] =
+    useBlockMerchantMutation();
 
   const handleApprove = async (id) => {
     try {
@@ -115,16 +117,15 @@ const PendingMerchant = () => {
     }
 
     try {
-      await updateMerchant({
-        id: rejectModal.merchant.id,
+      await blockMerchant({
+        merchantId: rejectModal.merchant.id,
         status: "rejected",
-        reject_reason: rejectModal.reason.trim(),
+        rejectReason: rejectModal.reason.trim(),
       }).unwrap();
-      toast.success("Merchant rejected successfully");
+      toast.success("Merchant rejected successfully.");
       closeRejectModal();
       refetch();
     } catch (error) {
-      console.error("Reject failed:", error);
       const message =
         error?.data?.message || error?.error || "Failed to reject merchant.";
       setRejectModal((prev) => ({
@@ -191,7 +192,7 @@ const PendingMerchant = () => {
               onClick={() => {
                 setSearch("");
                 refetch();
-                setSelected("");
+                setSelected([]);
               }}
             >
               Clear
@@ -268,70 +269,81 @@ const PendingMerchant = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                merchants.map((merchant) => (
-                  <TableRow
-                    key={merchant?.id}
-                    className="bg-white border-b hover:bg-gray-50 transition"
-                  >
-                    <TableCell>
-                      <input
-                        type="checkbox"
-                        checked={selected.includes(merchant?.id)}
-                        onChange={() => toggleSelect(merchant?.id)}
-                        className="w-4 h-4 rounded"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      {merchant?.application_id || (
-                        <span className="text-gray-500">N/A</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {merchant?.staffs?.find(
-                        (staff) => staff?.type === "merchant"
-                      )?.user_name || "N/A"}
-                    </TableCell>
-                    <TableCell>{merchant?.business_name}</TableCell>
-                    <TableCell>
-                      {merchant?.authorized_person || (
-                        <span className="text-gray-500">N/A</span>
-                      )}
-                    </TableCell>
-                    <TableCell>{merchant?.phone}</TableCell>
-                    <TableCell>{merchant?.email}</TableCell>
-                    <TableCell>
-                      {merchant?.reward_budget || (
-                        <span className="text-gray-500">N/A</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {new Date(merchant.created_at).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell className="py-4 flex gap-2">
-                      <Link
-                        to={`/admin/pending-merchant/details/${merchant?.id}`}
-                        className="p-2 rounded-md bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
-                      >
-                        <Eye size={16} />
-                      </Link>
-                      <button
-                        onClick={() => handleApprove(merchant.id)}
-                        disabled={isUpdating}
-                        className="px-2 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-500 disabled:opacity-50"
-                      >
-                        Approve
-                      </button>
+                merchants.map((merchant) => {
+                  const isRejected =
+                    (merchant?.status || "").toLowerCase() === "rejected";
+                  const isCurrentMerchantSubmitting =
+                    isRejecting && rejectModal.merchant?.id === merchant?.id;
 
-                      <button
-                        onClick={() => openRejectModal(merchant)}
-                        disabled={isUpdating}
-                        className="px-2 rounded-md bg-red-100 hover:bg-red-200 text-red-500 disabled:opacity-50"
-                      >
-                        Reject
-                      </button>
-                    </TableCell>
-                  </TableRow>
-                ))
+                  return (
+                    <TableRow
+                      key={merchant?.id}
+                      className="bg-white border-b hover:bg-gray-50 transition"
+                    >
+                      <TableCell>
+                        <input
+                          type="checkbox"
+                          checked={selected.includes(merchant?.id)}
+                          onChange={() => toggleSelect(merchant?.id)}
+                          className="w-4 h-4 rounded"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        {merchant?.application_id || (
+                          <span className="text-gray-500">N/A</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {merchant?.staffs?.find(
+                          (staff) => staff?.type === "merchant"
+                        )?.user_name || "N/A"}
+                      </TableCell>
+                      <TableCell>{merchant?.business_name}</TableCell>
+                      <TableCell>
+                        {merchant?.authorized_person || (
+                          <span className="text-gray-500">N/A</span>
+                        )}
+                      </TableCell>
+                      <TableCell>{merchant?.phone}</TableCell>
+                      <TableCell>{merchant?.email}</TableCell>
+                      <TableCell>
+                        {merchant?.reward_budget || (
+                          <span className="text-gray-500">N/A</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {new Date(merchant.created_at).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell className="py-4 flex gap-2">
+                        <Link
+                          to={`/admin/pending-merchant/details/${merchant?.id}`}
+                          className="p-2 rounded-md bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
+                        >
+                          <Eye size={16} />
+                        </Link>
+                        <button
+                          onClick={() => handleApprove(merchant.id)}
+                          disabled={isUpdating}
+                          className="px-2 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-500 disabled:opacity-50"
+                        >
+                          Approve
+                        </button>
+
+                        <button
+                          onClick={() => openRejectModal(merchant)}
+                          disabled={isRejected || isCurrentMerchantSubmitting}
+                          className="px-2 rounded-md bg-yellow-100 text-gray-700 hover:bg-yellow-200 disabled:opacity-50"
+                        >
+                          {isCurrentMerchantSubmitting
+                            ? "Submitting..."
+                            : isRejected
+                            ? "Rejected"
+                            : "Reject"}
+                        </button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>
@@ -393,7 +405,7 @@ const PendingMerchant = () => {
               type="button"
               onClick={closeRejectModal}
               className="px-4 py-2 text-sm rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50"
-              disabled={isUpdating}
+              disabled={isRejecting}
             >
               Cancel
             </button>
@@ -401,9 +413,9 @@ const PendingMerchant = () => {
               variant="danger"
               size="md"
               onClick={handleRejectSubmit}
-              disabled={isUpdating}
+              disabled={isRejecting}
             >
-              {isUpdating ? "Submitting..." : "Reject"}
+              {isRejecting ? "Submitting..." : "Reject"}
             </PrimaryButton>
           </DialogFooter>
         </DialogContent>
