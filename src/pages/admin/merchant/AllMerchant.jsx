@@ -10,6 +10,7 @@ import { Link } from "react-router";
 import {
   useDeleteMerchantMutation,
   useSuspendMerchantMutation,
+  useUpdateMerchantMutation,
 } from "../../../redux/features/admin/merchantManagement/merchantManagementApi";
 import { useGetAllBusinessTypesQuery } from "../../../redux/features/admin/businessType/businessTypeApi";
 import {
@@ -71,6 +72,8 @@ const AllMerchant = () => {
   const [deleteMerchant] = useDeleteMerchantMutation();
   const [suspendMerchant, { isLoading: isSuspending }] =
     useSuspendMerchantMutation();
+  const [updateMerchant, { isLoading: isUpdating }] =
+    useUpdateMerchantMutation();
   const [selected, setSelected] = useState([]);
   const [suspendModal, setSuspendModal] = useState(initialSuspendState);
 
@@ -144,6 +147,17 @@ const AllMerchant = () => {
         ...prev,
         error: message,
       }));
+    }
+  };
+
+  const handleUnsuspend = async (id) => {
+    try {
+      await updateMerchant({ id, body: { status: "approved" } }).unwrap();
+      toast.success("Merchant unsuspended successfully.");
+      refetch();
+    } catch (error) {
+      console.error("Unsuspend failed:", error);
+      toast.error("Failed to unsuspend merchant.");
     }
   };
 
@@ -313,7 +327,8 @@ const AllMerchant = () => {
                   const isSuspended =
                     (m?.status || "").toLowerCase() === "suspended";
                   const isCurrentMerchantSubmitting =
-                    isSuspending && suspendModal.merchant?.id === m.id;
+                    (isSuspending && suspendModal.merchant?.id === m.id) ||
+                    (isUpdating && m.id);
 
                   return (
                     <TableRow
@@ -383,16 +398,22 @@ const AllMerchant = () => {
                             <PencilLine size={16} />
                           </Link>
                           <button
-                            onClick={() => openSuspendModal(m)}
-                            disabled={
-                              isSuspended || isCurrentMerchantSubmitting
+                            onClick={() =>
+                              isSuspended
+                                ? handleUnsuspend(m.id)
+                                : openSuspendModal(m)
                             }
-                            className="px-2 rounded-md bg-yellow-100 text-gray-700 hover:bg-yellow-200 disabled:opacity-50"
+                            disabled={isCurrentMerchantSubmitting}
+                            className={`px-2 rounded-md ${
+                              isSuspended
+                                ? "bg-green-100 text-green-700 hover:bg-green-200"
+                                : "bg-yellow-100 text-gray-700 hover:bg-yellow-200"
+                            } disabled:opacity-50`}
                           >
                             {isCurrentMerchantSubmitting
                               ? "Submitting..."
                               : isSuspended
-                              ? "Suspended"
+                              ? "Unsuspend"
                               : "Suspend"}
                           </button>
                         </div>
