@@ -18,6 +18,8 @@ import { useNavigate, useParams } from "react-router";
 import { companyLogoPlaceholder } from "../../../assets/assets";
 import SkeletonField from "../../../components/skeleton/SkeletonField";
 import { useGetMemberByReferralQuery } from "../../../redux/features/admin/memberManagement/memberManagementApi";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
 
 const MerchantEdit = () => {
   const [businessLogo, setBusinessLogo] = useState(null);
@@ -49,9 +51,12 @@ const MerchantEdit = () => {
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(merchantEditSchema),
+    shouldFocusError: false,
   });
 
   // Populate existing merchant data into form
@@ -69,7 +74,7 @@ const MerchantEdit = () => {
         delete payload.merchant_password;
       }
       if (businessLogo) {
-        register("business_logo", businessLogo);
+        payload.business_logo = businessLogo;
       }
 
       await updateMerchant({ id, ...payload }).unwrap();
@@ -82,7 +87,12 @@ const MerchantEdit = () => {
     }
   };
 
-  if (isFetching)
+  const onError = (errors) => {
+    console.log("Form Errors:", errors);
+    toast.error("Please check the form for errors");
+  };
+
+  if (!merchantData || isFetching) {
     return (
       <div className="p-6 space-y-4">
         {/* Skeleton for breadcrumb */}
@@ -106,6 +116,7 @@ const MerchantEdit = () => {
         </div>
       </div>
     );
+  }
 
   if (isError)
     return <p className="p-6 text-red-500">Failed to load merchant data.</p>;
@@ -120,7 +131,7 @@ const MerchantEdit = () => {
         ]}
       />
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit, onError)}>
         {/* Business Information */}
         <ComponentCard title="Business Information">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -144,6 +155,10 @@ const MerchantEdit = () => {
               <div>
                 <Label>State</Label>
                 <Input {...register("state")} placeholder="State" />
+              </div>
+              <div>
+                <Label>Town</Label>
+                <Input {...register("town")} placeholder="Town" />
               </div>
               <div>
                 <Label>Product/Service</Label>
@@ -216,7 +231,37 @@ const MerchantEdit = () => {
                 <Label>
                   Phone Number (<span className="text-red-500">*</span>)
                 </Label>
-                <Input {...register("phone")} placeholder="Phone Number" />
+                <PhoneInput
+                  country={"my"}
+                  value={watch("phone")}
+                  onChange={(phone, countryData) => {
+                    const numeric = phone.replace("+", "");
+                    setValue("phone", numeric);
+                    setValue("country_code", countryData?.dialCode);
+                  }}
+                  inputProps={{
+                    name: "phone",
+                    required: true,
+                  }}
+                  countryCodeEditable={false}
+                  enableSearch={true}
+                  autocompleteSearch={true}
+                  searchPlaceholder="search"
+                  prefix=""
+                  inputStyle={{ width: "100%" }}
+                  buttonStyle={{}}
+                  dropdownStyle={{ maxHeight: "250px" }}
+                  searchStyle={{
+                    width: "100%",
+                    padding: "8px",
+                    boxSizing: "border-box",
+                  }}
+                />
+                {errors.phone && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.phone.message}
+                  </p>
+                )}
               </div>
               <div>
                 <Label>Email Address</Label>

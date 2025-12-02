@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const optionalText = z.string().optional().or(z.literal(""));
+const optionalText = z.union([z.string(), z.number()]).nullable().optional();
 
 export const merchantEditSchema = z.object({
   business_name: z.string().min(1, "Business name is required"),
@@ -14,12 +14,15 @@ export const merchantEditSchema = z.object({
     .min(1, "Authorized person name is required"),
   phone: z
     .string()
-    .transform((value) => value.replace(/[\s-]/g, ""))
-    .refine((value) => /^\d{10,11}$/.test(value), {
-      message: "Invalid phone number",
+    .transform((value) => value.replace(/\D/g, ""))
+    .refine((value) => value.length >= 10 && value.length <= 15, {
+      message: "Phone number must be between 10 and 15 digits",
     }),
   email: z
     .union([z.literal(""), z.string().email("Invalid email address")])
+    .nullable()
     .optional(),
   designation: optionalText,
+  town: optionalText,
+  country_code: optionalText,
 });
