@@ -97,7 +97,7 @@ const VoucherDetails = () => {
               <div className="flex justify-between items-center">
                 <span className="text-gray-500">Rejected By</span>
                 <span className="text-lg text-red-600">
-                  {data?.rejected_by ?? "N/A"}
+                  {data?.rejected_by?.name ?? "N/A"}
                 </span>
               </div>
             )}

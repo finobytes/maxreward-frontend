@@ -51,6 +51,10 @@ export const NAV_CONFIG = {
       icon: <ChartArea />,
       subItems: [
         { name: "Voucher", path: "/admin/voucher-manage" },
+        {
+          name: "Denomination",
+          path: "/admin/denomination",
+        },
         { name: "Company Info", path: "/admin/company-info" },
         { name: "Income", path: "/admin/accounts/income" },
         { name: "Expense", path: "/admin/accounts/expense" },
@@ -77,10 +81,6 @@ export const NAV_CONFIG = {
         {
           name: "CP Unlock History",
           path: "/admin/cp-unlock-history",
-        },
-        {
-          name: "Denomination",
-          path: "/admin/denomination",
         },
         { name: "Email Log", path: "/admin/reports/email-log" },
         { name: "Redeem Mall Transaction", path: "/admin/reports/redemption" },
