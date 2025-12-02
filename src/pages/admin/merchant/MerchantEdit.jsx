@@ -73,11 +73,25 @@ const MerchantEdit = () => {
       if (!payload.merchant_password) {
         delete payload.merchant_password;
       }
+
+      const formData = new FormData();
+
+      Object.keys(payload).forEach((key) => {
+        if (payload[key] !== undefined && payload[key] !== null) {
+          formData.append(key, payload[key]);
+        }
+      });
+
       if (businessLogo) {
-        payload.business_logo = businessLogo;
+        formData.append("business_logo", businessLogo);
       }
 
-      await updateMerchant({ id, ...payload }).unwrap();
+      // Debug FormData
+      for (let [key, value] of formData.entries()) {
+        console.log(`FormData: ${key} = ${value}`);
+      }
+
+      await updateMerchant({ id, body: formData }).unwrap();
 
       toast.success("Merchant updated successfully!");
       navigate("/admin/merchant/all-merchant");

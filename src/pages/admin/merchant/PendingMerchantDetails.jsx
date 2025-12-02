@@ -56,7 +56,7 @@ const PendingMerchantDetails = () => {
         delete payload.merchant_password;
       }
 
-      await updateMerchant({ id, ...payload }).unwrap();
+      await updateMerchant({ id, body: payload }).unwrap();
 
       toast.success("Merchant updated successfully!");
       //   navigate("/admin/merchant/all-merchant");
