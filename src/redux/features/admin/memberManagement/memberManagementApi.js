@@ -77,10 +77,11 @@ export const memberApi = baseApi.injectEndpoints({
     }),
 
     updateMember: builder.mutation({
-      query: ({ id, formData }) => ({
+      query: ({ id, payload }) => ({
         url: `/members/${id}`,
         method: "PATCH",
-        body: formData,
+        body: payload, // normal JSON body
+        headers: { "Content-Type": "application/json" },
       }),
       invalidatesTags: (result, error, { id }) => [
         { type: "Member", id },
