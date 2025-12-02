@@ -57,8 +57,8 @@ const CpTransactionDetails = () => {
         <PageBreadcrumb
           items={[
             { label: "Home", to: "/admin" },
-            { label: "CP Transaction", to: "/admin/cp-transaction" },
-            { label: "Transaction Details" },
+            { label: "CP Distribution Report", to: "/admin/cp-transaction" },
+            { label: "CP Distribution Report Details" },
           ]}
         />
         <div className="flex items-center justify-center py-20">
@@ -79,7 +79,9 @@ const CpTransactionDetails = () => {
           ]}
         />
         <div className="text-center text-red-500 py-10 bg-white rounded-xl border border-red-200">
-          <p className="text-lg font-semibold">Failed to load transaction details.</p>
+          <p className="text-lg font-semibold">
+            Failed to load transaction details.
+          </p>
           <Link
             to="/admin/cp-transaction"
             className="mt-4 inline-flex items-center gap-2 text-brand-600 hover:text-brand-700"
@@ -110,7 +112,9 @@ const CpTransactionDetails = () => {
   }
 
   const transaction = data.data;
-  const isNegative = transaction.transaction_type === "spent" || transaction.transaction_type === "transferred";
+  const isNegative =
+    transaction.transaction_type === "spent" ||
+    transaction.transaction_type === "transferred";
 
   return (
     <div>
@@ -176,10 +180,17 @@ const CpTransactionDetails = () => {
             <InfoCard
               icon={<DollarSign className="text-brand-600" />}
               label="Transaction Type"
-              value={transactionTypeMapping[transaction.transaction_type] || transaction.transaction_type}
+              value={
+                transactionTypeMapping[transaction.transaction_type] ||
+                transaction.transaction_type
+              }
             />
             <InfoCard
-              icon={statusIcons[transaction.status] || <Info className="text-gray-600" />}
+              icon={
+                statusIcons[transaction.status] || (
+                  <Info className="text-gray-600" />
+                )
+              }
               label="Status"
               value={
                 <span
@@ -193,14 +204,19 @@ const CpTransactionDetails = () => {
                       : "bg-red-100 text-red-600"
                   }`}
                 >
-                  {transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)}
+                  {transaction.status.charAt(0).toUpperCase() +
+                    transaction.status.slice(1)}
                 </span>
               }
             />
             <InfoCard
               icon={<TrendingUp className="text-purple-600" />}
               label="CP Percentage"
-              value={transaction.cp_percentage ? `${transaction.cp_percentage}%` : "-"}
+              value={
+                transaction.cp_percentage
+                  ? `${transaction.cp_percentage}%`
+                  : "-"
+              }
             />
             <InfoCard
               icon={<Users className="text-indigo-600" />}
@@ -221,11 +237,23 @@ const CpTransactionDetails = () => {
               <User className="text-brand-600" /> Recipient Member
             </h2>
             <ul className="divide-y divide-gray-200 space-y-3">
-              <InfoRow label="Member ID" value={`#${transaction.recipient_member.id}`} />
+              <InfoRow
+                label="Member ID"
+                value={`#${transaction.recipient_member.id}`}
+              />
               <InfoRow label="Name" value={transaction.recipient_member.name} />
-              <InfoRow label="Username" value={transaction.recipient_member.user_name} />
-              <InfoRow label="Phone" value={transaction.recipient_member.phone} />
-              <InfoRow label="Email" value={transaction.recipient_member.email} />
+              <InfoRow
+                label="Username"
+                value={transaction.recipient_member.user_name}
+              />
+              <InfoRow
+                label="Phone"
+                value={transaction.recipient_member.phone}
+              />
+              <InfoRow
+                label="Email"
+                value={transaction.recipient_member.email}
+              />
               <InfoRow
                 label="Member Type"
                 value={
@@ -263,9 +291,15 @@ const CpTransactionDetails = () => {
               <Users className="text-green-600" /> Source Member
             </h2>
             <ul className="divide-y divide-gray-200 space-y-3">
-              <InfoRow label="Member ID" value={`#${transaction.source_member.id}`} />
+              <InfoRow
+                label="Member ID"
+                value={`#${transaction.source_member.id}`}
+              />
               <InfoRow label="Name" value={transaction.source_member.name} />
-              <InfoRow label="Username" value={transaction.source_member.user_name} />
+              <InfoRow
+                label="Username"
+                value={transaction.source_member.user_name}
+              />
               <InfoRow label="Phone" value={transaction.source_member.phone} />
               <InfoRow label="Email" value={transaction.source_member.email} />
               <InfoRow

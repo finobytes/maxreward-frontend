@@ -61,47 +61,63 @@ export const NAV_CONFIG = {
       icon: <ChartLine />,
       subItems: [
         // { name: "WhatsApp Log", path: "/admin/reports/whatsapp-log" },
-        { name: "Email Log", path: "/admin/reports/email-log" },
         {
-          name: "Point Statement",
-          path: "/admin/reports/member-points-report",
+          name: "Point Transaction",
+          path: "/admin/reports/transaction",
         },
-        { name: "Tree Performance", path: "/admin/reports/tree-performance" },
-        { name: "Redeem Mall Transaction", path: "/admin/reports/redemption" },
-      ],
-    },
-    {
-      name: "CP History",
-      icon: <History />,
-      subItems: [
+        { name: "Purchase transaction", path: "/admin/merchant-transaction" },
         {
-          name: "CP Transaction",
+          name: "CP Distribution Report",
           path: "/admin/cp-transaction",
         },
         {
-          name: "Member Community Point",
+          name: "Memberwise CP",
           path: "/admin/community-point",
         },
         {
           name: "CP Unlock History",
           path: "/admin/cp-unlock-history",
         },
+        {
+          name: "Denomination",
+          path: "/admin/denomination",
+        },
+        { name: "Email Log", path: "/admin/reports/email-log" },
+        { name: "Redeem Mall Transaction", path: "/admin/reports/redemption" },
       ],
     },
+    // {
+    //   name: "CP History",
+    //   icon: <History />,
+    //   subItems: [
+    //     {
+    //       name: "CP Transaction",
+    //       path: "/admin/cp-transaction",
+    //     },
+    //     {
+    //       name: "Member Community Point",
+    //       path: "/admin/community-point",
+    //     },
+    //     {
+    //       name: "CP Unlock History",
+    //       path: "/admin/cp-unlock-history",
+    //     },
+    //   ],
+    // },
 
-    {
-      name: "Transaction",
-      icon: <Wallet />,
-      subItems: [
-        { name: "Transaction", path: "/admin/reports/transaction" },
-        { name: "Merchants transaction", path: "/admin/merchant-transaction" },
-      ],
-    },
-    {
-      name: "Denomination",
-      icon: <DollarSign />,
-      path: "/admin/denomination",
-    },
+    // {
+    //   name: "Transaction",
+    //   icon: <Wallet />,
+    //   subItems: [
+    //     { name: "Transaction", path: "/admin/reports/transaction" },
+    //     { name: "Merchants transaction", path: "/admin/merchant-transaction" },
+    //   ],
+    // },
+    // {
+    //   name: "Denomination",
+    //   icon: <DollarSign />,
+    //   path: "/admin/denomination",
+    // },
     {
       name: "Notification",
       icon: <Bell />,
