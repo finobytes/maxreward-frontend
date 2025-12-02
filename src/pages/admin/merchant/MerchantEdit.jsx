@@ -187,8 +187,8 @@ const MerchantEdit = () => {
                 validationMessage="Company logo is required"
                 placeholderImage={companyLogoPlaceholder}
                 initialFiles={
-                  merchantData?.data?.business_logo
-                    ? [merchantData.data.business_logo]
+                  merchantData?.data?.merchant?.business_logo
+                    ? [merchantData.data.merchant.business_logo]
                     : []
                 }
                 onFilesChange={(file) => setBusinessLogo(file ?? null)}
