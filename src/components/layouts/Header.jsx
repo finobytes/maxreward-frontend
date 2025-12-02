@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
 
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useSidebar } from "../../context/SidebarContext";
 import UserDropdown from "../header/UserDropdown";
 import { logo } from "../../assets/assets";
-import { Menu, X } from "lucide-react";
-import NotificationDropdown from "../header/NotificationDropdown";
+import { Menu, X, Bell } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useVerifyMeQuery } from "../../redux/features/auth/authApi";
+import { useGetAllNotificationsQuery } from "../../redux/features/admin/notification/notificationApi";
 
 const Header = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
 
@@ -30,6 +31,12 @@ const Header = () => {
   const role = user?.role || "member"; // admin | merchant | member
 
   const { data, isLoading, refetch } = useVerifyMeQuery(role, { skip: !token });
+  const { data: notificationData } = useGetAllNotificationsQuery({
+    page: 1,
+    role,
+  });
+
+  const unreadCount = notificationData?.statistics?.total_unread || 0;
 
   useEffect(() => {
     if (token) refetch();
@@ -40,6 +47,16 @@ const Header = () => {
       name: "Loading...",
       email: "Loading...",
     };
+
+  const handleNotificationClick = () => {
+    if (role === "admin") {
+      navigate("/admin/notification");
+    } else if (role === "merchant") {
+      navigate("/merchant/notification");
+    } else if (role === "member") {
+      navigate("/member/notification");
+    }
+  };
 
   return (
     <header className="sticky top-0 flex w-full bg-white border-b border-gray-200 z-50 ">
@@ -85,7 +102,19 @@ const Header = () => {
         >
           <div className="flex items-center gap-2 2xsm:gap-3">
             {/* <!-- Notification Menu Area --> */}
-            <NotificationDropdown />
+            <button
+              className="relative flex items-center justify-center text-gray-500 bg-white border border-gray-200 rounded-full h-11 w-11 hover:bg-gray-100 transition"
+              onClick={handleNotificationClick}
+            >
+              <div className="relative">
+                {unreadCount > 0 && (
+                  <span className="absolute -top-2 -right-3 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-bold text-white">
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                )}
+                <Bell size={18} />
+              </div>
+            </button>
           </div>
           {/* <!-- User Area --> */}
           <UserDropdown user={userInfo} role={role} />
