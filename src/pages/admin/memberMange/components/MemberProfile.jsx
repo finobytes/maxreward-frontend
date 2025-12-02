@@ -48,7 +48,7 @@ const MemberProfile = ({ member }) => {
           {member.status === "blocked" ? (
             <>
               <p className="mt-2 text-red-500 font-medium">
-                Blocked By: {member?.blocked_by}
+                Blocked By: {member?.blocked_by?.name}
               </p>{" "}
               <p>Reason: {member?.block_reason}</p>
             </>
