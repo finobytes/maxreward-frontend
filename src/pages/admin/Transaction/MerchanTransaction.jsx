@@ -44,7 +44,7 @@ const MerchantTransaction = () => {
   return (
     <div>
       <PageBreadcrumb
-        items={[{ label: "Home", to: "/" }, { label: "Merchant Transactions" }]}
+        items={[{ label: "Home", to: "/" }, { label: "Purchase Transactions" }]}
       />
 
       <div className="rounded-xl border bg-white p-4 shadow-sm mt-4">
@@ -69,7 +69,7 @@ const MerchantTransaction = () => {
                 <TableHead>Payment Method</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Purchase Date</TableHead>
-                <TableHead>Action</TableHead>
+                {/* <TableHead>Action</TableHead> */}
               </TableRow>
             </TableHeader>
 
@@ -120,14 +120,14 @@ const MerchantTransaction = () => {
                       {new Date(t.created_at).toLocaleDateString()}
                     </TableCell>
 
-                    <TableCell>
+                    {/* <TableCell>
                       <Link
                         to={`/admin/merchant-transaction/${t.id}`}
                         className="p-2 bg-indigo-100 rounded-md text-indigo-600 inline-block"
                       >
                         <Eye size={16} />
                       </Link>
-                    </TableCell>
+                    </TableCell> */}
                   </TableRow>
                 ))
               )}

@@ -24,7 +24,7 @@ const OwnerInfoCard = ({ userInfo }) => {
     },
     {
       key: "Contributor level :",
-      value: "Level-3",
+      value: "",
     },
     {
       key: "Create at:",

@@ -82,14 +82,15 @@ const MemberUpdate = () => {
   // Submit handler
   const onSubmit = async (data) => {
     try {
-      const formData = new FormData();
-      formData.append("name", data.fullName);
-      formData.append("phone", data.phoneNumber);
-      formData.append("email", data.email);
-      formData.append("referral_code", data.referralCode);
-      formData.append("status", "active");
+      const payload = {
+        name: data.fullName,
+        phone: data.phoneNumber,
+        email: data.email,
+        status: "active",
+      };
 
-      const response = await updateMember({ id, formData }).unwrap();
+      const response = await updateMember({ id, payload }).unwrap();
+
       toast.success(response?.message || "Member updated successfully!");
       navigate("/admin/member-manage");
     } catch (err) {
@@ -191,10 +192,7 @@ const MemberUpdate = () => {
                 ) : (
                   <Input
                     value={
-                      isError
-                        ? "Referral Not Found"
-                        : memberData?.sponsored_member_info?.sponsor_member
-                            ?.name ?? ""
+                      isError ? "Referral Not Found" : memberData?.name ?? ""
                     }
                     readOnly
                   />
@@ -205,12 +203,7 @@ const MemberUpdate = () => {
                 id="referralStatus"
                 label="Referral Status"
                 readOnly
-                value={
-                  isError
-                    ? "Invalid"
-                    : memberData?.sponsored_member_info?.sponsor_member
-                        ?.status ?? ""
-                }
+                value={isError ? "Invalid" : memberData?.status ?? ""}
               />
             </div>
 

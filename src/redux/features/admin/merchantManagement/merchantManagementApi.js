@@ -72,10 +72,10 @@ export const merchantManagementApi = baseApi.injectEndpoints({
 
     // POST — Update merchant by ID
     updateMerchant: builder.mutation({
-      query: ({ id, ...updatedData }) => ({
+      query: ({ id, body }) => ({
         url: `/merchants/${id}`,
         method: "POST",
-        body: updatedData,
+        body: body,
       }),
       invalidatesTags: (result, error, { id }) => [
         { type: "Merchant", id },
@@ -96,7 +96,7 @@ export const merchantManagementApi = baseApi.injectEndpoints({
     }),
     suspendMerchant: builder.mutation({
       query: ({ merchantId, status = "suspended", suspendReason }) => ({
-        url: "/merchants/suspend",
+        url: "/admin/merchant-suspend",
         method: "POST",
         body: {
           merchant_id: merchantId,
@@ -108,6 +108,28 @@ export const merchantManagementApi = baseApi.injectEndpoints({
         { type: "Merchant", id: merchantId },
         { type: "Merchant", id: "LIST" },
       ],
+    }),
+    blockMerchant: builder.mutation({
+      query: ({ merchantId, id, status = "rejected", rejectReason }) => {
+        const targetId = merchantId ?? id;
+        return {
+          url: "/admin/merchant-rejected",
+          method: "POST",
+          body: {
+            merchant_id: targetId,
+            status,
+            ...(rejectReason && { rejected_reason: rejectReason }),
+          },
+        };
+      },
+      invalidatesTags: (result, error, { merchantId, id }) => {
+        const targetId = merchantId ?? id;
+        const tags = [{ type: "Merchant", id: "LIST" }];
+        if (targetId) {
+          tags.push({ type: "Merchant", id: targetId });
+        }
+        return tags;
+      },
     }),
   }),
   overrideExisting: false,
@@ -121,4 +143,5 @@ export const {
   useUpdateMerchantMutation,
   useDeleteMerchantMutation,
   useSuspendMerchantMutation,
+  useBlockMerchantMutation,
 } = merchantManagementApi;

@@ -84,8 +84,8 @@ const CommunityPointDetails = () => {
       <PageBreadcrumb
         items={[
           { label: "Home", to: "/admin" },
-          { label: "Member Community Point", to: "/admin/community-point" },
-          { label: "Member Community Point" },
+          { label: "Memberwise CP", to: "/admin/community-point" },
+          { label: "Memberwise CP Details" },
         ]}
       />
 
@@ -104,10 +104,8 @@ const CommunityPointDetails = () => {
 
           <div>
             <h3 className="text-lg font-medium text-gray-900">
-              {
-                memberDetails?.data[0]?.member?.name ??
-                memberDetails?.data[0]?.member?.name
-              }
+              {memberDetails?.data[0]?.member?.name ??
+                memberDetails?.data[0]?.member?.name}
             </h3>
           </div>
         </div>

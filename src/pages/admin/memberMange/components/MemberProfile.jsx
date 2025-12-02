@@ -48,15 +48,15 @@ const MemberProfile = ({ member }) => {
           {member.status === "blocked" ? (
             <>
               <p className="mt-2 text-red-500 font-medium">
-                Blocked By: {member?.blocked_by}
+                Blocked By: {member?.blocked_by?.name}
               </p>{" "}
-              <p>Reason: {member?.blocked_reason}</p>
+              <p>Reason: {member?.block_reason}</p>
             </>
           ) : null}
           {member.status === "suspended" ? (
             <>
               <p className="mt-2 text-red-500 font-medium">
-                Suspended By: {member?.suspended_by}
+                Suspended By: {member?.suspended_by?.name}
               </p>{" "}
               <p>Reason: {member?.suspended_reason}</p>
             </>

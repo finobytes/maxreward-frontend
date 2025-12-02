@@ -39,7 +39,8 @@ const transactionTypeMapping = {
 
 // CP Amount Badge
 const renderCpAmountBadge = (amount, transactionType) => {
-  const isNegative = transactionType === "spent" || transactionType === "transferred";
+  const isNegative =
+    transactionType === "spent" || transactionType === "transferred";
 
   return (
     <span
@@ -82,7 +83,10 @@ const CpTransaction = () => {
   return (
     <div>
       <PageBreadcrumb
-        items={[{ label: "Home", to: "/admin" }, { label: "CP Transaction" }]}
+        items={[
+          { label: "Home", to: "/admin" },
+          { label: "CP Distribution Report" },
+        ]}
       />
 
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white p-4">
@@ -146,8 +150,6 @@ const CpTransaction = () => {
                         {transactionTypeMapping[item?.transaction_type] ?? "-"}
                       </TableCell>
 
-                    
-
                       {/* Source Member */}
                       <TableCell>
                         <div className="flex flex-col">
@@ -174,7 +176,10 @@ const CpTransaction = () => {
 
                       {/* CP Amount */}
                       <TableCell className="text-center">
-                        {renderCpAmountBadge(item?.cp_amount, item?.transaction_type)}
+                        {renderCpAmountBadge(
+                          item?.cp_amount,
+                          item?.transaction_type
+                        )}
                       </TableCell>
 
                       {/* Status */}

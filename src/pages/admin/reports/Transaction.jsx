@@ -66,7 +66,7 @@ const Transaction = () => {
   return (
     <div>
       <PageBreadcrumb
-        items={[{ label: "Home", to: "/" }, { label: "Transactions" }]}
+        items={[{ label: "Home", to: "/" }, { label: " Point Transaction" }]}
       />
 
       <div className="rounded-xl border bg-white p-4 relative">
