@@ -7,7 +7,7 @@ import {
 } from "../../../../assets/assets";
 
 const MerchantProfileCard = ({ merchantData }) => {
-  // console.log("merchant profile card", merchantData);
+  console.log("merchant profile card", merchantData);
   return (
     <section className="w-full overflow-hidden">
       <div className="w-full relative">
@@ -49,6 +49,24 @@ const MerchantProfileCard = ({ merchantData }) => {
             </div>
           </div> */}
         </div>
+      </div>
+      <div className="ml-2">
+        {merchantData?.status === "blocked" ? (
+          <>
+            <p className="mt-2 text-red-500 font-medium">
+              Blocked By: {merchantData?.blocked_by?.name}
+            </p>{" "}
+            <p>Reason: {merchantData?.block_reason}</p>
+          </>
+        ) : null}
+        {merchantData?.status === "suspended" ? (
+          <>
+            <p className="mt-2 text-red-500 font-medium">
+              Suspended By: {merchantData?.suspended_by?.name}
+            </p>{" "}
+            <p>Reason: {merchantData?.suspended_reason}</p>
+          </>
+        ) : null}
       </div>
     </section>
   );
