@@ -73,7 +73,7 @@ const Notification = () => {
                   className="flex items-start gap-3 flex-1"
                   onClick={() => handleMarkAsRead(n.id)}
                 >
-                  {n.status === "unread" ? (
+                  {n.is_read === false ? (
                     <Circle className="text-blue-500 w-4 h-4 mt-1" />
                   ) : (
                     <CheckCircle2 className="text-gray-400 w-4 h-4 mt-1" />
