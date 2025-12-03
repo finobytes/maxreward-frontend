@@ -146,9 +146,7 @@ const CpTransactionDetails = () => {
 
             {/* Total Transaction Amount */}
             <div>
-              <p className="text-xs text-gray-500 mb-1">
-                Total Transaction Amount
-              </p>
+              <p className="text-xs text-gray-500 mb-1">Total Transaction</p>
               <p className="font-medium text-blue-600">
                 {poolInfo.total_transaction_amount || 0}
               </p>
@@ -156,7 +154,7 @@ const CpTransactionDetails = () => {
 
             {/* Total CP Amount */}
             <div>
-              <p className="text-xs text-gray-500 mb-1">Total CP Amount</p>
+              <p className="text-xs text-gray-500 mb-1">Total CP</p>
               <p className="font-medium text-green-600">
                 {poolInfo.total_cp_amount || 0}
               </p>
