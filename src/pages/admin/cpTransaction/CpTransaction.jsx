@@ -29,50 +29,6 @@ const formatDateTime = (value) => {
   });
 };
 
-// Transaction Type Full Form
-const transactionTypeMapping = {
-  earned: "Earned",
-  spent: "Spent",
-  transferred: "Transferred",
-  refunded: "Refunded",
-};
-
-// CP Amount Badge
-const renderCpAmountBadge = (amount, transactionType) => {
-  const isNegative =
-    transactionType === "spent" || transactionType === "transferred";
-
-  return (
-    <span
-      className={`inline-flex rounded-full px-3 py-1 text-sm font-medium ${
-        isNegative ? "bg-red-100 text-red-600" : "bg-green-100 text-green-600"
-      }`}
-    >
-      {isNegative ? `-${amount}` : `+${amount}`}
-    </span>
-  );
-};
-
-// Status Badge
-const renderStatusBadge = (status) => {
-  const statusColors = {
-    available: "bg-green-100 text-green-600",
-    locked: "bg-yellow-100 text-yellow-600",
-    released: "bg-blue-100 text-blue-600",
-    expired: "bg-red-100 text-red-600",
-  };
-
-  return (
-    <span
-      className={`inline-flex rounded-full px-3 py-1 text-sm font-medium ${
-        statusColors[status] || "bg-gray-100 text-gray-600"
-      }`}
-    >
-      {status.charAt(0).toUpperCase() + status.slice(1)}
-    </span>
-  );
-};
-
 const CpTransaction = () => {
   const { transactions, meta, isLoading, isFetching, error, changePage } =
     useCpTransactionAdmin();
@@ -102,13 +58,10 @@ const CpTransaction = () => {
               <TableRow>
                 <TableHead>S/N</TableHead>
                 <TableHead>Date & Time</TableHead>
-                <TableHead>Transaction Type</TableHead>
-                <TableHead>Source Member</TableHead>
-                <TableHead className="text-center">Level</TableHead>
-                <TableHead className="text-center">CP %</TableHead>
-                <TableHead className="text-center">CP Amount</TableHead>
-                <TableHead className="text-center">Status</TableHead>
-                <TableHead className="text-center">Action</TableHead>
+                <TableHead>Transaction ID</TableHead>
+                <TableHead>CP Source</TableHead>
+                <TableHead className="text-center">Total CP Amount</TableHead>
+                <TableHead className="text-center">Distribution Pool</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -145,48 +98,33 @@ const CpTransaction = () => {
                       {/* Date/Time */}
                       <TableCell>{formatDateTime(item?.created_at)}</TableCell>
 
-                      {/* Transaction Type */}
+                      {/* Transaction ID */}
                       <TableCell>
-                        {transactionTypeMapping[item?.transaction_type] ?? "-"}
+                        <span className="font-medium text-gray-900">
+                          {item?.transaction_id ?? "-"}
+                        </span>
                       </TableCell>
 
-                      {/* Source Member */}
+                      {/* CP Source (Member Info) */}
                       <TableCell>
                         <div className="flex flex-col">
                           <span className="font-medium text-gray-900">
-                            {item?.source_member?.name ?? "-"}
+                            {item?.member?.name ?? "-"}
                           </span>
                           <span className="text-xs text-gray-500">
-                            {item?.source_member?.user_name ?? ""}
+                            {item?.member?.phone ?? ""}
                           </span>
                         </div>
                       </TableCell>
 
-                      {/* Level */}
+                      {/* Total CP Amount */}
                       <TableCell className="text-center">
-                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-purple-100 text-purple-600 font-semibold">
-                          {item?.level ?? "-"}
+                        <span className="inline-flex rounded-full px-3 py-1 text-sm font-medium bg-green-100 text-green-600">
+                          {item?.total_cp_amount ?? 0}
                         </span>
                       </TableCell>
 
-                      {/* CP Percentage */}
-                      <TableCell className="text-center font-medium">
-                        {item?.cp_percentage ? `${item.cp_percentage}%` : "-"}
-                      </TableCell>
-
-                      {/* CP Amount */}
-                      <TableCell className="text-center">
-                        {renderCpAmountBadge(
-                          item?.cp_amount,
-                          item?.transaction_type
-                        )}
-                      </TableCell>
-
-                      {/* Status */}
-                      <TableCell className="text-center">
-                        {renderStatusBadge(item?.status)}
-                      </TableCell>
-
+                      {/* Distribution Pool (Total Transaction Amount) */}
                       <TableCell className="text-center">
                         <Link
                           to={`/admin/cp-transaction/${item?.id}`}
