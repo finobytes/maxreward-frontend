@@ -88,7 +88,7 @@ const CpTransactionDetails = () => {
             className="mt-4 inline-flex items-center gap-2 text-brand-600 hover:text-brand-700"
           >
             <ArrowLeft size={18} />
-            Back to CP Transactions
+            CP Distribution Report
           </Link>
         </div>
       </div>
