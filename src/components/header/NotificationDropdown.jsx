@@ -37,7 +37,7 @@ const NotificationDropdown = () => {
 
   const unreadCount = data?.statistics?.total_unread || 0;
 
-    console.log("notificationsLL", notifications);
+    // console.log("notificationsLL", notifications);
 
   const handleToggle = async () => {
     setIsOpen((prev) => !prev);

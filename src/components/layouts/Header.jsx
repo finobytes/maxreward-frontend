@@ -7,7 +7,7 @@ import { logo } from "../../assets/assets";
 import { Menu, X, Bell } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useVerifyMeQuery } from "../../redux/features/auth/authApi";
-import { useGetAllNotificationsQuery } from "../../redux/features/admin/notification/notificationApi";
+import { useGetAllNotificationsQuery, useSaveAllUnreadCountMutation } from "../../redux/features/admin/notification/notificationApi";
 
 const Header = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
@@ -36,6 +36,9 @@ const Header = () => {
     role,
   });
 
+
+  const [saveAllUnreadCount] = useSaveAllUnreadCountMutation();
+
   const unreadCount = notificationData?.statistics?.total_unread || 0;
 
   useEffect(() => {
@@ -48,7 +51,11 @@ const Header = () => {
       email: "Loading...",
     };
 
-  const handleNotificationClick = () => {
+  const handleNotificationClick = async () => {
+    if(unreadCount > 0){
+      await saveAllUnreadCount(role);
+    }
+
     if (role === "admin") {
       navigate("/admin/notification");
     } else if (role === "merchant") {
