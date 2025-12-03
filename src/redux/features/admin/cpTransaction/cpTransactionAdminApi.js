@@ -32,6 +32,12 @@ export const cpTransactionAdminApi = baseApi.injectEndpoints({
       },
       keepUnusedDataFor: 0,
     }),
+    getCPDistributionPoolDetails: builder.query({
+      query: (transactionId) => ({
+        url: `/admin/get-single-cp-distribution-pool-${transactionId}`,
+      }),
+      keepUnusedDataFor: 0,
+    }),
   }),
 });
 
@@ -39,4 +45,5 @@ export const {
   useGetAdminCpTransactionQuery,
   useGetAdminCpTransactionDetailsQuery,
   useGetCPDistributionPoolQuery,
+  useGetCPDistributionPoolDetailsQuery,
 } = cpTransactionAdminApi;
