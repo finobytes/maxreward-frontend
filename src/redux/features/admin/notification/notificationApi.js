@@ -58,12 +58,14 @@ export const notificationApi = baseApi.injectEndpoints({
       query: (role = "member") => {
         let endpoint;
 
+        console.log("role in api:", role);
+
         if (role === "merchant") {
           endpoint = "/notifications/merchant/save-count";
         } else if (role === "member") {
           endpoint = "/notifications/member/save-count";
         } else if (role === "admin") {
-          endpoint = "/notifications/save-count";
+          endpoint = "/notifications/admin/save-count";
         }
 
         return {
@@ -71,6 +73,7 @@ export const notificationApi = baseApi.injectEndpoints({
           method: "POST",
         };
       },
+      invalidatesTags: ["Notifications"],
     }),
 
     // Mark all as read
