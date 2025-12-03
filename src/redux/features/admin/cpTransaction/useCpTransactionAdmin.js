@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import { setPage, setPerPage } from "./cpTransactionAdminSlice";
-import { useGetAdminCpTransactionQuery } from "./cpTransactionAdminApi";
+import { useGetCPDistributionPoolQuery } from "./cpTransactionAdminApi";
 
 export const useCpTransactionAdmin = () => {
   const dispatch = useDispatch();
@@ -11,7 +11,7 @@ export const useCpTransactionAdmin = () => {
     perPage: perPage ?? 20,
   };
 
-  const query = useGetAdminCpTransactionQuery(queryArgs);
+  const query = useGetCPDistributionPoolQuery(queryArgs);
 
   const transactions = query.data?.data?.data ?? [];
   const metaSource = query.data?.data ?? {};

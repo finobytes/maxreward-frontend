@@ -20,8 +20,23 @@ export const cpTransactionAdminApi = baseApi.injectEndpoints({
       }),
       keepUnusedDataFor: 0,
     }),
+    getCPDistributionPool: builder.query({
+      query: ({ page = 1, perPage } = {}) => {
+        return {
+          url: `/admin/get-cp-distribution-pool`,
+          params: {
+            page,
+            per_page: perPage,
+          },
+        };
+      },
+      keepUnusedDataFor: 0,
+    }),
   }),
 });
 
-export const { useGetAdminCpTransactionQuery, useGetAdminCpTransactionDetailsQuery } =
-  cpTransactionAdminApi;
+export const {
+  useGetAdminCpTransactionQuery,
+  useGetAdminCpTransactionDetailsQuery,
+  useGetCPDistributionPoolQuery,
+} = cpTransactionAdminApi;
