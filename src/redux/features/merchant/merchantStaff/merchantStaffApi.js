@@ -4,16 +4,16 @@ export const merchantStaffApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // GET — All Staffs (no query params)
     getAllStaffs: builder.query({
-      query: () => `/staffs`,
+      query: (merchantId) => `/staffs/merchant/${merchantId}`,
       transformResponse: (response) => {
         const data = response?.data || {};
         return {
-          staffs: data.data || [],
+          staffs: data.staffs || [],
           pagination: {
-            currentPage: data.current_page || 1,
-            lastPage: data.last_page || 1,
-            perPage: data.per_page || 10,
-            total: data.total || data.data?.length || 0,
+            currentPage: 1,
+            lastPage: 1,
+            perPage: 10,
+            total: data.total || 0,
           },
         };
       },

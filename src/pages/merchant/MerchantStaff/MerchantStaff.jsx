@@ -16,8 +16,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useMerchantStaff } from "../../../redux/features/merchant/merchantStaff/useMerchantStaff";
-import { useDeleteStaffMutation } from "../../../redux/features/merchant/merchantStaff/merchantStaffApi";
-import { toast } from "sonner";
 import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSkeleton";
 
 const MerchantStaff = () => {
@@ -28,10 +26,8 @@ const MerchantStaff = () => {
     actions: { setDebouncedSearch, setStatus, resetFilters, setCurrentPage },
     filters: { search, status },
   } = useMerchantStaff();
-  const [deleteStaff, { isLoading: isDeleting }] = useDeleteStaffMutation();
   const [selected, setSelected] = useState([]);
-  const [deletingId, setDeletingId] = useState(null);
-
+  console.log(staffs);
   const toggleSelect = (id) => {
     setSelected((prev) =>
       prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
@@ -43,18 +39,6 @@ const MerchantStaff = () => {
       setSelected(staffs.map((s) => s.id));
     } else {
       setSelected([]);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    setDeletingId(id);
-    try {
-      await deleteStaff(id).unwrap();
-      toast.success("Staff deleted successfully!");
-    } catch (err) {
-      toast.error(err?.data?.message || "Failed to delete staff");
-    } finally {
-      setDeletingId(null);
     }
   };
 
@@ -145,11 +129,7 @@ const MerchantStaff = () => {
                 staffs.map((staff, idx) => (
                   <TableRow
                     key={staff.id}
-                    className={`transition ${
-                      deletingId === staff.id
-                        ? "opacity-50 pointer-events-none"
-                        : "hover:bg-gray-50"
-                    }`}
+                    className="transition hover:bg-gray-50"
                   >
                     <TableCell>
                       <input
@@ -160,10 +140,7 @@ const MerchantStaff = () => {
                       />
                     </TableCell>
                     <TableCell>
-                      {(pagination?.current_page
-                        ? pagination.current_page - 1
-                        : 0) *
-                        (pagination?.per_page || staffs.length) +
+                      {(pagination?.currentPage - 1) * pagination?.perPage +
                         (idx + 1)}
                     </TableCell>
                     <TableCell>{staff.name}</TableCell>
@@ -209,8 +186,8 @@ const MerchantStaff = () => {
 
           {/* Pagination */}
           <Pagination
-            currentPage={pagination?.current_page}
-            totalPages={pagination?.last_page}
+            currentPage={pagination?.currentPage}
+            totalPages={pagination?.totalPages}
             onPageChange={setCurrentPage}
           />
         </div>
