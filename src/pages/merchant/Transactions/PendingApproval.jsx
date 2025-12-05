@@ -217,7 +217,7 @@ const PendingApproval = () => {
                 <TableHead className="">Phone Number</TableHead>
                 <TableHead className="">Total Transaction</TableHead>
                 <TableHead className="">Points Redeemed</TableHead>
-                <TableHead>Balance Paid</TableHead>
+                <TableHead>Cash Paid Amount</TableHead>
                 <TableHead>Payment Method</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="">Actions</TableHead>
@@ -256,7 +256,7 @@ const PendingApproval = () => {
                       <TableCell>{txn.member?.name || "N/A"}</TableCell>
                       <TableCell>{txn.member?.phone}</TableCell>
                       <TableCell>{currency(txn.transaction_amount)}</TableCell>
-                      <TableCell>{currency(txn.redeem_amount)}</TableCell>
+                      <TableCell>{txn.redeem_amount}</TableCell>
                       <TableCell>{currency(txn.cash_redeem_amount)}</TableCell>
                       <TableCell>{txn.payment_method}</TableCell>
                       <TableCell>

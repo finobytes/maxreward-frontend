@@ -241,7 +241,6 @@ const PendingMerchant = () => {
                     className="w-4 h-4 rounded"
                   />
                 </TableHead>
-                <TableHead>Application ID</TableHead>
                 <TableHead>Merchant ID</TableHead>
                 <TableHead>Company Name</TableHead>
                 <TableHead>Authorized Person</TableHead>
@@ -289,18 +288,13 @@ const PendingMerchant = () => {
                         />
                       </TableCell>
                       <TableCell>
-                        {merchant?.application_id || (
-                          <span className="text-gray-500">N/A</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
                         {merchant?.staffs?.find(
                           (staff) => staff?.type === "merchant"
                         )?.user_name || "N/A"}
                       </TableCell>
                       <TableCell>{merchant?.business_name}</TableCell>
                       <TableCell>
-                        {merchant?.authorized_person || (
+                        {merchant?.authorized_person_name || (
                           <span className="text-gray-500">N/A</span>
                         )}
                       </TableCell>

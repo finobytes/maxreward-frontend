@@ -106,7 +106,7 @@ const MerchantTransaction = () => {
                     <TableCell>{t?.member?.name}</TableCell>
 
                     <TableCell>RM {t.transaction_amount}</TableCell>
-                    <TableCell>RM {t.redeem_amount}</TableCell>
+                    <TableCell>{t.redeem_amount} pts</TableCell>
                     <TableCell>RM {t.cash_redeem_amount}</TableCell>
                     <TableCell className="capitalize">
                       {t.payment_method}

@@ -134,7 +134,7 @@ const DailyTransaction = () => {
                 <TableHead>Member Name</TableHead>
                 <TableHead>Total Transaction</TableHead>
                 <TableHead>Points Redeemed</TableHead>
-                <TableHead>Balance Paid</TableHead>
+                <TableHead>Cash Paid Amount</TableHead>
                 <TableHead>Payment Method</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Date</TableHead>
@@ -177,7 +177,7 @@ const DailyTransaction = () => {
                     <TableCell>{txn.transaction_id}</TableCell>
                     <TableCell>{txn.member?.name || "N/A"}</TableCell>
                     <TableCell>{currency(txn.transaction_amount)}</TableCell>
-                    <TableCell>{currency(txn.redeem_amount)}</TableCell>
+                    <TableCell>{txn.redeem_amount}</TableCell>
                     <TableCell>{currency(txn.cash_redeem_amount)}</TableCell>
                     <TableCell className="capitalize">
                       {txn.payment_method}
