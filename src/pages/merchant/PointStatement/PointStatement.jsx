@@ -14,7 +14,7 @@ import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
 import { usePointStatementMember } from "../../../redux/features/member/pointStatement/usePointStatementMember";
 import { Eye } from "lucide-react";
 import { Link } from "react-router";
-
+import TableRowsSkeleton from "../../../components/skeleton/TableRowsSkeleton";
 // Pick Member ID
 const pickMemberId = (profile) =>
   profile?.merchant?.corporate_member?.id ||
