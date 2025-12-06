@@ -30,10 +30,17 @@ import {
   DialogTitle,
 } from "../../../components/ui/dialog";
 import { useGetMerchantTransactionsQuery } from "../../../redux/features/admin/reports/transaction/merchantTransaction";
+import { useGetCurrentSettingsQuery } from "../../../redux/features/admin/settings/settingsApi";
 
 const MerchantTransaction = () => {
+  const { data: settingsData, isLoading: settingsLoading } =
+    useGetCurrentSettingsQuery();
   const [page, setPage] = useState(1);
-
+  console.log(
+    "settingsData",
+    settingsData?.setting_attribute?.maxreward?.rm_points
+  );
+  const rmPoints = settingsData?.setting_attribute?.maxreward?.rm_points;
   const { data, isLoading, isFetching, isError } =
     useGetMerchantTransactionsQuery({ page });
 
@@ -106,7 +113,9 @@ const MerchantTransaction = () => {
                     <TableCell>{t?.member?.name}</TableCell>
 
                     <TableCell>RM {t.transaction_amount}</TableCell>
-                    <TableCell>{t.redeem_amount} pts</TableCell>
+                    <TableCell>
+                      {t.redeem_amount} pts = RM {t.redeem_amount / rmPoints}
+                    </TableCell>
                     <TableCell>RM {t.cash_redeem_amount}</TableCell>
                     <TableCell className="capitalize">
                       {t.payment_method}
