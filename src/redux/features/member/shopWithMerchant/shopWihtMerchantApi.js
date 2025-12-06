@@ -3,11 +3,9 @@ import { baseApi } from "../../../api/baseApi";
 export const shopWithMerchantApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     //  Get merchant by unique number
-    getMerchant: builder.mutation({
-      query: (code) => `merchants/unique/${code}`,
+    getMerchantSearch: builder.query({
+      query: (search) => `merchants/unique/${search}`,
       transformResponse: (res) => res?.data ?? res,
-      providesTags: ["ShopWithMerChant"],
-      invalidatesTags: ["ShopWithMerChant"],
     }),
 
     //  Check member redeem amount
@@ -101,7 +99,8 @@ export const shopWithMerchantApi = baseApi.injectEndpoints({
 });
 
 export const {
-  useGetMerchantMutation,
+  useGetMerchantSearchQuery,
+  useLazyGetMerchantSearchQuery,
   useCheckMemberRedeemAmountMutation,
   useMakePurchaseForMemberMutation,
   useGetMemberPurchasesQuery,

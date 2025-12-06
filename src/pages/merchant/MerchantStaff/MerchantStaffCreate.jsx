@@ -13,11 +13,15 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
 
 const MerchantStaffCreate = () => {
   const [createStaff, { isLoading }] = useCreateStaffMutation();
-  const { user } = useSelector((state) => state.auth); //  current merchant
   const navigate = useNavigate();
+
+  const { data } = useVerifyMeQuery("merchant");
+  console.log("Merchant Data:", data);
+  const merchant_id = data?.merchant_id || data?.id;
 
   const {
     register,
@@ -25,6 +29,7 @@ const MerchantStaffCreate = () => {
     formState: { errors },
     reset,
     setValue,
+    setError,
     watch,
   } = useForm({
     resolver: zodResolver(merchantStaffSchema),
@@ -43,7 +48,7 @@ const MerchantStaffCreate = () => {
   const onSubmit = async (formData) => {
     try {
       const payload = {
-        merchant_id: user?.merchant_id || 2, // Dynamic or fallback
+        merchant_id: merchant_id || 1,
         name: formData.name,
         phone: formData.phone,
         email: formData.email,
@@ -64,6 +69,15 @@ const MerchantStaffCreate = () => {
       navigate("/merchant/merchant-staff"); // redirect after success
     } catch (err) {
       console.error(" Create Failed:", err);
+      // Handle validation errors from backend
+      if (err?.data?.errors) {
+        Object.keys(err.data.errors).forEach((key) => {
+          setError(key, {
+            type: "server",
+            message: err.data.errors[key][0],
+          });
+        });
+      }
       toast.error(err?.data?.message || "Failed to create staff");
     }
   };
