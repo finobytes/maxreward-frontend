@@ -15,12 +15,13 @@ export const merchantSchema = z.object({
   annual_sales_turnover: z.string().optional(),
   reward_budget: z.string().optional(),
 
-  phone: z
-    .string()
-    .transform((v) => v.replace(/[\s-]/g, ""))
-    .refine((v) => /^\d{10,11}$/.test(v), {
-      message: "Invalid phone number",
-    }),
+    phone: z
+        .string()
+        .transform((v) => v.replace(/[\s-]/g, ""))
+        .refine((v) => /^\d{4,15}$/.test(v), {
+            message: "Invalid phone number",
+        }),
+
 
   email: z.string().email().optional().or(z.literal("")),
 
