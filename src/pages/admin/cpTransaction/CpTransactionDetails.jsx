@@ -132,6 +132,19 @@ const CpTransactionDetails = () => {
           {/* Grid Content */}
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Card Item */}
+              <div className="bg-gray-50 p-4 rounded-lg border hover:shadow transition">
+                  <p className="text-xs text-gray-500 mb-1">CP Source</p>
+                  <p className="font-medium text-gray-800">
+                      {poolInfo.member?.name || "-"}
+                  </p>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-lg border hover:shadow transition">
+                  <p className="text-xs text-gray-500 mb-1">Phone Number</p>
+                  <p className="font-medium text-gray-800">
+                      {poolInfo.phone || poolInfo.member?.phone || "-"}
+                  </p>
+              </div>
             <div className="bg-gray-50 p-4 rounded-lg border hover:shadow transition">
               <p className="text-xs text-gray-500 mb-1">Date & Time</p>
               <p className="font-medium text-gray-800">
@@ -160,33 +173,13 @@ const CpTransactionDetails = () => {
               </p>
             </div>
 
-            <div className="bg-gray-50 p-4 rounded-lg border hover:shadow transition">
-              <p className="text-xs text-gray-500 mb-1">CP Source</p>
-              <p className="font-medium text-gray-800">
-                {poolInfo.member?.name || "-"}
-              </p>
-            </div>
+              <div className="bg-gray-50 p-4 rounded-lg border hover:shadow transition">
+                  <p className="text-xs text-gray-500 mb-1">Total CP Distributed</p>
+                  <p className="font-semibold text-green-600 text-lg">
+                      {poolInfo.total_cp_distributed || 0}
+                  </p>
+              </div>
 
-            <div className="bg-gray-50 p-4 rounded-lg border hover:shadow transition">
-              <p className="text-xs text-gray-500 mb-1">Phone Number</p>
-              <p className="font-medium text-gray-800">
-                {poolInfo.phone || poolInfo.member?.phone || "-"}
-              </p>
-            </div>
-
-            <div className="bg-gray-50 p-4 rounded-lg border hover:shadow transition">
-              <p className="text-xs text-gray-500 mb-1">No Of Referral</p>
-              <p className="font-medium text-gray-800">
-                {poolInfo.total_referrals || 0}
-              </p>
-            </div>
-
-            <div className="bg-gray-50 p-4 rounded-lg border hover:shadow transition flex flex-col items-start">
-              <p className="text-xs text-gray-500 mb-1">Unlocked Level</p>
-              <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-purple-100 text-purple-600 font-semibold shadow">
-                {poolInfo.unlocked_level || 0}
-              </span>
-            </div>
           </div>
         </div>
       )}
@@ -198,6 +191,7 @@ const CpTransactionDetails = () => {
               <TableRow>
                 <TableHead>S/N</TableHead>
                 <TableHead>Receiver Name</TableHead>
+                  <TableHead>No Of Referral</TableHead>
                 <TableHead>Phone Number</TableHead>
                 <TableHead className="text-center">Level</TableHead>
                 <TableHead className="text-center">CP%</TableHead>
@@ -225,6 +219,12 @@ const CpTransactionDetails = () => {
                       </span>
                     </TableCell>
 
+                      {/* Phone Number */}
+                      <TableCell>
+                      <span className="text-gray-500">
+                        {item?.total_referrals ?? "-"}
+                      </span>
+                      </TableCell>
                     {/* Phone Number */}
                     <TableCell>
                       <span className="text-gray-500">
