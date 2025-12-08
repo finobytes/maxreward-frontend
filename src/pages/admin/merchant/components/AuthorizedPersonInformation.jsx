@@ -34,7 +34,7 @@ const AuthorizedPersonInformation = ({ merchantData }) => {
             <div className="relative min-w-full divide-y divide-gray-200">
               <ul className="divide-y divide-gray-200">
                 {people.map((person) => (
-                  <li className="flex" key={person.email}>
+                  <li className="flex" key={person.key}>
                     <p className="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-0">
                       {person.key}
                     </p>
