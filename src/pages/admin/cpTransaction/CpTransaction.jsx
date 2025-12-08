@@ -60,7 +60,7 @@ const CpTransaction = () => {
                 <TableHead>Date & Time</TableHead>
                 <TableHead>Transaction ID</TableHead>
                 <TableHead>CP Source</TableHead>
-                <TableHead className="text-center">Total CP Amount</TableHead>
+                <TableHead className="text-center">Total CP Received</TableHead>
                 <TableHead className="text-center">Distribution Pool</TableHead>
               </TableRow>
             </TableHeader>

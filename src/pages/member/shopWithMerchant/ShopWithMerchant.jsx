@@ -11,7 +11,8 @@ import { qr } from "../../../assets/assets";
 import ComponentCard from "../../../components/common/ComponentCard";
 import MerchantCard from "./components/MerchantCard";
 import {
-  useGetMerchantMutation,
+  useGetMerchantSearchQuery,
+  useLazyGetMerchantSearchQuery,
   useLocateMerchantsQuery,
 } from "../../../redux/features/member/shopWithMerchant/shopWihtMerchantApi";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -20,8 +21,23 @@ import { useGetAllBusinessTypesQuery } from "@/redux/features/admin/businessType
 import SearchableSelect from "../../../components/form/SearchableSelect";
 
 const ShopWithMerchant = () => {
+  const [searchText, setSearchText] = React.useState("");
+  const [debouncedSearch, setDebouncedSearch] = React.useState("");
   const navigate = useNavigate();
-  const [getMerchant, { isLoading }] = useGetMerchantMutation();
+  React.useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchText);
+    }, 300); // debounce 300ms
+
+    return () => clearTimeout(handler);
+  }, [searchText]);
+
+  const { data: suggestions, isFetching: isSearching } =
+    useGetMerchantSearchQuery(debouncedSearch, {
+      skip: !debouncedSearch || debouncedSearch.length < 1,
+    });
+  const [getMerchantSearch, { isFetching: isLoading }] =
+    useLazyGetMerchantSearchQuery();
   const {
     data: businessTypes,
     isLoading: isBusinessTypeLoading,
@@ -33,6 +49,7 @@ const ShopWithMerchant = () => {
     register: registerSimple,
     handleSubmit: handleSubmitSimple,
     formState: { errors: simpleErrors },
+    setValue: setSimpleValue,
   } = useForm();
 
   const {
@@ -56,7 +73,7 @@ const ShopWithMerchant = () => {
         return;
       }
 
-      const res = await getMerchant(code).unwrap();
+      const res = await getMerchantSearch(code).unwrap();
 
       if (res?.id) {
         toast.success(`Merchant "${res.business_name}" found successfully!`);
@@ -82,6 +99,17 @@ const ShopWithMerchant = () => {
     };
     setFilters(payload);
   };
+
+  // Ensure suggestions is an array
+  const suggestionsList = Array.isArray(suggestions)
+    ? suggestions
+    : suggestions
+    ? [suggestions]
+    : [];
+
+  const { onChange: onSimpleChange, ...simpleRest } = registerSimple(
+    "merchantNameOrUniqueNumber"
+  );
 
   return (
     <div>
@@ -119,18 +147,58 @@ const ShopWithMerchant = () => {
                   onSubmit={handleSubmitSimple(onSubmitSimple)}
                   className="space-y-4"
                 >
-                  <div className="max-w-[350px]">
+                  <div className="relative max-w-[350px]">
                     <Label>Merchant Name / Unique Number</Label>
+
                     <Input
-                      placeholder="Enter merchant unique number or Name"
-                      {...registerSimple("merchantNameOrUniqueNumber", {
-                        required: "Merchant code is required",
-                      })}
+                      placeholder="Enter merchant name or unique number"
+                      value={searchText}
+                      onChange={(e) => {
+                        onSimpleChange(e);
+                        setSearchText(e.target.value);
+                      }}
+                      {...simpleRest}
                     />
-                    {simpleErrors.merchantNameOrUniqueNumber && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {simpleErrors.merchantNameOrUniqueNumber.message}
-                      </p>
+
+                    {/* Suggestion Dropdown */}
+                    {searchText && suggestionsList?.length > 0 && (
+                      <ul className="absolute z-50 bg-white border shadow-md rounded-md mt-1 w-full max-h-60 overflow-y-auto">
+                        {suggestionsList.map((m) => (
+                          <li
+                            key={m.id}
+                            className="p-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
+                          >
+                            <div
+                              onClick={() => {
+                                const val = m.unique_number || m.business_name;
+                                setSearchText(val);
+                                setSimpleValue(
+                                  "merchantNameOrUniqueNumber",
+                                  val
+                                );
+                              }}
+                              className="flex-1"
+                            >
+                              <p className="font-medium">{m.business_name}</p>
+                              <p className="text-xs text-gray-500">
+                                {m.unique_number}
+                              </p>
+                            </div>
+
+                            {/* Redeem Button */}
+                            <button
+                              onClick={() =>
+                                navigate("/member/redeem-with-merchant", {
+                                  state: { merchant: m },
+                                })
+                              }
+                              className="ml-3 px-3 py-1 text-sm rounded-md bg-brand-200 text-white hover:bg-brand-300 transition"
+                            >
+                              Redeem
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
                     )}
                   </div>
 

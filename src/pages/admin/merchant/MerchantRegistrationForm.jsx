@@ -5,6 +5,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { useNavigate, useSearchParams } from "react-router";
 import { useSelector } from "react-redux";
+import { Eye, EyeOff } from "lucide-react";
 
 import PageBreadcrumb from "@/components/common/PageBreadcrumb";
 import ComponentCard from "@/components/common/ComponentCard";
@@ -30,7 +31,9 @@ const merchantRegistrationSchema = merchantSchema.extend({
 });
 
 const MerchantRegistrationForm = () => {
-  const { user } = useSelector((state) => state.auth);
+    const [showPassword, setShowPassword] = useState(false);
+
+    const { user } = useSelector((state) => state.auth);
   const role = user?.role;
 
   const [referralInput, setReferralInput] = useState("");
@@ -252,19 +255,32 @@ const MerchantRegistrationForm = () => {
                   placeholder="Reward Budget (%)"
                 />
               </div>
-              <div>
-                <Label>Password</Label>
-                <Input
-                  type="password"
-                  {...register("merchant_password")}
-                  placeholder="Password"
-                />
-                {errors.merchant_password && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.merchant_password.message}
-                  </p>
-                )}
-              </div>
+                <div>
+                    <Label>Password</Label>
+
+                    <div className="relative">
+                        <Input
+                            type={showPassword ? "text" : "password"}
+                            {...register("merchant_password")}
+                            placeholder="Password"
+                            className="pr-10"
+                        />
+
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword((prev) => !prev)}
+                            className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+                        >
+                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                    </div>
+
+                    {errors.merchant_password && (
+                        <p className="text-red-500 text-xs mt-1">
+                            {errors.merchant_password.message}
+                        </p>
+                    )}
+                </div>
             </div>
 
             <div className="md:col-span-1">

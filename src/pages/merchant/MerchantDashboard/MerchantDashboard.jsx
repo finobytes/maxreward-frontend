@@ -77,13 +77,15 @@ const MerchantDashboard = () => {
 
   return (
     <div>
-      <h1 className="text-xl font-semibold text-gray-600 pb-4">Dashboard</h1>
+      <h1 className="text-base md:text-lg lg:text-xl font-semibold text-gray-600 pb-4">
+        Dashboard
+      </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4">
         <div className="2xl:col-span-1">
           <MembershipCard data={data} />
         </div>
         <div className="2xl:col-span-2">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-2 2xl:grid-cols-3 gap-4">
             {cardsData.map((card, index) => (
               <DashboardCard key={index} {...card} />
             ))}

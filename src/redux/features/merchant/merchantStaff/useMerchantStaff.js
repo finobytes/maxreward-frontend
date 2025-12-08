@@ -10,13 +10,23 @@ import {
   resetFilters,
 } from "./merchantStaffSlice";
 import { useGetAllStaffsQuery } from "./merchantStaffApi";
+import { useVerifyMeQuery } from "../../auth/authApi";
 
 export const useMerchantStaff = () => {
   const dispatch = useDispatch();
   const { search, status, currentPage, perPage, sortBy, sortOrder } =
     useSelector((state) => state.merchantStaff);
 
+  const { user } = useSelector((state) => state.auth);
+  const role = user?.role || "member"; // admin | merchant | member
+  const { data: verifyData, isLoading: verifying } = useVerifyMeQuery(role);
   const [debouncedSearch, setDebouncedSearch] = useState(search);
+  const merchantId =
+    verifyData?.merchant_id || // corporate member
+    verifyData?.merchant?.corporate_member_id || // direct corporate member id
+    verifyData?.member?.id || // member id
+    verifyData?.data?.id || // fallback
+    verifyData?.id; // fallback
 
   // Debounce search by 600ms
   useEffect(() => {
@@ -26,8 +36,12 @@ export const useMerchantStaff = () => {
     return () => clearTimeout(handler);
   }, [debouncedSearch, dispatch]);
 
-  const { data, isLoading, isFetching, refetch } = useGetAllStaffsQuery();
-
+  const { data, isLoading, isFetching, refetch } = useGetAllStaffsQuery(
+    merchantId,
+    { skip: !merchantId }
+  );
+  console.log("merchantId", merchantId);
+  console.log("data merchant", data);
   // Filter & Sort locally
   const filteredStaffs = useMemo(() => {
     if (!data?.staffs) return [];

@@ -55,7 +55,7 @@ const Login = () => {
           : "/member"
       );
     } catch (err) {
-      console.error("Login failed:", err);
+      // console.log("Login failed:::", err?.data?.error)
 
       // error handling
       if (
@@ -67,6 +67,8 @@ const Login = () => {
         );
       } else if (err?.status === 401 || err?.status === 400) {
         toast.error("Invalid username or password.");
+      }else if (err?.status === 403 ) {
+        toast.error(err?.data?.error || "Access forbidden.");
       } else if (err?.status === 500) {
         toast.error("Server error. Please try again later.");
       } else {

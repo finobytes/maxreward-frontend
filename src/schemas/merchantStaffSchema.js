@@ -6,12 +6,7 @@ export const merchantStaffSchema = z.object({
     .min(3, { message: "Full name must be at least 3 characters long" })
     .max(100, { message: "Full name must be less than 100 characters" }),
 
-  phoneNumber: z
-    .string()
-    .transform((value) => value.replace(/[\s-]/g, "")) // space & dash remove
-    .refine((value) => /^\d{10,11}$/.test(value), {
-      message: "Invalid phone number",
-    }),
+  phone: z.string().min(1, { message: "Phone number is required" }),
 
   email: z
     .string()

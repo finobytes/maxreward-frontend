@@ -22,7 +22,7 @@ const MerchantDetails = () => {
   const [currentTab, setCurrentTab] = useState("statements");
   const { id } = useParams();
   const { data, isLoading } = useGetMerchantByIdQuery(id);
-  console.log("merchant details data", data?.data);
+  console.log("merchant details data", data?.data?.merchant);
   if (isLoading) return <MerchantDetailsSkeleton />;
   return (
     <div>

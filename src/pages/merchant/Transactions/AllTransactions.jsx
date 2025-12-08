@@ -133,7 +133,7 @@ const AllTransactions = () => {
                 <TableHead className="">Phone Number</TableHead>
                 <TableHead className="">Total Transaction</TableHead>
                 <TableHead className="">Points Redeemed</TableHead>
-                <TableHead>Balance Paid</TableHead>
+                <TableHead>Cash Paid Amount</TableHead>
                 <TableHead>Reward Fee</TableHead>
                 <TableHead>Balance</TableHead>
                 <TableHead>Payment Method</TableHead>
@@ -188,9 +188,7 @@ const AllTransactions = () => {
                     <TableCell className="">
                       {currency(txn.transaction_amount)}
                     </TableCell>
-                    <TableCell className="">
-                      {currency(txn.redeem_amount)}
-                    </TableCell>
+                    <TableCell className="">{txn.redeem_amount}</TableCell>
                     <TableCell className="">
                       {currency(txn.cash_redeem_amount)}
                     </TableCell>

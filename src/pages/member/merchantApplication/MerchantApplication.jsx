@@ -14,6 +14,7 @@ import { useGetAllBusinessTypesQuery } from "@/redux/features/admin/businessType
 import { merchantSchema } from "../../../schemas/merchantSchema";
 import { useSelector } from "react-redux";
 import { companyLogoPlaceholder } from "../../../assets/assets";
+import { Eye, EyeOff } from "lucide-react";
 
 // Referral imports
 import SkeletonField from "@/components/skeleton/SkeletonField";
@@ -25,6 +26,7 @@ import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 
 const MerchantApplication = () => {
+  const [showPassword, setShowPassword] = useState(false);
   const { user } = useSelector((state) => state.auth);
   const role = user?.role;
 
@@ -66,10 +68,6 @@ const MerchantApplication = () => {
   } = useGetMemberByReferralQuery(debouncedReferral, {
     skip: !debouncedReferral || debouncedReferral.length < 3,
   });
-  console.log(
-    "memberData",
-    memberData?.sponsored_member_info?.sponsor_member?.id
-  );
   // Fetch current user's referral code
   const { data, isLoading } = useVerifyMeQuery();
 
@@ -141,10 +139,7 @@ const MerchantApplication = () => {
 
       // Add referral sponsor ID if exists
       if (!isError && memberData) {
-        formData.append(
-          "member_id",
-          memberData?.sponsored_member_info?.sponsor_member?.id
-        );
+        formData.append("member_id", memberData?.id);
       }
 
       // gather other form fields as necessary
@@ -266,11 +261,24 @@ const MerchantApplication = () => {
 
               <div>
                 <Label>Password</Label>
-                <Input
-                  type="password"
-                  {...register("merchant_password")}
-                  placeholder="Password"
-                />
+
+                <div className="relative">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    {...register("merchant_password")}
+                    placeholder="Password"
+                    className="pr-10"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+
                 {errors.merchant_password && (
                   <p className="text-red-500 text-xs mt-1">
                     {errors.merchant_password.message}
