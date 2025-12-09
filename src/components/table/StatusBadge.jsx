@@ -20,7 +20,7 @@ const StatusBadge = ({ status, children }) => {
   };
   return (
     <span
-      className={`px-3 py-1 text-xs font-medium rounded-full ${
+      className={`px-3 py-1 text-xs font-medium rounded-full capitalize ${
         styles[status] || "bg-gray-100 text-gray-700"
       }`}
     >
