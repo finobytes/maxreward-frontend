@@ -36,16 +36,11 @@ const MerchantTransaction = () => {
   const { data: settingsData, isLoading: settingsLoading } =
     useGetCurrentSettingsQuery();
   const [page, setPage] = useState(1);
-  console.log(
-    "settingsData",
-    settingsData?.setting_attribute?.maxreward?.rm_points
-  );
   const rmPoints = settingsData?.setting_attribute?.maxreward?.rm_points;
   const { data, isLoading, isFetching, isError } =
     useGetMerchantTransactionsQuery({ page });
 
   const transactions = data?.transactions || [];
-  console.log("transactions", transactions);
   const meta = data?.meta || {};
 
   return (

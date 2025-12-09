@@ -17,6 +17,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTransactions } from "../../../redux/features/merchant/transactions/useTransaction";
 import { Link } from "react-router";
+import { useGetCurrentSettingsQuery } from "../../../redux/features/admin/settings/settingsApi";
 
 const statusOptions = [
   { label: "All Statuses", value: "all" },
@@ -47,6 +48,11 @@ const AllTransactions = () => {
     setPage,
     refresh,
   } = useTransactions("all");
+
+  const { data: settingsData, isLoading: settingsLoading } =
+    useGetCurrentSettingsQuery();
+
+  const rmPoints = settingsData?.setting_attribute?.maxreward?.rm_points;
 
   const handleSearchChange = (eventOrValue) => {
     const nextValue =
@@ -188,12 +194,15 @@ const AllTransactions = () => {
                     <TableCell className="">
                       {currency(txn.transaction_amount)}
                     </TableCell>
-                    <TableCell className="">{txn.redeem_amount} pts</TableCell>
+                    <TableCell className="">
+                      pts {txn.redeem_amount} = RM{" "}
+                      {Number(txn.redeem_amount / rmPoints).toFixed(2)}
+                    </TableCell>
                     <TableCell className="">
                       {currency(txn.cash_redeem_amount)}
                     </TableCell>
-                    <TableCell className="">{txn.reward_fee} pts</TableCell>
-                    <TableCell className="">{txn.balance} pts</TableCell>
+                    <TableCell className="">pts {txn.reward_fee} </TableCell>
+                    <TableCell className="">pts {txn.balance} </TableCell>
                     <TableCell className="capitalize">
                       {txn.payment_method || "—"}
                     </TableCell>
