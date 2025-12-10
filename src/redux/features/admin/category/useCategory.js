@@ -29,16 +29,15 @@ export const useCategory = () => {
     e.preventDefault();
     try {
       if (editId) {
-        // For update, we use the user's requested PATCH method.
-        // If image is present, we might need FormData, but user showed simple JSON example for update.
-        // However, standard consistency implies we might update image too.
-        // I'll send plain JSON if no image, or if image is string (url).
-        // If image is File, I'll send FormData.
-        // BUT user specifically said update body: name: "Fashion N".
-        // I will stick to sending what matches the backend expectation.
-        // If the backend expects JSON for PATCH, I'll send JSON.
-
-        await updateCategory({ id: editId, data: formData }).unwrap();
+        const data = new FormData();
+        data.append("name", formData.name);
+        if (formData.image instanceof File) {
+          data.append("image", formData.image);
+        }
+        // Note: Some backends require POST with _method="PATCH" for file uploads.
+        // If this PATCH fails for files, that would be the next fix.
+        // For now, adhering to user's PATCH method.
+        await updateCategory({ id: editId, data }).unwrap();
       } else {
         // Create requires FormData for image
         const data = new FormData();
