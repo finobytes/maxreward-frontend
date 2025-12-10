@@ -49,6 +49,7 @@ const Category = () => {
 
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
 
   useEffect(() => {
     dispatch(setSearch(debouncedSearch));
@@ -75,12 +76,14 @@ const Category = () => {
   const handlePerPageChange = (n) => dispatch(setPerPage(n));
 
   const openCreateModal = () => {
-    setFormData({ name: "" });
+    setFormData({ name: "", image: null });
+    setImagePreview(null);
     setIsModalOpen(true);
   };
 
   const openEditModal = (item) => {
     handleEdit(item);
+    setImagePreview(item.image_url);
     setIsModalOpen(true);
   };
 
@@ -294,23 +297,36 @@ const Category = () => {
               />
             </div>
 
-            {/* Image Upload - Only for Create usually, or if supported in update */}
-            {!editId && (
-              <div>
-                <label className="text-sm font-medium text-gray-700">
-                  Category Image
-                </label>
-                <input
-                  type="file"
-                  onChange={(e) =>
-                    setFormData({ ...formData, image: e.target.files[0] })
+            {/* Image Upload */}
+            <div>
+              <label className="text-sm font-medium text-gray-700">
+                Category Image
+              </label>
+
+              {imagePreview && (
+                <div className="mt-2 mb-2">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-24 h-24 object-cover rounded-md border"
+                  />
+                </div>
+              )}
+
+              <input
+                type="file"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    setFormData({ ...formData, image: file });
+                    setImagePreview(URL.createObjectURL(file));
                   }
-                  className="mt-1 w-full border rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  accept="image/*"
-                  required
-                />
-              </div>
-            )}
+                }}
+                className="mt-1 w-full border rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                accept="image/*"
+                required={!editId} // Required only for create
+              />
+            </div>
 
             <div className="flex justify-end gap-3">
               <PrimaryButton
