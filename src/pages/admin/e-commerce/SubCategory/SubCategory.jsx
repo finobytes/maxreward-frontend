@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { PencilLine, Trash2Icon, Plus, Loader } from "lucide-react";
+import {
+  PencilLine,
+  Trash2Icon,
+  Plus,
+  Loader,
+  AlertTriangle,
+} from "lucide-react";
 import SearchInput from "../../../../components/form/form-elements/SearchInput";
 import DropdownSelect from "../../../../components/ui/dropdown/DropdownSelect";
 import PrimaryButton from "../../../../components/ui/PrimaryButton";
@@ -29,6 +35,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
+  DialogDescription,
 } from "../../../../components/ui/dialog";
 import BulkActionBar from "../../../../components/table/BulkActionBar";
 import { toast } from "sonner";
@@ -51,8 +59,16 @@ const SubCategory = () => {
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Delete Modal States
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+
+  const [formLoading, setFormLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
   // Fetch categories for dropdown
   const { data: allCategories } = useGetAllCategoriesQuery();
+  const categories = allCategories?.data?.categories;
 
   useEffect(() => {
     dispatch(setSearch(debouncedSearch));
@@ -74,12 +90,18 @@ const SubCategory = () => {
       resetFilters: resetAllFilters,
     },
   } = useSubCategory();
-
+  console.log("subCategories", subCategories?.data);
   const handlePageChange = (p) => dispatch(setPage(p));
   const handlePerPageChange = (n) => dispatch(setPerPage(n));
 
   const openCreateModal = () => {
-    setFormData({ name: "", category_id: "" });
+    setFormData({
+      name: "",
+      category_id: "",
+      description: "",
+      sort_order: "",
+      is_active: true,
+    });
     setIsModalOpen(true);
   };
 
@@ -88,16 +110,51 @@ const SubCategory = () => {
     setIsModalOpen(true);
   };
 
-  const onSubmit = async (e) => {
-    await handleSubmit(e);
-    setIsModalOpen(false);
+  const submitForm = async (e) => {
+    e.preventDefault();
+    setFormLoading(true);
+
+    try {
+      await handleSubmit(e);
+      toast.success(
+        editId
+          ? "Sub Category updated successfully!"
+          : "Sub Category created successfully!"
+      );
+      setIsModalOpen(false);
+    } catch (err) {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const openDeleteModal = (id) => {
+    setDeleteId(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+    setDeleteLoading(true);
+
+    try {
+      await handleDelete(deleteId);
+      toast.success("Sub Category deleted successfully!");
+      setIsDeleteModalOpen(false);
+      setDeleteId(null);
+    } catch (error) {
+      toast.error("Failed to delete sub category");
+    } finally {
+      setDeleteLoading(false);
+    }
   };
 
   const [selected, setSelected] = useState([]);
 
   const toggleSelectAll = (checked) => {
     if (checked) {
-      setSelected(subCategories?.map((m) => m.id));
+      setSelected(subCategories?.data?.map((m) => m.id));
     } else {
       setSelected([]);
     }
@@ -185,7 +242,7 @@ const SubCategory = () => {
             <div className="p-6 text-center text-red-500">
               Failed to load sub categories.
             </div>
-          ) : !subCategories?.length ? (
+          ) : !subCategories?.data?.length ? (
             <div className="p-6 text-center text-gray-500">
               No sub categories found.
             </div>
@@ -197,8 +254,8 @@ const SubCategory = () => {
                     <input
                       type="checkbox"
                       checked={
-                        subCategories?.length > 0 &&
-                        selected.length === subCategories?.length
+                        subCategories?.data?.length > 0 &&
+                        selected.length === subCategories?.data?.length
                       }
                       onChange={(e) => toggleSelectAll(e.target.checked)}
                       className="w-4 h-4 rounded"
@@ -207,12 +264,14 @@ const SubCategory = () => {
                   <TableHead>S/N</TableHead>
                   <TableHead>Category</TableHead>
                   <TableHead>Sub Category Name</TableHead>
+                  <TableHead>Sort Order</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead>Created At</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {subCategories?.map((b, idx) => (
+                {subCategories?.data?.map((b, idx) => (
                   <TableRow key={b.id}>
                     <TableCell>
                       <input
@@ -227,6 +286,18 @@ const SubCategory = () => {
                       {b.category?.name || "N/A"}
                     </TableCell>
                     <TableCell className="capitalize">{b.name}</TableCell>
+                    <TableCell>{b.sort_order}</TableCell>
+                    <TableCell>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          b.is_active
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        {b.is_active ? "Active" : "Inactive"}
+                      </span>
+                    </TableCell>
                     <TableCell>
                       {new Date(b.created_at).toLocaleDateString()}
                     </TableCell>
@@ -239,7 +310,7 @@ const SubCategory = () => {
                           <PencilLine size={16} />
                         </button>
                         <button
-                          onClick={() => handleDelete(b.id)}
+                          onClick={() => openDeleteModal(b.id)}
                           className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200"
                         >
                           <Trash2Icon size={16} />
@@ -271,7 +342,7 @@ const SubCategory = () => {
             </DialogTitle>
           </DialogHeader>
 
-          <form onSubmit={onSubmit} className="space-y-4 mt-3">
+          <form onSubmit={submitForm} className="space-y-4 mt-3">
             <div>
               <label className="text-sm font-medium text-gray-700">
                 Category
@@ -285,7 +356,7 @@ const SubCategory = () => {
                 required
               >
                 <option value="">Select Category</option>
-                {allCategories?.data?.map((cat) => (
+                {categories?.map((cat) => (
                   <option key={cat.id} value={cat.id}>
                     {cat.name}
                   </option>
@@ -309,19 +380,120 @@ const SubCategory = () => {
               />
             </div>
 
+            <div>
+              <label className="text-sm font-medium text-gray-700">
+                Description
+              </label>
+              <textarea
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+                className="mt-1 w-full border rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                placeholder="Enter description"
+                rows={3}
+              />
+            </div>
+
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <label className="text-sm font-medium text-gray-700">
+                  Sort Order
+                </label>
+                <input
+                  type="number"
+                  value={formData.sort_order}
+                  onChange={(e) =>
+                    setFormData({ ...formData, sort_order: e.target.value })
+                  }
+                  className="mt-1 w-full border rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  placeholder="0"
+                />
+              </div>
+              <div className="flex items-center pt-6">
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_active}
+                    onChange={(e) =>
+                      setFormData({ ...formData, is_active: e.target.checked })
+                    }
+                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                  />
+                  <span className="text-sm font-medium text-gray-700">
+                    Active
+                  </span>
+                </label>
+              </div>
+            </div>
+
             <div className="flex justify-end gap-3">
               <PrimaryButton
                 type="button"
                 variant="secondary"
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => !formLoading && setIsModalOpen(false)}
+                disabled={formLoading}
               >
                 Cancel
               </PrimaryButton>
-              <PrimaryButton type="submit" variant="primary">
-                {editId ? "Update" : "Create"}
+              <PrimaryButton
+                type="submit"
+                variant="primary"
+                disabled={formLoading}
+              >
+                {formLoading ? (
+                  <Loader className="w-4 h-4 animate-spin" />
+                ) : editId ? (
+                  "Update"
+                ) : (
+                  "Create"
+                )}
               </PrimaryButton>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Modal */}
+      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <div className="flex flex-col items-center">
+              <div className="p-3 bg-red-100 rounded-full">
+                <AlertTriangle className="w-6 h-6 text-red-600" />
+              </div>
+
+              <DialogTitle className="text-xl mt-2">
+                Delete Sub Category
+              </DialogTitle>
+              <DialogDescription className="text-center mt-2">
+                Are you sure you want to delete this sub category? This action
+                is permanent and cannot be undone.
+              </DialogDescription>
+            </div>
+          </DialogHeader>
+
+          <DialogFooter className="mt-4">
+            <PrimaryButton
+              variant="secondary"
+              onClick={() => !deleteLoading && setIsDeleteModalOpen(false)}
+              disabled={deleteLoading}
+            >
+              Cancel
+            </PrimaryButton>
+
+            <PrimaryButton
+              variant="danger"
+              onClick={confirmDelete}
+              disabled={deleteLoading}
+            >
+              {deleteLoading ? (
+                <Loader className="w-4 h-4 animate-spin" />
+              ) : (
+                "Delete"
+              )}
+            </PrimaryButton>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

@@ -35,7 +35,7 @@ export const subCategoryApi = baseApi.injectEndpoints({
     updateSubCategory: builder.mutation({
       query: ({ id, data }) => ({
         url: `/sub-categories/${id}`,
-        method: "PATCH",
+        method: "POST",
         body: data,
       }),
       invalidatesTags: (result, error, { id }) => [
