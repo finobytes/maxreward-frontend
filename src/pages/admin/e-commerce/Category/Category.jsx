@@ -141,18 +141,6 @@ const Category = () => {
     }
   };
 
-  const [selected, setSelected] = useState([]);
-
-  const toggleSelectAll = (checked) => {
-    setSelected(checked ? categories?.data?.map((m) => m.id) : []);
-  };
-
-  const toggleSelect = (id) => {
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
-  };
-
   return (
     <div>
       <PageBreadcrumb
@@ -198,27 +186,12 @@ const Category = () => {
               onClick={() => {
                 resetFilters();
                 setLocalSearch("");
-                setSelected([]);
               }}
             >
               Clear
             </PrimaryButton>
           </div>
         </div>
-
-        {/* Bulk Action */}
-        {selected.length > 0 && (
-          <BulkActionBar
-            selectedCount={selected.length}
-            actions={[
-              {
-                label: "Delete Selected",
-                variant: "danger",
-                onClick: () => toast.warning("Bulk delete not implemented yet"),
-              },
-            ]}
-          />
-        )}
 
         {/* Table */}
         <div className="mt-4 overflow-x-auto">
@@ -236,16 +209,6 @@ const Category = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>
-                    <input
-                      type="checkbox"
-                      checked={
-                        categories?.data?.length > 0 &&
-                        selected.length === categories?.data?.length
-                      }
-                      onChange={(e) => toggleSelectAll(e.target.checked)}
-                    />
-                  </TableHead>
                   <TableHead>S/N</TableHead>
                   <TableHead>Image</TableHead>
                   <TableHead>Name</TableHead>
@@ -257,16 +220,7 @@ const Category = () => {
               <TableBody>
                 {categories?.data?.map((item, idx) => (
                   <TableRow key={item.id}>
-                    <TableCell>
-                      <input
-                        type="checkbox"
-                        checked={selected.includes(item.id)}
-                        onChange={() => toggleSelect(item.id)}
-                      />
-                    </TableCell>
-
                     <TableCell>{idx + 1}</TableCell>
-
                     <TableCell>
                       {item.image_url ? (
                         <img
