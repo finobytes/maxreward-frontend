@@ -38,7 +38,6 @@ import {
   DialogFooter,
   DialogDescription,
 } from "../../../../components/ui/dialog";
-import BulkActionBar from "../../../../components/table/BulkActionBar";
 import { toast } from "sonner";
 
 const useDebounced = (value, delay = 400) => {
@@ -150,25 +149,6 @@ const SubCategory = () => {
     }
   };
 
-  const [selected, setSelected] = useState([]);
-
-  const toggleSelectAll = (checked) => {
-    if (checked) {
-      setSelected(subCategories?.data?.map((m) => m.id));
-    } else {
-      setSelected([]);
-    }
-  };
-  const toggleSelect = (id) => {
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
-  };
-  // Bulk actions (placeholder)
-  const bulkUpdateStatus = (newStatus) => {
-    toast.warning(`Bulk update to ${newStatus} (not implemented yet)`);
-  };
-
   return (
     <div>
       <PageBreadcrumb
@@ -214,26 +194,12 @@ const SubCategory = () => {
               onClick={() => {
                 dispatch(resetAllFilters());
                 setLocalSearch("");
-                setSelected([]);
               }}
             >
               Clear
             </PrimaryButton>
           </div>
         </div>
-        {/* Bulk Actions */}
-        {selected.length > 0 && (
-          <BulkActionBar
-            selectedCount={selected.length}
-            actions={[
-              {
-                label: "Delete",
-                variant: "danger",
-                onClick: () => bulkUpdateStatus("delete"),
-              },
-            ]}
-          />
-        )}
         {/* Table */}
         <div className="mt-4 overflow-x-auto">
           {isLoading ? (
@@ -250,17 +216,6 @@ const SubCategory = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>
-                    <input
-                      type="checkbox"
-                      checked={
-                        subCategories?.data?.length > 0 &&
-                        selected.length === subCategories?.data?.length
-                      }
-                      onChange={(e) => toggleSelectAll(e.target.checked)}
-                      className="w-4 h-4 rounded"
-                    />
-                  </TableHead>
                   <TableHead>S/N</TableHead>
                   <TableHead>Category</TableHead>
                   <TableHead>Sub Category Name</TableHead>
@@ -273,14 +228,6 @@ const SubCategory = () => {
               <TableBody>
                 {subCategories?.data?.map((b, idx) => (
                   <TableRow key={b.id}>
-                    <TableCell>
-                      <input
-                        type="checkbox"
-                        checked={selected.includes(b.id)}
-                        onChange={() => toggleSelect(b.id)}
-                        className="w-4 h-4 rounded"
-                      />
-                    </TableCell>
                     <TableCell>{idx + 1}</TableCell>
                     <TableCell className="capitalize">
                       {b.category?.name || "N/A"}
