@@ -22,7 +22,13 @@ export const useSubCategory = () => {
   const [updateSubCategory] = useUpdateSubCategoryMutation();
   const [deleteSubCategory] = useDeleteSubCategoryMutation();
 
-  const [formData, setFormData] = useState({ name: "", category_id: "" });
+  const [formData, setFormData] = useState({
+    name: "",
+    category_id: "",
+    description: "",
+    sort_order: "",
+    is_active: true,
+  });
   const [editId, setEditId] = useState(null);
 
   const handleSubmit = async (e) => {
@@ -33,10 +39,17 @@ export const useSubCategory = () => {
       } else {
         await createSubCategory(formData).unwrap();
       }
-      setFormData({ name: "", category_id: "" });
+      setFormData({
+        name: "",
+        category_id: "",
+        description: "",
+        sort_order: "",
+        is_active: true,
+      });
       setEditId(null);
     } catch (err) {
       console.error("Error submitting sub-category:", err);
+      throw err;
     }
   };
 
@@ -45,16 +58,18 @@ export const useSubCategory = () => {
     setFormData({
       name: item.name,
       category_id: item.category_id || item.category?.id || "",
+      description: item.description || "",
+      sort_order: item.sort_order || "",
+      is_active: item.is_active ?? true,
     });
   };
 
   const handleDelete = async (id) => {
-    if (confirm("Are you sure to delete this sub-category?")) {
-      try {
-        await deleteSubCategory(id).unwrap();
-      } catch (err) {
-        console.error("Error deleting sub-category:", err);
-      }
+    try {
+      await deleteSubCategory(id).unwrap();
+    } catch (err) {
+      console.error("Error deleting sub-category:", err);
+      throw err;
     }
   };
 
