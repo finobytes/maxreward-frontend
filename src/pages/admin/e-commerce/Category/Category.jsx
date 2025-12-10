@@ -6,7 +6,6 @@ import {
   Plus,
   Loader,
   X,
-  CloudUpload,
   AlertTriangle,
 } from "lucide-react";
 import Dropzone from "../../../../components/form/form-elements/Dropzone";
@@ -29,7 +28,6 @@ import {
   setPage,
   setPerPage,
 } from "../../../../redux/features/admin/category/categorySlice";
-
 import {
   Dialog,
   DialogContent,
@@ -54,20 +52,22 @@ const useDebounced = (value, delay = 400) => {
 const Category = () => {
   const dispatch = useDispatch();
   const { search, per_page } = useSelector((s) => s.category);
+
   const [localSearch, setLocalSearch] = useState(search || "");
   const debouncedSearch = useDebounced(localSearch, 450);
 
-  // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
 
-  // Delete Modal States
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
 
+  const [formLoading, setFormLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
   useEffect(() => {
     dispatch(setSearch(debouncedSearch));
-  }, [debouncedSearch, dispatch]);
+  }, [debouncedSearch]);
 
   const {
     data: categories,
@@ -82,7 +82,7 @@ const Category = () => {
       handleSubmit,
       handleEdit,
       handleDelete,
-      resetFilters: resetAllFilters,
+      resetFilters,
     },
   } = useCategory();
 
@@ -101,9 +101,23 @@ const Category = () => {
     setIsModalOpen(true);
   };
 
-  const onSubmit = async (e) => {
-    await handleSubmit(e);
-    setIsModalOpen(false);
+  const submitForm = async (e) => {
+    e.preventDefault();
+    setFormLoading(true);
+
+    try {
+      await handleSubmit(e);
+      toast.success(
+        editId
+          ? "Category updated successfully!"
+          : "Category created successfully!"
+      );
+      setIsModalOpen(false);
+    } catch (err) {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setFormLoading(false);
+    }
   };
 
   const openDeleteModal = (id) => {
@@ -112,38 +126,33 @@ const Category = () => {
   };
 
   const confirmDelete = async () => {
-    if (deleteId) {
-      try {
-        await handleDelete(deleteId);
-        toast.success("Category deleted successfully");
-        setIsDeleteModalOpen(false);
-        setDeleteId(null);
-      } catch (error) {
-        toast.error("Failed to delete category");
-        console.error(error);
-      }
+    if (!deleteId) return;
+    setDeleteLoading(true);
+
+    try {
+      await handleDelete(deleteId);
+      toast.success("Category deleted successfully!");
+      setIsDeleteModalOpen(false);
+      setDeleteId(null);
+    } catch (error) {
+      toast.error("Failed to delete category");
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
   const [selected, setSelected] = useState([]);
 
   const toggleSelectAll = (checked) => {
-    if (checked) {
-      setSelected(categories?.data?.map((m) => m.id));
-    } else {
-      setSelected([]);
-    }
+    setSelected(checked ? categories?.data?.map((m) => m.id) : []);
   };
+
   const toggleSelect = (id) => {
     setSelected((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
-  // Bulk actions (placeholder)
-  const bulkUpdateStatus = (newStatus) => {
-    toast.warning(`Bulk update to ${newStatus} (not implemented yet)`);
-  };
-  console.log(categories?.data);
+
   return (
     <div>
       <PageBreadcrumb
@@ -162,14 +171,14 @@ const Category = () => {
         )}
 
         {/* Filters */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <SearchInput
             value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
             placeholder="Search category..."
           />
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-3">
             <PrimaryButton variant="primary" onClick={openCreateModal}>
               <Plus size={16} /> Create
             </PrimaryButton>
@@ -187,7 +196,7 @@ const Category = () => {
             <PrimaryButton
               variant="secondary"
               onClick={() => {
-                resetAllFilters();
+                resetFilters();
                 setLocalSearch("");
                 setSelected([]);
               }}
@@ -196,19 +205,21 @@ const Category = () => {
             </PrimaryButton>
           </div>
         </div>
-        {/* Bulk Actions */}
+
+        {/* Bulk Action */}
         {selected.length > 0 && (
           <BulkActionBar
             selectedCount={selected.length}
             actions={[
               {
-                label: "Delete",
+                label: "Delete Selected",
                 variant: "danger",
-                onClick: () => bulkUpdateStatus("delete"),
+                onClick: () => toast.warning("Bulk delete not implemented yet"),
               },
             ]}
           />
         )}
+
         {/* Table */}
         <div className="mt-4 overflow-x-auto">
           {isLoading ? (
@@ -233,7 +244,6 @@ const Category = () => {
                         selected.length === categories?.data?.length
                       }
                       onChange={(e) => toggleSelectAll(e.target.checked)}
-                      className="w-4 h-4 rounded"
                     />
                   </TableHead>
                   <TableHead>S/N</TableHead>
@@ -243,23 +253,25 @@ const Category = () => {
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
+
               <TableBody>
-                {categories?.data?.map((b, idx) => (
-                  <TableRow key={b.id}>
+                {categories?.data?.map((item, idx) => (
+                  <TableRow key={item.id}>
                     <TableCell>
                       <input
                         type="checkbox"
-                        checked={selected.includes(b.id)}
-                        onChange={() => toggleSelect(b.id)}
-                        className="w-4 h-4 rounded"
+                        checked={selected.includes(item.id)}
+                        onChange={() => toggleSelect(item.id)}
                       />
                     </TableCell>
+
                     <TableCell>{idx + 1}</TableCell>
+
                     <TableCell>
-                      {b.image_url ? (
+                      {item.image_url ? (
                         <img
-                          src={b.image_url}
-                          alt={b.name}
+                          src={item.image_url}
+                          alt={item.name}
                           className="w-10 h-10 object-cover rounded-full"
                         />
                       ) : (
@@ -268,20 +280,24 @@ const Category = () => {
                         </div>
                       )}
                     </TableCell>
-                    <TableCell className="capitalize">{b.name}</TableCell>
+
+                    <TableCell className="capitalize">{item.name}</TableCell>
+
                     <TableCell>
-                      {new Date(b.created_at).toLocaleDateString()}
+                      {new Date(item.created_at).toLocaleDateString()}
                     </TableCell>
+
                     <TableCell>
                       <div className="flex gap-2">
                         <button
-                          onClick={() => openEditModal(b)}
+                          onClick={() => openEditModal(item)}
                           className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200"
                         >
                           <PencilLine size={16} />
                         </button>
+
                         <button
-                          onClick={() => openDeleteModal(b.id)}
+                          onClick={() => openDeleteModal(item.id)}
                           className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200"
                         >
                           <Trash2Icon size={16} />
@@ -304,7 +320,7 @@ const Category = () => {
         )}
       </div>
 
-      {/* Modal for Create / Edit */}
+      {/* Create / Edit Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent>
           <DialogHeader>
@@ -313,32 +329,26 @@ const Category = () => {
             </DialogTitle>
           </DialogHeader>
 
-          <form onSubmit={onSubmit} className="space-y-4 mt-3">
+          <form onSubmit={submitForm} className="space-y-4 mt-3">
             <div>
-              <label className="text-sm font-medium text-gray-700">
-                Category Name
-              </label>
+              <label className="text-sm font-medium">Category Name</label>
               <input
                 type="text"
                 value={formData.name}
+                required
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                className="mt-1 w-full border rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                placeholder="Enter category name"
-                required
+                className="mt-1 w-full border rounded-md p-2"
               />
             </div>
 
-            {/* Image Upload */}
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
-                Category Image
-              </label>
+              <label className="text-sm font-medium">Category Image</label>
               <Dropzone
-                onFilesChange={(file) => {
-                  setFormData((prev) => ({ ...prev, image: file || null }));
-                }}
+                onFilesChange={(file) =>
+                  setFormData((prev) => ({ ...prev, image: file || null }))
+                }
                 maxFiles={1}
                 initialFiles={imagePreview ? [imagePreview] : []}
                 validationMessage={
@@ -351,42 +361,68 @@ const Category = () => {
               <PrimaryButton
                 type="button"
                 variant="secondary"
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => !formLoading && setIsModalOpen(false)}
+                disabled={formLoading}
               >
                 Cancel
               </PrimaryButton>
-              <PrimaryButton type="submit" variant="primary">
-                {editId ? "Update" : "Create"}
+
+              <PrimaryButton
+                type="submit"
+                variant="primary"
+                disabled={formLoading}
+              >
+                {formLoading ? (
+                  <Loader className="w-4 h-4 animate-spin" />
+                ) : editId ? (
+                  "Update"
+                ) : (
+                  "Create"
+                )}
               </PrimaryButton>
             </div>
           </form>
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete Modal */}
       <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
         <DialogContent>
           <DialogHeader>
-            <div className="flex flex-col items-center text-center gap-2">
+            <div className="flex flex-col items-center">
               <div className="p-3 bg-red-100 rounded-full">
-                <AlertTriangle className="h-6 w-6 text-red-600" />
+                <AlertTriangle className="w-6 h-6 text-red-600" />
               </div>
-              <DialogTitle className="text-xl">Confirm Deletion</DialogTitle>
+
+              <DialogTitle className="text-xl mt-2">
+                Delete Category
+              </DialogTitle>
+              <DialogDescription className="text-center mt-2">
+                Are you sure you want to delete this category? This action is
+                permanent and cannot be undone.
+              </DialogDescription>
             </div>
-            <DialogDescription className="text-center pt-2">
-              Are you sure you want to delete this category? This action cannot
-              be undone.
-            </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
+
+          <DialogFooter className="mt-4">
             <PrimaryButton
               variant="secondary"
-              onClick={() => setIsDeleteModalOpen(false)}
+              onClick={() => !deleteLoading && setIsDeleteModalOpen(false)}
+              disabled={deleteLoading}
             >
               Cancel
             </PrimaryButton>
-            <PrimaryButton variant="danger" onClick={confirmDelete}>
-              Delete
+
+            <PrimaryButton
+              variant="danger"
+              onClick={confirmDelete}
+              disabled={deleteLoading}
+            >
+              {deleteLoading ? (
+                <Loader className="w-4 h-4 animate-spin" />
+              ) : (
+                "Delete"
+              )}
             </PrimaryButton>
           </DialogFooter>
         </DialogContent>
