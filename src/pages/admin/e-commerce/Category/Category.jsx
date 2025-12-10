@@ -36,7 +36,6 @@ import {
   DialogFooter,
   DialogDescription,
 } from "../../../../components/ui/dialog";
-import BulkActionBar from "../../../../components/table/BulkActionBar";
 import { toast } from "sonner";
 import SearchInput from "../../../../components/form/form-elements/SearchInput";
 
