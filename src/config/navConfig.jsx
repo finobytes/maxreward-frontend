@@ -23,6 +23,7 @@ import {
   BanknoteArrowDown,
   History,
   Wallet,
+  ShoppingBasket,
 } from "lucide-react";
 
 export const NAV_CONFIG = {
@@ -44,6 +45,17 @@ export const NAV_CONFIG = {
           name: "Business Type",
           path: "/admin/merchant/business-type",
         },
+      ],
+    },
+    {
+      name: "E-Commerce",
+      icon: <ShoppingBasket />,
+      subItems: [
+        {
+          name: "Category",
+          path: "/admin/e-commerce/category",
+        },
+        { name: "Sub Category", path: "/admin/e-commerce/sub-category" },
       ],
     },
     {

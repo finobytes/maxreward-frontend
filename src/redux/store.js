@@ -20,6 +20,8 @@ import cpUnlockHistoryAdminReducer from "./features/admin/cpUnlockHistory/cpUnlo
 import cpUnlockHistoryMemberReducer from "./features/member/cpUnlockHistory/cpUnlockHistoryMemberSlice";
 import communityPointAdminReducer from "./features/admin/communityPoint/communityPointAdminSlice";
 import communityPointMemberReducer from "./features/member/communityPoint/communityPointMemberSlice";
+import categoryReducer from "./features/admin/category/categorySlice";
+import subCategoryReducer from "./features/admin/subCategory/subCategorySlice";
 import { baseApi } from "./api/baseApi";
 
 export const store = configureStore({
@@ -45,6 +47,8 @@ export const store = configureStore({
     cpUnlockHistoryMember: cpUnlockHistoryMemberReducer,
     communityPointAdmin: communityPointAdminReducer,
     communityPointMember: communityPointMemberReducer,
+    category: categoryReducer,
+    subCategory: subCategoryReducer,
     [baseApi.reducerPath]: baseApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>

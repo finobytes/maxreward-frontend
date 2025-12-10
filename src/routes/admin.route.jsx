@@ -41,6 +41,8 @@ import CommunityPointDetails from "../pages/admin/communityPoint/CommunityPointD
 import MerchantTransaction from "../pages/admin/Transaction/MerchanTransaction";
 import MerchantTransactionDetails from "../pages/admin/Transaction/MerchantTransactionDetails";
 import CPLevel from "../pages/admin/Settings/CPLevel";
+import Category from "../pages/admin/e-commerce/Category/Category";
+import SubCategory from "../pages/admin/e-commerce/SubCategory/SubCategory";
 
 export const adminRoutes = [
   {
@@ -70,6 +72,14 @@ export const adminRoutes = [
   {
     path: "staff-manage",
     element: <StaffManage />,
+  },
+  {
+    path: "e-commerce/category",
+    element: <Category />,
+  },
+  {
+    path: "e-commerce/sub-category",
+    element: <SubCategory />,
   },
   {
     path: "cp-transaction",
