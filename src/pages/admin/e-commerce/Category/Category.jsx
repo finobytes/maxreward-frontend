@@ -93,7 +93,7 @@ const Category = () => {
 
   const toggleSelectAll = (checked) => {
     if (checked) {
-      setSelected(categories?.map((m) => m.id));
+      setSelected(categories?.data?.map((m) => m.id));
     } else {
       setSelected([]);
     }
@@ -107,7 +107,7 @@ const Category = () => {
   const bulkUpdateStatus = (newStatus) => {
     toast.warning(`Bulk update to ${newStatus} (not implemented yet)`);
   };
-
+  console.log(categories?.data);
   return (
     <div>
       <PageBreadcrumb
@@ -181,7 +181,7 @@ const Category = () => {
             <div className="p-6 text-center text-red-500">
               Failed to load categories.
             </div>
-          ) : !categories?.length ? (
+          ) : !categories?.data?.length ? (
             <div className="p-6 text-center text-gray-500">
               No categories found.
             </div>
@@ -193,21 +193,22 @@ const Category = () => {
                     <input
                       type="checkbox"
                       checked={
-                        categories?.length > 0 &&
-                        selected.length === categories?.length
+                        categories?.data?.length > 0 &&
+                        selected.length === categories?.data?.length
                       }
                       onChange={(e) => toggleSelectAll(e.target.checked)}
                       className="w-4 h-4 rounded"
                     />
                   </TableHead>
                   <TableHead>S/N</TableHead>
+                  <TableHead>Image</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Created At</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {categories?.map((b, idx) => (
+                {categories?.data?.map((b, idx) => (
                   <TableRow key={b.id}>
                     <TableCell>
                       <input
@@ -218,6 +219,19 @@ const Category = () => {
                       />
                     </TableCell>
                     <TableCell>{idx + 1}</TableCell>
+                    <TableCell>
+                      {b.image_url ? (
+                        <img
+                          src={b.image_url}
+                          alt={b.name}
+                          className="w-10 h-10 object-cover rounded-full"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-xs">
+                          No Img
+                        </div>
+                      )}
+                    </TableCell>
                     <TableCell className="capitalize">{b.name}</TableCell>
                     <TableCell>
                       {new Date(b.created_at).toLocaleDateString()}
@@ -279,6 +293,24 @@ const Category = () => {
                 required
               />
             </div>
+
+            {/* Image Upload - Only for Create usually, or if supported in update */}
+            {!editId && (
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Category Image
+                </label>
+                <input
+                  type="file"
+                  onChange={(e) =>
+                    setFormData({ ...formData, image: e.target.files[0] })
+                  }
+                  className="mt-1 w-full border rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  accept="image/*"
+                  required
+                />
+              </div>
+            )}
 
             <div className="flex justify-end gap-3">
               <PrimaryButton
