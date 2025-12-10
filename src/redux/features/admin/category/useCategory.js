@@ -60,12 +60,11 @@ export const useCategory = () => {
   };
 
   const handleDelete = async (id) => {
-    if (confirm("Are you sure to delete this category?")) {
-      try {
-        await deleteCategory(id).unwrap();
-      } catch (err) {
-        console.error("Error deleting category:", err);
-      }
+    try {
+      await deleteCategory(id).unwrap();
+    } catch (err) {
+      console.error("Error deleting category:", err);
+      throw err;
     }
   };
 
