@@ -8,6 +8,8 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import SearchInput from "../../../../components/form/form-elements/SearchInput";
+import InputField from "../../../../components/form/input/InputField";
+import Select from "../../../../components/form/Select";
 import DropdownSelect from "../../../../components/ui/dropdown/DropdownSelect";
 import PrimaryButton from "../../../../components/ui/PrimaryButton";
 import Pagination from "../../../../components/table/Pagination";
@@ -294,34 +296,30 @@ const SubCategory = () => {
               <label className="text-sm font-medium text-gray-700">
                 Category
               </label>
-              <select
+              <Select
                 value={formData.category_id}
                 onChange={(e) =>
                   setFormData({ ...formData, category_id: e.target.value })
                 }
-                className="mt-1 w-full border rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+                options={categories?.map((cat) => ({
+                  value: cat.id,
+                  label: cat.name,
+                }))}
+                placeholder="Select Category"
                 required
-              >
-                <option value="">Select Category</option>
-                {categories?.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
 
             <div>
               <label className="text-sm font-medium text-gray-700">
                 Sub Category Name
               </label>
-              <input
+              <InputField
                 type="text"
                 value={formData.name}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                className="mt-1 w-full border rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 placeholder="Enter sub category name"
                 required
               />
@@ -347,13 +345,12 @@ const SubCategory = () => {
                 <label className="text-sm font-medium text-gray-700">
                   Sort Order
                 </label>
-                <input
+                <InputField
                   type="number"
                   value={formData.sort_order}
                   onChange={(e) =>
                     setFormData({ ...formData, sort_order: e.target.value })
                   }
-                  className="mt-1 w-full border rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   placeholder="0"
                 />
               </div>
