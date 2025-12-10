@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { PencilLine, Trash2Icon, Plus, Loader } from "lucide-react";
+import {
+  PencilLine,
+  Trash2Icon,
+  Plus,
+  Loader,
+  X,
+  CloudUpload,
+  AlertTriangle,
+} from "lucide-react";
+import Dropzone from "../../../../components/form/form-elements/Dropzone";
 import DropdownSelect from "../../../../components/ui/dropdown/DropdownSelect";
 import PrimaryButton from "../../../../components/ui/PrimaryButton";
 import Pagination from "../../../../components/table/Pagination";
@@ -19,7 +28,6 @@ import {
   setSearch,
   setPage,
   setPerPage,
-  resetFilters,
 } from "../../../../redux/features/admin/category/categorySlice";
 
 import {
@@ -27,6 +35,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
+  DialogDescription,
 } from "../../../../components/ui/dialog";
 import BulkActionBar from "../../../../components/table/BulkActionBar";
 import { toast } from "sonner";
@@ -43,13 +53,17 @@ const useDebounced = (value, delay = 400) => {
 
 const Category = () => {
   const dispatch = useDispatch();
-  const { search, page, per_page } = useSelector((s) => s.category);
+  const { search, per_page } = useSelector((s) => s.category);
   const [localSearch, setLocalSearch] = useState(search || "");
   const debouncedSearch = useDebounced(localSearch, 450);
 
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
+
+  // Delete Modal States
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
 
   useEffect(() => {
     dispatch(setSearch(debouncedSearch));
@@ -90,6 +104,25 @@ const Category = () => {
   const onSubmit = async (e) => {
     await handleSubmit(e);
     setIsModalOpen(false);
+  };
+
+  const openDeleteModal = (id) => {
+    setDeleteId(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (deleteId) {
+      try {
+        await handleDelete(deleteId);
+        toast.success("Category deleted successfully");
+        setIsDeleteModalOpen(false);
+        setDeleteId(null);
+      } catch (error) {
+        toast.error("Failed to delete category");
+        console.error(error);
+      }
+    }
   };
 
   const [selected, setSelected] = useState([]);
@@ -154,7 +187,7 @@ const Category = () => {
             <PrimaryButton
               variant="secondary"
               onClick={() => {
-                dispatch(resetAllFilters());
+                resetAllFilters();
                 setLocalSearch("");
                 setSelected([]);
               }}
@@ -248,7 +281,7 @@ const Category = () => {
                           <PencilLine size={16} />
                         </button>
                         <button
-                          onClick={() => handleDelete(b.id)}
+                          onClick={() => openDeleteModal(b.id)}
                           className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200"
                         >
                           <Trash2Icon size={16} />
@@ -299,32 +332,18 @@ const Category = () => {
 
             {/* Image Upload */}
             <div>
-              <label className="text-sm font-medium text-gray-700">
+              <label className="text-sm font-medium text-gray-700 mb-2 block">
                 Category Image
               </label>
-
-              {imagePreview && (
-                <div className="mt-2 mb-2">
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    className="w-24 h-24 object-cover rounded-md border"
-                  />
-                </div>
-              )}
-
-              <input
-                type="file"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    setFormData({ ...formData, image: file });
-                    setImagePreview(URL.createObjectURL(file));
-                  }
+              <Dropzone
+                onFilesChange={(file) => {
+                  setFormData((prev) => ({ ...prev, image: file || null }));
                 }}
-                className="mt-1 w-full border rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                accept="image/*"
-                required={!editId} // Required only for create
+                maxFiles={1}
+                initialFiles={imagePreview ? [imagePreview] : []}
+                validationMessage={
+                  !editId && !formData.image ? "Image is required" : null
+                }
               />
             </div>
 
@@ -341,6 +360,35 @@ const Category = () => {
               </PrimaryButton>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <div className="flex flex-col items-center text-center gap-2">
+              <div className="p-3 bg-red-100 rounded-full">
+                <AlertTriangle className="h-6 w-6 text-red-600" />
+              </div>
+              <DialogTitle className="text-xl">Confirm Deletion</DialogTitle>
+            </div>
+            <DialogDescription className="text-center pt-2">
+              Are you sure you want to delete this category? This action cannot
+              be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <PrimaryButton
+              variant="secondary"
+              onClick={() => setIsDeleteModalOpen(false)}
+            >
+              Cancel
+            </PrimaryButton>
+            <PrimaryButton variant="danger" onClick={confirmDelete}>
+              Delete
+            </PrimaryButton>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
