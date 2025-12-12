@@ -56,6 +56,11 @@ export const NAV_CONFIG = {
           path: "/admin/e-commerce/category",
         },
         { name: "Sub Category", path: "/admin/e-commerce/sub-category" },
+        { name: "Brand", path: "/admin/e-commerce/brand" },
+        { name: "Model", path: "/admin/e-commerce/model" },
+        { name: "Gender", path: "/admin/e-commerce/gender" },
+        { name: "Attribute", path: "/admin/e-commerce/attribute" },
+        { name: "Attribute Item", path: "/admin/e-commerce/attribute-item" },
       ],
     },
     {

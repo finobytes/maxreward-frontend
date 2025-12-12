@@ -45,7 +45,15 @@ import ReferralList from "../pages/admin/memberMange/ReferralList";
 =======
 import Category from "../pages/admin/e-commerce/Category/Category";
 import SubCategory from "../pages/admin/e-commerce/SubCategory/SubCategory";
+<<<<<<< HEAD
 >>>>>>> ee7a1b5 (implement admin category and subcategory management with Redux Toolkit and RTK Query.)
+=======
+import Brand from "../pages/admin/e-commerce/Brand/Brand";
+import Model from "../pages/admin/e-commerce/Model/Model";
+import Gender from "../pages/admin/e-commerce/Gender/Gender";
+import Attribute from "../pages/admin/e-commerce/Attribute/Attribute";
+import AttributeItem from "../pages/admin/e-commerce/AttributeItem/AttributeItem";
+>>>>>>> 1c71b86 (Implement CRUD operations and UI for e-commerce models, brands, genders, attributes, and attribute items in the admin panel.)
 
 export const adminRoutes = [
   {
@@ -83,6 +91,26 @@ export const adminRoutes = [
   {
     path: "e-commerce/sub-category",
     element: <SubCategory />,
+  },
+  {
+    path: "e-commerce/brand",
+    element: <Brand />,
+  },
+  {
+    path: "e-commerce/model",
+    element: <Model />,
+  },
+  {
+    path: "e-commerce/gender",
+    element: <Gender />,
+  },
+  {
+    path: "e-commerce/attribute",
+    element: <Attribute />,
+  },
+  {
+    path: "e-commerce/attribute-item",
+    element: <AttributeItem />,
   },
   {
     path: "cp-transaction",
