@@ -22,6 +22,11 @@ import communityPointAdminReducer from "./features/admin/communityPoint/communit
 import communityPointMemberReducer from "./features/member/communityPoint/communityPointMemberSlice";
 import categoryReducer from "./features/admin/category/categorySlice";
 import subCategoryReducer from "./features/admin/subCategory/subCategorySlice";
+import brandReducer from "./features/admin/brand/brandSlice";
+import modelReducer from "./features/admin/model/modelSlice";
+import genderReducer from "./features/admin/gender/genderSlice";
+import attributeReducer from "./features/admin/attribute/attributeSlice";
+import attributeItemReducer from "./features/admin/attributeItem/attributeItemSlice";
 import { baseApi } from "./api/baseApi";
 
 export const store = configureStore({
@@ -49,6 +54,11 @@ export const store = configureStore({
     communityPointMember: communityPointMemberReducer,
     category: categoryReducer,
     subCategory: subCategoryReducer,
+    brand: brandReducer,
+    model: modelReducer,
+    gender: genderReducer,
+    attribute: attributeReducer,
+    attributeItem: attributeItemReducer,
     [baseApi.reducerPath]: baseApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>

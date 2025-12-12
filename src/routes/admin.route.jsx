@@ -43,6 +43,11 @@ import MerchantTransactionDetails from "../pages/admin/Transaction/MerchantTrans
 import CPLevel from "../pages/admin/Settings/CPLevel";
 import Category from "../pages/admin/e-commerce/Category/Category";
 import SubCategory from "../pages/admin/e-commerce/SubCategory/SubCategory";
+import Brand from "../pages/admin/e-commerce/Brand/Brand";
+import Model from "../pages/admin/e-commerce/Model/Model";
+import Gender from "../pages/admin/e-commerce/Gender/Gender";
+import Attribute from "../pages/admin/e-commerce/Attribute/Attribute";
+import AttributeItem from "../pages/admin/e-commerce/AttributeItem/AttributeItem";
 
 export const adminRoutes = [
   {
@@ -80,6 +85,26 @@ export const adminRoutes = [
   {
     path: "e-commerce/sub-category",
     element: <SubCategory />,
+  },
+  {
+    path: "e-commerce/brand",
+    element: <Brand />,
+  },
+  {
+    path: "e-commerce/model",
+    element: <Model />,
+  },
+  {
+    path: "e-commerce/gender",
+    element: <Gender />,
+  },
+  {
+    path: "e-commerce/attribute",
+    element: <Attribute />,
+  },
+  {
+    path: "e-commerce/attribute-item",
+    element: <AttributeItem />,
   },
   {
     path: "cp-transaction",
