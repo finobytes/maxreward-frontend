@@ -100,7 +100,7 @@ const SubCategory = () => {
       name: "",
       category_id: "",
       description: "",
-      sort_order: "",
+      // sort_order: "",
       is_active: true,
     });
     setIsModalOpen(true);
@@ -221,7 +221,7 @@ const SubCategory = () => {
                   <TableHead>S/N</TableHead>
                   <TableHead>Category</TableHead>
                   <TableHead>Sub Category Name</TableHead>
-                  <TableHead>Sort Order</TableHead>
+                  {/* <TableHead>Sort Order</TableHead> */}
                   <TableHead>Status</TableHead>
                   <TableHead>Created At</TableHead>
                   <TableHead>Actions</TableHead>
@@ -235,7 +235,7 @@ const SubCategory = () => {
                       {b.category?.name || "N/A"}
                     </TableCell>
                     <TableCell className="capitalize">{b.name}</TableCell>
-                    <TableCell>{b.sort_order}</TableCell>
+                    {/* <TableCell>{b.sort_order}</TableCell> */}
                     <TableCell>
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -341,7 +341,7 @@ const SubCategory = () => {
             </div>
 
             <div className="flex gap-4">
-              <div className="flex-1">
+              {/* <div className="flex-1">
                 <label className="text-sm font-medium text-gray-700">
                   Sort Order
                 </label>
@@ -353,7 +353,7 @@ const SubCategory = () => {
                   }
                   placeholder="0"
                 />
-              </div>
+              </div> */}
               <div className="flex items-center pt-6">
                 <label className="flex items-center space-x-2 cursor-pointer">
                   <input

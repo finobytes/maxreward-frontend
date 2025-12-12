@@ -95,7 +95,7 @@ const Category = () => {
       // slug: "",
       description: "",
       image: null,
-      sort_order: 0,
+      // sort_order: 0,
       is_active: true,
     });
     setImagePreview(null);
@@ -219,7 +219,7 @@ const Category = () => {
                   <TableHead>S/N</TableHead>
                   <TableHead>Image</TableHead>
                   <TableHead>Name</TableHead>
-                  <TableHead>Sort Order</TableHead>
+                  {/* <TableHead>Sort Order</TableHead> */}
                   <TableHead>Status</TableHead>
                   <TableHead>Created At</TableHead>
                   <TableHead>Actions</TableHead>
@@ -246,7 +246,7 @@ const Category = () => {
 
                     <TableCell className="capitalize">{item.name}</TableCell>
 
-                    <TableCell>{item.sort_order}</TableCell>
+                    {/* <TableCell>{item.sort_order}</TableCell> */}
                     <TableCell>
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -345,7 +345,7 @@ const Category = () => {
             </div>
 
             <div className="flex gap-4">
-              <div className="flex-1">
+              {/* <div className="flex-1">
                 <label className="text-sm font-medium">Sort Order</label>
                 <InputField
                   type="number"
@@ -355,7 +355,7 @@ const Category = () => {
                   }
                   placeholder="0"
                 />
-              </div>
+              </div> */}
               <div className="flex items-center pt-6">
                 <label className="flex items-center space-x-2 cursor-pointer">
                   <input
