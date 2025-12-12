@@ -26,7 +26,7 @@ export const useSubCategory = () => {
     name: "",
     category_id: "",
     description: "",
-    sort_order: "",
+    // sort_order: "",
     is_active: true,
   });
   const [editId, setEditId] = useState(null);
@@ -43,7 +43,7 @@ export const useSubCategory = () => {
         name: "",
         category_id: "",
         description: "",
-        sort_order: "",
+        // sort_order: "",
         is_active: true,
       });
       setEditId(null);
@@ -59,7 +59,7 @@ export const useSubCategory = () => {
       name: item.name,
       category_id: item.category_id || item.category?.id || "",
       description: item.description || "",
-      sort_order: item.sort_order || "",
+      // sort_order: item.sort_order || "",
       is_active: item.is_active ?? true,
     });
   };

@@ -96,7 +96,7 @@ const Brand = () => {
       slug: "",
       description: "",
       image: null,
-      sort_order: 0,
+      // sort_order: 0,
       is_active: true,
       is_featured: false,
     });
@@ -219,7 +219,7 @@ const Brand = () => {
                   <TableHead>S/N</TableHead>
                   <TableHead>Image</TableHead>
                   <TableHead>Name</TableHead>
-                  <TableHead>Sort Order</TableHead>
+                  {/* <TableHead>Sort Order</TableHead> */}
                   <TableHead>Status</TableHead>
                   <TableHead>Featured</TableHead>
                   <TableHead>Actions</TableHead>
@@ -245,7 +245,7 @@ const Brand = () => {
                     </TableCell>
 
                     <TableCell className="capitalize">{item.name}</TableCell>
-                    <TableCell>{item.sort_order}</TableCell>
+                    {/* <TableCell>{item.sort_order}</TableCell> */}
 
                     <TableCell>
                       <span
@@ -366,7 +366,7 @@ const Brand = () => {
               />
             </div>
 
-            <div className="flex gap-4">
+            {/* <div className="flex gap-4">
               <div className="flex-1">
                 <label className="text-sm font-medium">Sort Order</label>
                 <InputField
@@ -378,7 +378,7 @@ const Brand = () => {
                   placeholder="0"
                 />
               </div>
-            </div>
+            </div> */}
 
             <div className="flex gap-6 pt-2">
               <label className="flex items-center space-x-2 cursor-pointer">

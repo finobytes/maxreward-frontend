@@ -27,7 +27,7 @@ export const useCategory = () => {
     // slug: "",
     description: "",
     image: null,
-    sort_order: 0,
+    // sort_order: 0,
     is_active: true,
   });
   const [editId, setEditId] = useState(null);
@@ -40,8 +40,8 @@ export const useCategory = () => {
       // if (formData.slug) data.append("slug", formData.slug);
       if (formData.description)
         data.append("description", formData.description);
-      if (formData.sort_order !== null)
-        data.append("sort_order", formData.sort_order);
+      // if (formData.sort_order !== null)
+      //   data.append("sort_order", formData.sort_order);
       data.append("is_active", formData.is_active ? "1" : "0");
 
       if (formData.image instanceof File) {
@@ -59,7 +59,7 @@ export const useCategory = () => {
         // slug: "",
         description: "",
         image: null,
-        sort_order: 0,
+        // sort_order: 0,
         is_active: true,
       });
       setEditId(null);
@@ -75,7 +75,7 @@ export const useCategory = () => {
       // slug: item.slug || "",
       description: item.description || "",
       image: null, // Image is not editable directly here, only replaced
-      sort_order: item.sort_order || 0,
+      // sort_order: item.sort_order || 0,
       is_active: item.is_active === 1 || item.is_active === true,
     });
   };

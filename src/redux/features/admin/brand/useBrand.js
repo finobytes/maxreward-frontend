@@ -31,7 +31,7 @@ export const useBrand = () => {
     slug: "",
     description: "",
     image: null,
-    sort_order: 0,
+    // sort_order: 0,
     is_active: true,
     is_featured: false,
   });
@@ -45,8 +45,8 @@ export const useBrand = () => {
       if (formData.slug) data.append("slug", formData.slug);
       if (formData.description)
         data.append("description", formData.description);
-      if (formData.sort_order !== null)
-        data.append("sort_order", formData.sort_order);
+      // if (formData.sort_order !== null)
+      //   data.append("sort_order", formData.sort_order);
       data.append("is_active", formData.is_active ? "1" : "0");
       data.append("is_featured", formData.is_featured ? "1" : "0");
 
@@ -65,7 +65,7 @@ export const useBrand = () => {
         slug: "",
         description: "",
         image: null,
-        sort_order: 0,
+        // sort_order: 0,
         is_active: true,
         is_featured: false,
       });
@@ -83,7 +83,7 @@ export const useBrand = () => {
       slug: item.slug || "",
       description: item.description || "",
       image: null,
-      sort_order: item.sort_order || 0,
+      // sort_order: item.sort_order || 0,
       is_active: item.is_active === 1 || item.is_active === true,
       is_featured: item.is_featured === 1 || item.is_featured === true,
     });
