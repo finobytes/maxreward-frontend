@@ -22,32 +22,46 @@ export const useCategory = () => {
   const [updateCategory] = useUpdateCategoryMutation();
   const [deleteCategory] = useDeleteCategoryMutation();
 
-  const [formData, setFormData] = useState({ name: "", image: null });
+  const [formData, setFormData] = useState({
+    name: "",
+    // slug: "",
+    description: "",
+    image: null,
+    sort_order: 0,
+    is_active: true,
+  });
   const [editId, setEditId] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const data = new FormData();
+      data.append("name", formData.name);
+      // if (formData.slug) data.append("slug", formData.slug);
+      if (formData.description)
+        data.append("description", formData.description);
+      if (formData.sort_order !== null)
+        data.append("sort_order", formData.sort_order);
+      data.append("is_active", formData.is_active ? "1" : "0");
+
+      if (formData.image instanceof File) {
+        data.append("image", formData.image);
+      }
+
       if (editId) {
-        const data = new FormData();
-        data.append("name", formData.name);
-        if (formData.image instanceof File) {
-          data.append("image", formData.image);
-        }
-        // Note: Some backends require POST with _method="PATCH" for file uploads.
-        // If this PATCH fails for files, that would be the next fix.
-        // For now, adhering to user's PATCH method.
+        data.append("_method", "POST");
         await updateCategory({ id: editId, data }).unwrap();
       } else {
-        // Create requires FormData for image
-        const data = new FormData();
-        data.append("name", formData.name);
-        if (formData.image) {
-          data.append("image", formData.image);
-        }
         await createCategory(data).unwrap();
       }
-      setFormData({ name: "", image: null });
+      setFormData({
+        name: "",
+        // slug: "",
+        description: "",
+        image: null,
+        sort_order: 0,
+        is_active: true,
+      });
       setEditId(null);
     } catch (err) {
       console.error("Error submitting category:", err);
@@ -56,7 +70,14 @@ export const useCategory = () => {
 
   const handleEdit = (item) => {
     setEditId(item.id);
-    setFormData({ name: item.name }); // match user example where only name is updated
+    setFormData({
+      name: item.name,
+      // slug: item.slug || "",
+      description: item.description || "",
+      image: null, // Image is not editable directly here, only replaced
+      sort_order: item.sort_order || 0,
+      is_active: item.is_active === 1 || item.is_active === true,
+    });
   };
 
   const handleDelete = async (id) => {
