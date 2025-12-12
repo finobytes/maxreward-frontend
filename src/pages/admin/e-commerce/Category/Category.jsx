@@ -11,6 +11,7 @@ import {
 import Dropzone from "../../../../components/form/form-elements/Dropzone";
 import DropdownSelect from "../../../../components/ui/dropdown/DropdownSelect";
 import PrimaryButton from "../../../../components/ui/PrimaryButton";
+import InputField from "../../../../components/form/input/InputField";
 import Pagination from "../../../../components/table/Pagination";
 import PageBreadcrumb from "../../../../components/common/PageBreadcrumb";
 import MerchantStaffSkeleton from "../../../../components/skeleton/MerchantStaffSkeleton";
@@ -89,7 +90,14 @@ const Category = () => {
   const handlePerPageChange = (n) => dispatch(setPerPage(n));
 
   const openCreateModal = () => {
-    setFormData({ name: "", image: null });
+    setFormData({
+      name: "",
+      // slug: "",
+      description: "",
+      image: null,
+      sort_order: 0,
+      is_active: true,
+    });
     setImagePreview(null);
     setIsModalOpen(true);
   };
@@ -211,6 +219,8 @@ const Category = () => {
                   <TableHead>S/N</TableHead>
                   <TableHead>Image</TableHead>
                   <TableHead>Name</TableHead>
+                  <TableHead>Sort Order</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead>Created At</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
@@ -235,6 +245,19 @@ const Category = () => {
                     </TableCell>
 
                     <TableCell className="capitalize">{item.name}</TableCell>
+
+                    <TableCell>{item.sort_order}</TableCell>
+                    <TableCell>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          item.is_active
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        {item.is_active ? "Active" : "Inactive"}
+                      </span>
+                    </TableCell>
 
                     <TableCell>
                       {new Date(item.created_at).toLocaleDateString()}
@@ -285,15 +308,70 @@ const Category = () => {
           <form onSubmit={submitForm} className="space-y-4 mt-3">
             <div>
               <label className="text-sm font-medium">Category Name</label>
-              <input
+              <InputField
                 type="text"
                 value={formData.name}
                 required
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                className="mt-1 w-full border rounded-md p-2"
+                placeholder="Enter category name"
               />
+            </div>
+
+            {/* <div>
+              <label className="text-sm font-medium">Slug</label>
+              <InputField
+                type="text"
+                value={formData.slug}
+                onChange={(e) =>
+                  setFormData({ ...formData, slug: e.target.value })
+                }
+                placeholder="Enter slug (optional)"
+              />
+            </div> */}
+
+            <div>
+              <label className="text-sm font-medium">Description</label>
+              <textarea
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+                className="mt-1 w-full border rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                placeholder="Enter description"
+                rows={3}
+              />
+            </div>
+
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <label className="text-sm font-medium">Sort Order</label>
+                <InputField
+                  type="number"
+                  value={formData.sort_order}
+                  onChange={(e) =>
+                    setFormData({ ...formData, sort_order: e.target.value })
+                  }
+                  placeholder="0"
+                />
+              </div>
+              <div className="flex items-center pt-6">
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_active}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        is_active: e.target.checked,
+                      })
+                    }
+                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                  />
+                  <span className="text-sm font-medium">Active</span>
+                </label>
+              </div>
             </div>
 
             <div>
