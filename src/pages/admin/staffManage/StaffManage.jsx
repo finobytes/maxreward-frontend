@@ -72,7 +72,7 @@ const StaffManage = () => {
             onChange={(e) => setSearch(e.target.value)}
           />
 
-          <div className="flex flex-col sm:flex-row gap-3 items-center">
+          <div className="flex flex-wrap gap-3 items-center">
             <PrimaryButton
               variant="primary"
               size="md"
