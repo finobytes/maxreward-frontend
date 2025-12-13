@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import QRCode from "react-qr-code";
 import PageBreadcrumb from "@/components/common/PageBreadcrumb";
 import SearchInput from "@/components/form/form-elements/SearchInput";
 import PrimaryButton from "@/components/ui/PrimaryButton";
@@ -8,7 +9,6 @@ import Pagination from "@/components/table/Pagination";
 import { useMerchantManagement } from "../../../redux/features/admin/merchantManagement/useMerchantManagement";
 import { Link } from "react-router";
 import {
-  useDeleteMerchantMutation,
   useSuspendMerchantMutation,
   useUpdateMerchantMutation,
 } from "../../../redux/features/admin/merchantManagement/merchantManagementApi";
@@ -43,6 +43,8 @@ const initialSuspendState = {
   error: "",
 };
 
+const QR_MODAL_INITIAL = { open: false, data: null };
+
 const AllMerchant = () => {
   const {
     data: businessTypes,
@@ -61,7 +63,6 @@ const AllMerchant = () => {
     debouncedSearch,
     actions: {
       setPage,
-      setPerPage,
       setStatus,
       setBusinessType,
       setDebouncedSearch,
@@ -69,25 +70,18 @@ const AllMerchant = () => {
     },
   } = useMerchantManagement();
 
-  const [deleteMerchant] = useDeleteMerchantMutation();
   const [suspendMerchant, { isLoading: isSuspending }] =
     useSuspendMerchantMutation();
   const [updateMerchant, { isLoading: isUpdating }] =
     useUpdateMerchantMutation();
   const [selected, setSelected] = useState([]);
   const [suspendModal, setSuspendModal] = useState(initialSuspendState);
+  const [qrModal, setQrModal] = useState(QR_MODAL_INITIAL);
 
   const handleClear = () => {
     clearFilters();
     setDebouncedSearch(""); // Local search input reset
     setSelected([]);
-  };
-
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure to delete this merchant?")) {
-      await deleteMerchant(id);
-      refetch();
-    }
   };
 
   console.log("Fetched merchants data:", merchants);
@@ -377,11 +371,16 @@ const AllMerchant = () => {
                         <StatusBadge status={m.status} />
                       </TableCell>
                       <TableCell>
-                        <img
-                          src={memberQR}
-                          alt="QR Code"
-                          className="w-12 h-12 object-contain"
-                        />
+                        <div
+                          className="cursor-pointer hover:opacity-80 transition-opacity"
+                          onClick={() => setQrModal({ open: true, data: m })}
+                        >
+                          <img
+                            src={memberQR}
+                            alt="QR Code"
+                            className="w-12 h-12 object-contain"
+                          />
+                        </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
@@ -492,6 +491,50 @@ const AllMerchant = () => {
               {isSuspending ? "Submitting..." : "Suspend"}
             </PrimaryButton>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={qrModal.open}
+        onOpenChange={(open) => {
+          if (!open) setQrModal(QR_MODAL_INITIAL);
+        }}
+      >
+        <DialogContent className="sm:max-w-sm flex flex-col items-center">
+          <DialogHeader>
+            <DialogTitle className="text-center">
+              {qrModal.data?.business_name}'s QR Code
+            </DialogTitle>
+            <DialogDescription className="text-center">
+              Scan to view details
+            </DialogDescription>
+          </DialogHeader>
+          <div className="p-4 bg-white rounded-xl shadow-sm border border-gray-100">
+            {(() => {
+              const userName = qrModal.data?.staffs?.find(
+                (staff) => staff?.type === "merchant"
+              )?.user_name;
+
+              return userName ? (
+                <QRCode
+                  value={userName}
+                  size={200}
+                  style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                  viewBox={`0 0 256 256`}
+                />
+              ) : (
+                <div className="w-[200px] h-[200px] flex items-center justify-center bg-gray-50 text-gray-400 text-sm">
+                  No user_name found
+                </div>
+              );
+            })()}
+          </div>
+          <p className="text-sm font-medium text-gray-500 mt-2">
+            {
+              qrModal.data?.staffs?.find((staff) => staff?.type === "merchant")
+                ?.user_name
+            }
+          </p>
         </DialogContent>
       </Dialog>
     </div>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import QRCode from "react-qr-code";
 import { useDispatch, useSelector } from "react-redux";
 import { Eye, PencilLine, Trash2Icon, Plus, Loader } from "lucide-react";
 import { Link } from "react-router";
@@ -61,9 +62,10 @@ const MemberManage = () => {
     reason: "",
     error: "",
   });
+  const [qrModal, setQrModal] = useState({ open: false, data: null });
 
   const dispatch = useDispatch();
-  const { search, status, page, perPage, memberType } = useSelector(
+  const { search, status, perPage, memberType } = useSelector(
     (s) => s.memberManagement
   );
 
@@ -101,10 +103,6 @@ const MemberManage = () => {
 
   const bulkUpdateStatus = (newStatus) => {
     toast.warning(`Bulk update to ${newStatus} (not implemented yet)`);
-  };
-
-  const bulkDelete = () => {
-    toast("Bulk delete (not implemented yet)");
   };
 
   const handleStatusChange = async (id, newStatus, reasonText = "") => {
@@ -357,11 +355,16 @@ const MemberManage = () => {
                         {new Date(m.created_at).toLocaleDateString()}
                       </TableCell>
                       <TableCell>
-                        <img
-                          src={memberQR}
-                          alt="QR Code"
-                          className="w-12 h-12 object-contain"
-                        />
+                        <div
+                          className="cursor-pointer hover:opacity-80 transition-opacity"
+                          onClick={() => setQrModal({ open: true, data: m })}
+                        >
+                          <img
+                            src={memberQR}
+                            alt="QR Code"
+                            className="w-12 h-12 object-contain"
+                          />
+                        </div>
                       </TableCell>
                       <TableCell>
                         <StatusBadge status={m.status} />
@@ -504,6 +507,40 @@ const MemberManage = () => {
                 : "Submit"}
             </PrimaryButton>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        open={qrModal.open}
+        onOpenChange={(open) => {
+          if (!open) setQrModal({ open: false, data: null });
+        }}
+      >
+        <DialogContent className="sm:max-w-sm flex flex-col items-center">
+          <DialogHeader>
+            <DialogTitle className="text-center">
+              {qrModal.data?.name}'s QR Code
+            </DialogTitle>
+            <DialogDescription className="text-center">
+              Scan to view details
+            </DialogDescription>
+          </DialogHeader>
+          <div className="p-4 bg-white rounded-xl shadow-sm border border-gray-100">
+            {qrModal.data?.user_name ? (
+              <QRCode
+                value={qrModal.data.user_name}
+                size={200}
+                style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                viewBox={`0 0 256 256`}
+              />
+            ) : (
+              <div className="w-[200px] h-[200px] flex items-center justify-center bg-gray-50 text-gray-400 text-sm">
+                No user_name found
+              </div>
+            )}
+          </div>
+          <p className="text-sm font-medium text-gray-500 mt-2">
+            {qrModal.data?.user_name}
+          </p>
         </DialogContent>
       </Dialog>
     </div>
