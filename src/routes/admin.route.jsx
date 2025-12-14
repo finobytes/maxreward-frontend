@@ -31,6 +31,7 @@ import VoucherManage from "../pages/admin/VoucherManage/VoucherManage";
 import WhatsAppLog from "../pages/admin/reports/WhatsAppLog";
 import EmailLog from "../pages/admin/reports/EmailLog";
 import VoucherDetails from "../pages/admin/VoucherManage/VoucherDetails";
+import ReferralList from "../pages/admin/memberMange/ReferralList";
 import CpTransaction from "../pages/admin/cpTransaction/CpTransaction";
 import CpTransactionDetails from "../pages/admin/cpTransaction/CpTransactionDetails";
 import CpUnlockHistory from "../pages/admin/cpUnlockHistory/CpUnlockHistory";
@@ -40,20 +41,13 @@ import CommunityPointDetails from "../pages/admin/communityPoint/CommunityPointD
 import MerchantTransaction from "../pages/admin/Transaction/MerchanTransaction";
 import MerchantTransactionDetails from "../pages/admin/Transaction/MerchantTransactionDetails";
 import CPLevel from "../pages/admin/Settings/CPLevel";
-<<<<<<< HEAD
-import ReferralList from "../pages/admin/memberMange/ReferralList";
-=======
 import Category from "../pages/admin/e-commerce/Category/Category";
 import SubCategory from "../pages/admin/e-commerce/SubCategory/SubCategory";
-<<<<<<< HEAD
->>>>>>> ee7a1b5 (implement admin category and subcategory management with Redux Toolkit and RTK Query.)
-=======
 import Brand from "../pages/admin/e-commerce/Brand/Brand";
 import Model from "../pages/admin/e-commerce/Model/Model";
 import Gender from "../pages/admin/e-commerce/Gender/Gender";
 import Attribute from "../pages/admin/e-commerce/Attribute/Attribute";
 import AttributeItem from "../pages/admin/e-commerce/AttributeItem/AttributeItem";
->>>>>>> 1c71b86 (Implement CRUD operations and UI for e-commerce models, brands, genders, attributes, and attribute items in the admin panel.)
 
 export const adminRoutes = [
   {
