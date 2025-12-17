@@ -13,4 +13,7 @@ export const productSchema = z.object({
   // or we can validate they are array of something
   images: z.any().optional(),
   variations: z.any().optional(),
+  product_type: z.enum(["simple", "variable"]).default("variable"),
+  gender_id: z.coerce.string().optional(),
+  model_id: z.coerce.string().optional(),
 });
