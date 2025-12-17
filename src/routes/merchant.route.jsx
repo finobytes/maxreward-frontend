@@ -20,6 +20,10 @@ import TransactionDetails from "../pages/merchant/PointStatement/TransactionDeta
 import DailyTransaction from "../pages/merchant/Transactions/DailyTransaction";
 import Notification from "../pages/merchant/Notification/Notification";
 import NotificationDetails from "../pages/merchant/Notification/NotificationDetails";
+import AllProducts from "../pages/merchant/ProductManagement/AllProducts";
+import PendingProducts from "../pages/merchant/ProductManagement/PendingProducts";
+import ApprovedProducts from "../pages/merchant/ProductManagement/ApprovedProducts";
+import ProductForm from "../pages/merchant/ProductManagement/ProductForm";
 
 export const merchantRoute = [
   {
@@ -57,6 +61,26 @@ export const merchantRoute = [
   {
     path: "transactions/daily-transactions",
     element: <DailyTransaction />,
+  },
+  {
+    path: "product/all-products",
+    element: <AllProducts />,
+  },
+  {
+    path: "product/pending-products",
+    element: <PendingProducts />,
+  },
+  {
+    path: "product/approved-products",
+    element: <ApprovedProducts />,
+  },
+  {
+    path: "product/create",
+    element: <ProductForm />,
+  },
+  {
+    path: "product/edit/:id",
+    element: <ProductForm />,
   },
   {
     path: "redeem-mall",

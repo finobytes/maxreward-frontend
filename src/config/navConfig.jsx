@@ -24,6 +24,7 @@ import {
   History,
   Wallet,
   ShoppingBasket,
+  BoxIcon,
 } from "lucide-react";
 
 export const NAV_CONFIG = {
@@ -162,6 +163,24 @@ export const NAV_CONFIG = {
       icon: <Users />,
       name: "Merchant Staff",
       path: "/merchant/merchant-staff",
+    },
+    {
+      icon: <BoxIcon />,
+      name: "Products",
+      subItems: [
+        {
+          name: "All Products",
+          path: "/merchant/product/all-products",
+        },
+        {
+          name: "Pending Products",
+          path: "/merchant/product/pending-products",
+        },
+        {
+          name: "Approved Products",
+          path: "/merchant/product/approved-products",
+        },
+      ],
     },
     {
       icon: <Wallet />,
