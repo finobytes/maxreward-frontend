@@ -396,7 +396,7 @@ const ProductForm = () => {
   const isLoading = isCreating || isUpdating || isLoadingProduct;
 
   return (
-    <div>
+    <div className="space-y-6">
       <PageBreadcrumb
         items={[
           { label: "Dashboard", to: "/merchant" },
@@ -405,13 +405,11 @@ const ProductForm = () => {
         ]}
       />
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <ComponentCard
-          title={isEditMode ? "Edit Product Details" : "New Product Details"}
-        >
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {/* Name */}
-            <div className="sm:col-span-2">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        {/* Section 1: Basic Information */}
+        <ComponentCard title="Basic Information">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="md:col-span-2">
               <Label htmlFor="name">Product Name</Label>
               <Input
                 type="text"
@@ -423,13 +421,12 @@ const ProductForm = () => {
               />
             </div>
 
-            {/* SKU Short Code */}
             <div>
               <Label htmlFor="sku_short_code">SKU Short Code</Label>
               <Input
                 type="text"
                 id="sku_short_code"
-                placeholder="e.g. TSHIRT-001"
+                placeholder="e.g. TSHIRT"
                 {...register("sku_short_code")}
                 onBlur={(e) => handleSkuValidation(e.target.value)}
                 error={!!errors.sku_short_code}
@@ -437,7 +434,22 @@ const ProductForm = () => {
               />
             </div>
 
-            {/* Brand */}
+            <div className="md:col-span-2">
+              <Label htmlFor="description">Description</Label>
+              <textarea
+                id="description"
+                placeholder="Enter product description"
+                {...register("description")}
+                className="w-full rounded-md border border-gray-300 p-3 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 transition-colors"
+                rows={4}
+              />
+            </div>
+          </div>
+        </ComponentCard>
+
+        {/* Section 2: Organization */}
+        <ComponentCard title="Organization">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <div>
               <Label>Brand</Label>
               <Select
@@ -449,7 +461,6 @@ const ProductForm = () => {
               />
             </div>
 
-            {/* Category */}
             <div>
               <Label>Category</Label>
               <Select
@@ -464,37 +475,7 @@ const ProductForm = () => {
               />
             </div>
 
-            {/* Gender */}
-            <div>
-              <Label>Gender</Label>
-              <Select
-                {...register("gender_id")}
-                options={genders.map((g) => ({
-                  value: g.id,
-                  label: g.name,
-                }))}
-                placeholder="Select Gender"
-                error={!!errors.gender_id}
-                hint={errors.gender_id?.message}
-              />
-            </div>
-
-            {/* Model */}
-            <div>
-              <Label>Model</Label>
-              <Select
-                {...register("model_id")}
-                options={models.map((m) => ({
-                  value: m.id,
-                  label: m.name,
-                }))}
-                placeholder="Select Model"
-                error={!!errors.model_id}
-                hint={errors.model_id?.message}
-              />
-            </div>
-
-            {/* SubCategory */}
+            {/* SubCategory - Conditionally Rendered */}
             {selectedCategoryId && (
               <div className="animate-fade-in-down">
                 <Label>Sub Category</Label>
@@ -509,89 +490,122 @@ const ProductForm = () => {
               </div>
             )}
 
-            {/* Description */}
-            <div className="sm:col-span-3">
-              <Label htmlFor="description">Description</Label>
-              <textarea
-                id="description"
-                placeholder="Enter product description"
-                {...register("description")}
-                className="w-full rounded-md border border-gray-300 p-2 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
-                rows={4}
+            <div>
+              <Label>Gender</Label>
+              <Select
+                {...register("gender_id")}
+                options={genders.map((g) => ({
+                  value: g.id,
+                  label: g.name,
+                }))}
+                placeholder="Select Gender"
+                error={!!errors.gender_id}
+                hint={errors.gender_id?.message}
+              />
+            </div>
+
+            <div>
+              <Label>Model</Label>
+              <Select
+                {...register("model_id")}
+                options={models.map((m) => ({
+                  value: m.id,
+                  label: m.name,
+                }))}
+                placeholder="Select Model"
+                error={!!errors.model_id}
+                hint={errors.model_id?.message}
               />
             </div>
           </div>
+        </ComponentCard>
 
-          {/* General Images */}
-          <div className="mt-6">
-            <Label>Product Images (General)</Label>
-            <div className="mt-2">
-              <Controller
-                control={control}
-                name="images"
-                render={({ field: { onChange } }) => (
-                  <Dropzone
-                    multiple={true}
-                    maxFiles={12}
-                    onFilesChange={onChange}
-                    initialFiles={
-                      isEditMode && productData?.images
-                        ? productData.images
-                        : []
-                    }
-                    validationMessage={errors.images?.message}
-                  />
-                )}
-              />
-            </div>
+        {/* Section 3: Media */}
+        <ComponentCard title="Product Media">
+          <div className="space-y-2">
+            <Label>General Images</Label>
+            <p className="text-sm text-gray-500 mb-2">
+              Upload general images for the product. Variation-specific images
+              can be added later.
+            </p>
+            <Controller
+              control={control}
+              name="images"
+              render={({ field: { onChange } }) => (
+                <Dropzone
+                  multiple={true}
+                  maxFiles={12}
+                  onFilesChange={onChange}
+                  initialFiles={
+                    isEditMode && productData?.images ? productData.images : []
+                  }
+                  validationMessage={errors.images?.message}
+                />
+              )}
+            />
           </div>
+        </ComponentCard>
 
-          {/* Product Type Switch */}
-          <div className="sm:col-span-1 mt-6">
-            <Label>Product Type</Label>
-            <div className="flex items-center gap-3 mt-2">
+        {/* Section 4: Product Data (Price & Variations) */}
+        <ComponentCard title="Product Data">
+          {/* Type Switch Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-4 mb-6">
+            <div>
+              <h3 className="text-lg font-medium text-gray-900">
+                Configuration
+              </h3>
+              <p className="text-sm text-gray-500">
+                Choose between a simple product or one with variations.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 mt-4 sm:mt-0 bg-gray-50 px-4 py-2 rounded-full border">
               <span
-                className={`text-sm font-medium ${
+                className={`text-sm font-semibold transition-colors ${
                   productType === "variable"
-                    ? "text-brand-600"
-                    : "text-gray-500"
+                    ? "text-gray-400"
+                    : "text-brand-600"
                 }`}
               >
-                Variable
+                Simple
               </span>
               <button
                 type="button"
                 role="switch"
-                aria-checked={productType === "simple"}
+                aria-checked={productType === "variable"}
                 onClick={() =>
                   setValue(
                     "product_type",
                     productType === "variable" ? "simple" : "variable"
                   )
                 }
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 ${
-                  productType === "simple" ? "bg-brand-600" : "bg-gray-300"
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 ${
+                  productType === "variable" ? "bg-brand-600" : "bg-gray-300"
                 }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${
-                    productType === "simple" ? "translate-x-6" : "translate-x-1"
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 shadow-sm ${
+                    productType === "variable"
+                      ? "translate-x-6"
+                      : "translate-x-1"
                   }`}
                 />
               </button>
               <span
-                className={`text-sm font-medium ${
-                  productType === "simple" ? "text-brand-600" : "text-gray-500"
+                className={`text-sm font-semibold transition-colors ${
+                  productType === "variable"
+                    ? "text-brand-600"
+                    : "text-gray-400"
                 }`}
               >
-                Simple
+                Variable
               </span>
             </div>
           </div>
 
-          {/* Simple Product Fields */}
+          {/* Simple Product Inputs */}
           {productType === "simple" && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6 p-4 bg-gray-50 rounded-lg animate-fade-in-down">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in-down">
               <div>
                 <Label htmlFor="regular_price">Regular Price (RM)*</Label>
                 <Input
@@ -613,6 +627,10 @@ const ProductForm = () => {
                 />
               </div>
               <div>
+                <Label htmlFor="unit_weight">Unit Weight (kg)</Label>
+                <Input type="number" step="0.01" {...register("unit_weight")} />
+              </div>
+              <div>
                 <Label htmlFor="sale_price">Sale Price (RM)</Label>
                 <Input type="number" step="0.01" {...register("sale_price")} />
               </div>
@@ -624,194 +642,296 @@ const ProductForm = () => {
                 <Label htmlFor="cost_price">Cost Price (RM)</Label>
                 <Input type="number" step="0.01" {...register("cost_price")} />
               </div>
-              <div>
-                <Label htmlFor="unit_weight">Unit Weight (kg)</Label>
-                <Input type="number" step="0.01" {...register("unit_weight")} />
+            </div>
+          )}
+
+          {/* Variable Product Inputs */}
+          {productType === "variable" && (
+            <div className="space-y-8 animate-fade-in-down">
+              {/* 1. Generator */}
+              <div className="bg-gray-50 border rounded-xl overflow-hidden">
+                <div className="p-4 border-b bg-gray-100/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <h4 className="font-semibold text-gray-800">
+                      Variation Generator
+                    </h4>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Select attributes to automatically generate combinations.
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <PrimaryButton
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleAddAttributeSelection}
+                    >
+                      + Add Attribute
+                    </PrimaryButton>
+                    <PrimaryButton
+                      type="button"
+                      size="sm"
+                      onClick={handleGenerateVariations}
+                      disabled={isGenerating}
+                    >
+                      {isGenerating ? "Generating..." : "Generate Combinations"}
+                    </PrimaryButton>
+                  </div>
+                </div>
+
+                <div className="p-5 space-y-4">
+                  {selectedAttributes.length === 0 ? (
+                    <div className="text-center py-6 text-gray-400 text-sm">
+                      Click "Add Attribute" to start generating variations.
+                    </div>
+                  ) : (
+                    selectedAttributes.map((attr, index) => (
+                      <div
+                        key={index}
+                        className="flex flex-col md:flex-row gap-4 items-start md:items-end p-3 bg-white border rounded-lg shadow-sm"
+                      >
+                        <div className="w-full md:w-1/4">
+                          <Label className="mb-1 text-xs uppercase tracking-wide text-gray-500">
+                            Attribute Type
+                          </Label>
+                          <Select
+                            value={attr.attribute_id}
+                            onChange={(e) =>
+                              updateAttributeSelection(
+                                index,
+                                "attribute_id",
+                                e.target.value
+                              )
+                            }
+                            options={attributes.map((a) => ({
+                              value: a.id,
+                              label: a.name,
+                            }))}
+                            placeholder="Select Attribute"
+                          />
+                        </div>
+                        <div className="w-full md:flex-1">
+                          <Label className="mb-1 text-xs uppercase tracking-wide text-gray-500">
+                            Attribute Values
+                          </Label>
+                          <MultiSelect
+                            isMulti
+                            options={getItemsForAttribute(
+                              attr.attribute_id
+                            ).map((i) => ({ value: i.id, label: i.name }))}
+                            value={getItemsForAttribute(attr.attribute_id)
+                              .filter((i) =>
+                                attr.attribute_item_ids.includes(i.id)
+                              )
+                              .map((i) => ({ value: i.id, label: i.name }))}
+                            onChange={(selected) =>
+                              updateAttributeSelection(
+                                index,
+                                "attribute_item_ids",
+                                selected.map((s) => s.value)
+                              )
+                            }
+                            placeholder="Select Values"
+                            isDisabled={!attr.attribute_id}
+                            className="text-sm"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveAttributeSelection(index)}
+                          className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded transition-colors"
+                          title="Remove Attribute"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M3 6h18" />
+                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                          </svg>
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
+
+              {/* 2. List of Variations */}
+              {variationFields.length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      Variations ({variationFields.length})
+                    </h3>
+                    <span className="text-sm text-gray-500">
+                      Configure price and stock for each variation
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-6">
+                    {variationFields.map((field, index) => (
+                      <div
+                        key={field.id}
+                        className="border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow bg-white"
+                      >
+                        {/* Header of Card */}
+                        <div className="bg-gray-50 px-5 py-3 border-b flex flex-wrap items-center justify-between gap-2">
+                          <div>
+                            <h4 className="font-semibold text-gray-800 flex items-center gap-2">
+                              <span className="bg-brand-100 text-brand-700 px-2 py-0.5 rounded text-xs uppercase tracking-wider">
+                                #{index + 1}
+                              </span>
+                              {field.formatted_attributes || "Variation"}
+                            </h4>
+                            <p className="text-xs text-gray-500 mt-0.5 font-mono">
+                              SKU: {field.sku}
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => removeVariation(index)}
+                            className="text-red-500 hover:text-red-700 text-sm font-medium hover:underline"
+                          >
+                            Remove
+                          </button>
+                        </div>
+
+                        {/* Body of Card */}
+                        <div className="p-5">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                            <div>
+                              <Label className="text-xs">Regular Price*</Label>
+                              <Input
+                                className="h-9 text-sm"
+                                {...register(
+                                  `variations.${index}.regular_price`
+                                )}
+                                placeholder="0.00"
+                                error={
+                                  !!errors.variations?.[index]?.regular_price
+                                }
+                              />
+                            </div>
+                            <div>
+                              <Label className="text-xs">Regular Point*</Label>
+                              <Input
+                                className="h-9 text-sm"
+                                {...register(
+                                  `variations.${index}.regular_point`
+                                )}
+                                placeholder="0"
+                                error={
+                                  !!errors.variations?.[index]?.regular_point
+                                }
+                              />
+                            </div>
+                            <div>
+                              <Label className="text-xs">Stock Quantity*</Label>
+                              <Input
+                                className="h-9 text-sm"
+                                {...register(
+                                  `variations.${index}.actual_quantity`
+                                )}
+                                placeholder="0"
+                                error={
+                                  !!errors.variations?.[index]?.actual_quantity
+                                }
+                              />
+                            </div>
+                            <div>
+                              <Label className="text-xs">Sale Price</Label>
+                              <Input
+                                className="h-9 text-sm"
+                                {...register(`variations.${index}.sale_price`)}
+                                placeholder="0.00"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="bg-gray-50/50 rounded-lg p-3 border border-dashed border-gray-300">
+                            <Label className="mb-2 text-xs text-gray-500">
+                              Variation Specific Images
+                            </Label>
+                            <Controller
+                              control={control}
+                              name={`variations.${index}.images`}
+                              render={({ field: { onChange, value } }) => (
+                                <Dropzone
+                                  multiple={true}
+                                  maxFiles={5}
+                                  onFilesChange={onChange}
+                                  initialFiles={
+                                    isEditMode && value ? value : []
+                                  }
+                                  // compact mode maybe?
+                                />
+                              )}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Error Message for Variations */}
+              {errors.variations && (
+                <div className="p-4 bg-red-50 text-red-600 rounded-lg border border-red-100 flex items-center gap-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                  <span className="text-sm font-medium">
+                    {errors.variations.message ||
+                      "At least one variation is required."}
+                  </span>
+                </div>
+              )}
             </div>
           )}
         </ComponentCard>
 
-        {/* Variations Section */}
-        {productType === "variable" && (
-          <ComponentCard title="Product Variations" className="mt-6">
-            <div className="space-y-6">
-              {/* Generator Controls */}
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <h3 className="text-sm font-semibold mb-3">
-                  Variation Generator
-                </h3>
-                {selectedAttributes.map((attr, index) => (
-                  <div key={index} className="flex gap-4 items-end mb-4">
-                    <div className="flex-1">
-                      <Label>Attribute</Label>
-                      <Select
-                        value={attr.attribute_id}
-                        onChange={(e) =>
-                          updateAttributeSelection(
-                            index,
-                            "attribute_id",
-                            e.target.value
-                          )
-                        }
-                        options={attributes.map((a) => ({
-                          value: a.id,
-                          label: a.name,
-                        }))}
-                        placeholder="Select Attribute"
-                      />
-                    </div>
-                    <div className="flex-[2]">
-                      <Label>Values</Label>
-                      <MultiSelect
-                        isMulti
-                        options={getItemsForAttribute(attr.attribute_id).map(
-                          (i) => ({ value: i.id, label: i.name })
-                        )}
-                        value={getItemsForAttribute(attr.attribute_id)
-                          .filter((i) => attr.attribute_item_ids.includes(i.id))
-                          .map((i) => ({ value: i.id, label: i.name }))}
-                        onChange={(selected) =>
-                          updateAttributeSelection(
-                            index,
-                            "attribute_item_ids",
-                            selected.map((s) => s.value)
-                          )
-                        }
-                        placeholder="Select Values"
-                        isDisabled={!attr.attribute_id}
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveAttributeSelection(index)}
-                      className="text-red-500 mb-2"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
-
-                <div className="flex gap-4 mt-4">
-                  <PrimaryButton
-                    type="button"
-                    variant="secondary"
-                    size="sm"
-                    onClick={handleAddAttributeSelection}
-                  >
-                    + Add Attribute
-                  </PrimaryButton>
-                  <PrimaryButton
-                    type="button"
-                    size="sm"
-                    onClick={handleGenerateVariations}
-                    disabled={isGenerating}
-                  >
-                    {isGenerating ? "Generating..." : "Generate Variations"}
-                  </PrimaryButton>
-                </div>
-              </div>
-
-              {/* Variations List */}
-              {variationFields.length > 0 && (
-                <div className="space-y-4">
-                  <Label>Generated Variations ({variationFields.length})</Label>
-                  {variationFields.map((field, index) => (
-                    <div
-                      key={field.id}
-                      className="border p-4 rounded-lg bg-white relative"
-                    >
-                      <div className="absolute top-2 right-2">
-                        <button
-                          type="button"
-                          onClick={() => removeVariation(index)}
-                          className="text-red-500 text-sm"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                      <h4 className="font-semibold text-sm mb-3">
-                        {field.formatted_attributes || `Variation ${index + 1}`}{" "}
-                        <span className="text-gray-400 font-normal">
-                          ({field.sku})
-                        </span>
-                      </h4>
-
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div>
-                          <Label>Regular Price*</Label>
-                          <Input
-                            {...register(`variations.${index}.regular_price`)}
-                            placeholder="0.00"
-                            error={!!errors.variations?.[index]?.regular_price}
-                          />
-                        </div>
-                        <div>
-                          <Label>Regular Point*</Label>
-                          <Input
-                            {...register(`variations.${index}.regular_point`)}
-                            placeholder="0"
-                            error={!!errors.variations?.[index]?.regular_point}
-                          />
-                        </div>
-                        <div>
-                          <Label>Quantity*</Label>
-                          <Input
-                            {...register(`variations.${index}.actual_quantity`)}
-                            placeholder="0"
-                            error={
-                              !!errors.variations?.[index]?.actual_quantity
-                            }
-                          />
-                        </div>
-                        <div>
-                          <Label>Sale Price</Label>
-                          <Input
-                            {...register(`variations.${index}.sale_price`)}
-                            placeholder="0.00"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="mt-4">
-                        <Label>Images</Label>
-                        <Controller
-                          control={control}
-                          name={`variations.${index}.images`}
-                          render={({ field: { onChange, value } }) => (
-                            <Dropzone
-                              multiple={true}
-                              maxFiles={5}
-                              onFilesChange={onChange}
-                              initialFiles={isEditMode && value ? value : []}
-                            />
-                          )}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {errors.variations && (
-                <p className="text-red-500 text-sm mt-2">
-                  {errors.variations.message || "Variations are required"}
-                </p>
-              )}
-            </div>
-          </ComponentCard>
-        )}
-
-        <div className="mt-8 flex gap-4">
-          <PrimaryButton type="submit" disabled={isLoading}>
-            {isLoading ? "Saving..." : "Submit"}
-          </PrimaryButton>
+        {/* Action Buttons */}
+        <div className="flex justify-end gap-4 pt-4 pb-12">
           <PrimaryButton
-            variant="secondary"
             type="button"
+            variant="outline"
+            className="w-32"
             onClick={() => navigate("/merchant/product/all-products")}
           >
             Cancel
+          </PrimaryButton>
+          <PrimaryButton type="submit" className="w-48" disabled={isLoading}>
+            {isLoading ? (
+              <span className="flex items-center gap-2">
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Saving...
+              </span>
+            ) : isEditMode ? (
+              "Update Product"
+            ) : (
+              "Create Product"
+            )}
           </PrimaryButton>
         </div>
       </form>
