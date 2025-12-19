@@ -1,10 +1,16 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useGetProductsQuery } from "./productApi";
+import {
+  useGetProductsQuery,
+  useGenerateVariationsMutation,
+  useValidateSkuMutation,
+} from "./productApi";
 import {
   setSearch,
   setStatus,
   setCategory,
   setBrand,
+  setType,
+  setMerchantId,
   setCurrentPage,
   resetFilters,
 } from "./productSlice";
@@ -32,16 +38,17 @@ export const useProduct = () => {
     status: filters.status,
     category_id: filters.category_id,
     brand_id: filters.brand_id,
+    type: filters.type,
+    merchant_id: filters.merchant_id,
   };
 
   const { data, isLoading, isError, error, isFetching } =
     useGetProductsQuery(queryArgs);
 
-  const setDebouncedSearch = (value) => {
-    // This function implies we are debouncing here, but we can't easily debounce a dispatch without a custom hook logic.
-    // So we will just expose setSearch and let the component handle debouncing or just dispatch immediately.
-    dispatch(setSearch(value));
-  };
+  const [generateVariations, { isLoading: isGeneratingVariations }] =
+    useGenerateVariationsMutation();
+  const [validateSku, { isLoading: isValidatingSku }] =
+    useValidateSkuMutation();
 
   return {
     products: data?.products || [],
@@ -59,8 +66,16 @@ export const useProduct = () => {
       setStatus: (value) => dispatch(setStatus(value)),
       setCategory: (value) => dispatch(setCategory(value)),
       setBrand: (value) => dispatch(setBrand(value)),
+      setType: (value) => dispatch(setType(value)),
+      setMerchantId: (value) => dispatch(setMerchantId(value)),
       setCurrentPage: (value) => dispatch(setCurrentPage(value)),
       resetFilters: () => dispatch(resetFilters()),
+      generateVariations,
+      validateSku,
+    },
+    status: {
+      isGeneratingVariations,
+      isValidatingSku,
     },
   };
 };

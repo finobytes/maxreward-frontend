@@ -6,6 +6,8 @@ const initialState = {
     status: "", // "pending", "approved", "rejected", or empty for all
     category_id: "",
     brand_id: "",
+    type: "",
+    merchant_id: "",
   },
   pagination: {
     currentPage: 1,
@@ -43,6 +45,14 @@ const productSlice = createSlice({
       state.filters = initialState.filters;
       state.pagination = initialState.pagination;
     },
+    setType: (state, action) => {
+      state.filters.type = action.payload;
+      state.pagination.currentPage = 1;
+    },
+    setMerchantId: (state, action) => {
+      state.filters.merchant_id = action.payload;
+      state.pagination.currentPage = 1;
+    },
   },
 });
 
@@ -51,6 +61,8 @@ export const {
   setStatus,
   setCategory,
   setBrand,
+  setType,
+  setMerchantId,
   setCurrentPage,
   resetFilters,
 } = productSlice.actions;

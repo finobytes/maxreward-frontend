@@ -21,6 +21,8 @@ export const productApi = baseApi.injectEndpoints({
         status = "",
         category_id = "",
         brand_id = "",
+        type = "",
+        merchant_id = "",
       } = {}) => {
         const params = new URLSearchParams();
         params.set("page", page);
@@ -29,6 +31,8 @@ export const productApi = baseApi.injectEndpoints({
         if (status) params.set("status", status);
         if (category_id) params.set("category_id", category_id);
         if (brand_id) params.set("brand_id", brand_id);
+        if (type) params.set("type", type);
+        if (merchant_id) params.set("merchant_id", merchant_id);
 
         return `/products?${params.toString()}`;
       },
@@ -72,6 +76,24 @@ export const productApi = baseApi.injectEndpoints({
       ],
     }),
 
+    // GENERATE VARIATIONS
+    generateVariations: builder.mutation({
+      query: (data) => ({
+        url: "/products/generate-variations",
+        method: "POST",
+        body: data,
+      }),
+    }),
+
+    // VALIDATE SKU
+    validateSku: builder.mutation({
+      query: (data) => ({
+        url: "/products/validate-sku",
+        method: "POST",
+        body: data,
+      }),
+    }),
+
     // DELETE
     deleteProduct: builder.mutation({
       query: (id) => ({
@@ -89,4 +111,6 @@ export const {
   useGetSingleProductQuery,
   useUpdateProductMutation,
   useDeleteProductMutation,
+  useGenerateVariationsMutation,
+  useValidateSkuMutation,
 } = productApi;
