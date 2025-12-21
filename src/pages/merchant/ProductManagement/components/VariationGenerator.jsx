@@ -71,7 +71,12 @@ const VariationGenerator = ({
           formatted_attributes: v.formatted_attributes,
           regular_price: "",
           regular_point: "",
+          sale_price: "",
+          sale_point: "",
+          cost_price: "",
           actual_quantity: "",
+          low_stock_threshold: "",
+          ean_no: "",
           images: [],
         }));
 

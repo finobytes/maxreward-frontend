@@ -28,6 +28,7 @@ import ProductMedia from "./components/ProductMedia";
 import SimpleProductFields from "./components/SimpleProductFields";
 import VariationGenerator from "./components/VariationGenerator";
 import VariationList from "./components/VariationList";
+import ColorImageGallery from "./components/ColorImageGallery";
 
 const ProductForm = () => {
   const navigate = useNavigate();
@@ -94,6 +95,7 @@ const ProductForm = () => {
 
       // Variable Product defaults
       variations: [],
+      color_images: {},
     },
   });
 
@@ -205,7 +207,7 @@ const ProductForm = () => {
 
       // General Images (Indexed)
       if (formData.images && formData.images.length > 0) {
-        formData.images.forEach((file, index) => {
+        Array.from(formData.images).forEach((file, index) => {
           if (file instanceof File) {
             data.append(`images[${index}]`, file);
           }
@@ -251,8 +253,39 @@ const ProductForm = () => {
           });
 
           // Variation Images (Indexed)
-          if (v.images && v.images.length > 0) {
-            v.images.forEach((file, imgIndex) => {
+          // 1. Check for specific images uploaded for this variation
+          const specificImages =
+            v.images && v.images.length > 0 ? Array.from(v.images) : [];
+
+          // 2. Check for color-based images
+          let colorImages = [];
+          if (v.attributes && formData.color_images) {
+            const colorAttr = v.attributes.find((attr) => {
+              const name = attr.attribute_name?.toLowerCase();
+              return (
+                name && (name.includes("color") || name.includes("colour"))
+              );
+            });
+
+            if (
+              colorAttr &&
+              formData.color_images[colorAttr.attribute_item_id]
+            ) {
+              const colorFiles =
+                formData.color_images[colorAttr.attribute_item_id];
+              if (colorFiles.length > 0) {
+                colorImages = Array.from(colorFiles);
+              }
+            }
+          }
+
+          // Combine images: Prioritize specific images if we want, or just merge.
+          // Requirement: "Images will be uploaded separately for each attribute item".
+          // Usually this implies the color gallery IS the source for color variations.
+          const allImages = [...specificImages, ...colorImages];
+
+          if (allImages.length > 0) {
+            allImages.forEach((file, imgIndex) => {
               if (file instanceof File) {
                 data.append(`variations[${index}][images][${imgIndex}]`, file);
               }
@@ -377,12 +410,12 @@ const ProductForm = () => {
                   replaceVariations={replaceVariations}
                 />
 
+                <ColorImageGallery variations={variationFields} />
                 <VariationList
                   variationFields={variationFields}
                   removeVariation={removeVariation}
                   isEditMode={isEditMode}
                 />
-
                 {/* Error Message for Variations */}
                 {errors.variations && (
                   <div className="p-4 bg-red-50 text-red-600 rounded-lg border border-red-100 flex items-center gap-2">
@@ -416,12 +449,11 @@ const ProductForm = () => {
             <PrimaryButton
               type="button"
               variant="outline"
-              className="w-32"
               onClick={() => navigate("/merchant/product/all-products")}
             >
               Cancel
             </PrimaryButton>
-            <PrimaryButton type="submit" className="w-48" disabled={isLoading}>
+            <PrimaryButton type="submit" disabled={isLoading}>
               {isLoading ? (
                 <span className="flex items-center gap-2">
                   <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

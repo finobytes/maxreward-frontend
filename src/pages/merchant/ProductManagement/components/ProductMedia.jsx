@@ -1,12 +1,11 @@
 import React from "react";
-import { useFormContext, Controller } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import ComponentCard from "../../../../components/common/ComponentCard";
 import Label from "../../../../components/form/Label";
-import Dropzone from "../../../../components/form/form-elements/Dropzone";
 
 const ProductMedia = ({ initialFiles = [] }) => {
   const {
-    control,
+    register,
     formState: { errors },
   } = useFormContext();
 
@@ -15,22 +14,24 @@ const ProductMedia = ({ initialFiles = [] }) => {
       <div className="space-y-2">
         <Label>General Images</Label>
         <p className="text-sm text-gray-500 mb-2">
-          Upload general images for the product. Variation-specific images can
-          be added later.
+          Upload general images for the product.
         </p>
-        <Controller
-          control={control}
-          name="images"
-          render={({ field: { onChange } }) => (
-            <Dropzone
-              multiple={true}
-              maxFiles={12}
-              onFilesChange={onChange}
-              initialFiles={initialFiles}
-              validationMessage={errors.images?.message}
-            />
-          )}
+
+        <input
+          type="file"
+          multiple
+          className="block w-full text-sm text-gray-500
+            file:mr-4 file:py-2 file:px-4
+            file:rounded-full file:border-0
+            file:text-sm file:font-semibold
+            file:bg-brand-50 file:text-brand-700
+            hover:file:bg-brand-100
+          "
+          {...register("images")}
         />
+        {errors.images && (
+          <p className="text-red-500 text-sm mt-1">{errors.images.message}</p>
+        )}
       </div>
     </ComponentCard>
   );
