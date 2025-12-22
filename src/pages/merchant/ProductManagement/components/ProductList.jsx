@@ -113,7 +113,7 @@ const ProductList = ({ statusFilter = "", title = "Products" }) => {
           <Table className="w-full table-auto border-collapse">
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[40px]">
+                {/* <TableHead className="w-[40px]">
                   <input
                     type="checkbox"
                     checked={
@@ -122,7 +122,7 @@ const ProductList = ({ statusFilter = "", title = "Products" }) => {
                     onChange={(e) => toggleSelectAll(e.target.checked)}
                     className="w-4 h-4 rounded"
                   />
-                </TableHead>
+                </TableHead> */}
                 <TableHead className="text-gray-700 font-medium">S/N</TableHead>
                 <TableHead className="text-gray-700 font-medium">
                   Product Name
@@ -160,14 +160,14 @@ const ProductList = ({ statusFilter = "", title = "Products" }) => {
                     key={product.id}
                     className="transition hover:bg-gray-50"
                   >
-                    <TableCell>
+                    {/* <TableCell>
                       <input
                         type="checkbox"
                         checked={selected.includes(product.id)}
                         onChange={() => toggleSelect(product.id)}
                         className="w-4 h-4 rounded"
                       />
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell>
                       {(pagination?.currentPage - 1) * pagination?.perPage +
                         (idx + 1)}
@@ -187,7 +187,7 @@ const ProductList = ({ statusFilter = "", title = "Products" }) => {
                     </TableCell>
                     <TableCell>{product.category?.name || "-"}</TableCell>
                     <TableCell>{product.brand?.name || "-"}</TableCell>
-                    <TableCell>{product.price}</TableCell>
+                    <TableCell>{product.sale_price}</TableCell>
                     <TableCell>
                       <StatusBadge status={product.status} />
                     </TableCell>

@@ -29,8 +29,19 @@ import SimpleProductFields from "./components/SimpleProductFields";
 import VariationGenerator from "./components/VariationGenerator";
 import VariationList from "./components/VariationList";
 import ColorImageGallery from "./components/ColorImageGallery";
+import { useSelector } from "react-redux";
+import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
 
 const ProductForm = () => {
+  const { user, token } = useSelector((state) => state.auth);
+  const role = user?.role || "member"; // admin | merchant | member
+
+  const {
+    data,
+    isLoading: merchantDataLoading,
+    error,
+  } = useVerifyMeQuery(role, { skip: !token });
+  console.log("merchantDataLoading", data);
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = !!id;
@@ -173,13 +184,13 @@ const ProductForm = () => {
       console.error("SKU validation failed", err);
     }
   };
-
+  const merchantId = data?.merchant_id || data?.merchant?.id;
   const onSubmit = async (formData) => {
     try {
       const data = new FormData();
 
       // Basic Fields
-      data.append("merchant_id", "6"); // Hardcoded as per requirement/context
+      data.append("merchant_id", merchantId);
       data.append("name", formData.name);
       data.append("sku_short_code", formData.sku_short_code);
       data.append("type", formData.product_type);
