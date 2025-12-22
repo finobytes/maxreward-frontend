@@ -179,13 +179,15 @@ const ProductForm = () => {
       const data = new FormData();
 
       // Basic Fields
-      data.append("merchant_id", "1"); // Hardcoded as per requirement/context
+      data.append("merchant_id", "6"); // Hardcoded as per requirement/context
       data.append("name", formData.name);
       data.append("sku_short_code", formData.sku_short_code);
       data.append("type", formData.product_type);
       data.append("category_id", formData.category_id);
       data.append("brand_id", formData.brand_id);
-      data.append("status", formData.status || "active");
+
+      // Default to "active" if not provided, though checking form logic "draft" is default
+      data.append("status", formData.status || "draft");
 
       if (formData.sub_category_id)
         data.append("subcategory_id", formData.sub_category_id);
@@ -194,7 +196,7 @@ const ProductForm = () => {
       if (formData.description)
         data.append("description", formData.description);
 
-      // Simple Product Fields
+      // --- Simple Product Logic ---
       if (formData.product_type === "simple") {
         data.append("regular_price", formData.regular_price);
         data.append("regular_point", formData.regular_point);
@@ -203,19 +205,48 @@ const ProductForm = () => {
         if (formData.cost_price) data.append("cost_price", formData.cost_price);
         if (formData.unit_weight)
           data.append("unit_weight", formData.unit_weight);
+        if (formData.actual_quantity)
+          data.append("actual_quantity", formData.actual_quantity);
       }
 
-      // General Images (Indexed)
-      if (formData.images && formData.images.length > 0) {
-        Array.from(formData.images).forEach((file, index) => {
-          if (file instanceof File) {
-            data.append(`images[${index}]`, file);
-          }
-        });
-      }
-
-      // Variations
+      // --- Variable Product Logic ---
       if (formData.product_type === "variable" && formData.variations?.length) {
+        // Derive root prices from variations (using Min values)
+        const regularPrices = formData.variations
+          .map((v) => Number(v.regular_price))
+          .filter((n) => !isNaN(n));
+        const salePrices = formData.variations
+          .map((v) => Number(v.sale_price))
+          .filter((n) => !isNaN(n));
+        const costPrices = formData.variations
+          .map((v) => Number(v.cost_price))
+          .filter((n) => !isNaN(n));
+        const regularPoints = formData.variations
+          .map((v) => Number(v.regular_point))
+          .filter((n) => !isNaN(n));
+        const salePoints = formData.variations
+          .map((v) => Number(v.sale_point))
+          .filter((n) => !isNaN(n));
+
+        if (regularPrices.length)
+          data.append("regular_price", Math.min(...regularPrices));
+        if (salePrices.length)
+          data.append("sale_price", Math.min(...salePrices));
+        if (costPrices.length)
+          data.append("cost_price", Math.min(...costPrices));
+        if (regularPoints.length)
+          data.append("regular_point", Math.min(...regularPoints));
+        if (salePoints.length)
+          data.append("sale_point", Math.min(...salePoints));
+
+        // For unit_weight, we can take the first one or just ignore if not common.
+        // Example payload had "unit_weight": "100" at root. Let's try to grab from first var or formData default.
+        // If formData.unit_weight is empty (hidden), check variations.
+        const weight = formData.variations.find(
+          (v) => v.unit_weight
+        )?.unit_weight;
+        if (weight) data.append("unit_weight", weight);
+
         formData.variations.forEach((v, index) => {
           data.append(`variations[${index}][sku]`, v.sku);
           data.append(`variations[${index}][regular_price]`, v.regular_price);
@@ -241,24 +272,25 @@ const ProductForm = () => {
             data.append(`variations[${index}][unit_weight]`, v.unit_weight);
 
           // Attributes
-          v.attributes.forEach((attr, aIndex) => {
-            data.append(
-              `variations[${index}][attributes][${aIndex}][attribute_id]`,
-              attr.attribute_id
-            );
-            data.append(
-              `variations[${index}][attributes][${aIndex}][attribute_item_id]`,
-              attr.attribute_item_id
-            );
-          });
+          if (v.attributes) {
+            v.attributes.forEach((attr, aIndex) => {
+              data.append(
+                `variations[${index}][attributes][${aIndex}][attribute_id]`,
+                attr.attribute_id
+              );
+              data.append(
+                `variations[${index}][attributes][${aIndex}][attribute_item_id]`,
+                attr.attribute_item_id
+              );
+            });
+          }
 
-          // Variation Images (Indexed)
-          // 1. Check for specific images uploaded for this variation
+          // Variation Images
           const specificImages =
             v.images && v.images.length > 0 ? Array.from(v.images) : [];
 
-          // 2. Check for color-based images
           let colorImages = [];
+          // If we have a color gallery, check if this variation matches a color
           if (v.attributes && formData.color_images) {
             const colorAttr = v.attributes.find((attr) => {
               const name = attr.attribute_name?.toLowerCase();
@@ -279,9 +311,6 @@ const ProductForm = () => {
             }
           }
 
-          // Combine images: Prioritize specific images if we want, or just merge.
-          // Requirement: "Images will be uploaded separately for each attribute item".
-          // Usually this implies the color gallery IS the source for color variations.
           const allImages = [...specificImages, ...colorImages];
 
           if (allImages.length > 0) {
@@ -290,6 +319,15 @@ const ProductForm = () => {
                 data.append(`variations[${index}][images][${imgIndex}]`, file);
               }
             });
+          }
+        });
+      }
+
+      // General Images (Indexed)
+      if (formData.images && formData.images.length > 0) {
+        Array.from(formData.images).forEach((file, index) => {
+          if (file instanceof File) {
+            data.append(`images[${index}]`, file);
           }
         });
       }
