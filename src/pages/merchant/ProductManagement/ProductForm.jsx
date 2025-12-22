@@ -31,6 +31,7 @@ import VariationList from "./components/VariationList";
 import ColorImageGallery from "./components/ColorImageGallery";
 import { useSelector } from "react-redux";
 import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
+import { useGetCurrentSettingsQuery } from "../../../redux/features/admin/settings/settingsApi";
 
 const ProductForm = () => {
   const { user, token } = useSelector((state) => state.auth);
@@ -41,7 +42,11 @@ const ProductForm = () => {
     isLoading: merchantDataLoading,
     error,
   } = useVerifyMeQuery(role, { skip: !token });
-  console.log("merchantDataLoading", data);
+  const { data: settingsData, isLoading: settingsLoading } =
+    useGetCurrentSettingsQuery();
+
+  const rmPoints = settingsData?.setting_attribute?.maxreward?.rm_points;
+  console.log("rmPoints", rmPoints);
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = !!id;
@@ -447,7 +452,9 @@ const ProductForm = () => {
             </div>
 
             {/* Simple Product Inputs */}
-            {productType === "simple" && <SimpleProductFields />}
+            {productType === "simple" && (
+              <SimpleProductFields rmPoints={rmPoints} />
+            )}
 
             {/* Variable Product Inputs */}
             {productType === "variable" && (
@@ -464,6 +471,7 @@ const ProductForm = () => {
                   variationFields={variationFields}
                   removeVariation={removeVariation}
                   isEditMode={isEditMode}
+                  rmPoints={rmPoints}
                 />
                 {/* Error Message for Variations */}
                 {errors.variations && (

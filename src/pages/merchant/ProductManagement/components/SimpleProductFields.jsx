@@ -3,11 +3,26 @@ import { useFormContext } from "react-hook-form";
 import Label from "../../../../components/form/Label";
 import Input from "../../../../components/form/input/InputField";
 
-const SimpleProductFields = () => {
+const SimpleProductFields = ({ rmPoints }) => {
   const {
     register,
+    setValue,
     formState: { errors },
   } = useFormContext();
+
+  const registerWithPoints = (name, pointName) => {
+    const { onChange, ...rest } = register(name);
+    return {
+      ...rest,
+      onChange: (e) => {
+        onChange(e);
+        const val = parseFloat(e.target.value);
+        if (!isNaN(val) && rmPoints) {
+          setValue(pointName, (val * rmPoints).toFixed(2));
+        }
+      },
+    };
+  };
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in-down">
@@ -16,7 +31,7 @@ const SimpleProductFields = () => {
         <Input
           type="number"
           step="0.01"
-          {...register("regular_price")}
+          {...registerWithPoints("regular_price", "regular_point")}
           error={!!errors.regular_price}
           hint={errors.regular_price?.message}
         />
@@ -37,7 +52,11 @@ const SimpleProductFields = () => {
       </div>
       <div>
         <Label htmlFor="sale_price">Sale Price (RM)</Label>
-        <Input type="number" step="0.01" {...register("sale_price")} />
+        <Input
+          type="number"
+          step="0.01"
+          {...registerWithPoints("sale_price", "sale_point")}
+        />
       </div>
       <div>
         <Label htmlFor="sale_point">Sale Point</Label>
@@ -46,6 +65,10 @@ const SimpleProductFields = () => {
       <div>
         <Label htmlFor="cost_price">Cost Price (RM)</Label>
         <Input type="number" step="0.01" {...register("cost_price")} />
+      </div>
+      <div>
+        <Label htmlFor="actual_quantity">Actual Quantity</Label>
+        <Input type="number" {...register("actual_quantity")} />
       </div>
     </div>
   );
