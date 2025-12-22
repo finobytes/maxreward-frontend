@@ -1,172 +1,177 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import Label from "../../../../components/form/Label";
+import { UploadCloud, X, ImageIcon } from "lucide-react";
 import ComponentCard from "../../../../components/common/ComponentCard";
+import Label from "../../../../components/form/Label";
 
 const ColorImageGallery = ({ variations = [] }) => {
-  const {
-    register,
-    watch,
-    setValue,
-    formState: { errors },
-  } = useFormContext();
-  const [colorAttributes, setColorAttributes] = useState([]);
+  const { watch, setValue } = useFormContext();
   const [activeTab, setActiveTab] = useState(0);
 
-  // Extract unique color attributes from variations
-  useEffect(() => {
-    if (!variations || variations.length === 0) {
-      setColorAttributes([]);
-      return;
-    }
-
-    const colors = new Map();
+  /* --------------------------------------------------
+   Extract unique color attributes
+  -------------------------------------------------- */
+  const colors = useMemo(() => {
+    const map = new Map();
 
     variations.forEach((v) => {
-      if (v.attributes) {
-        v.attributes.forEach((attr) => {
-          // Check if attribute name contains "color" or "colour" (case insensitive)
-          const name = attr.attribute_name?.toLowerCase();
-          if (name && (name.includes("color") || name.includes("colour"))) {
-            if (!colors.has(attr.attribute_item_id)) {
-              colors.set(attr.attribute_item_id, {
-                id: attr.attribute_item_id,
-                name: attr.attribute_item_name,
-                attribute_id: attr.attribute_id, // Keep track of parent attribute ID if needed
-              });
-            }
+      v.attributes?.forEach((attr) => {
+        const name = attr.attribute_name?.toLowerCase();
+        if (name && (name.includes("color") || name.includes("colour"))) {
+          if (!map.has(attr.attribute_item_id)) {
+            map.set(attr.attribute_item_id, {
+              id: attr.attribute_item_id,
+              name: attr.attribute_item_name,
+              attribute_id: attr.attribute_id,
+            });
           }
-        });
-      }
+        }
+      });
     });
 
-    const colorList = Array.from(colors.values());
-    setColorAttributes(colorList);
-    // Reset active tab if it's out of bounds
-    if (activeTab >= colorList.length) {
-      setActiveTab(0);
-    }
+    return Array.from(map.values());
   }, [variations]);
 
-  // Watch the current images for the active tab to show previews
-  const currentImages = watch(`color_images.${colorAttributes[activeTab]?.id}`);
+  const activeColor = colors[activeTab];
+  const images = watch(`color_images.${activeColor?.id}`) || [];
 
-  if (colorAttributes.length === 0) return null;
+  /* --------------------------------------------------
+   Remove image
+  -------------------------------------------------- */
+  const removeImage = (index) => {
+    const updated = Array.from(images);
+    updated.splice(index, 1);
+    setValue(`color_images.${activeColor.id}`, updated);
+  };
+
+  if (!colors.length) return null;
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
-      <h4 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
-        <span className="bg-brand-600 text-white p-1 rounded">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <path d="m14.31 8 5.74 9.94" />
-            <path d="M9.69 8h11.48" />
-            <path d="m7.38 12 5.74-9.94" />
-            <path d="M9.69 16 3.95 6.06" />
-            <path d="M14.31 16H2.83" />
-            <path d="m16.62 12-5.74 9.94" />
-          </svg>
-        </span>
-        Color Variation Images
-      </h4>
-      <p className="text-sm text-gray-500 mb-6">
-        Upload images for each color. These images will be automatically applied
-        to all variations of that color.
-      </p>
+    <ComponentCard title="Color Based Image Gallery">
+      {/* ================= Sticky Horizontal Tabs ================= */}
+      <div className="sticky top-20 z-20 bg-white pb-4">
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+          {colors.map((color, index) => {
+            const hasImages = watch(`color_images.${color.id}`)?.length > 0;
 
-      <div className="flex flex-col md:flex-row gap-6">
-        {/* Tabs */}
-        <div className="w-full md:w-48 flex-shrink-0 flex md:flex-col gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0">
-          {colorAttributes.map((color, index) => (
-            <button
-              key={color.id}
-              type="button"
-              onClick={() => setActiveTab(index)}
-              className={`px-4 py-2.5 rounded-lg text-sm font-medium text-left transition-all whitespace-nowrap ${
-                activeTab === index
-                  ? "bg-brand-600 text-white ring-1 ring-brand-200 shadow-sm"
-                  : "bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-              }`}
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span>{color.name}</span>
-                {watch(`color_images.${color.id}`)?.length > 0 && (
-                  <span className="flex h-2 w-2 rounded-full bg-green-500"></span>
+            return (
+              <button
+                key={color.id}
+                type="button"
+                onClick={() => setActiveTab(index)}
+                className={`flex items-center gap-3 px-4 py-2 rounded-full border whitespace-nowrap transition ${
+                  activeTab === index
+                    ? "bg-brand-600 text-white border-brand-600 shadow"
+                    : "bg-gray-50 hover:bg-gray-100 border-gray-200"
+                }`}
+              >
+                <span
+                  className="h-3 w-3 rounded-full border"
+                  style={{ backgroundColor: color.name.toLowerCase() }}
+                />
+                <span className="text-sm font-medium">{color.name}</span>
+
+                {hasImages && (
+                  <span className="h-2 w-2 rounded-full bg-green-500" />
                 )}
-              </div>
-            </button>
-          ))}
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 bg-gray-50/50 rounded-xl border border-dashed border-gray-200 p-6">
-          {colorAttributes[activeTab] && (
-            <div className="space-y-4 animate-fade-in">
-              <div className="flex items-center justify-between">
-                <Label className="text-gray-700">
-                  Images for {colorAttributes[activeTab].name}
-                </Label>
-                <span className="text-xs text-gray-500">
-                  {currentImages?.length || 0} files selected
-                </span>
-              </div>
-
-              <input
-                type="file"
-                multiple
-                className="block w-full text-sm text-gray-500
-                            file:mr-4 file:py-2.5 file:px-4
-                            file:rounded-full file:border-0
-                            file:text-xs file:font-semibold
-                            file:bg-brand-600 file:text-white
-                            hover:file:bg-brand-700
-                            cursor-pointer file:cursor-pointer
-                        "
-                {...register(`color_images.${colorAttributes[activeTab].id}`)}
-              />
-
-              {/* Simple Preview */}
-              {currentImages && currentImages.length > 0 && (
-                <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2 mt-4">
-                  {Array.from(currentImages).map((file, i) => (
-                    <div
-                      key={i}
-                      className="aspect-square rounded-lg overflow-hidden border border-gray-200 bg-white relative group"
-                    >
-                      {file instanceof File ? (
-                        <img
-                          src={URL.createObjectURL(file)}
-                          alt="preview"
-                          className="w-full h-full object-cover"
-                          onLoad={(e) => URL.revokeObjectURL(e.target.src)}
-                        />
-                      ) : (
-                        // Handle potential string URLs if editing existing product (though current logic is mostly for new uploads)
-                        <img
-                          src={file}
-                          alt="preview"
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+              </button>
+            );
+          })}
         </div>
       </div>
-    </div>
+
+      {/* ================= Content ================= */}
+      <div className="mt-6 space-y-5">
+        <div className="flex items-center justify-between">
+          <Label>
+            Images for{" "}
+            <span className="font-semibold text-gray-900">
+              {activeColor.name}
+            </span>
+          </Label>
+          <span className="text-xs text-gray-500">
+            {images.length} selected
+          </span>
+        </div>
+
+        {/* ================= Upload Zone ================= */}
+        <label className="relative flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-10 cursor-pointer bg-gray-50 hover:bg-gray-100 transition">
+          <UploadCloud className="h-9 w-9 text-brand-600 mb-2" />
+          <p className="text-sm font-medium text-gray-700">
+            Click or drag images to upload
+          </p>
+          <p className="text-xs text-gray-500 mt-1">
+            You can upload multiple images
+          </p>
+
+          <input
+            type="file"
+            multiple
+            className="absolute inset-0 opacity-0 cursor-pointer"
+            onChange={(e) => {
+              if (e.target.files && e.target.files.length > 0) {
+                const newFiles = Array.from(e.target.files);
+                const currentImages =
+                  watch(`color_images.${activeColor.id}`) || [];
+                const validCurrentImages =
+                  currentImages instanceof FileList
+                    ? Array.from(currentImages)
+                    : currentImages;
+
+                setValue(`color_images.${activeColor.id}`, [
+                  ...validCurrentImages,
+                  ...newFiles,
+                ]);
+                e.target.value = ""; // Reset input
+              }
+            }}
+          />
+        </label>
+
+        {/* ================= Empty State ================= */}
+        {!images.length && (
+          <div className="flex flex-col items-center justify-center py-10 text-gray-400">
+            <ImageIcon className="h-10 w-10 mb-2" />
+            <p className="text-sm">No images uploaded yet</p>
+          </div>
+        )}
+
+        {/* ================= Preview Grid ================= */}
+        {images.length > 0 && (
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
+            {Array.from(images).map((file, index) => {
+              const src =
+                file instanceof File ? URL.createObjectURL(file) : file;
+
+              return (
+                <div
+                  key={index}
+                  className="relative group rounded-xl overflow-hidden border bg-white shadow-sm"
+                >
+                  <img
+                    src={src}
+                    alt="preview"
+                    className="h-32 w-full object-cover"
+                    onLoad={() =>
+                      file instanceof File && URL.revokeObjectURL(src)
+                    }
+                  />
+
+                  {/* Remove */}
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index)}
+                    className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </ComponentCard>
   );
 };
 
