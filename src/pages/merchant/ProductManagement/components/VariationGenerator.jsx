@@ -6,6 +6,7 @@ import PrimaryButton from "../../../../components/ui/PrimaryButton";
 import Label from "../../../../components/form/Label";
 import Select from "@/components/form/Select";
 import { useGenerateVariationsMutation } from "../../../../redux/features/merchant/product/productApi";
+import { generateEAN13 } from "../../../../utils/eanGenerator";
 
 const VariationGenerator = ({
   attributes = [],
@@ -76,7 +77,7 @@ const VariationGenerator = ({
           cost_price: "",
           actual_quantity: "",
           low_stock_threshold: "",
-          ean_no: "",
+          ean_no: generateEAN13(),
           images: [],
         }));
 
