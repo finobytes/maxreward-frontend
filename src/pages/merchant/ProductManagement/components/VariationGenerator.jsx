@@ -66,16 +66,23 @@ const VariationGenerator = ({
       }).unwrap();
 
       if (result.success) {
+        // Read root values for auto-fill
+        const rootValues = getValues();
+
         const newVariations = result.data.variations.map((v) => ({
           sku: v.sku,
           attributes: v.attributes,
           formatted_attributes: v.formatted_attributes,
-          regular_price: "",
-          regular_point: "",
-          sale_price: "",
-          sale_point: "",
-          cost_price: "",
-          actual_quantity: "",
+
+          // Auto-fill from root values
+          regular_price: rootValues.regular_price || "",
+          regular_point: rootValues.regular_point || "",
+          sale_price: rootValues.sale_price || "",
+          sale_point: rootValues.sale_point || "",
+          cost_price: rootValues.cost_price || "",
+          unit_weight: rootValues.unit_weight || "",
+          actual_quantity: "", // Quantity is usually unique per variation, keeping blank or 0
+
           low_stock_threshold: "",
           ean_no: generateEAN13(),
           images: [],
@@ -146,10 +153,19 @@ const VariationGenerator = ({
                       e.target.value
                     )
                   }
-                  options={attributes.map((a) => ({
-                    value: a.id,
-                    label: a.name,
-                  }))}
+                  options={attributes
+                    .filter(
+                      (a) =>
+                        !selectedAttributes.some(
+                          (sa) =>
+                            sa.attribute_id == a.id &&
+                            sa.attribute_id != attr.attribute_id
+                        )
+                    )
+                    .map((a) => ({
+                      value: a.id,
+                      label: a.name,
+                    }))}
                   placeholder="Select Attribute"
                 />
               </div>

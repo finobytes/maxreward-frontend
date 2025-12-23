@@ -23,9 +23,7 @@ import { useGetAllModelsQuery } from "../../../redux/features/admin/model/modelA
 
 // Form Sections
 import ProductBasicInfo from "./components/ProductBasicInfo";
-import ProductOrganization from "./components/ProductOrganization";
 import ProductMedia from "./components/ProductMedia";
-import SimpleProductFields from "./components/SimpleProductFields";
 import VariationGenerator from "./components/VariationGenerator";
 import VariationList from "./components/VariationList";
 import ColorImageGallery from "./components/ColorImageGallery";
@@ -37,13 +35,8 @@ const ProductForm = () => {
   const { user, token } = useSelector((state) => state.auth);
   const role = user?.role || "member"; // admin | merchant | member
 
-  const {
-    data,
-    isLoading: merchantDataLoading,
-    error,
-  } = useVerifyMeQuery(role, { skip: !token });
-  const { data: settingsData, isLoading: settingsLoading } =
-    useGetCurrentSettingsQuery();
+  const { data } = useVerifyMeQuery(role, { skip: !token });
+  const { data: settingsData } = useGetCurrentSettingsQuery();
 
   const rmPoints = settingsData?.setting_attribute?.maxreward?.rm_points;
   console.log("rmPoints", rmPoints);
@@ -379,14 +372,14 @@ const ProductForm = () => {
 
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-          <ProductBasicInfo handleSkuValidation={handleSkuValidation} />
-
-          <ProductOrganization
+          <ProductBasicInfo
+            handleSkuValidation={handleSkuValidation}
             brands={brands}
             categories={categories}
             subCategories={subCategories}
             genders={genders}
             models={models}
+            rmPoints={rmPoints}
           />
 
           <ProductMedia
@@ -451,10 +444,10 @@ const ProductForm = () => {
               </div>
             </div>
 
-            {/* Simple Product Inputs */}
-            {productType === "simple" && (
+            {/* Simple Product Inputs - Moved to ProductBasicInfo */}
+            {/* {productType === "simple" && (
               <SimpleProductFields rmPoints={rmPoints} />
-            )}
+            )} */}
 
             {/* Variable Product Inputs */}
             {productType === "variable" && (
