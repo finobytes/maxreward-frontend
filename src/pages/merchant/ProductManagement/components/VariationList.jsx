@@ -54,18 +54,40 @@ const VariationList = ({ variationFields, removeVariation, rmPoints }) => {
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {variationFields.map((field, index) => {
-            // Helper for registering with custom Change logic
+            // Helper for number validation and auto-calc
+            const handleNumberChange = (e, onChange, pointName = null) => {
+              let val = e.target.value;
+              val = val.replace(/[^0-9.]/g, "");
+              if ((val.match(/\./g) || []).length > 1) {
+                const parts = val.split(".");
+                val = parts.shift() + "." + parts.join("");
+              }
+              e.target.value = val;
+              onChange(e);
+
+              if (pointName && rmPoints) {
+                const numVal = parseFloat(val);
+                if (!isNaN(numVal)) {
+                  setValue(pointName, (numVal * rmPoints).toFixed(2));
+                } else if (val === "") {
+                  setValue(pointName, "");
+                }
+              }
+            };
+
             const registerWithPoints = (name, pointName) => {
               const { onChange, ...rest } = register(name);
               return {
                 ...rest,
-                onChange: (e) => {
-                  onChange(e);
-                  const val = parseFloat(e.target.value);
-                  if (!isNaN(val) && rmPoints) {
-                    setValue(pointName, (val * rmPoints).toFixed(2));
-                  }
-                },
+                onChange: (e) => handleNumberChange(e, onChange, pointName),
+              };
+            };
+
+            const registerNumber = (name) => {
+              const { onChange, ...rest } = register(name);
+              return {
+                ...rest,
+                onChange: (e) => handleNumberChange(e, onChange),
               };
             };
 
@@ -102,7 +124,7 @@ const VariationList = ({ variationFields, removeVariation, rmPoints }) => {
                 <td className="px-3 py-2 align-top">
                   <Input
                     className="h-9 text-xs min-w-[80px]"
-                    type="number"
+                    type="text"
                     {...registerWithPoints(
                       `variations.${index}.regular_price`,
                       `variations.${index}.regular_point`
@@ -114,8 +136,8 @@ const VariationList = ({ variationFields, removeVariation, rmPoints }) => {
                 <td className="px-3 py-2 align-top">
                   <Input
                     className="h-9 text-xs min-w-[80px]"
-                    type="number"
-                    {...register(`variations.${index}.regular_point`)}
+                    type="text"
+                    {...registerNumber(`variations.${index}.regular_point`)}
                     placeholder="0"
                     error={!!errors.variations?.[index]?.regular_point}
                   />
@@ -123,7 +145,7 @@ const VariationList = ({ variationFields, removeVariation, rmPoints }) => {
                 <td className="px-3 py-2 align-top">
                   <Input
                     className="h-9 text-xs min-w-[80px]"
-                    type="number"
+                    type="text"
                     {...registerWithPoints(
                       `variations.${index}.sale_price`,
                       `variations.${index}.sale_point`
@@ -134,16 +156,16 @@ const VariationList = ({ variationFields, removeVariation, rmPoints }) => {
                 <td className="px-3 py-2 align-top">
                   <Input
                     className="h-9 text-xs min-w-[80px]"
-                    type="number"
-                    {...register(`variations.${index}.sale_point`)}
+                    type="text"
+                    {...registerNumber(`variations.${index}.sale_point`)}
                     placeholder="0"
                   />
                 </td>
                 <td className="px-3 py-2 align-top">
                   <Input
                     className="h-9 text-xs min-w-[80px]"
-                    type="number"
-                    {...register(`variations.${index}.actual_quantity`)}
+                    type="text"
+                    {...registerNumber(`variations.${index}.actual_quantity`)}
                     placeholder="0"
                     error={!!errors.variations?.[index]?.actual_quantity}
                   />
@@ -151,16 +173,18 @@ const VariationList = ({ variationFields, removeVariation, rmPoints }) => {
                 <td className="px-3 py-2 align-top">
                   <Input
                     className="h-9 text-xs min-w-[80px]"
-                    type="number"
-                    {...register(`variations.${index}.cost_price`)}
+                    type="text"
+                    {...registerNumber(`variations.${index}.cost_price`)}
                     placeholder="0.00"
                   />
                 </td>
                 <td className="px-3 py-2 align-top">
                   <Input
                     className="h-9 text-xs min-w-[80px]"
-                    type="number"
-                    {...register(`variations.${index}.low_stock_threshold`)}
+                    type="text"
+                    {...registerNumber(
+                      `variations.${index}.low_stock_threshold`
+                    )}
                     placeholder="0"
                   />
                 </td>

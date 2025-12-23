@@ -28,17 +28,42 @@ const ProductBasicInfo = ({
     (sub) => sub.category_id == selectedCategoryId
   );
 
+  const handleNumberChange = (e, onChange, pointName = null) => {
+    let val = e.target.value;
+    // Allow digits and single decimal point
+    val = val.replace(/[^0-9.]/g, "");
+    if ((val.match(/\./g) || []).length > 1) {
+      const parts = val.split(".");
+      val = parts.shift() + "." + parts.join("");
+    }
+
+    e.target.value = val;
+    onChange(e);
+
+    // Point Calculation
+    if (pointName && rmPoints) {
+      const numVal = parseFloat(val);
+      if (!isNaN(numVal)) {
+        setValue(pointName, (numVal * rmPoints).toFixed(2));
+      } else if (val === "") {
+        setValue(pointName, "");
+      }
+    }
+  };
+
   const registerWithPoints = (name, pointName) => {
     const { onChange, ...rest } = register(name);
     return {
       ...rest,
-      onChange: (e) => {
-        onChange(e);
-        const val = parseFloat(e.target.value);
-        if (!isNaN(val) && rmPoints) {
-          setValue(pointName, (val * rmPoints).toFixed(2));
-        }
-      },
+      onChange: (e) => handleNumberChange(e, onChange, pointName),
+    };
+  };
+
+  const registerNumber = (name) => {
+    const { onChange, ...rest } = register(name);
+    return {
+      ...rest,
+      onChange: (e) => handleNumberChange(e, onChange),
     };
   };
 
@@ -162,8 +187,7 @@ const ProductBasicInfo = ({
         <div>
           <Label htmlFor="regular_price">Regular Price (RM)*</Label>
           <Input
-            type="number"
-            step="0.01"
+            type="text"
             {...registerWithPoints("regular_price", "regular_point")}
             error={!!errors.regular_price}
             hint={errors.regular_price?.message}
@@ -174,9 +198,8 @@ const ProductBasicInfo = ({
         <div>
           <Label htmlFor="regular_point">Regular Point*</Label>
           <Input
-            type="number"
-            step="0.01"
-            {...register("regular_point")}
+            type="text"
+            {...registerNumber("regular_point")}
             error={!!errors.regular_point}
             hint={errors.regular_point?.message}
           />
@@ -186,8 +209,7 @@ const ProductBasicInfo = ({
         <div>
           <Label htmlFor="sale_price">Sell Price (RM)</Label>
           <Input
-            type="number"
-            step="0.01"
+            type="text"
             {...registerWithPoints("sale_price", "sale_point")}
           />
         </div>
@@ -195,24 +217,13 @@ const ProductBasicInfo = ({
         {/* 11. Sell Point */}
         <div>
           <Label htmlFor="sale_point">Sell Point</Label>
-          <Input type="number" step="0.01" {...register("sale_point")} />
+          <Input type="text" {...registerNumber("sale_point")} />
         </div>
 
         {/* 12. Unit Weight */}
         <div>
           <Label htmlFor="unit_weight">Unit Weight (kg)</Label>
-          <Input type="number" step="0.01" {...register("unit_weight")} />
-        </div>
-
-        {/* Extra Fields (Cost, Quantity) to ensure no data loss even if not explicitly requested in order */}
-        <div>
-          <Label htmlFor="cost_price">Cost Price (RM)</Label>
-          <Input type="number" step="0.01" {...register("cost_price")} />
-        </div>
-
-        <div>
-          <Label htmlFor="actual_quantity">Actual Quantity</Label>
-          <Input type="number" {...register("actual_quantity")} />
+          <Input type="text" {...registerNumber("unit_weight")} />
         </div>
       </div>
     </ComponentCard>
