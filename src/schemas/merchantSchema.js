@@ -31,9 +31,9 @@ export const merchantSchema = z.object({
 
   designation: z.string().optional(),
 
-  merchant_password: z
-    .string()
-    .min(6, "Password must be at least 6 characters"),
+  // merchant_password: z
+  //   .string()
+  //   .min(6, "Password must be at least 6 characters"),
 
   status: z.string().min(1, "Status is required"),
   town: z.string().optional(),

@@ -100,7 +100,7 @@ const PointStatement = () => {
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white p-4">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <h1 className="text-xl font-semibold text-gray-900">
-            My Points Transaction History
+           Transaction History
           </h1>
           {isFetching && (
             <span className="text-sm text-gray-500">Refreshing...</span>
