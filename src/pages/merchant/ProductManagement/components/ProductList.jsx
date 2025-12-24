@@ -113,30 +113,34 @@ const ProductList = ({ statusFilter = "", title = "Products" }) => {
           <Table className="w-full table-auto border-collapse">
             <TableHeader>
               <TableRow>
-                {/* <TableHead className="w-[40px]">
-                  <input
-                    type="checkbox"
-                    checked={
-                      products.length > 0 && selected.length === products.length
-                    }
-                    onChange={(e) => toggleSelectAll(e.target.checked)}
-                    className="w-4 h-4 rounded"
-                  />
-                </TableHead> */}
-                <TableHead className="text-gray-700 font-medium">S/N</TableHead>
-                <TableHead className="text-gray-700 font-medium">
-                  Product Name
+                <TableHead className="text-gray-700 font-medium w-[50px]">
+                  S/N
                 </TableHead>
                 <TableHead className="text-gray-700 font-medium">
-                  Category
+                  Image
+                </TableHead>
+                <TableHead className="text-gray-700 font-medium">
+                  Product Name
                 </TableHead>
                 <TableHead className="text-gray-700 font-medium">
                   Brand
                 </TableHead>
                 <TableHead className="text-gray-700 font-medium">
-                  Price
+                  Category
                 </TableHead>
                 <TableHead className="text-gray-700 font-medium">
+                  Sub Category
+                </TableHead>
+                <TableHead className="text-gray-700 font-medium">
+                  Model
+                </TableHead>
+                <TableHead className="text-gray-700 font-medium">
+                  Price / Points
+                </TableHead>
+                <TableHead className="text-gray-700 font-medium">
+                  Product Type
+                </TableHead>
+                <TableHead className="text-gray-700 font-medium text-center">
                   Status
                 </TableHead>
                 <TableHead className="text-gray-700 font-medium text-center">
@@ -155,61 +159,136 @@ const ProductList = ({ statusFilter = "", title = "Products" }) => {
                   </TableCell>
                 </TableRow>
               ) : (
-                products.map((product, idx) => (
-                  <TableRow
-                    key={product.id}
-                    className="transition hover:bg-gray-50"
-                  >
-                    {/* <TableCell>
-                      <input
-                        type="checkbox"
-                        checked={selected.includes(product.id)}
-                        onChange={() => toggleSelect(product.id)}
-                        className="w-4 h-4 rounded"
-                      />
-                    </TableCell> */}
-                    <TableCell>
-                      {(pagination?.currentPage - 1) * pagination?.perPage +
-                        (idx + 1)}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        {/* Placeholder for image if available */}
-                        {product.thumbnail && (
-                          <img
-                            src={product.thumbnail}
-                            alt={product.name}
-                            className="w-8 h-8 rounded object-cover"
-                          />
-                        )}
-                        <span>{product.name}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>{product.category?.name || "-"}</TableCell>
-                    <TableCell>{product.brand?.name || "-"}</TableCell>
-                    <TableCell>{product.sale_price}</TableCell>
-                    <TableCell>
-                      <StatusBadge status={product.status} />
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2 justify-center">
-                        <Link
-                          to={`/merchant/product/edit/${product.id}`}
-                          className="p-2 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-500"
-                        >
-                          <PencilLine size={16} />
-                        </Link>
+                products.map((product, idx) => {
+                  const image =
+                    product.images && product.images.length > 0
+                      ? product.images[0].url
+                      : null;
 
-                        <button
-                          onClick={() => handleDelete(product.id)}
-                          className="p-2 rounded-md bg-red-100 hover:bg-red-200 text-red-500"
-                        >
-                          <Trash2Icon size={16} />
-                        </button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
+                  // Calculate range for variable products if needed,
+                  // but data provides root level price/point which is usually the min/display price.
+                  // We will use root level values as they are populated.
+
+                  return (
+                    <TableRow
+                      key={product.id}
+                      className="transition hover:bg-gray-50 align-top"
+                    >
+                      <TableCell className="align-middle">
+                        {(pagination?.currentPage - 1) * pagination?.perPage +
+                          (idx + 1)}
+                      </TableCell>
+                      <TableCell className="align-middle">
+                        <div className="h-12 w-12 rounded-lg border border-gray-100 bg-gray-50 flex items-center justify-center overflow-hidden">
+                          {image ? (
+                            <img
+                              src={image}
+                              alt={product.name}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <Eye className="h-4 w-4 text-gray-400" />
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="align-middle">
+                        <div className="flex flex-col gap-1">
+                          <span className="font-semibold text-gray-900 line-clamp-2">
+                            {product.name}
+                          </span>
+                          <div className="flex flex-col text-xs text-gray-500 gap-0.5">
+                            {product.type === "variable" && (
+                              <span className="text-blue-600">
+                                {product.variations?.length || 0} variations
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="align-middle">
+                        <span className="text-sm font-medium text-gray-700">
+                          {product.brand?.name || "-"}
+                        </span>
+                      </TableCell>
+                      <TableCell className="align-middle">
+                        <span className="text-sm text-gray-700">
+                          {product.category?.name || "-"}
+                        </span>
+                      </TableCell>
+                      <TableCell className="align-middle">
+                        <span className="text-sm text-gray-700">
+                          {product.sub_category?.name ||
+                            product.subcategory?.name ||
+                            "-"}
+                        </span>
+                      </TableCell>
+                      <TableCell className="align-middle">
+                        <span className="text-sm text-gray-700">
+                          {product.model?.name || "-"}
+                        </span>
+                      </TableCell>
+                      <TableCell className="align-middle">
+                        <div className="flex flex-col gap-1 text-sm">
+                          <div className="flex items-center gap-1">
+                            <span className="text-gray-500 text-xs w-10">
+                              Price:
+                            </span>
+                            <span className="font-medium text-green-600">
+                              {product.sale_price > 0
+                                ? product.sale_price
+                                : product.regular_price}
+                            </span>
+                            {product.sale_price > 0 &&
+                              product.sale_price < product.regular_price && (
+                                <span className="text-xs text-gray-400 line-through">
+                                  {product.regular_price}
+                                </span>
+                              )}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <span className="text-gray-500 text-xs w-10">
+                              Points:
+                            </span>
+                            <span className="font-medium text-brand-600">
+                              {product.sale_point > 0
+                                ? product.sale_point
+                                : product.regular_point}
+                            </span>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="align-middle">
+                        <div className="flex flex-col gap-1 text-xs">
+                          <span className="bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full w-fit capitalize border border-purple-100">
+                            {product.type}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center align-middle">
+                        <StatusBadge status={product.status} />
+                      </TableCell>
+                      <TableCell className="align-middle">
+                        <div className="flex gap-2 justify-center">
+                          <Link
+                            to={`/merchant/product/edit/${product.id}`}
+                            className="p-2 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors border border-blue-200"
+                            title="Edit"
+                          >
+                            <PencilLine size={16} />
+                          </Link>
+
+                          <button
+                            onClick={() => handleDelete(product.id)}
+                            className="p-2 rounded-md bg-red-50 hover:bg-red-100 text-red-600 transition-colors border border-red-200"
+                            title="Delete"
+                          >
+                            <Trash2Icon size={16} />
+                          </button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>
