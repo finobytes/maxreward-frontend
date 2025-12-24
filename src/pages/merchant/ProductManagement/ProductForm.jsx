@@ -116,6 +116,7 @@ const ProductForm = () => {
     control,
     setError,
     clearErrors,
+    getValues,
     formState: { errors },
   } = methods;
 
@@ -219,21 +220,25 @@ const ProductForm = () => {
       }
 
       // --- Variable Product Logic ---
-      if (formData.product_type === "variable" && formData.variations?.length) {
+      // --- Variable Product Logic ---
+      const formVariations = getValues("variations");
+      const formColorImages = getValues("color_images");
+
+      if (formData.product_type === "variable" && formVariations?.length) {
         // Derive root prices from variations (using Min values)
-        const regularPrices = formData.variations
+        const regularPrices = formVariations
           .map((v) => Number(v.regular_price))
           .filter((n) => !isNaN(n));
-        const salePrices = formData.variations
+        const salePrices = formVariations
           .map((v) => Number(v.sale_price))
           .filter((n) => !isNaN(n));
-        const costPrices = formData.variations
+        const costPrices = formVariations
           .map((v) => Number(v.cost_price))
           .filter((n) => !isNaN(n));
-        const regularPoints = formData.variations
+        const regularPoints = formVariations
           .map((v) => Number(v.regular_point))
           .filter((n) => !isNaN(n));
-        const salePoints = formData.variations
+        const salePoints = formVariations
           .map((v) => Number(v.sale_point))
           .filter((n) => !isNaN(n));
 
@@ -249,14 +254,10 @@ const ProductForm = () => {
           data.append("sale_point", Math.min(...salePoints));
 
         // For unit_weight, we can take the first one or just ignore if not common.
-        // Example payload had "unit_weight": "100" at root. Let's try to grab from first var or formData default.
-        // If formData.unit_weight is empty (hidden), check variations.
-        const weight = formData.variations.find(
-          (v) => v.unit_weight
-        )?.unit_weight;
+        const weight = formVariations.find((v) => v.unit_weight)?.unit_weight;
         if (weight) data.append("unit_weight", weight);
 
-        formData.variations.forEach((v, index) => {
+        formVariations.forEach((v, index) => {
           data.append(`variations[${index}][sku]`, v.sku);
           data.append(`variations[${index}][regular_price]`, v.regular_price);
           data.append(`variations[${index}][regular_point]`, v.regular_point);
@@ -300,20 +301,24 @@ const ProductForm = () => {
 
           let colorImages = [];
           // If we have a color gallery, check if this variation matches a color
-          if (v.attributes && formData.color_images) {
+          if (v.attributes && formColorImages) {
             const colorAttr = v.attributes.find((attr) => {
-              const name = attr.attribute_name?.toLowerCase();
+              let name = attr.attribute_name;
+
+              // Fallback: lookup attribute name from global list if missing in variation
+              if (!name && attributes) {
+                const found = attributes.find((a) => a.id == attr.attribute_id);
+                if (found) name = found.name;
+              }
+
+              const lower = name?.toLowerCase();
               return (
-                name && (name.includes("color") || name.includes("colour"))
+                lower && (lower.includes("color") || lower.includes("colour"))
               );
             });
 
-            if (
-              colorAttr &&
-              formData.color_images[colorAttr.attribute_item_id]
-            ) {
-              const colorFiles =
-                formData.color_images[colorAttr.attribute_item_id];
+            if (colorAttr && formColorImages[colorAttr.attribute_item_id]) {
+              const colorFiles = formColorImages[colorAttr.attribute_item_id];
               if (colorFiles.length > 0) {
                 colorImages = Array.from(colorFiles);
               }
@@ -333,8 +338,10 @@ const ProductForm = () => {
       }
 
       // General Images (Indexed)
-      if (formData.images && formData.images.length > 0) {
-        Array.from(formData.images).forEach((file, index) => {
+      // Use getValues for images to be safe, though formData usually has them if input exists
+      const rootImages = getValues("images");
+      if (rootImages && rootImages.length > 0) {
+        Array.from(rootImages).forEach((file, index) => {
           if (file instanceof File) {
             data.append(`images[${index}]`, file);
           }
