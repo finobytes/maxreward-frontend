@@ -13,6 +13,7 @@ const ProductBasicInfo = ({
   genders = [],
   models = [],
   rmPoints,
+  productType,
 }) => {
   const {
     register,
@@ -183,48 +184,63 @@ const ProductBasicInfo = ({
           />
         </div>
 
-        {/* 8. Regular Price */}
-        <div>
-          <Label htmlFor="regular_price">Regular Price (RM)*</Label>
-          <Input
-            type="text"
-            {...registerWithPoints("regular_price", "regular_point")}
-            error={!!errors.regular_price}
-            hint={errors.regular_price?.message}
-          />
-        </div>
+        {/* Pricing & Weight - Only for Simple Products */}
+        {productType === "simple" && (
+          <>
+            {/* 8. Regular Price */}
+            <div>
+              <Label htmlFor="regular_price">Regular Price (RM)*</Label>
+              <Input
+                type="text"
+                {...registerWithPoints("regular_price", "regular_point")}
+                error={!!errors.regular_price}
+                hint={errors.regular_price?.message}
+              />
+            </div>
 
-        {/* 9. Regular Point */}
-        <div>
-          <Label htmlFor="regular_point">Regular Point*</Label>
-          <Input
-            type="text"
-            {...registerNumber("regular_point")}
-            error={!!errors.regular_point}
-            hint={errors.regular_point?.message}
-          />
-        </div>
+            {/* 9. Regular Point */}
+            <div>
+              <Label htmlFor="regular_point">Regular Point*</Label>
+              <Input
+                type="text"
+                {...registerNumber("regular_point")}
+                error={!!errors.regular_point}
+                hint={errors.regular_point?.message}
+              />
+            </div>
 
-        {/* 10. Sell Price */}
-        <div>
-          <Label htmlFor="sale_price">Sell Price (RM)</Label>
-          <Input
-            type="text"
-            {...registerWithPoints("sale_price", "sale_point")}
-          />
-        </div>
+            {/* 10. Sell Price */}
+            <div>
+              <Label htmlFor="sale_price">Sell Price (RM)</Label>
+              <Input
+                type="text"
+                {...registerWithPoints("sale_price", "sale_point")}
+              />
+            </div>
 
-        {/* 11. Sell Point */}
-        <div>
-          <Label htmlFor="sale_point">Sell Point</Label>
-          <Input type="text" {...registerNumber("sale_point")} />
-        </div>
+            {/* 11. Sell Point */}
+            <div>
+              <Label htmlFor="sale_point">Sell Point</Label>
+              <Input type="text" {...registerNumber("sale_point")} />
+            </div>
 
-        {/* 12. Unit Weight */}
-        <div>
-          <Label htmlFor="unit_weight">Unit Weight (kg)</Label>
-          <Input type="text" {...registerNumber("unit_weight")} />
-        </div>
+            {/* 12. Unit Weight */}
+            <div>
+              <Label htmlFor="unit_weight">Unit Weight (kg)</Label>
+              <Input type="text" {...registerNumber("unit_weight")} />
+            </div>
+            {/* 13. Actual Quantity */}
+            <div>
+              <Label htmlFor="actual_quantity">Actual Quantity</Label>
+              <Input
+                type="text"
+                {...registerNumber("actual_quantity")}
+                error={!!errors?.actual_quantity}
+                hint={errors?.actual_quantity?.message}
+              />
+            </div>
+          </>
+        )}
       </div>
     </ComponentCard>
   );

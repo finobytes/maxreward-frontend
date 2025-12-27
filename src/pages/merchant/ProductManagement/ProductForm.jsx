@@ -134,6 +134,26 @@ const ProductForm = () => {
   useEffect(() => {
     if (productData && isEditMode) {
       const data = productData.data || productData;
+
+      // Extract Color Images for the Gallery
+      const initialColorImages = {};
+      if (data.variations) {
+        data.variations.forEach((v) => {
+          const colorAttr = v.variation_attributes?.find((va) => {
+            const name = va.attribute?.name?.toLowerCase();
+            return name && (name.includes("color") || name.includes("colour"));
+          });
+
+          if (colorAttr && v.images && v.images.length > 0) {
+            const colorId = colorAttr.attribute_item_id;
+            // Only add if not already present (assuming same color variations share images or first one is representative)
+            if (!initialColorImages[colorId]) {
+              initialColorImages[colorId] = v.images.map((img) => img.url);
+            }
+          }
+        });
+      }
+
       reset({
         name: data.name || "",
         sku_short_code: data.sku_short_code || "",
@@ -145,7 +165,7 @@ const ProductForm = () => {
         description: data.description || "",
         status: data.status || "draft",
         product_type: data.type || "variable",
-        images: data.images || [],
+        images: data.images?.map((img) => img.url) || [],
 
         regular_price: data.regular_price ? String(data.regular_price) : "",
         regular_point: data.regular_point ? String(data.regular_point) : "",
@@ -164,8 +184,12 @@ const ProductForm = () => {
               v.variation_attributes?.map((va) => ({
                 attribute_id: va.attribute_id,
                 attribute_item_id: va.attribute_item_id,
+                attribute_name: va.attribute?.name,
+                attribute_item_name: va.attribute_item?.name,
               })) || v.attributes,
           })) || [],
+
+        color_images: initialColorImages,
       });
     }
   }, [productData, isEditMode, reset]);
@@ -387,13 +411,10 @@ const ProductForm = () => {
             genders={genders}
             models={models}
             rmPoints={rmPoints}
+            productType={productType}
           />
 
-          <ProductMedia
-            initialFiles={
-              isEditMode && productData?.images ? productData.images : []
-            }
-          />
+          <ProductMedia />
 
           <ComponentCard title="Product Data">
             {/* Type Switch Header */}
