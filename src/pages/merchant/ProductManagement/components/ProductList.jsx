@@ -270,6 +270,14 @@ const ProductList = ({ statusFilter = "", title = "Products" }) => {
                       <TableCell className="align-middle">
                         <div className="flex gap-2 justify-center">
                           <Link
+                            to={`/merchant/product/view/${product.id}`}
+                            className="p-2 rounded-md bg-gray-50 hover:bg-gray-100 text-gray-600 transition-colors border border-gray-200"
+                            title="View"
+                          >
+                            <Eye size={16} />
+                          </Link>
+
+                          <Link
                             to={`/merchant/product/edit/${product.id}`}
                             className="p-2 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors border border-blue-200"
                             title="Edit"

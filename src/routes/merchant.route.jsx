@@ -24,6 +24,7 @@ import AllProducts from "../pages/merchant/ProductManagement/AllProducts";
 import PendingProducts from "../pages/merchant/ProductManagement/PendingProducts";
 import ApprovedProducts from "../pages/merchant/ProductManagement/ApprovedProducts";
 import ProductForm from "../pages/merchant/ProductManagement/ProductForm";
+import ProductDetails from "../pages/merchant/ProductManagement/ProductDetails";
 
 export const merchantRoute = [
   {
@@ -81,6 +82,10 @@ export const merchantRoute = [
   {
     path: "product/edit/:id",
     element: <ProductForm />,
+  },
+  {
+    path: "product/view/:id",
+    element: <ProductDetails />,
   },
   {
     path: "redeem-mall",
