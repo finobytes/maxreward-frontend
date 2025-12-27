@@ -16,6 +16,8 @@ import {
 import { toast } from "sonner";
 import StatusBadge from "../../../components/table/StatusBadge";
 
+import ProductDetailsSkeleton from "../../../components/skeleton/ProductDetailsSkeleton";
+
 const ProductDetails = () => {
   const { id } = useParams();
   const { data: productData, isLoading } = useGetSingleProductQuery(id);
@@ -29,16 +31,7 @@ const ProductDetails = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <PageBreadcrumb items={[{ label: "..." }]} />
-        <ComponentCard>
-          <div className="p-8 text-center text-gray-500">
-            Loading product details...
-          </div>
-        </ComponentCard>
-      </div>
-    );
+    return <ProductDetailsSkeleton />;
   }
 
   if (!product) {

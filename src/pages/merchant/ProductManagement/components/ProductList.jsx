@@ -6,7 +6,7 @@ import PrimaryButton from "../../../../components/ui/PrimaryButton";
 import DropdownSelect from "../../../../components/ui/dropdown/DropdownSelect";
 import StatusBadge from "../../../../components/table/StatusBadge";
 import Pagination from "../../../../components/table/Pagination";
-import ProductSkeleton from "../../../../components/skeleton/ProductSkeleton";
+import ProductTableSkeleton from "../../../../components/skeleton/ProductTableSkeleton";
 import {
   Table,
   TableBody,
@@ -151,7 +151,7 @@ const ProductList = ({ statusFilter = "", title = "Products" }) => {
 
             <TableBody>
               {isLoading ? (
-                <ProductSkeleton rows={8} cols={6} />
+                <ProductTableSkeleton rows={8} />
               ) : products.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={8} className="text-center py-6">

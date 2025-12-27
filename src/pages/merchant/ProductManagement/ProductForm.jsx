@@ -31,8 +31,11 @@ import { useSelector } from "react-redux";
 import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
 import { useGetCurrentSettingsQuery } from "../../../redux/features/admin/settings/settingsApi";
 
+import ProductFormSkeleton from "../../../components/skeleton/ProductFormSkeleton";
+
 const ProductForm = () => {
   const { user, token } = useSelector((state) => state.auth);
+
   const role = user?.role || "member"; // admin | merchant | member
 
   const { data } = useVerifyMeQuery(role, { skip: !token });
@@ -390,6 +393,10 @@ const ProductForm = () => {
   };
 
   const isLoading = isCreating || isUpdating || isLoadingProduct;
+
+  if (isEditMode && isLoadingProduct) {
+    return <ProductFormSkeleton />;
+  }
 
   return (
     <div className="space-y-6">
