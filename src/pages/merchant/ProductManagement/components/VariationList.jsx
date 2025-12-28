@@ -27,13 +27,13 @@ const VariationList = ({ variationFields, removeVariation, rmPoints }) => {
               EAN
             </th>
             <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px]">
-              Regular Price
+              Regular Price (RM)*
             </th>
             <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px]">
-              Regular Point
+              Regular Point*
             </th>
             <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px]">
-              Sell Price
+              Sell Price (RM)
             </th>
             <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px]">
               Sell Point

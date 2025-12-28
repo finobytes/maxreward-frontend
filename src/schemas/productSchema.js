@@ -60,22 +60,24 @@ export const productSchema = z
     images: z.any().optional(),
   })
   .superRefine((data, ctx) => {
-    if (data.product_type === "simple") {
+    if (data.product_type === "simple" || data.product_type === "variable") {
       if (!data.regular_price) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Regular Price is required for simple products",
+          message: "Regular Price is required",
           path: ["regular_price"],
         });
       }
       if (!data.regular_point) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Regular Point is required for simple products",
+          message: "Regular Point is required",
           path: ["regular_point"],
         });
       }
-    } else if (data.product_type === "variable") {
+    }
+
+    if (data.product_type === "variable") {
       if (!data.variations || data.variations.length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
