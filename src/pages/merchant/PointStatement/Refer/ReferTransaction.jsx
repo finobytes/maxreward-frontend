@@ -134,7 +134,7 @@ const ReferTransaction = () => {
                 <TableHead className="text-center">Status</TableHead>
                 <TableHead>Reason</TableHead>
                 <TableHead className="text-center">BRP</TableHead>
-                <TableHead className="text-center">Action</TableHead>
+                {/* <TableHead className="text-center">Action</TableHead> */}
               </TableRow>
             </TableHeader>
 
@@ -188,7 +188,7 @@ const ReferTransaction = () => {
                         {item?.brp ?? "0.00"}
                       </TableCell>
 
-                      <TableCell className="text-center">
+                      {/* <TableCell className="text-center">
                         <Link
                           to={`/merchant/point-statement/${item?.id}`}
                           className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500 inline-block transition-colors"
@@ -196,7 +196,7 @@ const ReferTransaction = () => {
                         >
                           <Eye size={18} />
                         </Link>
-                      </TableCell>
+                      </TableCell> */}
                     </TableRow>
                   );
                 })

@@ -135,7 +135,7 @@ const AvailableTransaction = () => {
                 <TableHead>Reason</TableHead>
                 <TableHead className="text-center">BAP</TableHead>
                 <TableHead className="text-center">BOP</TableHead>
-                <TableHead className="text-center">Action</TableHead>
+                {/* <TableHead className="text-center">Action</TableHead> */}
               </TableRow>
             </TableHeader>
 
@@ -192,7 +192,7 @@ const AvailableTransaction = () => {
                         {item?.bop ?? "0.00"}
                       </TableCell>
 
-                      <TableCell className="text-center">
+                      {/* <TableCell className="text-center">
                         <Link
                           to={`/merchant/point-statement/${item?.id}`}
                           className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500 inline-block transition-colors"
@@ -200,7 +200,7 @@ const AvailableTransaction = () => {
                         >
                           <Eye size={18} />
                         </Link>
-                      </TableCell>
+                      </TableCell> */}
                     </TableRow>
                   );
                 })
