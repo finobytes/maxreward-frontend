@@ -108,6 +108,8 @@ const ProductForm = () => {
       // Variable Product defaults
       variations: [],
       color_images: {},
+      delete_images: [],
+      deleted_color_images: {},
     },
   });
 
@@ -151,7 +153,7 @@ const ProductForm = () => {
             const colorId = colorAttr.attribute_item_id;
             // Only add if not already present (assuming same color variations share images or first one is representative)
             if (!initialColorImages[colorId]) {
-              initialColorImages[colorId] = v.images.map((img) => img.url);
+              initialColorImages[colorId] = v.images;
             }
           }
         });
@@ -168,7 +170,7 @@ const ProductForm = () => {
         description: data.description || "",
         status: data.status || "draft",
         product_type: data.type || "variable",
-        images: data.images?.map((img) => img.url) || [],
+        images: data.images || [],
 
         regular_price: data.regular_price ? String(data.regular_price) : "",
         regular_point: data.regular_point ? String(data.regular_point) : "",
@@ -233,6 +235,20 @@ const ProductForm = () => {
       if (formData.description)
         data.append("description", formData.description);
 
+      // --- Delete Images (Main Product) ---
+      const deleteImages = formData.delete_images;
+      if (deleteImages && deleteImages.length > 0) {
+        deleteImages.forEach((img, idx) => {
+          // Backend expects array of identifiers to delete.
+          // If the backend uses 'deleteMultipleImages' with Cloudinary, it likely needs public_id.
+          // Ideally we send the public_id if available, or the full object/url depending on backend expectation.
+          // Based on backend code, it calls deleteMultipleImages($deleteImages).
+          // We'll append the unique identifier.
+          const valueToDelete = img.public_id || img.url || img;
+          data.append(`delete_images[${idx}]`, valueToDelete);
+        });
+      }
+
       // --- Simple Product Logic ---
       if (formData.product_type === "simple") {
         data.append("regular_price", formData.regular_price);
@@ -250,6 +266,7 @@ const ProductForm = () => {
       // --- Variable Product Logic ---
       const formVariations = getValues("variations");
       const formColorImages = getValues("color_images");
+      const formDeletedColorImages = getValues("deleted_color_images");
 
       if (formData.product_type === "variable" && formVariations?.length) {
         // Derive root prices from variations (using Min values)
@@ -318,6 +335,41 @@ const ProductForm = () => {
               data.append(
                 `variations[${index}][attributes][${aIndex}][attribute_item_id]`,
                 attr.attribute_item_id
+              );
+            });
+          }
+
+          // Delete Variation Images
+          let deletedImagesForVariation = [];
+          if (v.attributes && formDeletedColorImages) {
+            const colorAttr = v.attributes.find((attr) => {
+              let name = attr.attribute_name;
+              // Fallback: lookup attribute name from global list if missing in variation
+              if (!name && attributes) {
+                const found = attributes.find((a) => a.id == attr.attribute_id);
+                if (found) name = found.name;
+              }
+              const lower = name?.toLowerCase();
+              return (
+                lower && (lower.includes("color") || lower.includes("colour"))
+              );
+            });
+
+            if (
+              colorAttr &&
+              formDeletedColorImages[colorAttr.attribute_item_id]
+            ) {
+              deletedImagesForVariation =
+                formDeletedColorImages[colorAttr.attribute_item_id];
+            }
+          }
+
+          if (deletedImagesForVariation.length > 0) {
+            deletedImagesForVariation.forEach((dImg, dIdx) => {
+              const dValue = dImg.public_id || dImg.url || dImg;
+              data.append(
+                `variations[${index}][delete_images][${dIdx}]`,
+                dValue
               );
             });
           }

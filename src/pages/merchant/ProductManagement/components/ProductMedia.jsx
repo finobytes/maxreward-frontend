@@ -15,8 +15,15 @@ const ProductMedia = () => {
 
   const removeImage = (index) => {
     const updated = Array.from(images);
+    const removed = updated[index];
     updated.splice(index, 1);
     setValue("images", updated, { shouldValidate: true });
+
+    // Track deleted images (if existing image from DB)
+    if (!(removed instanceof File)) {
+      const currentDeleted = watch("delete_images") || [];
+      setValue("delete_images", [...currentDeleted, removed]);
+    }
   };
 
   return (
@@ -78,7 +85,9 @@ const ProductMedia = () => {
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
             {Array.from(images).map((file, index) => {
               const src =
-                file instanceof File ? URL.createObjectURL(file) : file;
+                file instanceof File
+                  ? URL.createObjectURL(file)
+                  : file.url || file;
 
               return (
                 <div

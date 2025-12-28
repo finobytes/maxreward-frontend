@@ -40,8 +40,20 @@ const ColorImageGallery = ({ variations = [] }) => {
   -------------------------------------------------- */
   const removeImage = (index) => {
     const updated = Array.from(images);
+    const removed = updated[index];
     updated.splice(index, 1);
     setValue(`color_images.${activeColor.id}`, updated);
+
+    // Track deleted images
+    if (!(removed instanceof File)) {
+      const currentDeletedMap = watch("deleted_color_images") || {};
+      const currentDeletedForColor = currentDeletedMap[activeColor.id] || [];
+
+      setValue("deleted_color_images", {
+        ...currentDeletedMap,
+        [activeColor.id]: [...currentDeletedForColor, removed],
+      });
+    }
   };
 
   if (!colors.length) return null;
@@ -141,7 +153,9 @@ const ColorImageGallery = ({ variations = [] }) => {
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
             {Array.from(images).map((file, index) => {
               const src =
-                file instanceof File ? URL.createObjectURL(file) : file;
+                file instanceof File
+                  ? URL.createObjectURL(file)
+                  : file.url || file;
 
               return (
                 <div
