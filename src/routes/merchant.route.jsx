@@ -25,6 +25,8 @@ import PendingProducts from "../pages/merchant/ProductManagement/PendingProducts
 import ApprovedProducts from "../pages/merchant/ProductManagement/ApprovedProducts";
 import ProductForm from "../pages/merchant/ProductManagement/ProductForm";
 import ProductDetails from "../pages/merchant/ProductManagement/ProductDetails";
+import AvailableTransaction from "../pages/merchant/PointStatement/Available/AvailableTransaction";
+import ReferTransaction from "../pages/merchant/PointStatement/Refer/ReferTransaction";
 
 export const merchantRoute = [
   {
@@ -111,6 +113,14 @@ export const merchantRoute = [
   {
     path: "point-statement",
     element: <PointStatement />,
+  },
+  {
+    path: "available-transaction",
+    element: <AvailableTransaction />,
+  },
+  {
+    path: "refer-transaction",
+    element: <ReferTransaction />,
   },
   {
     path: "point-statement/:id",

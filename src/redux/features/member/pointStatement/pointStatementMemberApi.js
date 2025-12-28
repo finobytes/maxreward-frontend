@@ -20,8 +20,32 @@ export const pointStatementMemberApi = baseApi.injectEndpoints({
       }),
       keepUnusedDataFor: 0,
     }),
+    getAvailableTransactions: builder.query({
+      query: ({ memberId, page = 1, perPage = 20 } = {}) => ({
+        url: `/transactions/${memberId}/member/available/transactions`,
+        params: {
+          page,
+          per_page: perPage,
+        },
+      }),
+      keepUnusedDataFor: 0,
+    }),
+    getReferTransactions: builder.query({
+      query: ({ memberId, page = 1, perPage = 20 } = {}) => ({
+        url: `/transactions/${memberId}/member/refer/transactions`,
+        params: {
+          page,
+          per_page: perPage,
+        },
+      }),
+      keepUnusedDataFor: 0,
+    }),
   }),
 });
 
-export const { useGetPointStatementQuery, useGetTransactionDetailsQuery } =
-  pointStatementMemberApi;
+export const {
+  useGetPointStatementQuery,
+  useGetTransactionDetailsQuery,
+  useGetAvailableTransactionsQuery,
+  useGetReferTransactionsQuery,
+} = pointStatementMemberApi;

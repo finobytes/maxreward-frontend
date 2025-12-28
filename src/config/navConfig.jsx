@@ -218,7 +218,21 @@ export const NAV_CONFIG = {
     {
       icon: <ChartArea />,
       name: "Point Statement",
-      path: "/merchant/point-statement",
+
+      subItems: [
+        // {
+        //   name: "Point Statement",
+        //   path: "/merchant/point-statement",
+        // },
+        {
+          name: "Available Transaction",
+          path: "/merchant/available-transaction",
+        },
+        {
+          name: "Refer Transaction",
+          path: "/merchant/refer-transaction",
+        },
+      ],
     },
     {
       icon: <List />,
