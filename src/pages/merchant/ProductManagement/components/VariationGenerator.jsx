@@ -175,6 +175,14 @@ const VariationGenerator = ({
                 </Label>
                 <MultiSelect
                   isMulti
+                  menuPortalTarget={document.body}
+                  menuPosition="fixed"
+                  styles={{
+                    menuPortal: (base) => ({
+                      ...base,
+                      zIndex: 9999,
+                    }),
+                  }}
                   options={getItemsForAttribute(attr.attribute_id).map((i) => ({
                     value: i.id,
                     label: i.name,

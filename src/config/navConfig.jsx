@@ -173,12 +173,12 @@ export const NAV_CONFIG = {
           path: "/merchant/product/all-products",
         },
         {
-          name: "Pending Products",
-          path: "/merchant/product/pending-products",
+          name: "Draft Products",
+          path: "/merchant/product/draft-products",
         },
         {
-          name: "Approved Products",
-          path: "/merchant/product/approved-products",
+          name: "Active Products",
+          path: "/merchant/product/active-products",
         },
       ],
     },

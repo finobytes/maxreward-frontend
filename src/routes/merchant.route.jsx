@@ -70,11 +70,11 @@ export const merchantRoute = [
     element: <AllProducts />,
   },
   {
-    path: "product/pending-products",
+    path: "product/draft-products",
     element: <PendingProducts />,
   },
   {
-    path: "product/approved-products",
+    path: "product/active-products",
     element: <ApprovedProducts />,
   },
   {

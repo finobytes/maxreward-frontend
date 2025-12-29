@@ -221,14 +221,15 @@ const ProductBasicInfo = ({
           <Input type="text" {...registerNumber("sale_point")} />
         </div>
 
+        {/* 12. Unit Weight */}
+        <div>
+          <Label htmlFor="unit_weight">Unit Weight (kg)</Label>
+          <Input type="text" {...registerNumber("unit_weight")} />
+        </div>
+
         {/* Pricing & Weight - Only for Simple Products */}
         {productType === "simple" && (
           <>
-            {/* 12. Unit Weight */}
-            <div>
-              <Label htmlFor="unit_weight">Unit Weight (kg)</Label>
-              <Input type="text" {...registerNumber("unit_weight")} />
-            </div>
             {/* 13. Actual Quantity */}
             <div>
               <Label htmlFor="actual_quantity">Actual Quantity</Label>

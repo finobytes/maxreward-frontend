@@ -298,8 +298,12 @@ const ProductForm = () => {
           data.append("sale_point", Math.min(...salePoints));
 
         // For unit_weight, we can take the first one or just ignore if not common.
-        const weight = formVariations.find((v) => v.unit_weight)?.unit_weight;
-        if (weight) data.append("unit_weight", weight);
+        if (formData.unit_weight) {
+          data.append("unit_weight", formData.unit_weight);
+        } else {
+          const weight = formVariations.find((v) => v.unit_weight)?.unit_weight;
+          if (weight) data.append("unit_weight", weight);
+        }
 
         formVariations.forEach((v, index) => {
           data.append(`variations[${index}][sku]`, v.sku);
