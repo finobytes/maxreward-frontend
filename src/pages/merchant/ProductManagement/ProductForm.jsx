@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useForm, useFieldArray, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, useParams } from "react-router";
@@ -135,6 +135,56 @@ const ProductForm = () => {
   });
 
   const productType = watch("product_type");
+
+  const initialSelectedAttributes = useMemo(() => {
+    const data = productData?.data || productData;
+    if (!data) return [];
+
+    const grouped =
+      data.grouped_attributes || data.groupedAttributes || [];
+
+    if (grouped.length > 0) {
+      return grouped
+        .map((group) => {
+          const attributeId = group.attribute_id ?? group.attributeId ?? "";
+          if (!attributeId) return null;
+          const itemIds = (group.items || group.attribute_items || [])
+            .map((item) => Number(item.item_id ?? item.id))
+            .filter((id) => !Number.isNaN(id));
+          return {
+            attribute_id: String(attributeId),
+            attribute_item_ids: itemIds,
+          };
+        })
+        .filter(Boolean);
+    }
+
+    if (!data.variations || data.variations.length === 0) return [];
+
+    const map = new Map();
+
+    data.variations.forEach((variation) => {
+      const attrs =
+        variation.variation_attributes || variation.attributes || [];
+      attrs.forEach((attr) => {
+        const attrId = attr.attribute_id || attr.attribute?.id;
+        const itemId = attr.attribute_item_id || attr.attribute_item?.id;
+        if (!attrId || !itemId) return;
+        const key = String(attrId);
+        const value = Number(itemId);
+        if (Number.isNaN(value)) return;
+        if (!map.has(key)) {
+          map.set(key, new Set());
+        }
+        map.get(key).add(value);
+      });
+    });
+
+    return Array.from(map.entries()).map(([attribute_id, itemSet]) => ({
+      attribute_id,
+      attribute_item_ids: Array.from(itemSet),
+    }));
+  }, [productData]);
 
   useEffect(() => {
     if (productData && isEditMode) {
@@ -547,6 +597,7 @@ const ProductForm = () => {
                   attributeItems={attributeItems}
                   productId={id}
                   replaceVariations={replaceVariations}
+                  initialSelectedAttributes={initialSelectedAttributes}
                 />
 
                 <ColorImageGallery variations={variationFields} />

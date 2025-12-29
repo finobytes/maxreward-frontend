@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
 import MultiSelect from "react-select";
@@ -13,11 +13,20 @@ const VariationGenerator = ({
   attributeItems = [],
   productId,
   replaceVariations,
+  initialSelectedAttributes = [],
 }) => {
   const { getValues } = useFormContext();
   const [selectedAttributes, setSelectedAttributes] = useState([]);
+  const [hasInitialized, setHasInitialized] = useState(false);
   const [generateVariations, { isLoading: isGenerating }] =
     useGenerateVariationsMutation();
+
+  useEffect(() => {
+    if (!hasInitialized && initialSelectedAttributes.length > 0) {
+      setSelectedAttributes(initialSelectedAttributes);
+      setHasInitialized(true);
+    }
+  }, [hasInitialized, initialSelectedAttributes]);
 
   const getItemsForAttribute = (attrId) => {
     return attributeItems.filter((item) => item.attribute_id == attrId);
