@@ -48,6 +48,9 @@ const VariationList = ({ variationFields, removeVariation, rmPoints }) => {
               Low Qty
             </th>
             <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px]">
+              Unit Weight (kg)
+            </th>
+            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px]">
               Action
             </th>
           </tr>
@@ -186,6 +189,14 @@ const VariationList = ({ variationFields, removeVariation, rmPoints }) => {
                       `variations.${index}.low_stock_threshold`
                     )}
                     placeholder="0"
+                  />
+                </td>
+                <td className="px-3 py-2 align-top">
+                  <Input
+                    className="h-9 text-xs min-w-[80px]"
+                    type="text"
+                    {...registerNumber(`variations.${index}.unit_weight`)}
+                    placeholder="0.00"
                   />
                 </td>
                 <td className="px-3 py-2 text-center align-top">
