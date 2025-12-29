@@ -432,7 +432,6 @@ const ProductForm = () => {
       }
 
       if (isEditMode) {
-        data.append("_method", "PUT");
         await updateProduct({ id, data }).unwrap();
         toast.success("Product updated successfully!");
       } else {
