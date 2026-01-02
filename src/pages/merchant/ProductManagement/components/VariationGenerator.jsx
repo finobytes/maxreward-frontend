@@ -30,8 +30,14 @@ const VariationGenerator = ({
       initialSelectedAttributes.length > 0 &&
       initializedProductId !== productId
     ) {
-      setSelectedAttributes(initialSelectedAttributes);
-      setInitialAttributes(initialSelectedAttributes);
+      // Deep clone to prevent reference mutations
+      const deepCopy = JSON.parse(JSON.stringify(initialSelectedAttributes));
+      const deepCopyForInitial = JSON.parse(
+        JSON.stringify(initialSelectedAttributes)
+      );
+
+      setSelectedAttributes(deepCopy);
+      setInitialAttributes(deepCopyForInitial);
       setInitializedProductId(productId);
     }
   }, [initialSelectedAttributes, productId, initializedProductId]);
@@ -69,7 +75,7 @@ const VariationGenerator = ({
 
   const updateAttributeSelection = (index, field, value) => {
     const newAttrs = [...selectedAttributes];
-    newAttrs[index][field] = value;
+    newAttrs[index] = { ...newAttrs[index], [field]: value };
     setSelectedAttributes(newAttrs);
   };
 

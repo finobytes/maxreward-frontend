@@ -230,6 +230,7 @@ const ProductForm = () => {
         variations:
           data.variations?.map((v) => ({
             ...v,
+            variation_id: v.id,
             regular_price: String(v.regular_price),
             regular_point: v.regular_point ? String(v.regular_point) : "",
             actual_quantity: String(v.actual_quantity),

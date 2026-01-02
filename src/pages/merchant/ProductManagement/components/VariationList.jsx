@@ -39,7 +39,7 @@ const VariationList = ({ variationFields, removeVariation, rmPoints }) => {
               Sell Point
             </th>
             <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px]">
-              Active Qty
+              Actual Qty
             </th>
             <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px]">
               Cost Price
@@ -203,8 +203,17 @@ const VariationList = ({ variationFields, removeVariation, rmPoints }) => {
                   <button
                     type="button"
                     onClick={() => removeVariation(index)}
-                    className="text-red-500 hover:text-red-700 p-2 bg-red-200 hover:bg-red-300 rounded-full"
-                    title="Remove Variation"
+                    disabled={!!field.variation_id}
+                    className={`p-2 rounded-full transition-colors ${
+                      field.variation_id
+                        ? "text-gray-300 bg-gray-100 cursor-not-allowed"
+                        : "text-red-500 hover:text-red-700 bg-red-200 hover:bg-red-300"
+                    }`}
+                    title={
+                      field.variation_id
+                        ? "Existing variations cannot be removed"
+                        : "Remove Variation"
+                    }
                   >
                     <Trash size={16} />
                   </button>
