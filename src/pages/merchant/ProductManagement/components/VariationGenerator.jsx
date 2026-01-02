@@ -16,17 +16,39 @@ const VariationGenerator = ({
   initialSelectedAttributes = [],
 }) => {
   const { getValues } = useFormContext();
+  const [initialAttributes, setInitialAttributes] = useState([]);
   const [selectedAttributes, setSelectedAttributes] = useState([]);
-  const [hasInitialized, setHasInitialized] = useState(false);
+  const [initializedProductId, setInitializedProductId] = useState(null);
+
   const [generateVariations, { isLoading: isGenerating }] =
     useGenerateVariationsMutation();
 
   useEffect(() => {
-    if (!hasInitialized && initialSelectedAttributes.length > 0) {
+    // Initialize or re-initialize when initialSelectedAttributes populate
+    // and we haven't initialized for this specific productId yet.
+    if (
+      initialSelectedAttributes.length > 0 &&
+      initializedProductId !== productId
+    ) {
       setSelectedAttributes(initialSelectedAttributes);
-      setHasInitialized(true);
+      setInitialAttributes(initialSelectedAttributes);
+      setInitializedProductId(productId);
     }
-  }, [hasInitialized, initialSelectedAttributes]);
+  }, [initialSelectedAttributes, productId, initializedProductId]);
+
+  const isProtectedAttribute = (attr) => {
+    // Check if the attribute was present initially (by matching ID)
+    return initialAttributes.some(
+      (ia) => String(ia.attribute_id) === String(attr.attribute_id)
+    );
+  };
+
+  const getProtectedItemIds = (attrId) => {
+    const found = initialAttributes.find(
+      (ia) => String(ia.attribute_id) === String(attrId)
+    );
+    return found ? found.attribute_item_ids : [];
+  };
 
   const getItemsForAttribute = (attrId) => {
     return attributeItems.filter((item) => item.attribute_id == attrId);
@@ -155,6 +177,7 @@ const VariationGenerator = ({
                 </Label>
                 <Select
                   value={attr.attribute_id}
+                  disabled={isProtectedAttribute(attr)}
                   onChange={(e) =>
                     updateAttributeSelection(
                       index,
@@ -167,8 +190,9 @@ const VariationGenerator = ({
                       (a) =>
                         !selectedAttributes.some(
                           (sa) =>
-                            sa.attribute_id == a.id &&
-                            sa.attribute_id != attr.attribute_id
+                            String(sa.attribute_id) === String(a.id) &&
+                            String(sa.attribute_id) !==
+                              String(attr.attribute_id)
                         )
                     )
                     .map((a) => ({
@@ -191,6 +215,11 @@ const VariationGenerator = ({
                       ...base,
                       zIndex: 9999,
                     }),
+                    multiValueRemove: (base, state) => {
+                      return state.data.isFixed
+                        ? { ...base, display: "none" }
+                        : base;
+                    },
                   }}
                   options={getItemsForAttribute(attr.attribute_id).map((i) => ({
                     value: i.id,
@@ -198,14 +227,31 @@ const VariationGenerator = ({
                   }))}
                   value={getItemsForAttribute(attr.attribute_id)
                     .filter((i) => attr.attribute_item_ids.includes(i.id))
-                    .map((i) => ({ value: i.id, label: i.name }))}
-                  onChange={(selected) =>
+                    .map((i) => {
+                      const protectedIds = getProtectedItemIds(
+                        attr.attribute_id
+                      );
+                      const isFixed = protectedIds.some(
+                        (pid) => String(pid) === String(i.id)
+                      );
+                      return { value: i.id, label: i.name, isFixed };
+                    })}
+                  onChange={(selected) => {
+                    const newSelectedIds = selected
+                      ? selected.map((s) => s.value)
+                      : [];
+                    const protectedIds = getProtectedItemIds(attr.attribute_id);
+
+                    const mergedIds = [
+                      ...new Set([...newSelectedIds, ...protectedIds]),
+                    ];
+
                     updateAttributeSelection(
                       index,
                       "attribute_item_ids",
-                      selected.map((s) => s.value)
-                    )
-                  }
+                      mergedIds
+                    );
+                  }}
                   placeholder="Select Values"
                   isDisabled={!attr.attribute_id}
                   className="text-sm"
@@ -213,9 +259,18 @@ const VariationGenerator = ({
               </div>
               <button
                 type="button"
+                disabled={isProtectedAttribute(attr)}
                 onClick={() => handleRemoveAttributeSelection(index)}
-                className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded transition-colors"
-                title="Remove Attribute"
+                className={`p-2 rounded transition-colors ${
+                  isProtectedAttribute(attr)
+                    ? "text-gray-300 cursor-not-allowed"
+                    : "text-red-500 hover:text-red-700 hover:bg-red-50"
+                }`}
+                title={
+                  isProtectedAttribute(attr)
+                    ? "Existing attributes cannot be removed"
+                    : "Remove Attribute"
+                }
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

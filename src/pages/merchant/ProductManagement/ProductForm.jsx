@@ -36,13 +36,12 @@ import ProductFormSkeleton from "../../../components/skeleton/ProductFormSkeleto
 const ProductForm = () => {
   const { user, token } = useSelector((state) => state.auth);
 
-  const role = user?.role || "member"; // admin | merchant | member
+  const role = user?.role || "merchant";
 
   const { data } = useVerifyMeQuery(role, { skip: !token });
   const { data: settingsData } = useGetCurrentSettingsQuery();
 
   const rmPoints = settingsData?.setting_attribute?.maxreward?.rm_points;
-  console.log("rmPoints", rmPoints);
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = !!id;
@@ -140,8 +139,7 @@ const ProductForm = () => {
     const data = productData?.data || productData;
     if (!data) return [];
 
-    const grouped =
-      data.grouped_attributes || data.groupedAttributes || [];
+    const grouped = data.grouped_attributes || data.groupedAttributes || [];
 
     if (grouped.length > 0) {
       return grouped
