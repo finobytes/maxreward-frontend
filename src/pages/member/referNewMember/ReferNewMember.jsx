@@ -204,10 +204,10 @@ const ReferNewMember = () => {
                 <Label>Referred By</Label>
                 <SkeletonField />
               </div>
-              <div>
+              {/* <div>
                 <Label>Referral Status</Label>
                 <SkeletonField />
-              </div>
+              </div> */}
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -219,10 +219,10 @@ const ReferNewMember = () => {
                 <Label>Referred By</Label>
                 <Input disabled value={user?.name || ""} readOnly />
               </div>
-              <div>
+              {/* <div>
                 <Label>Referral Status</Label>
                 <Input disabled value={user?.status || ""} readOnly />
-              </div>
+              </div> */}
             </div>
           )}
           <div className="mt-8 flex gap-4">

@@ -50,6 +50,7 @@ const MerchantApplication = () => {
   // REFERRAL STATE + DEBOUNCE LOGIC
   // -----------------------------
   const [referralInput, setReferralInput] = useState("");
+  const [PhoneInputValue, setPhoneInputValue] = useState("");
   const [debouncedReferral, setDebouncedReferral] = useState("");
 
   useEffect(() => {
@@ -110,6 +111,11 @@ const MerchantApplication = () => {
         setReferralInput(corpRef);
         setValue("referralCode", corpRef); // <-- THIS FIXES IT 100%
       }
+      const corPhone = corporateReferralCode?.data?.phone;
+      if (corPhone) {
+        setPhoneInputValue(corPhone);
+        setValue("phone", corPhone); // <-- THIS FIXES IT 100%
+      }
     }
   }, [annualSalesTurnover, corporateReferralCode, setValue]);
 
@@ -117,6 +123,7 @@ const MerchantApplication = () => {
   useEffect(() => {
     if (data?.referral_code) {
       setReferralInput(data.referral_code); // this will show it in input
+      setPhoneInputValue(data.phone); // this will show it in input
     }
   }, [data?.referral_code]);
 
@@ -259,7 +266,7 @@ const MerchantApplication = () => {
                 />
               </div>
 
-              <div>
+              {/* <div>
                 <Label>Password</Label>
 
                 <div className="relative">
@@ -284,7 +291,8 @@ const MerchantApplication = () => {
                     {errors.merchant_password.message}
                   </p>
                 )}
-              </div>
+              </div> */}
+
             </div>
 
             {/* LOGO */}
@@ -370,14 +378,17 @@ const MerchantApplication = () => {
               {/* Referral Input */}
               <div>
                 <Label htmlFor="referralCode">
-                  Referral Code / Phone Number (
-                  <span className="text-red-500">*</span>)
+                  {/* Referral Code / Phone Number  */}
+                  Phone Number 
+                  (<span className="text-red-500">*</span>)
                 </Label>
                 <Input
                   id="referralCode"
-                  placeholder="Enter referral code / Phone Number"
+                  // placeholder="Enter referral code / Phone Number"
+                  placeholder="Enter Phone Number"
                   {...register("referralCode")}
-                  value={referralInput}
+                  // value={referralInput}
+                  value={PhoneInputValue}
                   onChange={(e) => {
                     if (Number(annualSalesTurnover) < 1000000) {
                       setReferralInput(e.target.value);
@@ -421,7 +432,7 @@ const MerchantApplication = () => {
               </div>
 
               {/* Referral Status */}
-              <div>
+              {/* <div>
                 <Label>Referral Status</Label>
                 {isFetching ? (
                   <SkeletonField />
@@ -432,7 +443,7 @@ const MerchantApplication = () => {
                     value={isError ? "Invalid" : memberData?.status || ""}
                   />
                 )}
-              </div>
+              </div> */}
             </div>
 
             <div className="mt-8 flex gap-4">

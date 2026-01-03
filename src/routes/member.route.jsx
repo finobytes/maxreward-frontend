@@ -7,7 +7,8 @@ import DataPrivacyPolicy from "../pages/member/dataPrivacyPolicy/DataPrivacyPoli
 import MaxRedeemMall from "../pages/member/maxRedeemMall/MaxRedeemMall";
 import MemberDashboard from "../pages/member/memberDashboard/MemberDashboard";
 import MerchantApplication from "../pages/member/merchantApplication/MerchantApplication";
-import PointStatement from "../pages/member/pointStatement/PointStatement";
+import AvailableTransaction from "../pages/member/pointStatement/Available/AvailableTransaction";
+import ReferTransaction from "../pages/member/pointStatement/Refer/ReferTransaction";
 import TransactionDetails from "../pages/member/pointStatement/TransactionDetails";
 import Profile from "../pages/member/profile/Profile";
 import PurchaseVoucher from "../pages/member/purchaseVoucher/PurchaseVoucher";
@@ -36,9 +37,17 @@ export const memberRoutes = [
     path: "show-qr-code",
     element: <ShowQrCode />,
   },
+  // {
+  //   path: "point-statement",
+  //   element: <PointStatement />,
+  // },
   {
-    path: "point-statement",
-    element: <PointStatement />,
+    path: "available-transaction",
+    element: <AvailableTransaction />,
+  },
+  {
+    path: "refer-transaction",
+    element: <ReferTransaction />,
   },
   {
     path: "point-statement/:id",

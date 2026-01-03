@@ -1,0 +1,89 @@
+import { z } from "zod";
+
+const variationSchema = z.object({
+  id: z.coerce.string().optional(), // for editing
+  // sku: z.string().min(1, "SKU is required"), // Backend generates SKU using short code, wait, user provides SKU? Backend says `generateVariations` returns SKUs, but `store` accepts `variations.*.sku`. So potentially user can edit it.
+  sku: z.string().min(1, "Variation SKU is required"),
+  regular_price: z.coerce.string().min(1, "Regular Price is required"),
+  regular_point: z.coerce.string().min(1, "Regular Point is required"),
+  sale_price: z.coerce.string().optional(),
+  sale_point: z.coerce.string().optional(),
+  cost_price: z.coerce.string().optional(),
+  actual_quantity: z.coerce.string().min(1, "Quantity is required"),
+  low_stock_threshold: z.coerce.string().optional(),
+  ean_no: z.string().optional(),
+  unit_weight: z.coerce.string().optional(),
+
+  // Attributes: [{ attribute_id, attribute_item_id }]
+  attributes: z
+    .array(
+      z.object({
+        attribute_id: z.coerce.string(),
+        attribute_item_id: z.coerce.string(),
+      })
+    )
+    .min(1, "Attributes are required"),
+
+  // Images handling is complex in forms, usually array of objects or files
+  images: z.any().optional(),
+  delete_images: z.array(z.string()).optional(),
+});
+
+export const productSchema = z
+  .object({
+    name: z.string().min(1, "Product name is required"),
+    merchant_id: z.coerce.string().optional(), // Often automatic
+    category_id: z.coerce.string().min(1, "Category is required"),
+    sub_category_id: z.coerce.string().optional(),
+    brand_id: z.coerce.string().min(1, "Brand is required"),
+    gender_id: z.coerce.string().optional(),
+    model_id: z.coerce.string().optional(),
+
+    sku_short_code: z.string().min(1, "SKU Short Code is required"),
+    product_type: z.enum(["simple", "variable"]).default("variable"),
+    status: z.enum(["active", "inactive", "draft", "out_of_stock"]).optional(),
+
+    short_description: z.string().optional(),
+    description: z.string().optional(),
+
+    // Simple Product Fields
+    regular_price: z.coerce.string().optional(),
+    regular_point: z.coerce.string().optional(),
+    sale_price: z.coerce.string().optional(),
+    sale_point: z.coerce.string().optional(),
+    cost_price: z.coerce.string().optional(),
+    unit_weight: z.coerce.string().optional(),
+
+    // Variable Product Fields
+    variations: z.array(variationSchema).optional(),
+
+    images: z.any().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.product_type === "simple" || data.product_type === "variable") {
+      if (!data.regular_price) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Regular Price is required",
+          path: ["regular_price"],
+        });
+      }
+      if (!data.regular_point) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Regular Point is required",
+          path: ["regular_point"],
+        });
+      }
+    }
+
+    if (data.product_type === "variable") {
+      if (!data.variations || data.variations.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "At least one variation is required for variable products",
+          path: ["variations"],
+        });
+      }
+    }
+  });

@@ -31,9 +31,9 @@ const merchantRegistrationSchema = merchantSchema.extend({
 });
 
 const MerchantRegistrationForm = () => {
-    const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-    const { user } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
   const role = user?.role;
 
   const [referralInput, setReferralInput] = useState("");
@@ -255,7 +255,7 @@ const MerchantRegistrationForm = () => {
                   placeholder="Reward Budget (%)"
                 />
               </div>
-                <div>
+              {/* <div>
                     <Label>Password</Label>
 
                     <div className="relative">
@@ -280,7 +280,7 @@ const MerchantRegistrationForm = () => {
                             {errors.merchant_password.message}
                         </p>
                     )}
-                </div>
+                </div> */}
             </div>
 
             <div className="md:col-span-1">
@@ -362,8 +362,7 @@ const MerchantRegistrationForm = () => {
               {/* Referral Code */}
               <div>
                 <Label htmlFor="referralCode">
-                  Referral Code / Phone Number (
-                  <span className="text-red-500">*</span>)
+                  Phone Number (<span className="text-red-500">*</span>)
                 </Label>
                 <Input
                   id="referralCode"
@@ -414,7 +413,7 @@ const MerchantRegistrationForm = () => {
               </div>
 
               {/* Referral Status */}
-              <div>
+              {/* <div>
                 <Label htmlFor="referralStatus">Referral Status</Label>
                 {isFetching ? (
                   <SkeletonField />
@@ -426,7 +425,7 @@ const MerchantRegistrationForm = () => {
                     value={isError ? "Invalid" : memberData?.status || ""}
                   />
                 )}
-              </div>
+              </div> */}
             </div>
             <div className="mt-8 flex gap-4">
               <PrimaryButton type="submit" disabled={isCreating}>

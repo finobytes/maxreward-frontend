@@ -3,6 +3,7 @@ import authReducer from "./features/auth/authSlice";
 import memberManagementReducer from "./features/admin/memberManagement/memberManagementSlice";
 import merchantManagementReducer from "./features/admin/merchantManagement/merchantManagementSlice";
 import merchantStaffReducer from "./features/merchant/merchantStaff/merchantStaffSlice";
+import productReducer from "./features/merchant/product/productSlice";
 import adminStaffReducer from "./features/admin/adminStaff/adminStaffSlice";
 import businessTypeReducer from "./features/admin/businessType/businessTypeSlice";
 import denominationReducer from "./features/admin/denomination/denominationSlice";
@@ -35,6 +36,7 @@ export const store = configureStore({
     memberManagement: memberManagementReducer,
     merchantManagement: merchantManagementReducer,
     merchantStaff: merchantStaffReducer,
+    product: productReducer,
     adminStaff: adminStaffReducer,
     businessType: businessTypeReducer,
     denomination: denominationReducer,

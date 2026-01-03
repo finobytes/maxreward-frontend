@@ -32,7 +32,7 @@ const VoucherPurchase = () => {
     isLoading,
     isFetching,
     isError,
-  } = useGetMemberVouchersQuery(currentPage); // ⭐ page passed here
+  } = useGetMemberVouchersQuery(currentPage); // page passed here
   console.log("response from backend with pagination:", apiResponse);
   const vouchers = apiResponse?.vouchers?.data ?? [];
   const pagination = apiResponse?.vouchers;
@@ -64,7 +64,7 @@ const VoucherPurchase = () => {
   }, [search, statusFilter, vouchers]);
 
   // Backend pagination — filtered data does NOT affect pagination
-  const paginatedData = filteredData; // ⭐ No slicing anymore
+  const paginatedData = filteredData; // No slicing anymore
 
   const toggleSelectAll = (checked) => {
     setSelected(checked ? paginatedData.map((v) => v.id) : []);

@@ -24,6 +24,7 @@ import {
   History,
   Wallet,
   ShoppingBasket,
+  BoxIcon,
 } from "lucide-react";
 
 export const NAV_CONFIG = {
@@ -164,6 +165,24 @@ export const NAV_CONFIG = {
       path: "/merchant/merchant-staff",
     },
     {
+      icon: <BoxIcon />,
+      name: "Products",
+      subItems: [
+        {
+          name: "All Products",
+          path: "/merchant/product/all-products",
+        },
+        {
+          name: "Draft Products",
+          path: "/merchant/product/draft-products",
+        },
+        {
+          name: "Active Products",
+          path: "/merchant/product/active-products",
+        },
+      ],
+    },
+    {
       icon: <Wallet />,
       name: "Transactions",
       subItems: [
@@ -199,7 +218,21 @@ export const NAV_CONFIG = {
     {
       icon: <ChartArea />,
       name: "Point Statement",
-      path: "/merchant/point-statement",
+
+      subItems: [
+        // {
+        //   name: "Point Statement",
+        //   path: "/merchant/point-statement",
+        // },
+        {
+          name: "Available Transaction",
+          path: "/merchant/available-transaction",
+        },
+        {
+          name: "Refer Transaction",
+          path: "/merchant/refer-transaction",
+        },
+      ],
     },
     {
       icon: <List />,
@@ -243,7 +276,16 @@ export const NAV_CONFIG = {
     {
       icon: <ChartArea />,
       name: "Point Statement",
-      path: "/member/point-statement",
+      subItems: [
+        {
+          name: "Available Transaction",
+          path: "/member/available-transaction",
+        },
+        {
+          name: "Refer Transaction",
+          path: "/member/refer-transaction",
+        },
+      ],
     },
     {
       icon: <ChartArea />,

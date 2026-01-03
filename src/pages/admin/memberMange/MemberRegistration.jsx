@@ -323,7 +323,7 @@ const MemberRegistration = () => {
               </div>
 
               {/* Referral Status */}
-              <div>
+              {/* <div>
                 <Label htmlFor="referralStatus">Referral Status</Label>
                 {isFetching ? (
                   <SkeletonField />
@@ -335,7 +335,7 @@ const MemberRegistration = () => {
                     value={isError ? "Invalid" : memberData?.status || ""}
                   />
                 )}
-              </div>
+              </div> */}
             </div>
 
             <div className="mt-8 flex gap-4">
