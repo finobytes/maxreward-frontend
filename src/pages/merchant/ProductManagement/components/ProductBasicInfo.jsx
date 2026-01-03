@@ -163,7 +163,13 @@ const ProductBasicInfo = ({
             type="text"
             id="sku_short_code"
             placeholder="e.g. TSHIRT"
-            {...register("sku_short_code")}
+            {...register("sku_short_code", {
+              onChange: (e) => {
+                const val = e.target.value.replace(/\s+/g, "-");
+                e.target.value = val;
+                setValue("sku_short_code", val);
+              },
+            })}
             onBlur={(e) =>
               handleSkuValidation && handleSkuValidation(e.target.value)
             }

@@ -269,7 +269,10 @@ const ProductForm = () => {
       // Basic Fields
       data.append("merchant_id", merchantId);
       data.append("name", formData.name);
-      data.append("sku_short_code", formData.sku_short_code);
+      data.append(
+        "sku_short_code",
+        formData.sku_short_code?.replace(/\s+/g, "-")
+      );
       data.append("type", formData.product_type);
       data.append("category_id", formData.category_id);
       data.append("brand_id", formData.brand_id);
