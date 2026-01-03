@@ -128,6 +128,7 @@ const ProductForm = () => {
     fields: variationFields,
     replace: replaceVariations,
     remove: removeVariation,
+    append: appendVariations,
   } = useFieldArray({
     control,
     name: "variations",
@@ -599,6 +600,7 @@ const ProductForm = () => {
                   attributeItems={attributeItems}
                   productId={id}
                   replaceVariations={replaceVariations}
+                  appendVariations={appendVariations}
                   initialSelectedAttributes={initialSelectedAttributes}
                 />
 

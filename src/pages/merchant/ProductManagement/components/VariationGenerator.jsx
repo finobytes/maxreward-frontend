@@ -13,6 +13,7 @@ const VariationGenerator = ({
   attributeItems = [],
   productId,
   replaceVariations,
+  appendVariations,
   initialSelectedAttributes = [],
 }) => {
   const { getValues } = useFormContext();
@@ -91,8 +92,8 @@ const VariationGenerator = ({
     }
 
     const formatAttrs = selectedAttributes.map((a) => ({
-      attribute_id: a.attribute_id,
-      attribute_item_ids: a.attribute_item_ids,
+      attribute_id: Number(a.attribute_id),
+      attribute_item_ids: a.attribute_item_ids.map((id) => Number(id)),
     }));
 
     try {
@@ -125,8 +126,17 @@ const VariationGenerator = ({
           images: [],
         }));
 
-        replaceVariations(newVariations);
-        toast.success(`Generated ${newVariations.length} variations`);
+        if (result.mode === "incremental") {
+          if (newVariations.length > 0) {
+            appendVariations(newVariations);
+            toast.success(`Added ${newVariations.length} new variations`);
+          } else {
+            toast.info("No new variations to add");
+          }
+        } else {
+          replaceVariations(newVariations);
+          toast.success(`Generated ${newVariations.length} variations`);
+        }
 
         if (result.data.has_conflicts) {
           toast.warning("Some generated SKUs already exist!");
