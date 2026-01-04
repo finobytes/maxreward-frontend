@@ -256,6 +256,8 @@ const ProductForm = () => {
           })) || [],
 
         color_images: initialColorImages,
+        delete_images: [],
+        deleted_color_images: {},
       });
     }
   }, [productData, isEditMode, reset]);

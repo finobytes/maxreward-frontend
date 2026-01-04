@@ -61,6 +61,7 @@ export const productSchema = z
     variations: z.array(variationSchema).optional(),
 
     images: z.any().optional(),
+    delete_images: z.any().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.product_type === "simple" || data.product_type === "variable") {
