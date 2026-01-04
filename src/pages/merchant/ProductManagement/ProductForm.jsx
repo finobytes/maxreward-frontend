@@ -359,6 +359,9 @@ const ProductForm = () => {
         }
 
         formVariations.forEach((v, index) => {
+          if (v.id) {
+            data.append(`variations[${index}][id]`, v.id);
+          }
           data.append(`variations[${index}][sku]`, v.sku);
           data.append(`variations[${index}][regular_price]`, v.regular_price);
           data.append(`variations[${index}][regular_point]`, v.regular_point);
