@@ -56,7 +56,7 @@ const ProductDetails = () => {
         <PageBreadcrumb
           items={[
             { label: "Dashboard", to: "/merchant" },
-            { label: "Products", to: "/merchant/product/all-products" },
+            { label: "Products", to: "/merchant/product/draft-products" },
             { label: product.name },
           ]}
         />

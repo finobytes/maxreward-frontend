@@ -494,7 +494,7 @@ const ProductForm = () => {
         await createProduct(data).unwrap();
         toast.success("Product created successfully!");
       }
-      navigate("/merchant/product/all-products");
+      navigate("/merchant/product/draft-products");
     } catch (err) {
       console.error("Failed to save product:", err);
       toast.error(
@@ -514,7 +514,7 @@ const ProductForm = () => {
       <PageBreadcrumb
         items={[
           { label: "Dashboard", to: "/merchant" },
-          { label: "Products", to: "/merchant/product/all-products" },
+          { label: "Products", to: "/merchant/product/draft-products" },
           { label: isEditMode ? "Edit Product" : "Create Product" },
         ]}
       />
@@ -647,7 +647,7 @@ const ProductForm = () => {
             <PrimaryButton
               type="button"
               variant="outline"
-              onClick={() => navigate("/merchant/product/all-products")}
+              onClick={() => navigate("/merchant/product/draft-products")}
             >
               Cancel
             </PrimaryButton>
