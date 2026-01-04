@@ -53,6 +53,9 @@ export const productSchema = z
     sale_point: z.coerce.string().optional(),
     cost_price: z.coerce.string().optional(),
     unit_weight: z.coerce.string().optional(),
+    actual_quantity: z.coerce.string().optional(),
+    low_stock_threshold: z.coerce.string().optional(),
+    ean_no: z.string().optional(),
 
     // Variable Product Fields
     variations: z.array(variationSchema).optional(),
@@ -75,6 +78,14 @@ export const productSchema = z
           path: ["regular_point"],
         });
       }
+    }
+
+    if (data.product_type === "simple" && !data.actual_quantity) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Actual Quantity is required",
+        path: ["actual_quantity"],
+      });
     }
 
     if (data.product_type === "variable") {

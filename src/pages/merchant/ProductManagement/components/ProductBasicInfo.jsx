@@ -156,27 +156,29 @@ const ProductBasicInfo = ({
           />
         </div>
 
-        {/* 6. SKU Short Code */}
-        <div>
-          <Label htmlFor="sku_short_code">SKU Short Code</Label>
-          <Input
-            type="text"
-            id="sku_short_code"
-            placeholder="e.g. TSHIRT"
-            {...register("sku_short_code", {
-              onChange: (e) => {
-                const val = e.target.value.replace(/\s+/g, "-");
-                e.target.value = val;
-                setValue("sku_short_code", val);
-              },
-            })}
-            onBlur={(e) =>
-              handleSkuValidation && handleSkuValidation(e.target.value)
-            }
-            error={!!errors.sku_short_code}
-            hint={errors.sku_short_code?.message}
-          />
-        </div>
+        {/* 6. SKU Short Code - Hide if Simple Product (moved to Table) */}
+        {productType !== "simple" && (
+          <div>
+            <Label htmlFor="sku_short_code">SKU Short Code</Label>
+            <Input
+              type="text"
+              id="sku_short_code"
+              placeholder="e.g. TSHIRT"
+              {...register("sku_short_code", {
+                onChange: (e) => {
+                  const val = e.target.value.replace(/\s+/g, "-");
+                  e.target.value = val;
+                  setValue("sku_short_code", val);
+                },
+              })}
+              onBlur={(e) =>
+                handleSkuValidation && handleSkuValidation(e.target.value)
+              }
+              error={!!errors.sku_short_code}
+              hint={errors.sku_short_code?.message}
+            />
+          </div>
+        )}
 
         {/* 7. Description */}
         <div className="md:col-span-3">
@@ -190,61 +192,50 @@ const ProductBasicInfo = ({
           />
         </div>
 
-        {/* 8. Regular Price */}
-        <div>
-          <Label htmlFor="regular_price">Regular Price (RM)*</Label>
-          <Input
-            type="text"
-            {...registerWithPoints("regular_price", "regular_point")}
-            error={!!errors.regular_price}
-            hint={errors.regular_price?.message}
-          />
-        </div>
-
-        {/* 9. Regular Point */}
-        <div>
-          <Label htmlFor="regular_point">Regular Point*</Label>
-          <Input
-            type="text"
-            {...registerNumber("regular_point")}
-            error={!!errors.regular_point}
-            hint={errors.regular_point?.message}
-          />
-        </div>
-
-        {/* 10. Sell Price */}
-        <div>
-          <Label htmlFor="sale_price">Sell Price (RM)</Label>
-          <Input
-            type="text"
-            {...registerWithPoints("sale_price", "sale_point")}
-          />
-        </div>
-
-        {/* 11. Sell Point */}
-        <div>
-          <Label htmlFor="sale_point">Sell Point</Label>
-          <Input type="text" {...registerNumber("sale_point")} />
-        </div>
-
-        {/* 12. Unit Weight */}
-        <div>
-          <Label htmlFor="unit_weight">Unit Weight (kg)</Label>
-          <Input type="text" {...registerNumber("unit_weight")} />
-        </div>
-
-        {/* Pricing & Weight - Only for Simple Products */}
-        {productType === "simple" && (
+        {/* Pricing & Weight - Hide for Simple Product (in Table now) */}
+        {productType !== "simple" && (
           <>
-            {/* 13. Actual Quantity */}
+            {/* 8. Regular Price */}
             <div>
-              <Label htmlFor="actual_quantity">Actual Quantity</Label>
+              <Label htmlFor="regular_price">Regular Price (RM)*</Label>
               <Input
                 type="text"
-                {...registerNumber("actual_quantity")}
-                error={!!errors?.actual_quantity}
-                hint={errors?.actual_quantity?.message}
+                {...registerWithPoints("regular_price", "regular_point")}
+                error={!!errors.regular_price}
+                hint={errors.regular_price?.message}
               />
+            </div>
+
+            {/* 9. Regular Point */}
+            <div>
+              <Label htmlFor="regular_point">Regular Point*</Label>
+              <Input
+                type="text"
+                {...registerNumber("regular_point")}
+                error={!!errors.regular_point}
+                hint={errors.regular_point?.message}
+              />
+            </div>
+
+            {/* 10. Sell Price */}
+            <div>
+              <Label htmlFor="sale_price">Sell Price (RM)</Label>
+              <Input
+                type="text"
+                {...registerWithPoints("sale_price", "sale_point")}
+              />
+            </div>
+
+            {/* 11. Sell Point */}
+            <div>
+              <Label htmlFor="sale_point">Sell Point</Label>
+              <Input type="text" {...registerNumber("sale_point")} />
+            </div>
+
+            {/* 12. Unit Weight */}
+            <div>
+              <Label htmlFor="unit_weight">Unit Weight (kg)</Label>
+              <Input type="text" {...registerNumber("unit_weight")} />
             </div>
           </>
         )}

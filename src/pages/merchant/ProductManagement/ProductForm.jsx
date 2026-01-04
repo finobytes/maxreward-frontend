@@ -23,6 +23,7 @@ import { useGetAllModelsQuery } from "../../../redux/features/admin/model/modelA
 
 // Form Sections
 import ProductBasicInfo from "./components/ProductBasicInfo";
+import SimpleProductTable from "./components/SimpleProductTable";
 import ProductMedia from "./components/ProductMedia";
 import VariationGenerator from "./components/VariationGenerator";
 import VariationList from "./components/VariationList";
@@ -103,6 +104,9 @@ const ProductForm = () => {
       sale_point: "",
       cost_price: "",
       unit_weight: "",
+      actual_quantity: "",
+      ean_no: "",
+      low_stock_threshold: "",
 
       // Variable Product defaults
       variations: [],
@@ -227,6 +231,13 @@ const ProductForm = () => {
         sale_point: data.sale_point ? String(data.sale_point) : "",
         cost_price: data.cost_price ? String(data.cost_price) : "",
         unit_weight: data.unit_weight ? String(data.unit_weight) : "",
+        actual_quantity: data.actual_quantity
+          ? String(data.actual_quantity)
+          : "",
+        ean_no: data.ean_no || data.ean || "",
+        low_stock_threshold: data.low_stock_threshold
+          ? String(data.low_stock_threshold)
+          : "",
 
         variations:
           data.variations?.map((v) => ({
@@ -313,6 +324,9 @@ const ProductForm = () => {
           data.append("unit_weight", formData.unit_weight);
         if (formData.actual_quantity)
           data.append("actual_quantity", formData.actual_quantity);
+        if (formData.low_stock_threshold)
+          data.append("low_stock_threshold", formData.low_stock_threshold);
+        if (formData.ean_no) data.append("ean_no", formData.ean_no);
       }
 
       // --- Variable Product Logic ---
@@ -590,10 +604,13 @@ const ProductForm = () => {
               </div>
             </div>
 
-            {/* Simple Product Inputs - Moved to ProductBasicInfo */}
-            {/* {productType === "simple" && (
-              <SimpleProductFields rmPoints={rmPoints} />
-            )} */}
+            {/* Simple Product Table */}
+            {productType === "simple" && (
+              <SimpleProductTable
+                rmPoints={rmPoints}
+                handleSkuValidation={handleSkuValidation}
+              />
+            )}
 
             {/* Variable Product Inputs */}
             {productType === "variable" && (
