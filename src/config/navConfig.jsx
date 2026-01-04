@@ -169,10 +169,6 @@ export const NAV_CONFIG = {
       name: "Products",
       subItems: [
         {
-          name: "All Products",
-          path: "/merchant/product/all-products",
-        },
-        {
           name: "Draft Products",
           path: "/merchant/product/draft-products",
         },
