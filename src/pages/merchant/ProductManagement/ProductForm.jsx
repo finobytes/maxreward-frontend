@@ -229,6 +229,17 @@ const ProductForm = () => {
         regular_point: data.regular_point ? String(data.regular_point) : "",
         sale_price: data.sale_price ? String(data.sale_price) : "",
         sale_point: data.sale_point ? String(data.sale_point) : "",
+
+        // Map to new fields for SimpleProductTable/Fields
+        variation_regular_price: data.regular_price
+          ? String(data.regular_price)
+          : "",
+        variation_regular_point: data.regular_point
+          ? String(data.regular_point)
+          : "",
+        variation_sale_price: data.sale_price ? String(data.sale_price) : "",
+        variation_sale_point: data.sale_point ? String(data.sale_point) : "",
+        sku: data.sku || data.sku_short_code || "",
         cost_price: data.cost_price ? String(data.cost_price) : "",
         unit_weight: data.unit_weight ? String(data.unit_weight) : "",
         actual_quantity: data.actual_quantity
@@ -317,10 +328,43 @@ const ProductForm = () => {
 
       // --- Simple Product Logic ---
       if (formData.product_type === "simple") {
-        data.append("regular_price", formData.regular_price);
-        data.append("regular_point", formData.regular_point);
-        if (formData.sale_price) data.append("sale_price", formData.sale_price);
-        if (formData.sale_point) data.append("sale_point", formData.sale_point);
+        if (formData.sku) data.append("sku", formData.sku);
+
+        // Map variation_* fields to payload
+        // Also map to standard fields if backend expects them there
+        if (formData.variation_regular_price) {
+          data.append(
+            "variation_regular_price",
+            formData.variation_regular_price
+          );
+          data.append("regular_price", formData.variation_regular_price);
+        }
+        if (formData.variation_regular_point) {
+          data.append(
+            "variation_regular_point",
+            formData.variation_regular_point
+          );
+          data.append("regular_point", formData.variation_regular_point);
+        }
+        if (formData.variation_sale_price) {
+          data.append("variation_sale_price", formData.variation_sale_price);
+          data.append("sale_price", formData.variation_sale_price);
+        }
+        if (formData.variation_sale_point) {
+          data.append("variation_sale_point", formData.variation_sale_point);
+          data.append("sale_point", formData.variation_sale_point);
+        }
+
+        // Fallback for old fields if they exist (though inputs are renamed)
+        if (formData.regular_price && !formData.variation_regular_price)
+          data.append("regular_price", formData.regular_price);
+        if (formData.regular_point && !formData.variation_regular_point)
+          data.append("regular_point", formData.regular_point);
+        if (formData.sale_price && !formData.variation_sale_price)
+          data.append("sale_price", formData.sale_price);
+        if (formData.sale_point && !formData.variation_sale_point)
+          data.append("sale_point", formData.sale_point);
+
         if (formData.cost_price) data.append("cost_price", formData.cost_price);
         if (formData.unit_weight)
           data.append("unit_weight", formData.unit_weight);

@@ -99,7 +99,7 @@ const SimpleProductTable = ({ rmPoints, handleSkuValidation }) => {
             <td className="px-3 py-2 align-top">
               <Input
                 className="h-9 text-xs min-w-[140px]"
-                {...register("sku_short_code", {
+                {...register("sku", {
                   onChange: (e) => {
                     const val = e.target.value.replace(/\s+/g, "-");
                     e.target.value = val;
@@ -142,10 +142,13 @@ const SimpleProductTable = ({ rmPoints, handleSkuValidation }) => {
               <Input
                 className="h-9 text-xs min-w-[100px]"
                 type="text"
-                {...registerWithPoints("regular_price", "regular_point")}
+                {...registerWithPoints(
+                  "variation_regular_price",
+                  " variation_regular_point"
+                )}
                 placeholder="0.00"
-                error={!!errors.regular_price}
-                hint={errors.regular_price?.message}
+                error={!!errors.variation_regular_price}
+                hint={errors.variation_regular_price?.message}
               />
             </td>
 
@@ -154,7 +157,7 @@ const SimpleProductTable = ({ rmPoints, handleSkuValidation }) => {
               <Input
                 className="h-9 text-xs min-w-[100px]"
                 type="text"
-                {...registerNumber("regular_point")}
+                {...registerNumber("variation_regular_point")}
                 placeholder="0"
                 error={!!errors.regular_point}
                 hint={errors.regular_point?.message}
@@ -166,7 +169,10 @@ const SimpleProductTable = ({ rmPoints, handleSkuValidation }) => {
               <Input
                 className="h-9 text-xs min-w-[100px]"
                 type="text"
-                {...registerWithPoints("sale_price", "sale_point")}
+                {...registerWithPoints(
+                  "variation_sale_price",
+                  "variation_sale_point"
+                )}
                 placeholder="0.00"
               />
             </td>
@@ -176,7 +182,7 @@ const SimpleProductTable = ({ rmPoints, handleSkuValidation }) => {
               <Input
                 className="h-9 text-xs min-w-[100px]"
                 type="text"
-                {...registerNumber("sale_point")}
+                {...registerNumber("variation_sale_point")}
                 placeholder="0"
               />
             </td>
