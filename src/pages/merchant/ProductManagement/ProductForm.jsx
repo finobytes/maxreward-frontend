@@ -244,10 +244,14 @@ const ProductForm = () => {
         unit_weight: data.unit_weight ? String(data.unit_weight) : "",
         actual_quantity: data.actual_quantity
           ? String(data.actual_quantity)
+          : data.variations?.[0]?.actual_quantity
+          ? String(data.variations[0].actual_quantity)
           : "",
-        ean_no: data.ean_no || data.ean || "",
+        ean_no: data.ean_no || data.ean || data.variations?.[0]?.ean_no || "",
         low_stock_threshold: data.low_stock_threshold
           ? String(data.low_stock_threshold)
+          : data.variations?.[0]?.low_stock_threshold
+          ? String(data.variations[0].low_stock_threshold)
           : "",
 
         variations:
