@@ -162,8 +162,8 @@ const ProductDetailsPage = () => {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen pb-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="pb-12">
+      <div className="">
         {/* Breadcrumb */}
         <nav className="flex items-center text-sm text-gray-500 mb-8 overflow-x-auto whitespace-nowrap">
           <Link to="/member/max-redeem-mall" className="hover:text-brand-600">
@@ -218,7 +218,7 @@ const ProductDetailsPage = () => {
           <div className="space-y-8">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-xs font-bold px-2 py-1 bg-brand-100 text-brand-700 rounded uppercase tracking-wider">
+                <span className="text-white text-xs font-bold px-2 py-1 bg-brand-100 text-brand-700 rounded uppercase tracking-wider">
                   {product.category?.name}
                 </span>
                 {product.sub_category && (
@@ -232,7 +232,6 @@ const ProductDetailsPage = () => {
               </h1>
 
               <div className="flex items-center gap-4 mb-6">
-                {/* Rating Mock */}
                 <div className="flex items-center text-yellow-400">
                   {[1, 2, 3, 4, 5].map((i) => (
                     <Star key={i} size={16} fill="currentColor" />
@@ -298,7 +297,7 @@ const ProductDetailsPage = () => {
                             px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all
                             ${
                               isSelected
-                                ? "border-brand-600 bg-brand-50 text-brand-700"
+                                ? "border-brand-600 bg-brand-50 text-white"
                                 : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50"
                             }
                           `}
@@ -334,10 +333,10 @@ const ProductDetailsPage = () => {
 
               <button
                 onClick={handleAddToCart}
-                className="flex-1 bg-brand-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-brand-200 hover:bg-brand-700 hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+                className="flex-1 bg-brand-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-gray-200 hover:bg-brand-700 hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
               >
                 <ShoppingCart size={20} />
-                Redeem Now
+                Add to Cart
               </button>
               <button className="p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-gray-600 transition-colors">
                 <Share2 size={20} />
