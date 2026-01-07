@@ -149,6 +149,13 @@ export const NAV_CONFIG = {
         { name: "CP Level", path: "/admin/cp-level" },
       ],
     },
+    {
+      name: "Role Permission",
+      icon: <ShieldCheck />,
+      subItems: [
+        { name: "Role List", path: "/admin/role-permission/role-list" },
+      ],
+    },
     { name: "Profile", icon: <UserCircle2 />, path: "/admin/profile" },
     { name: "Logout", icon: <LogOut />, path: "/login" },
   ],
