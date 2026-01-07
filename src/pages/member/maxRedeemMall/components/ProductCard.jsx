@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router";
-import { Heart, ShoppingBag } from "lucide-react";
+import { Eye, Heart, ShoppingBag } from "lucide-react";
 
 const ProductCard = ({ product }) => {
   // Determine display price and points
@@ -80,9 +80,9 @@ const ProductCard = ({ product }) => {
 
           <Link
             to={`/member/max-redeem-mall/${product.id}`}
-            className="h-8 w-8 rounded-full bg-gray-100 text-gray-900 flex items-center justify-center hover:bg-brand-600 hover:text-white transition-colors"
+            className="p-2 rounded-lg bg-gray-200 text-gray-900 flex items-center justify-center hover:bg-brand-600 hover:text-white transition-colors"
           >
-            <ShoppingBag size={16} />
+            <Eye size={16} /> <span className="ml-2 text-xs">View Details</span>
           </Link>
         </div>
       </div>

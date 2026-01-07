@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import MOCK_PRODUCTS from "./MockProducts";
 import ProductCard from "./components/ProductCard";
 import { Filter, Search, SlidersHorizontal, ChevronDown } from "lucide-react";
+import PrimaryButton from "../../../components/ui/PrimaryButton";
 
 const MaxRedeemMall = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,21 +24,18 @@ const MaxRedeemMall = () => {
   });
 
   return (
-    <div className="bg-gray-50/50 min-h-screen">
+    <div className="">
       {/* Header Banner Section */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-          <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">
-            MaxRedeem <span className="text-brand-600">Mall</span>
-          </h1>
-          <p className="text-gray-500 text-lg max-w-2xl">
-            Explore exclusive rewards and redeem your points for premium
-            products.
-          </p>
+      <div className="flex justify-between items-center mb-2">
+        <h1 className="text-lg md:text-xl font-extrabold text-gray-900 mb-4 tracking-tight">
+          Max Redeem <span className="text-brand-600">Mall</span>
+        </h1>
+        <div>
+          <PrimaryButton>View Order Transactions</PrimaryButton>
         </div>
       </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <hr />
+      <div className="w-full mx-auto mt-4">
         {/* Controls Bar */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
           {/* Search */}
@@ -62,7 +60,7 @@ const MaxRedeemMall = () => {
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all border ${
                   selectedCategory === cat
-                    ? "bg-brand-600 text-white border-brand-600 shadow-md shadow-brand-200"
+                    ? "bg-brand-600 text-white border-brand-600 shadow-md shadow-gray-200"
                     : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
                 }`}
               >
