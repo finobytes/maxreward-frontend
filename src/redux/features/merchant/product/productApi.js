@@ -146,6 +146,19 @@ export const productApi = baseApi.injectEndpoints({
       }),
     }),
 
+    // UPDATE STATUS
+    updateProductStatus: builder.mutation({
+      query: ({ id, status }) => ({
+        url: `/products/status/update/${id}`,
+        method: "PATCH",
+        body: { status },
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: "Product", id },
+        { type: "Product", id: "LIST" },
+      ],
+    }),
+
     // DELETE
     deleteProduct: builder.mutation({
       query: (id) => ({
@@ -163,6 +176,7 @@ export const {
   useGetMerchantProductsQuery,
   useGetSingleProductQuery,
   useUpdateProductMutation,
+  useUpdateProductStatusMutation,
   useDeleteProductMutation,
   useGenerateVariationsMutation,
   useValidateSkuMutation,

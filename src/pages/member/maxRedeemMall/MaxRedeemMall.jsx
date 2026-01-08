@@ -31,8 +31,8 @@ const MaxRedeemMall = () => {
     per_page: 12,
     search: debouncedSearch,
     category_id: selectedCategoryId,
-    // status: "approved", // Member sees approved products
-    // merchant_id: "", // If we needed to filter by specific merchant for member view
+    status: "active", // Member sees approved products
+    // merchant_id: "", // filter by specific merchant for member view
   });
 
   // Fetch Categories for filter
