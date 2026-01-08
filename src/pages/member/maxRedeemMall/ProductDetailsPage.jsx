@@ -223,7 +223,7 @@ const ProductDetailsPage = () => {
           <div className="space-y-8">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-brand-700 text-xs font-bold px-2 py-1 bg-brand-100 rounded uppercase tracking-wider">
+                <span className="text-white text-xs font-bold px-2 py-1 bg-brand-100 rounded uppercase tracking-wider">
                   {product.category?.name}
                 </span>
                 {product.sub_category && (
@@ -302,7 +302,7 @@ const ProductDetailsPage = () => {
                             px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all
                             ${
                               isSelected
-                                ? "border-brand-600 bg-brand-50 text-brand-700"
+                                ? "border-brand-600 bg-brand-50 text-white"
                                 : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50"
                             }
                           `}
