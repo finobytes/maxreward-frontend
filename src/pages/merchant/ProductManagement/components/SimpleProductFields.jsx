@@ -27,23 +27,36 @@ const SimpleProductFields = ({ rmPoints }) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in-down">
       <div>
-        <Label htmlFor="regular_price">Regular Price (RM)*</Label>
+        <Label htmlFor="sku">SKU</Label>
         <Input
-          type="number"
-          step="0.01"
-          {...registerWithPoints("regular_price", "regular_point")}
-          error={!!errors.regular_price}
-          hint={errors.regular_price?.message}
+          type="text"
+          placeholder="SKU"
+          {...register("sku")}
+          error={!!errors.sku}
+          hint={errors.sku?.message}
         />
       </div>
       <div>
-        <Label htmlFor="regular_point">Regular Point*</Label>
+        <Label htmlFor="variation_regular_price">Regular Price (RM)*</Label>
         <Input
           type="number"
           step="0.01"
-          {...register("regular_point")}
-          error={!!errors.regular_point}
-          hint={errors.regular_point?.message}
+          {...registerWithPoints(
+            "variation_regular_price",
+            "variation_regular_point"
+          )}
+          error={!!errors.variation_regular_price}
+          hint={errors.variation_regular_price?.message}
+        />
+      </div>
+      <div>
+        <Label htmlFor="variation_regular_point">Regular Point*</Label>
+        <Input
+          type="number"
+          step="0.01"
+          {...register("variation_regular_point")}
+          error={!!errors.variation_regular_point}
+          hint={errors.variation_regular_point?.message}
         />
       </div>
       <div>
@@ -51,16 +64,23 @@ const SimpleProductFields = ({ rmPoints }) => {
         <Input type="number" step="0.01" {...register("unit_weight")} />
       </div>
       <div>
-        <Label htmlFor="sale_price">Sale Price (RM)</Label>
+        <Label htmlFor="variation_sale_price">Sale Price (RM)</Label>
         <Input
           type="number"
           step="0.01"
-          {...registerWithPoints("sale_price", "sale_point")}
+          {...registerWithPoints(
+            "variation_sale_price",
+            "variation_sale_point"
+          )}
         />
       </div>
       <div>
-        <Label htmlFor="sale_point">Sale Point</Label>
-        <Input type="number" step="0.01" {...register("sale_point")} />
+        <Label htmlFor="variation_sale_point">Sale Point</Label>
+        <Input
+          type="number"
+          step="0.01"
+          {...register("variation_sale_point")}
+        />
       </div>
       <div>
         <Label htmlFor="cost_price">Cost Price (RM)</Label>

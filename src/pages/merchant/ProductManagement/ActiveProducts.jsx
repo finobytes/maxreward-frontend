@@ -2,19 +2,19 @@ import React from "react";
 import ProductList from "./components/ProductList";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 
-const PendingProducts = () => {
+const ActiveProducts = () => {
   return (
     <div className="space-y-6">
       <PageBreadcrumb
         items={[
           { label: "Dashboard", to: "/merchant" },
           { label: "Products" },
-          { label: "Pending Products" },
+          { label: "Active Products" },
         ]}
       />
-      <ProductList statusFilter="pending" title="Pending Products" />
+      <ProductList statusFilter="active" title="Active Products" />
     </div>
   );
 };
 
-export default PendingProducts;
+export default ActiveProducts;

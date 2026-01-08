@@ -5,6 +5,7 @@ import CpUnlockHistoryDetails from "../pages/member/cpUnlockHistory/CpUnlockHist
 import CommunityPoint from "../pages/member/communityPoint/CommunityPoint";
 import DataPrivacyPolicy from "../pages/member/dataPrivacyPolicy/DataPrivacyPolicy";
 import MaxRedeemMall from "../pages/member/maxRedeemMall/MaxRedeemMall";
+import ProductDetailsPage from "../pages/member/maxRedeemMall/ProductDetailsPage";
 import MemberDashboard from "../pages/member/memberDashboard/MemberDashboard";
 import MerchantApplication from "../pages/member/merchantApplication/MerchantApplication";
 import AvailableTransaction from "../pages/member/pointStatement/Available/AvailableTransaction";
@@ -76,6 +77,10 @@ export const memberRoutes = [
   {
     path: "max-redeem-mall",
     element: <MaxRedeemMall />,
+  },
+  {
+    path: "max-redeem-mall/:id",
+    element: <ProductDetailsPage />,
   },
   {
     path: "purchase-voucher",

@@ -20,13 +20,12 @@ import TransactionDetails from "../pages/merchant/PointStatement/TransactionDeta
 import DailyTransaction from "../pages/merchant/Transactions/DailyTransaction";
 import Notification from "../pages/merchant/Notification/Notification";
 import NotificationDetails from "../pages/merchant/Notification/NotificationDetails";
-import AllProducts from "../pages/merchant/ProductManagement/AllProducts";
-import PendingProducts from "../pages/merchant/ProductManagement/PendingProducts";
-import ApprovedProducts from "../pages/merchant/ProductManagement/ApprovedProducts";
 import ProductForm from "../pages/merchant/ProductManagement/ProductForm";
 import ProductDetails from "../pages/merchant/ProductManagement/ProductDetails";
 import AvailableTransaction from "../pages/merchant/PointStatement/Available/AvailableTransaction";
 import ReferTransaction from "../pages/merchant/PointStatement/Refer/ReferTransaction";
+import DraftProducts from "../pages/merchant/ProductManagement/DraftProducts";
+import ActiveProducts from "../pages/merchant/ProductManagement/ActiveProducts";
 
 export const merchantRoute = [
   {
@@ -66,16 +65,12 @@ export const merchantRoute = [
     element: <DailyTransaction />,
   },
   {
-    path: "product/all-products",
-    element: <AllProducts />,
-  },
-  {
     path: "product/draft-products",
-    element: <PendingProducts />,
+    element: <DraftProducts />,
   },
   {
     path: "product/active-products",
-    element: <ApprovedProducts />,
+    element: <ActiveProducts />,
   },
   {
     path: "product/create",

@@ -23,6 +23,7 @@ import { useGetAllModelsQuery } from "../../../redux/features/admin/model/modelA
 
 // Form Sections
 import ProductBasicInfo from "./components/ProductBasicInfo";
+import SimpleProductTable from "./components/SimpleProductTable";
 import ProductMedia from "./components/ProductMedia";
 import VariationGenerator from "./components/VariationGenerator";
 import VariationList from "./components/VariationList";
@@ -103,6 +104,9 @@ const ProductForm = () => {
       sale_point: "",
       cost_price: "",
       unit_weight: "",
+      actual_quantity: "",
+      ean_no: "",
+      low_stock_threshold: "",
 
       // Variable Product defaults
       variations: [],
@@ -225,8 +229,30 @@ const ProductForm = () => {
         regular_point: data.regular_point ? String(data.regular_point) : "",
         sale_price: data.sale_price ? String(data.sale_price) : "",
         sale_point: data.sale_point ? String(data.sale_point) : "",
+
+        // Map to new fields for SimpleProductTable/Fields
+        variation_regular_price: data.regular_price
+          ? String(data.regular_price)
+          : "",
+        variation_regular_point: data.regular_point
+          ? String(data.regular_point)
+          : "",
+        variation_sale_price: data.sale_price ? String(data.sale_price) : "",
+        variation_sale_point: data.sale_point ? String(data.sale_point) : "",
+        sku: data.sku || data.sku_short_code || "",
         cost_price: data.cost_price ? String(data.cost_price) : "",
         unit_weight: data.unit_weight ? String(data.unit_weight) : "",
+        actual_quantity: data.actual_quantity
+          ? String(data.actual_quantity)
+          : data.variations?.[0]?.actual_quantity
+          ? String(data.variations[0].actual_quantity)
+          : "",
+        ean_no: data.ean_no || data.ean || data.variations?.[0]?.ean_no || "",
+        low_stock_threshold: data.low_stock_threshold
+          ? String(data.low_stock_threshold)
+          : data.variations?.[0]?.low_stock_threshold
+          ? String(data.variations[0].low_stock_threshold)
+          : "",
 
         variations:
           data.variations?.map((v) => ({
@@ -245,6 +271,8 @@ const ProductForm = () => {
           })) || [],
 
         color_images: initialColorImages,
+        delete_images: [],
+        deleted_color_images: {},
       });
     }
   }, [productData, isEditMode, reset]);
@@ -304,15 +332,51 @@ const ProductForm = () => {
 
       // --- Simple Product Logic ---
       if (formData.product_type === "simple") {
-        data.append("regular_price", formData.regular_price);
-        data.append("regular_point", formData.regular_point);
-        if (formData.sale_price) data.append("sale_price", formData.sale_price);
-        if (formData.sale_point) data.append("sale_point", formData.sale_point);
+        if (formData.sku) data.append("sku", formData.sku);
+
+        // Map variation_* fields to payload
+        // Also map to standard fields if backend expects them there
+        if (formData.variation_regular_price) {
+          data.append(
+            "variation_regular_price",
+            formData.variation_regular_price
+          );
+          data.append("regular_price", formData.variation_regular_price);
+        }
+        if (formData.variation_regular_point) {
+          data.append(
+            "variation_regular_point",
+            formData.variation_regular_point
+          );
+          data.append("regular_point", formData.variation_regular_point);
+        }
+        if (formData.variation_sale_price) {
+          data.append("variation_sale_price", formData.variation_sale_price);
+          data.append("sale_price", formData.variation_sale_price);
+        }
+        if (formData.variation_sale_point) {
+          data.append("variation_sale_point", formData.variation_sale_point);
+          data.append("sale_point", formData.variation_sale_point);
+        }
+
+        // Fallback for old fields if they exist (though inputs are renamed)
+        if (formData.regular_price && !formData.variation_regular_price)
+          data.append("regular_price", formData.regular_price);
+        if (formData.regular_point && !formData.variation_regular_point)
+          data.append("regular_point", formData.regular_point);
+        if (formData.sale_price && !formData.variation_sale_price)
+          data.append("sale_price", formData.sale_price);
+        if (formData.sale_point && !formData.variation_sale_point)
+          data.append("sale_point", formData.sale_point);
+
         if (formData.cost_price) data.append("cost_price", formData.cost_price);
         if (formData.unit_weight)
           data.append("unit_weight", formData.unit_weight);
         if (formData.actual_quantity)
           data.append("actual_quantity", formData.actual_quantity);
+        if (formData.low_stock_threshold)
+          data.append("low_stock_threshold", formData.low_stock_threshold);
+        if (formData.ean_no) data.append("ean_no", formData.ean_no);
       }
 
       // --- Variable Product Logic ---
@@ -359,6 +423,9 @@ const ProductForm = () => {
         }
 
         formVariations.forEach((v, index) => {
+          if (v.id) {
+            data.append(`variations[${index}][id]`, v.id);
+          }
           data.append(`variations[${index}][sku]`, v.sku);
           data.append(`variations[${index}][regular_price]`, v.regular_price);
           data.append(`variations[${index}][regular_point]`, v.regular_point);
@@ -491,7 +558,7 @@ const ProductForm = () => {
         await createProduct(data).unwrap();
         toast.success("Product created successfully!");
       }
-      navigate("/merchant/product/all-products");
+      navigate("/merchant/product/draft-products");
     } catch (err) {
       console.error("Failed to save product:", err);
       toast.error(
@@ -511,7 +578,7 @@ const ProductForm = () => {
       <PageBreadcrumb
         items={[
           { label: "Dashboard", to: "/merchant" },
-          { label: "Products", to: "/merchant/product/all-products" },
+          { label: "Products", to: "/merchant/product/draft-products" },
           { label: isEditMode ? "Edit Product" : "Create Product" },
         ]}
       />
@@ -587,10 +654,13 @@ const ProductForm = () => {
               </div>
             </div>
 
-            {/* Simple Product Inputs - Moved to ProductBasicInfo */}
-            {/* {productType === "simple" && (
-              <SimpleProductFields rmPoints={rmPoints} />
-            )} */}
+            {/* Simple Product Table */}
+            {productType === "simple" && (
+              <SimpleProductTable
+                rmPoints={rmPoints}
+                handleSkuValidation={handleSkuValidation}
+              />
+            )}
 
             {/* Variable Product Inputs */}
             {productType === "variable" && (
@@ -644,7 +714,7 @@ const ProductForm = () => {
             <PrimaryButton
               type="button"
               variant="outline"
-              onClick={() => navigate("/merchant/product/all-products")}
+              onClick={() => navigate("/merchant/product/draft-products")}
             >
               Cancel
             </PrimaryButton>

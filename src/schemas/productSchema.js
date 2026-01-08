@@ -47,37 +47,59 @@ export const productSchema = z
     description: z.string().optional(),
 
     // Simple Product Fields
+    sku: z.string().optional(),
     regular_price: z.coerce.string().optional(),
     regular_point: z.coerce.string().optional(),
     sale_price: z.coerce.string().optional(),
     sale_point: z.coerce.string().optional(),
+
+    // New fields for simple product (treating it like a single variation)
+    variation_regular_price: z.coerce.string().optional(),
+    variation_regular_point: z.coerce.string().optional(),
+    variation_sale_price: z.coerce.string().optional(),
+    variation_sale_point: z.coerce.string().optional(),
+
     cost_price: z.coerce.string().optional(),
     unit_weight: z.coerce.string().optional(),
+    actual_quantity: z.coerce.string().optional(),
+    low_stock_threshold: z.coerce.string().optional(),
+    ean_no: z.string().optional(),
 
     // Variable Product Fields
     variations: z.array(variationSchema).optional(),
 
     images: z.any().optional(),
+    delete_images: z.any().optional(),
   })
   .superRefine((data, ctx) => {
-    if (data.product_type === "simple" || data.product_type === "variable") {
-      if (!data.regular_price) {
+    // For simple products, we now use variation_* fields
+    if (data.product_type === "simple") {
+      if (!data.variation_regular_price && !data.regular_price) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Regular Price is required",
-          path: ["regular_price"],
+          path: ["variation_regular_price"], // Point to new field
         });
       }
-      if (!data.regular_point) {
+      if (!data.variation_regular_point && !data.regular_point) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Regular Point is required",
-          path: ["regular_point"],
+          path: ["variation_regular_point"],
+        });
+      }
+      if (!data.actual_quantity) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Actual Quantity is required",
+          path: ["actual_quantity"],
         });
       }
     }
 
     if (data.product_type === "variable") {
+      // Logic for variable product validation...
+      // e.g. check if variations exist
       if (!data.variations || data.variations.length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -85,5 +107,8 @@ export const productSchema = z
           path: ["variations"],
         });
       }
+
+      // Also validate regular_price/point if needed for variable?
+      // Usually calculated from variations.
     }
   });

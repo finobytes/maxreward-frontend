@@ -29,7 +29,7 @@ const ProductBasicInfo = ({
     (sub) => sub.category_id == selectedCategoryId
   );
 
-  const handleNumberChange = (e, onChange, pointName = null) => {
+  const handleNumberChange = (e, onChange, pointName = null, syncTo = null) => {
     let val = e.target.value;
     // Allow digits and single decimal point
     val = val.replace(/[^0-9.]/g, "");
@@ -41,30 +41,47 @@ const ProductBasicInfo = ({
     e.target.value = val;
     onChange(e);
 
+    // Sync to another field if provided
+    if (syncTo) {
+      setValue(syncTo, val);
+    }
+
     // Point Calculation
     if (pointName && rmPoints) {
       const numVal = parseFloat(val);
       if (!isNaN(numVal)) {
-        setValue(pointName, (numVal * rmPoints).toFixed(2));
+        const points = (numVal * rmPoints).toFixed(2);
+        setValue(pointName, points);
+
+        // If we are syncing price to variation price, we should also sync computed points
+        if (syncTo && syncTo.includes("price")) {
+          // Derive point field name for variation: e.g. variation_regular_price -> variation_regular_point
+          const variationPointField = syncTo.replace("price", "point");
+          setValue(variationPointField, points);
+        }
       } else if (val === "") {
         setValue(pointName, "");
+        if (syncTo && syncTo.includes("price")) {
+          const variationPointField = syncTo.replace("price", "point");
+          setValue(variationPointField, "");
+        }
       }
     }
   };
 
-  const registerWithPoints = (name, pointName) => {
+  const registerWithPoints = (name, pointName, syncTo) => {
     const { onChange, ...rest } = register(name);
     return {
       ...rest,
-      onChange: (e) => handleNumberChange(e, onChange, pointName),
+      onChange: (e) => handleNumberChange(e, onChange, pointName, syncTo),
     };
   };
 
-  const registerNumber = (name) => {
+  const registerNumber = (name, syncTo) => {
     const { onChange, ...rest } = register(name);
     return {
       ...rest,
-      onChange: (e) => handleNumberChange(e, onChange),
+      onChange: (e) => handleNumberChange(e, onChange, null, syncTo),
     };
   };
 
@@ -168,6 +185,8 @@ const ProductBasicInfo = ({
                 const val = e.target.value.replace(/\s+/g, "-");
                 e.target.value = val;
                 setValue("sku_short_code", val);
+                // Auto fill sku
+                setValue("sku", val);
               },
             })}
             onBlur={(e) =>
@@ -189,13 +208,16 @@ const ProductBasicInfo = ({
             rows={4}
           />
         </div>
-
         {/* 8. Regular Price */}
         <div>
           <Label htmlFor="regular_price">Regular Price (RM)*</Label>
           <Input
             type="text"
-            {...registerWithPoints("regular_price", "regular_point")}
+            {...registerWithPoints(
+              "regular_price",
+              "regular_point",
+              "variation_regular_price"
+            )}
             error={!!errors.regular_price}
             hint={errors.regular_price?.message}
           />
@@ -206,7 +228,7 @@ const ProductBasicInfo = ({
           <Label htmlFor="regular_point">Regular Point*</Label>
           <Input
             type="text"
-            {...registerNumber("regular_point")}
+            {...registerNumber("regular_point", "variation_regular_point")}
             error={!!errors.regular_point}
             hint={errors.regular_point?.message}
           />
@@ -217,34 +239,29 @@ const ProductBasicInfo = ({
           <Label htmlFor="sale_price">Sell Price (RM)</Label>
           <Input
             type="text"
-            {...registerWithPoints("sale_price", "sale_point")}
+            {...registerWithPoints(
+              "sale_price",
+              "sale_point",
+              "variation_sale_price"
+            )}
           />
         </div>
 
         {/* 11. Sell Point */}
         <div>
           <Label htmlFor="sale_point">Sell Point</Label>
-          <Input type="text" {...registerNumber("sale_point")} />
+          <Input
+            type="text"
+            {...registerNumber("sale_point", "variation_sale_point")}
+          />
         </div>
-
-        {/* 12. Unit Weight */}
-        <div>
-          <Label htmlFor="unit_weight">Unit Weight (kg)</Label>
-          <Input type="text" {...registerNumber("unit_weight")} />
-        </div>
-
-        {/* Pricing & Weight - Only for Simple Products */}
-        {productType === "simple" && (
+        {/* Pricing & Weight - Hide for Simple Product (in Table now) */}
+        {productType !== "simple" && (
           <>
-            {/* 13. Actual Quantity */}
+            {/* 12. Unit Weight */}
             <div>
-              <Label htmlFor="actual_quantity">Actual Quantity</Label>
-              <Input
-                type="text"
-                {...registerNumber("actual_quantity")}
-                error={!!errors?.actual_quantity}
-                hint={errors?.actual_quantity?.message}
-              />
+              <Label htmlFor="unit_weight">Unit Weight (kg)</Label>
+              <Input type="text" {...registerNumber("unit_weight")} />
             </div>
           </>
         )}

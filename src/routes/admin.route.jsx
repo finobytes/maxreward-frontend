@@ -48,6 +48,7 @@ import Model from "../pages/admin/e-commerce/Model/Model";
 import Gender from "../pages/admin/e-commerce/Gender/Gender";
 import Attribute from "../pages/admin/e-commerce/Attribute/Attribute";
 import AttributeItem from "../pages/admin/e-commerce/AttributeItem/AttributeItem";
+import RoleList from "../pages/admin/rolePermission/RoleList";
 
 export const adminRoutes = [
   {
@@ -243,6 +244,10 @@ export const adminRoutes = [
   {
     path: "cp-level",
     element: <CPLevel />,
+  },
+  {
+    path: "role-permission/role-list",
+    element: <RoleList />,
   },
   {
     path: "profile",
