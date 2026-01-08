@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useFormContext } from "react-hook-form";
 import ComponentCard from "../../../../components/common/ComponentCard";
 import Label from "../../../../components/form/Label";
@@ -208,56 +208,57 @@ const ProductBasicInfo = ({
             rows={4}
           />
         </div>
-        {/* 8. Regular Price */}
-        <div>
-          <Label htmlFor="regular_price">Regular Price (RM)*</Label>
-          <Input
-            type="text"
-            {...registerWithPoints(
-              "regular_price",
-              "regular_point",
-              "variation_regular_price"
-            )}
-            error={!!errors.regular_price}
-            hint={errors.regular_price?.message}
-          />
-        </div>
-
-        {/* 9. Regular Point */}
-        <div>
-          <Label htmlFor="regular_point">Regular Point*</Label>
-          <Input
-            type="text"
-            {...registerNumber("regular_point", "variation_regular_point")}
-            error={!!errors.regular_point}
-            hint={errors.regular_point?.message}
-          />
-        </div>
-
-        {/* 10. Sell Price */}
-        <div>
-          <Label htmlFor="sale_price">Sell Price (RM)</Label>
-          <Input
-            type="text"
-            {...registerWithPoints(
-              "sale_price",
-              "sale_point",
-              "variation_sale_price"
-            )}
-          />
-        </div>
-
-        {/* 11. Sell Point */}
-        <div>
-          <Label htmlFor="sale_point">Sell Point</Label>
-          <Input
-            type="text"
-            {...registerNumber("sale_point", "variation_sale_point")}
-          />
-        </div>
         {/* Pricing & Weight - Hide for Simple Product (in Table now) */}
         {productType !== "simple" && (
           <>
+            {/* 8. Regular Price */}
+            <div>
+              <Label htmlFor="regular_price">Regular Price (RM)*</Label>
+              <Input
+                type="text"
+                {...registerWithPoints(
+                  "regular_price",
+                  "regular_point",
+                  "variation_regular_price"
+                )}
+                error={!!errors.regular_price}
+                hint={errors.regular_price?.message}
+              />
+            </div>
+
+            {/* 9. Regular Point */}
+            <div>
+              <Label htmlFor="regular_point">Regular Point*</Label>
+              <Input
+                type="text"
+                {...registerNumber("regular_point", "variation_regular_point")}
+                error={!!errors.regular_point}
+                hint={errors.regular_point?.message}
+              />
+            </div>
+
+            {/* 10. Sell Price */}
+            <div>
+              <Label htmlFor="sale_price">Sell Price (RM)</Label>
+              <Input
+                type="text"
+                {...registerWithPoints(
+                  "sale_price",
+                  "sale_point",
+                  "variation_sale_price"
+                )}
+              />
+            </div>
+
+            {/* 11. Sell Point */}
+            <div>
+              <Label htmlFor="sale_point">Sell Point</Label>
+              <Input
+                type="text"
+                {...registerNumber("sale_point", "variation_sale_point")}
+              />
+            </div>
+
             {/* 12. Unit Weight */}
             <div>
               <Label htmlFor="unit_weight">Unit Weight (kg)</Label>

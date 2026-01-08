@@ -104,6 +104,7 @@ const SimpleProductTable = ({ rmPoints, handleSkuValidation }) => {
                     const val = e.target.value.replace(/\s+/g, "-");
                     e.target.value = val;
                     setValue("sku_short_code", val);
+                    setValue("sku", val);
                   },
                 })}
                 onBlur={(e) =>
@@ -144,7 +145,7 @@ const SimpleProductTable = ({ rmPoints, handleSkuValidation }) => {
                 type="text"
                 {...registerWithPoints(
                   "variation_regular_price",
-                  " variation_regular_point"
+                  "variation_regular_point"
                 )}
                 placeholder="0.00"
                 error={!!errors.variation_regular_price}
@@ -159,8 +160,8 @@ const SimpleProductTable = ({ rmPoints, handleSkuValidation }) => {
                 type="text"
                 {...registerNumber("variation_regular_point")}
                 placeholder="0"
-                error={!!errors.regular_point}
-                hint={errors.regular_point?.message}
+                error={!!errors.variation_regular_point}
+                hint={errors.variation_regular_point?.message}
               />
             </td>
 

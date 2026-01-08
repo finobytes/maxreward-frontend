@@ -119,6 +119,7 @@ const ProductForm = () => {
   const {
     handleSubmit,
     reset,
+    register,
     watch,
     setValue,
     control,
@@ -222,7 +223,7 @@ const ProductForm = () => {
         model_id: data.model_id || "",
         description: data.description || "",
         status: data.status || "draft",
-        product_type: data.type || "variable",
+        product_type: (data.type || "variable").toLowerCase(),
         images: data.images || [],
 
         regular_price: data.regular_price ? String(data.regular_price) : "",
@@ -584,7 +585,18 @@ const ProductForm = () => {
       />
 
       <FormProvider {...methods}>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        <form
+          onSubmit={handleSubmit(onSubmit, (errors) => {
+            console.error("Form Validation Errors:", errors);
+            const errorFields = Object.keys(errors).join(", ");
+            const currentType = getValues("product_type");
+            toast.error(
+              `Validation Error (${currentType}). Check fields: ${errorFields}`
+            );
+          })}
+          className="space-y-8"
+        >
+          <input type="hidden" {...register("product_type")} />
           <ProductBasicInfo
             handleSkuValidation={handleSkuValidation}
             brands={brands}
