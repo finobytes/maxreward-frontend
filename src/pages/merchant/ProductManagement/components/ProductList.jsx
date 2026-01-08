@@ -17,31 +17,53 @@ import {
 } from "@/components/ui/table";
 import { useProduct } from "../../../../redux/features/merchant/product/useProduct";
 import { useDeleteProductMutation } from "../../../../redux/features/merchant/product/productApi";
+import { useVerifyMeQuery } from "../../../../redux/features/auth/authApi";
+// Pick Member ID
+const pickMemberId = (profile) =>
+  profile?.merchant?.corporate_member?.id ||
+  profile?.merchant?.corporate_member_id ||
+  null;
 
 const ProductList = ({ statusFilter = "", title = "Products" }) => {
+  const { data: memberProfile, isLoading: memberLoading } =
+    useVerifyMeQuery("merchant");
+  // Derive Merchant ID from profile
+  // The structure depends on the API response for 'merchant' role
+  // Typically: profile.id or profile.merchant.id
+  const merchantId =
+    memberProfile?.merchant?.id ||
+    memberProfile?.id ||
+    pickMemberId(memberProfile);
+
   const {
     products,
     pagination,
     isLoading,
-    actions: { setSearch, setStatus, resetFilters, setCurrentPage },
+    actions: {
+      setSearch,
+      setStatus,
+      resetFilters,
+      setCurrentPage,
+      setMerchantId,
+    },
     filters: { search, status },
   } = useProduct();
 
   const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation();
   const [selected, setSelected] = useState([]);
 
-  // Set initial status filter on mount
+  // Set initial status filter and merchant ID on mount/change
   useEffect(() => {
-    // Only set if different to avoid infinite loops or unnecessary fetching
-    // But since we want to enforce the page's context, yes.
-    setStatus(statusFilter);
-    return () => {
-      // Optional: reset on unmount
-      // resetFilters();
-      // Better not to reset on unmount if we want to keep state when navigating back,
-      // but since we have different pages for different statuses, we should probably set it.
-    };
+    if (statusFilter !== undefined) {
+      setStatus(statusFilter);
+    }
   }, [statusFilter]);
+
+  useEffect(() => {
+    if (merchantId) {
+      setMerchantId(merchantId);
+    }
+  }, [merchantId, setMerchantId]);
   // Note: we intentionally don't include setStatus in deps to avoid issues, usually it's stable.
 
   const toggleSelect = (id) => {

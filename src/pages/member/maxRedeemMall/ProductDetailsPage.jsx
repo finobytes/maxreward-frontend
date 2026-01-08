@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useParams, Link, useNavigate } from "react-router";
-import MOCK_PRODUCTS from "./MockProducts";
+import { useParams, Link } from "react-router";
 import {
   ChevronRight,
   Heart,
@@ -14,30 +13,17 @@ import {
   Plus,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useGetSingleProductQuery } from "../../../redux/features/merchant/product/productApi";
 
 const ProductDetailsPage = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
-  const [product, setProduct] = useState(null);
+  const { data: productData, isLoading } = useGetSingleProductQuery(id);
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedAttributes, setSelectedAttributes] = useState({});
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
 
-  useEffect(() => {
-    if (MOCK_PRODUCTS) {
-      const found = MOCK_PRODUCTS.find((p) => p.id === Number(id));
-      if (found) {
-        setProduct(found);
-        // Default selection for attributes if needed?
-        // Usually better to let user select.
-        // But for images, maybe default to first available.
-      } else {
-        // toast.error("Product not found");
-        // navigate("/member/max-redeem-mall");
-      }
-    }
-  }, [id, navigate]);
+  const product = productData?.data || productData;
 
   // Helper: Find Variation Match
   const currentVariation = useMemo(() => {
@@ -111,12 +97,31 @@ const ProductDetailsPage = () => {
     ) {
       setSelectedImage(displayImages[0]);
     }
-  }, [displayImages]);
+  }, [displayImages, selectedImage]);
 
-  if (!product) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="w-16 h-16 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          Product Not Found
+        </h2>
+        <p className="text-gray-500 mb-6">
+          The product you're looking for doesn't exist or has been removed.
+        </p>
+        <Link
+          to="/member/max-redeem-mall"
+          className="px-6 py-2 bg-brand-600 text-white rounded-lg"
+        >
+          Back to Mall
+        </Link>
       </div>
     );
   }
@@ -218,7 +223,7 @@ const ProductDetailsPage = () => {
           <div className="space-y-8">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-white text-xs font-bold px-2 py-1 bg-brand-100 text-brand-700 rounded uppercase tracking-wider">
+                <span className="text-brand-700 text-xs font-bold px-2 py-1 bg-brand-100 rounded uppercase tracking-wider">
                   {product.category?.name}
                 </span>
                 {product.sub_category && (
@@ -254,7 +259,7 @@ const ProductDetailsPage = () => {
                   <span className="text-2xl">Pts</span>
                 </div>
                 <div className="text-xl text-gray-500 mb-1">or RM {price}</div>
-                {regularPrice > price && (
+                {Number(regularPrice) > Number(price) && (
                   <div className="text-sm text-gray-400 line-through mb-2">
                     RM {regularPrice}
                   </div>
@@ -297,7 +302,7 @@ const ProductDetailsPage = () => {
                             px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all
                             ${
                               isSelected
-                                ? "border-brand-600 bg-brand-50 text-white"
+                                ? "border-brand-600 bg-brand-50 text-brand-700"
                                 : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50"
                             }
                           `}
