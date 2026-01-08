@@ -154,6 +154,7 @@ export const NAV_CONFIG = {
       icon: <ShieldCheck />,
       subItems: [
         { name: "Role List", path: "/admin/role-permission/role-list" },
+        { name: "Permission List", path: "/admin/role-permission/permission-list" },
       ],
     },
     { name: "Profile", icon: <UserCircle2 />, path: "/admin/profile" },

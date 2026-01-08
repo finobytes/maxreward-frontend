@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SearchInput from "../../../components/form/form-elements/SearchInput";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
 import DropdownSelect from "../../../components/ui/dropdown/DropdownSelect";
@@ -20,6 +20,7 @@ import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSke
 import { useAdminStaff } from "../../../redux/features/admin/adminStaff/useAdminStaff";
 import { useDeleteAdminStaffMutation } from "../../../redux/features/admin/adminStaff/adminStaffApi";
 import BulkActionBar from "../../../components/table/BulkActionBar";
+import { useGetAllRolesQuery } from "../../../redux/features/admin/rolePermission/rolePermissionApi";
 
 const StaffManage = () => {
   const {
@@ -39,6 +40,18 @@ const StaffManage = () => {
     useDeleteAdminStaffMutation();
   const [selected, setSelected] = useState([]);
   const [deletingId, setDeletingId] = useState(null);
+  const [roles, setRoles] = useState([]);
+
+  // Fetch all roles for dropdown
+  const { data: rolesData, isLoading: isLoadingRoles } = useGetAllRolesQuery();
+
+  console.log("roles", roles);
+
+  useEffect(() => {
+    if (rolesData?.success === true) {
+      setRoles(rolesData.data.admin);
+    }
+  }, [rolesData]);
 
   const toggleSelectAll = (checked) => {
     if (checked) {
@@ -165,6 +178,9 @@ const StaffManage = () => {
                   Join Date
                 </TableHead>
                 <TableHead className="text-gray-700 font-medium">
+                  Role
+                </TableHead>
+                <TableHead className="text-gray-700 font-medium">
                   Action
                 </TableHead>
               </TableRow>
@@ -238,6 +254,32 @@ const StaffManage = () => {
                         <span className="text-gray-500">N/A</span>
                       )}
                     </TableCell>
+
+                    <TableCell className="whitespace-normal break-words relative group">
+                      <div className="group-hover:hidden">
+                        {staff?.role?.name || (
+                          <span className="text-gray-500">N/A</span>
+                        )}
+                      </div>
+                      <div className="hidden group-hover:block absolute inset-0 bg-white z-10 p-2">
+                        <select
+                          className="w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          defaultValue={staff?.role?.id || ""}
+                          onChange={(e) => {
+                            // Handle role change
+                            console.log("Selected role:", e.target.value);
+                          }}
+                        >
+                          <option value="">Select Role</option>
+                          {roles.map((role) => (
+                            <option key={role.id} value={role.id}>
+                              {role.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </TableCell>
+
                     <TableCell>
                       <div className="py-2 flex gap-2 justify-center">
                         <Link

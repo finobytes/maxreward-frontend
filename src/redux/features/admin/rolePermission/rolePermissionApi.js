@@ -52,6 +52,59 @@ export const rolePermissionApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Role"],
     }),
+
+    // ============= PERMISSIONS =============
+
+    // CREATE PERMISSION
+    createPermission: builder.mutation({
+      query: (data) => ({
+        url: "/admin/permissions/create",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Permission"],
+    }),
+
+    // GET ALL PERMISSIONS (with pagination + search)
+    getPermissions: builder.query({
+      query: ({ page = 1, per_page = 10, search = "" } = {}) =>
+        `/admin/roles/permissions?per_page=${per_page}&page=${page}&search=${search}`,
+      providesTags: ["Permission"],
+    }),
+
+    // GET ALL PERMISSIONS (without pagination)
+    getAllPermissions: builder.query({
+      query: () => "/admin/permissions",
+      providesTags: ["Permission"],
+    }),
+
+    // GET SINGLE PERMISSION
+    getSinglePermission: builder.query({
+      query: (id) => `/admin/permissions/${id}`,
+      providesTags: (result, error, id) => [{ type: "Permission", id }],
+    }),
+
+    // UPDATE PERMISSION
+    updatePermission: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/admin/permissions/update/${id}`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: "Permission", id },
+        "Permission",
+      ],
+    }),
+
+    // DELETE PERMISSION
+    deletePermission: builder.mutation({
+      query: (id) => ({
+        url: `/admin/permissions/delete/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Permission"],
+    }),
   }),
 });
 
@@ -62,4 +115,10 @@ export const {
   useGetSingleRoleQuery,
   useUpdateRoleMutation,
   useDeleteRoleMutation,
+  useCreatePermissionMutation,
+  useGetPermissionsQuery,
+  useGetAllPermissionsQuery,
+  useGetSinglePermissionQuery,
+  useUpdatePermissionMutation,
+  useDeletePermissionMutation,
 } = rolePermissionApi;
