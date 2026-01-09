@@ -105,6 +105,98 @@ export const rolePermissionApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Permission"],
     }),
+
+    // ============= SECTIONS =============
+
+    // CREATE SECTION
+    createSection: builder.mutation({
+      query: (data) => ({
+        url: "/sections",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Section"],
+    }),
+
+    // GET ALL SECTIONS
+    getSections: builder.query({
+      query: () => "/sections",
+      providesTags: ["Section"],
+    }),
+
+    // GET SINGLE SECTION
+    getSingleSection: builder.query({
+      query: (id) => `/sections/${id}`,
+      providesTags: (result, error, id) => [{ type: "Section", id }],
+    }),
+
+    // UPDATE SECTION
+    updateSection: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/sections/${id}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: "Section", id },
+        "Section",
+      ],
+    }),
+
+    // DELETE SECTION
+    deleteSection: builder.mutation({
+      query: (id) => ({
+        url: `/sections/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Section"],
+    }),
+
+    // ============= ACTIONS =============
+
+    // CREATE ACTION
+    createAction: builder.mutation({
+      query: (data) => ({
+        url: "/actions",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Action"],
+    }),
+
+    // GET ALL ACTIONS
+    getActions: builder.query({
+      query: () => "/actions",
+      providesTags: ["Action"],
+    }),
+
+    // GET SINGLE ACTION
+    getSingleAction: builder.query({
+      query: (id) => `/actions/${id}`,
+      providesTags: (result, error, id) => [{ type: "Action", id }],
+    }),
+
+    // UPDATE ACTION
+    updateAction: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/actions/${id}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: "Action", id },
+        "Action",
+      ],
+    }),
+
+    // DELETE ACTION
+    deleteAction: builder.mutation({
+      query: (id) => ({
+        url: `/actions/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Action"],
+    }),
   }),
 });
 
@@ -121,4 +213,14 @@ export const {
   useGetSinglePermissionQuery,
   useUpdatePermissionMutation,
   useDeletePermissionMutation,
+  useCreateSectionMutation,
+  useGetSectionsQuery,
+  useGetSingleSectionQuery,
+  useUpdateSectionMutation,
+  useDeleteSectionMutation,
+  useCreateActionMutation,
+  useGetActionsQuery,
+  useGetSingleActionQuery,
+  useUpdateActionMutation,
+  useDeleteActionMutation,
 } = rolePermissionApi;

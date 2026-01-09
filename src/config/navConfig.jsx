@@ -155,6 +155,8 @@ export const NAV_CONFIG = {
       subItems: [
         { name: "Role List", path: "/admin/role-permission/role-list" },
         { name: "Permission List", path: "/admin/role-permission/permission-list" },
+        { name: "Section List", path: "/admin/role-permission/section-list" },
+        { name: "Action List", path: "/admin/role-permission/action-list" },
       ],
     },
     { name: "Profile", icon: <UserCircle2 />, path: "/admin/profile" },

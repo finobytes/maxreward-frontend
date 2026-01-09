@@ -50,6 +50,8 @@ import Attribute from "../pages/admin/e-commerce/Attribute/Attribute";
 import AttributeItem from "../pages/admin/e-commerce/AttributeItem/AttributeItem";
 import RoleList from "../pages/admin/rolePermission/RoleList";
 import PermissionList from "../pages/admin/rolePermission/PermissionList";
+import SectionList from "../pages/admin/rolePermission/SectionList";
+import ActionList from "../pages/admin/rolePermission/ActionList";
 
 export const adminRoutes = [
   {
@@ -253,6 +255,14 @@ export const adminRoutes = [
   {
     path: "role-permission/permission-list",
     element: <PermissionList />,
+  },
+  {
+    path: "role-permission/section-list",
+    element: <SectionList />,
+  },
+  {
+    path: "role-permission/action-list",
+    element: <ActionList />,
   },
   {
     path: "profile",
