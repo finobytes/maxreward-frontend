@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
@@ -14,6 +14,8 @@ import {
   useGetPermissionsQuery,
   useUpdatePermissionMutation,
   useDeletePermissionMutation,
+  useGetSectionsQuery,
+  useGetActionsQuery,
 } from "../../../redux/features/admin/rolePermission/rolePermissionApi";
 import {
   Dialog,
@@ -39,6 +41,8 @@ const permissionSchema = z.object({
   guard_name: z.enum(["admin", "merchant", "member"], {
     errorMap: () => ({ message: "Please select a valid guard type" }),
   }),
+  section: z.string().optional(),
+  action: z.string().optional(),
 });
 
 const PermissionList = () => {
@@ -54,6 +58,8 @@ const PermissionList = () => {
     page,
     per_page: perPage,
   });
+  const { data: sectionsData } = useGetSectionsQuery();
+  const { data: actionsData } = useGetActionsQuery();
   const [createPermission, { isLoading: isCreating }] = useCreatePermissionMutation();
   const [updatePermission, { isLoading: isUpdating }] = useUpdatePermissionMutation();
   const [deletePermission, { isLoading: isDeleting }] = useDeletePermissionMutation();
@@ -63,25 +69,57 @@ const PermissionList = () => {
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
+    setValue,
   } = useForm({
     resolver: zodResolver(permissionSchema),
     defaultValues: {
       name: "",
-      guard_name: "merchant",
+      guard_name: "admin",
+      section: "",
+      action: "",
     },
   });
+
+  // Watch form values
+  const watchGuardName = watch("guard_name");
+  const watchSection = watch("section");
+  const watchAction = watch("action");
+
+  // Auto-generate permission name when section and action are selected
+  useEffect(() => {
+    if (watchGuardName && watchSection && watchAction) {
+      let generatedName;
+
+      // generatedName = `${watchGuardName}.${watchSection}.${watchAction}`;
+
+      if (watchGuardName === "admin") {
+        generatedName = `${watchGuardName}.${watchSection}.${watchAction}`.toLowerCase();
+      } else {
+        // For merchant and other guards, exclude guard name
+        generatedName = `${watchSection}.${watchAction}`.toLowerCase();
+      }
+      setValue("name", generatedName);
+    }
+  }, [watchGuardName, watchSection, watchAction, setValue]);
 
   // Form Submit (Create or Update)
   const onSubmit = async (formData) => {
     try {
       let res;
 
+      // Only send name and guard_name to API
+      const apiData = {
+        name: formData.name,
+        guard_name: formData.guard_name,
+      };
+
       if (editingPermission) {
         // Update existing permission
-        res = await updatePermission({ id: editingPermission.id, data: formData }).unwrap();
+        res = await updatePermission({ id: editingPermission.id, data: apiData }).unwrap();
       } else {
         // Create new permission
-        res = await createPermission(formData).unwrap();
+        res = await createPermission(apiData).unwrap();
       }
 
       if (res?.success) {
@@ -108,9 +146,27 @@ const PermissionList = () => {
   // Edit Permission
   const handleEdit = (permission) => {
     setEditingPermission(permission);
+
+    // Parse permission name to extract section and action
+    const nameParts = permission.name.split('.');
+    let section = "";
+    let action = "";
+
+    if (permission.guard_name === "admin" && nameParts.length === 3) {
+      // Format: admin.section.action
+      section = nameParts[1];
+      action = nameParts[2];
+    } else if (nameParts.length === 2) {
+      // Format: section.action (for merchant/member)
+      section = nameParts[0];
+      action = nameParts[1];
+    }
+
     reset({
       name: permission.name,
       guard_name: permission.guard_name,
+      section: section,
+      action: action,
     });
     setIsModalOpen(true);
   };
@@ -172,7 +228,7 @@ const PermissionList = () => {
         headerAction={
           <PrimaryButton onClick={() => {
             setEditingPermission(null);
-            reset({ name: "", guard_name: "merchant" });
+            reset({ name: "", guard_name: "admin", section: "", action: "" });
             setIsModalOpen(true);
           }} className="flex items-center gap-2">
             <Plus className="w-4 h-4" />
@@ -240,7 +296,7 @@ const PermissionList = () => {
         setIsModalOpen(open);
         if (!open) {
           setEditingPermission(null);
-          reset({ name: "", guard_name: "merchant" });
+          reset({ name: "", guard_name: "merchant", section: "", action: "" });
         }
       }}>
         <DialogContent className="sm:max-w-[500px]">
@@ -251,22 +307,9 @@ const PermissionList = () => {
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
-              {/* Permission Name */}
-              <div>
-                <Label htmlFor="name">Permission Name</Label>
-                <Input
-                  type="text"
-                  id="name"
-                  placeholder="Enter permission name (e.g., create-user, view-reports)"
-                  {...register("name")}
-                  error={!!errors.name}
-                  hint={errors.name?.message}
-                />
-              </div>
-
               {/* Guard Name */}
               <div>
-                <Label htmlFor="guard_name">Type</Label>
+                <Label htmlFor="guard_name">Guard Type</Label>
                 <Select
                   {...register("guard_name")}
                   error={!!errors.guard_name}
@@ -274,8 +317,58 @@ const PermissionList = () => {
                   options={[
                     { value: "admin", label: "Admin" },
                     { value: "merchant", label: "Merchant" },
-                    { value: "member", label: "Member" },
+                    // { value: "member", label: "Member" },
                   ]}
+                />
+              </div>
+
+              {/* Section Dropdown */}
+              <div>
+                <Label htmlFor="section">Section</Label>
+                <Select
+                  {...register("section")}
+                  error={!!errors.section}
+                  hint={errors.section?.message}
+                  options={
+                    sectionsData?.data?.data?.map((section) => ({
+                      value: section.name,
+                      label: section.display_name || section.name,
+                    })) || []
+                  }
+                />
+              </div>
+
+              {/* Action Dropdown */}
+              <div>
+                <Label htmlFor="action">Action</Label>
+                <Select
+                  {...register("action")}
+                  error={!!errors.action}
+                  hint={errors.action?.message}
+                  options={
+                    actionsData?.data?.data?.map((action) => ({
+                      value: action.name,
+                      label: action.display_name || action.name,
+                    })) || []
+                  }
+                />
+              </div>
+
+              {/* Permission Name (Auto-generated) */}
+              <div>
+                <Label htmlFor="name">
+                  Permission Name
+                  <span className="text-xs text-gray-500 ml-2">(Auto-generated)</span>
+                </Label>
+                <Input
+                  type="text"
+                  id="name"
+                  placeholder="Enter permission name (e.g., admin.product.view)"
+                  {...register("name")}
+                  error={!!errors.name}
+                  hint={errors.name?.message}
+                  readOnly
+                  className="bg-gray-100"
                 />
               </div>
             </div>
@@ -289,7 +382,7 @@ const PermissionList = () => {
                 onClick={() => {
                   setIsModalOpen(false);
                   setEditingPermission(null);
-                  reset({ name: "", guard_name: "merchant" });
+                  reset({ name: "", guard_name: "merchant", section: "", action: "" });
                 }}
               >
                 Cancel

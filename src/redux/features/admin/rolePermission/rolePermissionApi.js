@@ -58,7 +58,7 @@ export const rolePermissionApi = baseApi.injectEndpoints({
     // CREATE PERMISSION
     createPermission: builder.mutation({
       query: (data) => ({
-        url: "/admin/permissions/create",
+        url: "/admin/roles/permissions/create",
         method: "POST",
         body: data,
       }),
@@ -87,7 +87,7 @@ export const rolePermissionApi = baseApi.injectEndpoints({
     // UPDATE PERMISSION
     updatePermission: builder.mutation({
       query: ({ id, data }) => ({
-        url: `/admin/permissions/update/${id}`,
+        url: `/admin/roles/permissions/update/${id}`,
         method: "PUT",
         body: data,
       }),
@@ -100,7 +100,7 @@ export const rolePermissionApi = baseApi.injectEndpoints({
     // DELETE PERMISSION
     deletePermission: builder.mutation({
       query: (id) => ({
-        url: `/admin/permissions/delete/${id}`,
+        url: `/admin/roles/permissions/delete/${id}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Permission"],
