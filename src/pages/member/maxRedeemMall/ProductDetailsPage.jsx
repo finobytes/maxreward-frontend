@@ -237,13 +237,13 @@ const ProductDetailsPage = () => {
               </h1>
 
               <div className="flex items-center gap-4 mb-6">
-                <div className="flex items-center text-yellow-400">
+                {/* <div className="flex items-center text-yellow-400">
                   {[1, 2, 3, 4, 5].map((i) => (
                     <Star key={i} size={16} fill="currentColor" />
                   ))}
                 </div>
                 <span className="text-sm text-gray-500">(128 reviews)</span>
-                <div className="h-4 w-[1px] bg-gray-300"></div>
+                <div className="h-4 w-[1px] bg-gray-300"></div> */}
                 <span
                   className={`text-sm font-medium ${
                     stock > 0 ? "text-green-600" : "text-red-600"
@@ -373,7 +373,7 @@ const ProductDetailsPage = () => {
             {/* Tabs (Description, etc) */}
             <div className="border-t pt-8">
               <div className="flex gap-6 border-b mb-4">
-                {["description", "specifications", "reviews"].map((tab) => (
+                {["description", "specifications"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
