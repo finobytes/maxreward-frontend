@@ -333,6 +333,16 @@ const ProductForm = () => {
 
       // --- Simple Product Logic ---
       if (formData.product_type === "simple") {
+        if (isEditMode) {
+          data.append("product_id", id);
+          const simpleVarId =
+            formData.variations?.[0]?.variation_id ||
+            formData.variations?.[0]?.id;
+          if (simpleVarId) {
+            data.append("variation_id", simpleVarId);
+          }
+        }
+
         if (formData.sku) data.append("sku", formData.sku);
 
         // Map variation_* fields to payload
