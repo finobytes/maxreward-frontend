@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import Input from "../../../../components/form/input/InputField";
-import { Trash } from "lucide-react";
+import { Trash, Image as ImageIcon } from "lucide-react";
 import PrimaryButton from "../../../../components/ui/PrimaryButton";
 import { Button } from "../../../../components/ui/button";
 import { Label } from "../../../../components/ui/label";
@@ -123,17 +123,24 @@ const VariationList = ({
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
-            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              <input
-                type="checkbox"
-                checked={
-                  variationFields.length > 0 &&
-                  selected.length === variationFields.length
-                }
-                onChange={(e) => toggleSelectAll(e.target.checked)}
-                className="w-4 h-4 rounded"
-              />
-            </th>
+            {!isEditMode && (
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <input
+                  type="checkbox"
+                  checked={
+                    variationFields.length > 0 &&
+                    selected.length === variationFields.length
+                  }
+                  onChange={(e) => toggleSelectAll(e.target.checked)}
+                  className="w-4 h-4 rounded"
+                />
+              </th>
+            )}
+            {isEditMode && (
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[60px]">
+                Image
+              </th>
+            )}
             <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[150px]">
               Variation
             </th>
@@ -213,14 +220,31 @@ const VariationList = ({
 
             return (
               <tr key={field.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-3 py-4 text-sm text-gray-900 align-top">
-                  <input
-                    type="checkbox"
-                    checked={selected.includes(field.id)}
-                    onChange={() => toggleSelect(field.id)}
-                    className="w-4 h-4 rounded"
-                  />
-                </td>
+                {!isEditMode && (
+                  <td className="px-3 py-4 text-sm text-gray-900 align-top">
+                    <input
+                      type="checkbox"
+                      checked={selected.includes(field.id)}
+                      onChange={() => toggleSelect(field.id)}
+                      className="w-4 h-4 rounded"
+                    />
+                  </td>
+                )}
+                {isEditMode && (
+                  <td className="px-3 py-4 text-sm text-gray-900 align-top">
+                    <div className="h-10 w-10 border rounded bg-white overflow-hidden flex items-center justify-center">
+                      {field.images?.[0]?.url ? (
+                        <img
+                          src={field.images[0].url}
+                          alt=""
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <ImageIcon size={14} className="text-gray-300" />
+                      )}
+                    </div>
+                  </td>
+                )}
                 <td className="px-3 py-4 text-sm text-gray-900 align-top">
                   <div className="font-medium">
                     {field.attributes
