@@ -14,9 +14,11 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useGetSingleProductQuery } from "../../../redux/features/merchant/product/productApi";
+import { useAddToCartMutation } from "../../../redux/features/member/maxRedeemMall/maxRedeemApi";
 
 const ProductDetailsPage = () => {
   const { id } = useParams();
+  const [addToCartMutation, { isLoading: isAdding }] = useAddToCartMutation();
   const { data: productData, isLoading } = useGetSingleProductQuery(id);
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedAttributes, setSelectedAttributes] = useState({});
@@ -144,8 +146,6 @@ const ProductDetailsPage = () => {
     : product.regular_point;
 
   const regularPrice = currentVariation?.regular_price || product.regular_price;
-  const regularPoints =
-    currentVariation?.regular_point || product.regular_point;
 
   const stock = currentVariation
     ? currentVariation.actual_quantity
@@ -158,12 +158,29 @@ const ProductDetailsPage = () => {
     }));
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (product.type === "variable" && !isVariationSelected) {
       toast.error("Please select all options");
       return;
     }
-    toast.success("Added to cart successfully!");
+
+    if (quantity > stock) {
+      toast.error(`Only ${stock} items available in stock`);
+      return;
+    }
+
+    const payload = {
+      product_id: product.id,
+      product_variation_id: currentVariation?.id || null,
+      quantity: quantity,
+    };
+
+    try {
+      await addToCartMutation(payload).unwrap();
+      toast.success("Added to cart successfully");
+    } catch (error) {
+      toast.error(error?.data?.message || "Failed to add to cart");
+    }
   };
 
   return (
@@ -338,10 +355,11 @@ const ProductDetailsPage = () => {
 
               <button
                 onClick={handleAddToCart}
-                className="flex-1 bg-brand-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-gray-200 hover:bg-brand-700 hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+                disabled={isAdding || stock === 0}
+                className="flex-1 bg-brand-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-gray-200 hover:bg-brand-700 hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed"
               >
                 <ShoppingCart size={20} />
-                Add to Cart
+                {isAdding ? "Adding..." : "Add to Cart"}
               </button>
               <button className="p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-gray-600 transition-colors">
                 <Share2 size={20} />
