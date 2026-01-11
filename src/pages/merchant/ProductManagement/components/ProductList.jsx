@@ -436,13 +436,15 @@ const ProductList = ({ statusFilter = "", title = "Products" }) => {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-0">
-            <PrimaryButton
-              variant="secondary"
-              onClick={() => setStatusModalOpen(false)}
-              disabled={isUpdatingStatus}
-            >
-              Cancel
-            </PrimaryButton>
+            <div className="mr-2">
+              <PrimaryButton
+                variant="secondary"
+                onClick={() => setStatusModalOpen(false)}
+                disabled={isUpdatingStatus}
+              >
+                Cancel
+              </PrimaryButton>
+            </div>
             <PrimaryButton
               variant={
                 itemToUpdate?.newStatus === "inactive" ? "danger" : "primary"

@@ -395,7 +395,7 @@ const VariationList = ({
               />
             </div>
           </div>
-          <DialogFooter className="sm:justify-end">
+          <DialogFooter className="sm:justify-end gap-2">
             <Button
               type="button"
               variant="secondary"
