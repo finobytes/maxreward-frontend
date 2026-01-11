@@ -569,7 +569,14 @@ const ProductForm = () => {
         await createProduct(data).unwrap();
         toast.success("Product created successfully!");
       }
-      navigate("/merchant/product/draft-products");
+      const targetStatus = formData.status || "draft";
+      if (targetStatus === "active") {
+        navigate("/merchant/product/active-products");
+      } else if (targetStatus === "inactive") {
+        navigate("/merchant/product/inactive-products");
+      } else {
+        navigate("/merchant/product/draft-products");
+      }
     } catch (err) {
       console.error("Failed to save product:", err);
       toast.error(
@@ -607,6 +614,8 @@ const ProductForm = () => {
           className="space-y-8"
         >
           <input type="hidden" {...register("product_type")} />
+          <input type="hidden" {...register("status")} />
+
           <ProductBasicInfo
             handleSkuValidation={handleSkuValidation}
             brands={brands}

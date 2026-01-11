@@ -26,6 +26,7 @@ import AvailableTransaction from "../pages/merchant/PointStatement/Available/Ava
 import ReferTransaction from "../pages/merchant/PointStatement/Refer/ReferTransaction";
 import DraftProducts from "../pages/merchant/ProductManagement/DraftProducts";
 import ActiveProducts from "../pages/merchant/ProductManagement/ActiveProducts";
+import InactiveProducts from "../pages/merchant/ProductManagement/InactiveProducts";
 
 export const merchantRoute = [
   {
@@ -71,6 +72,10 @@ export const merchantRoute = [
   {
     path: "product/active-products",
     element: <ActiveProducts />,
+  },
+  {
+    path: "product/inactive-products",
+    element: <InactiveProducts />,
   },
   {
     path: "product/create",
