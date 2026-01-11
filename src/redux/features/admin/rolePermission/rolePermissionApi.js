@@ -53,6 +53,19 @@ export const rolePermissionApi = baseApi.injectEndpoints({
       invalidatesTags: ["Role"],
     }),
 
+    // ASSIGN PERMISSIONS TO ROLE
+    assignPermissionsToRole: builder.mutation({
+      query: ({ roleId, permissions }) => ({
+        url: `/admin/roles/${roleId}/assign-permissions`,
+        method: "POST",
+        body: { permissions },
+      }),
+      invalidatesTags: (result, error, { roleId }) => [
+        { type: "Role", id: roleId },
+        "Role",
+      ],
+    }),
+
     // ============= PERMISSIONS =============
 
     // CREATE PERMISSION
@@ -74,7 +87,7 @@ export const rolePermissionApi = baseApi.injectEndpoints({
 
     // GET ALL PERMISSIONS (without pagination)
     getAllPermissions: builder.query({
-      query: () => "/admin/permissions",
+      query: () => "/admin/roles/permissions",
       providesTags: ["Permission"],
     }),
 
@@ -207,6 +220,7 @@ export const {
   useGetSingleRoleQuery,
   useUpdateRoleMutation,
   useDeleteRoleMutation,
+  useAssignPermissionsToRoleMutation,
   useCreatePermissionMutation,
   useGetPermissionsQuery,
   useGetAllPermissionsQuery,
