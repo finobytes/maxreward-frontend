@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router";
 import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag } from "lucide-react";
@@ -18,6 +18,15 @@ import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
 import Input from "../../../components/form/input/InputField";
 import Label from "../../../components/form/Label";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../../../components/ui/dialog";
+import { Button } from "../../../components/ui/button";
 
 // Schema for checkout form
 const checkoutSchema = z.object({
@@ -101,11 +110,10 @@ const CartPage = () => {
 
   const subtotalPoints = cartTotal;
   const shippingPoints = items.length > 0 ? 120 : 0;
-  const taxPoints = items.length > 0 ? 80 : 0;
-  const platformFees = items.length > 0 ? 200 : 0;
+  // const taxPoints = items.length > 0 ? 80 : 0; // Removed as per request
+  // const platformFees = items.length > 0 ? 200 : 0; // Removed as per request
 
-  const totalPoints =
-    subtotalPoints + shippingPoints + taxPoints + platformFees;
+  const totalPoints = subtotalPoints + shippingPoints;
   const newAvailablePoints = availablePoints - totalPoints;
 
   const insufficientPoints = newAvailablePoints < 0;
@@ -147,11 +155,35 @@ const CartPage = () => {
     }
   };
 
-  const handleRemove = async (id) => {
-    if (confirm("Remove this item from cart?")) {
+  const [deleteItem, setDeleteItem] = useState(null);
+  const [isClearCartOpen, setIsClearCartOpen] = useState(false);
+
+  // ... (onSubmit remains mostly the same, lines 112-147)
+
+  const handleClearCart = () => {
+    setIsClearCartOpen(true);
+  };
+
+  const confirmClearCart = async () => {
+    try {
+      await clearCart().unwrap();
+      toast.success("Cart cleared successfully");
+      setIsClearCartOpen(false);
+    } catch {
+      toast.error("Failed to clear cart");
+    }
+  };
+
+  const handleRemove = (id) => {
+    setDeleteItem(id);
+  };
+
+  const confirmRemoveItem = async () => {
+    if (deleteItem) {
       try {
-        await removeFromCart(id).unwrap();
+        await removeFromCart(deleteItem).unwrap();
         toast.success("Item removed");
+        setDeleteItem(null);
       } catch {
         toast.error("Failed to remove item");
       }
@@ -299,7 +331,17 @@ const CartPage = () => {
                   ))}
                 </div>
               </div>
-
+              <div className="flex items-center justify-end gap-4">
+                {items.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleClearCart}
+                    className="text-sm text-red-600 hover:text-red-700 font-medium flex items-center gap-1"
+                  >
+                    <Trash2 size={16} /> Clear Cart
+                  </button>
+                )}
+              </div>
               {/* Shipping Form Card */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                 <h3 className="text-lg font-bold text-gray-900 mb-4">
@@ -408,14 +450,7 @@ const CartPage = () => {
                     <span>Shipping (In Points)</span>
                     <span className="font-semibold">{shippingPoints}</span>
                   </div>
-                  <div className="flex justify-between items-center text-white/80">
-                    <span>Tax (In Points)</span>
-                    <span className="font-semibold">{taxPoints}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-white/80">
-                    <span>Platform Fees (In Points)</span>
-                    <span className="font-semibold">{platformFees}</span>
-                  </div>
+                  {/* Tax and Platform Fees removed */}
                 </div>
 
                 <div className="border-t border-white/20 pt-4 mb-6">
@@ -471,6 +506,50 @@ const CartPage = () => {
           </form>
         </FormProvider>
       )}
+
+      {/* Clear Cart Modal */}
+      <Dialog open={isClearCartOpen} onOpenChange={setIsClearCartOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Clear Cart</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to remove all items from your cart? This
+              action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsClearCartOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmClearCart}>
+              Clear Cart
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Remove Item Modal */}
+      <Dialog
+        open={!!deleteItem}
+        onOpenChange={(open) => !open && setDeleteItem(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Remove Item</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to remove this item from your cart?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteItem(null)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmRemoveItem}>
+              Remove
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
