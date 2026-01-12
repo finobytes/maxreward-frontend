@@ -149,7 +149,9 @@ const ProductDetailsPage = () => {
 
   const stock = currentVariation
     ? currentVariation.actual_quantity
-    : product.actual_quantity || 0;
+    : product.type === "simple"
+    ? product.variations?.[0]?.actual_quantity || 0
+    : 0;
 
   const handleAttributeSelect = (attrId, itemId) => {
     setSelectedAttributes((prev) => ({
