@@ -173,7 +173,9 @@ const ProductDetailsPage = () => {
 
     const payload = {
       product_id: product.id,
-      product_variation_id: currentVariation?.id || null,
+      product_variation_id:
+        currentVariation?.id ||
+        (product.type === "simple" ? product.variations?.[0]?.id : null),
       quantity: quantity,
     };
 
