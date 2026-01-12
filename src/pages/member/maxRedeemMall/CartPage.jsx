@@ -229,7 +229,7 @@ const CartPage = () => {
                       <div className="flex-1 text-center sm:text-left">
                         {item.brand && (
                           <div className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full w-fit mb-1 mx-auto sm:mx-0">
-                            92% Off
+                            {/* 92% Off */}
                           </div>
                         )}
                         <h3 className="text-lg font-bold text-gray-900 mb-1">
@@ -244,7 +244,8 @@ const CartPage = () => {
                                   key={i}
                                   className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600"
                                 >
-                                  {attr.attribute_name}: {attr.item_name}
+                                  {attr.attribute_name}:{" "}
+                                  {attr.attribute_item_name}
                                 </span>
                               )
                             )}
