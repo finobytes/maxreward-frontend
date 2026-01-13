@@ -15,14 +15,12 @@ const variationSchema = z.object({
   unit_weight: z.coerce.string().optional(),
 
   // Attributes: [{ attribute_id, attribute_item_id }]
-  attributes: z
-    .array(
-      z.object({
-        attribute_id: z.coerce.string(),
-        attribute_item_id: z.coerce.string(),
-      })
-    )
-    .min(1, "Attributes are required"),
+  attributes: z.array(
+    z.object({
+      attribute_id: z.coerce.string(),
+      attribute_item_id: z.coerce.string(),
+    })
+  ),
 
   // Images handling is complex in forms, usually array of objects or files
   images: z.any().optional(),
@@ -106,9 +104,18 @@ export const productSchema = z
           message: "At least one variation is required for variable products",
           path: ["variations"],
         });
+      } else {
+        // Enforce attributes for each variation in variable product
+        data.variations.forEach((variation, index) => {
+          if (!variation.attributes || variation.attributes.length === 0) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message:
+                "Attributes are required for variable product variations",
+              path: ["variations", index, "attributes"],
+            });
+          }
+        });
       }
-
-      // Also validate regular_price/point if needed for variable?
-      // Usually calculated from variations.
     }
   });

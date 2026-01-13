@@ -28,6 +28,7 @@ import DraftProducts from "../pages/merchant/ProductManagement/DraftProducts";
 import ActiveProducts from "../pages/merchant/ProductManagement/ActiveProducts";
 import AssignPermissionsToRole from "../pages/merchant/rolePermission/AssignPermissionsToRole";
 import RoleList from "../pages/merchant/rolePermission/RoleList";
+import InactiveProducts from "../pages/merchant/ProductManagement/InactiveProducts";
 
 export const merchantRoute = [
   {
@@ -73,6 +74,10 @@ export const merchantRoute = [
   {
     path: "product/active-products",
     element: <ActiveProducts />,
+  },
+  {
+    path: "product/inactive-products",
+    element: <InactiveProducts />,
   },
   {
     path: "product/create",

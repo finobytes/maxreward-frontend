@@ -49,9 +49,9 @@ const ProductCard = ({ product }) => {
 
         {/* Action Buttons */}
         <div className="absolute top-3 right-3 flex flex-col gap-2 transform translate-x-12 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300">
-          <button className="h-8 w-8 bg-white rounded-full flex items-center justify-center text-gray-600 hover:text-red-500 hover:bg-red-50 shadow-md transition-colors">
+          {/* <button className="h-8 w-8 bg-white rounded-full flex items-center justify-center text-gray-600 hover:text-red-500 hover:bg-red-50 shadow-md transition-colors">
             <Heart size={16} />
-          </button>
+          </button> */}
         </div>
       </div>
 

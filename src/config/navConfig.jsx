@@ -187,6 +187,10 @@ export const NAV_CONFIG = {
           name: "Active Products",
           path: "/merchant/product/active-products",
         },
+        {
+          name: "Inactive Products",
+          path: "/merchant/product/inactive-products",
+        },
       ],
     },
     {
