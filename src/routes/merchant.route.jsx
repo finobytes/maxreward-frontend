@@ -26,6 +26,8 @@ import AvailableTransaction from "../pages/merchant/PointStatement/Available/Ava
 import ReferTransaction from "../pages/merchant/PointStatement/Refer/ReferTransaction";
 import DraftProducts from "../pages/merchant/ProductManagement/DraftProducts";
 import ActiveProducts from "../pages/merchant/ProductManagement/ActiveProducts";
+import AssignPermissionsToRole from "../pages/merchant/rolePermission/AssignPermissionsToRole";
+import RoleList from "../pages/merchant/rolePermission/RoleList";
 
 export const merchantRoute = [
   {
@@ -144,5 +146,13 @@ export const merchantRoute = [
   {
     path: "notification/:id",
     element: <NotificationDetails />,
+  },
+  {
+    path: "role-permission/assign",
+    element: <AssignPermissionsToRole />,
+  },
+  {
+    path: "role-permission/role-list",
+    element: <RoleList />,
   },
 ];

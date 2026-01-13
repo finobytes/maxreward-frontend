@@ -264,6 +264,14 @@ export const NAV_CONFIG = {
         },
       ],
     },
+    {
+      name: "Role Permission",
+      icon: <ShieldCheck />,
+      subItems: [
+        { name: "Role List", path: "/merchant/role-permission/role-list" },
+        { name: "Assign Permissions", path: "/merchant/role-permission/assign" },
+      ],
+    },
     { icon: <CircleUserRound />, name: "Profile", path: "/merchant/profile" },
 
     { name: "Logout", icon: <LogOut />, path: "/login" },
