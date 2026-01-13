@@ -214,9 +214,9 @@ const ProductDetailsPage = () => {
                 alt={product.name}
                 className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500"
               />
-              <button className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur rounded-full hover:bg-brand-50 text-gray-600 hover:text-red-500 shadow-sm transition-colors">
+              {/* <button className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur rounded-full hover:bg-brand-50 text-gray-600 hover:text-red-500 shadow-sm transition-colors">
                 <Heart size={20} />
-              </button>
+              </button> */}
             </div>
             {/* Thumbnails */}
             <div className="grid grid-cols-5 gap-4">
@@ -391,51 +391,52 @@ const ProductDetailsPage = () => {
                 </span>
               </div>
             </div>
+          </div>
+        </div>
 
-            {/* Tabs (Description, etc) */}
-            <div className="border-t pt-8">
-              <div className="flex gap-6 border-b mb-4">
-                {["description", "specifications"].map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={`pb-3 text-sm font-bold uppercase tracking-wide border-b-2 transition-colors ${
-                      activeTab === tab
-                        ? "border-brand-600 text-brand-600"
-                        : "border-transparent text-gray-400 hover:text-gray-600"
-                    }`}
-                  >
-                    {tab}
-                  </button>
-                ))}
-              </div>
+        {/* Tabs (Description, etc) */}
+        <div className="mt-2 md:mt-4 ">
+          {" "}
+          <div className=" border-t pt-8">
+            <div className="flex gap-6 border-b mb-4">
+              {["description", "specifications"].map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`pb-3 text-sm font-bold uppercase tracking-wide border-b-2 transition-colors ${
+                    activeTab === tab
+                      ? "border-brand-600 text-brand-600"
+                      : "border-transparent text-gray-400 hover:text-gray-600"
+                  }`}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
 
-              <div className="prose prose-sm prose-gray max-w-none">
-                {activeTab === "description" && (
-                  <p>{product.description || "No description available."}</p>
-                )}
-                {activeTab === "specifications" && (
-                  <div className="grid grid-cols-1 gap-y-2">
-                    <div className="grid grid-cols-3 border-b py-2">
-                      <span className="font-semibold">Brand</span>{" "}
-                      <span className="col-span-2">{product.brand?.name}</span>
-                    </div>
-                    <div className="grid grid-cols-3 border-b py-2">
-                      <span className="font-semibold">Model</span>{" "}
-                      <span className="col-span-2">{product.model?.name}</span>
-                    </div>
-                    <div className="grid grid-cols-3 border-b py-2">
-                      <span className="font-semibold">Weight</span>{" "}
-                      <span className="col-span-2">
-                        {product.unit_weight} kg
-                      </span>
-                    </div>
+            <div className="prose prose-sm prose-gray max-w-none">
+              {activeTab === "description" && (
+                <p>{product.description || "No description available."}</p>
+              )}
+              {activeTab === "specifications" && (
+                <div className="grid grid-cols-1 gap-y-2">
+                  <div className="grid grid-cols-3 border-b py-2">
+                    <span className="font-semibold">Brand</span>{" "}
+                    <span className="col-span-2">{product.brand?.name}</span>
                   </div>
-                )}
-                {activeTab === "reviews" && (
-                  <p className="text-gray-500 italic">No reviews yet.</p>
-                )}
-              </div>
+                  <div className="grid grid-cols-3 border-b py-2">
+                    <span className="font-semibold">Model</span>{" "}
+                    <span className="col-span-2">{product.model?.name}</span>
+                  </div>
+                  <div className="grid grid-cols-3 border-b py-2">
+                    <span className="font-semibold">Weight</span>{" "}
+                    <span className="col-span-2">{product.unit_weight} kg</span>
+                  </div>
+                </div>
+              )}
+              {activeTab === "reviews" && (
+                <p className="text-gray-500 italic">No reviews yet.</p>
+              )}
             </div>
           </div>
         </div>
