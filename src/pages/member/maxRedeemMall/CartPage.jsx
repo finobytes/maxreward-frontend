@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router";
-import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag } from "lucide-react";
+import {
+  Trash2,
+  Plus,
+  Minus,
+  ArrowLeft,
+  ShoppingBag,
+  Store,
+  ChevronRight,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -51,8 +59,12 @@ const CartPage = () => {
   const [purchaseProduct, { isLoading: isPurchasing }] =
     usePurchaseProductMutation();
 
-  const items = cartData?.cart_items || [];
-  const cartTotal = cartData?.total_amount || 0;
+  // Parse New API Structure
+  const cartByMerchant = cartData?.cart_by_merchant || [];
+  const allItems = cartByMerchant.flatMap((group) => group.items) || [];
+
+  // Use summary from API if available, else fallback
+  const cartTotal = cartData?.summary?.total_amount || 0;
 
   // Auth & Wallet
   const { user, token } = useSelector((state) => state.auth);
@@ -97,21 +109,16 @@ const CartPage = () => {
         customer_postcode: member.postcode || "",
         customer_city: member.city || "",
         customer_state: member.state || "",
-        customer_country: member.country_code || "60",
+        customer_country: member.country_code || "",
       });
     }
   }, [profileData, reset]);
 
   // Calculations
-  // API returns total_amount. Assuming it includes item prices.
-  // We add shipping/tax/platform on top? Or backend handles it?
-  // Current requirement implies frontend addition based on previous code.
-  // Using cartTotal from API as "Subtotal".
-
   const subtotalPoints = cartTotal;
-  const shippingPoints = items.length > 0 ? 120 : 0;
-  // const taxPoints = items.length > 0 ? 80 : 0; // Removed as per request
-  // const platformFees = items.length > 0 ? 200 : 0; // Removed as per request
+  const shippingPoints = allItems.length > 0 ? 120 : 0;
+  // const taxPoints = allItems.length > 0 ? 80 : 0; // Removed as per request
+  // const platformFees = allItems.length > 0 ? 200 : 0; // Removed as per request
 
   const totalPoints = subtotalPoints + shippingPoints;
   const newAvailablePoints = availablePoints - totalPoints;
@@ -119,7 +126,7 @@ const CartPage = () => {
   const insufficientPoints = newAvailablePoints < 0;
 
   const onSubmit = async (formData) => {
-    if (items.length === 0) {
+    if (allItems.length === 0) {
       toast.error("Cart is empty");
       return;
     }
@@ -132,14 +139,12 @@ const CartPage = () => {
       const payload = {
         member_id: profileData?.id || profileData?.data?.id,
         ...formData,
-        // If API expects items for purchase validation, we send them.
-        // Or if 'purchaseProduct' triggers checkout from backend cart, we might just need address.
-        // Sticking to previous payload structure but using API items structure if needed.
-        items: items.map((item) => ({
+        // Mapping items for payload, ensuring all required fields are present
+        items: allItems.map((item) => ({
           product_id: item.product_id,
           product_variation_id: item.variation_id,
           quantity: item.quantity,
-          points: item.price, // API returns 'price', mapping to points
+          points: item.price,
         })),
         total_points: totalPoints,
       };
@@ -147,7 +152,9 @@ const CartPage = () => {
       await purchaseProduct(payload).unwrap();
 
       toast.success("Order placed successfully!");
-      await clearCart().unwrap(); // API clear
+      // Assuming backend clears cart after purchase or we do it here.
+      // Safe to call clearCart typically if backend doesn't auto-clear or as a safeguard.
+      await clearCart().unwrap();
       navigate("/member/max-redeem-mall");
     } catch (error) {
       console.error("Purchase failed", error);
@@ -157,8 +164,6 @@ const CartPage = () => {
 
   const [deleteItem, setDeleteItem] = useState(null);
   const [isClearCartOpen, setIsClearCartOpen] = useState(false);
-
-  // ... (onSubmit remains mostly the same, lines 112-147)
 
   const handleClearCart = () => {
     setIsClearCartOpen(true);
@@ -199,6 +204,12 @@ const CartPage = () => {
     }
   };
 
+  if (isLoadingCart) {
+    return (
+      <div className="p-12 text-center text-gray-500">Loading cart...</div>
+    );
+  }
+
   return (
     <div className="pb-12 space-y-8">
       {/* Header */}
@@ -214,7 +225,7 @@ const CartPage = () => {
         </Link>
       </div>
 
-      {items.length === 0 ? (
+      {allItems.length === 0 ? (
         <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-gray-300">
           <ShoppingBag className="mx-auto h-16 w-16 text-gray-300 mb-4" />
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
@@ -237,102 +248,139 @@ const CartPage = () => {
             className="grid grid-cols-1 lg:grid-cols-3 gap-8"
           >
             <div className="lg:col-span-2 space-y-6">
-              {/* Cart Items List */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="p-6 space-y-6">
-                  {items.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b last:border-0 last:pb-0"
+              {/* Dynamic Merchant Groups */}
+              {cartByMerchant.map((group) => (
+                <div
+                  key={group.merchant.merchant_id}
+                  className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+                >
+                  {/* Merchant Header */}
+                  <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
+                    <Link
+                      to={`/member/max-redeem-mall?merchant_id=${group.merchant.merchant_id}`}
+                      className="flex items-center gap-3 group hover:opacity-80 transition-opacity"
                     >
-                      {/* Image */}
-                      <div className="w-24 h-24 rounded-xl bg-gray-50 border border-gray-100 flex-shrink-0 overflow-hidden">
+                      <div className="w-8 h-8 rounded-full bg-white border border-gray-200 overflow-hidden flex-shrink-0">
                         <img
                           src={
-                            item.product_image?.url ||
-                            "https://placehold.co/100x100?text=Product"
+                            group.merchant.merchant_logo ||
+                            "https://placehold.co/100x100?text=Logo"
                           }
-                          alt={item.product_name}
+                          alt={group.merchant.merchant_name}
                           className="w-full h-full object-cover"
                         />
                       </div>
-
-                      {/* Details */}
-                      <div className="flex-1 text-center sm:text-left">
-                        {item.brand && (
-                          <div className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full w-fit mb-1 mx-auto sm:mx-0">
-                            {/* 92% Off */}
-                          </div>
-                        )}
-                        <h3 className="text-lg font-bold text-gray-900 mb-1">
-                          {item.product_name}
-                        </h3>
-                        {/* Variation / Attributes */}
-                        {item.variation_details?.attributes && (
-                          <div className="flex flex-wrap gap-2 mt-2 justify-center sm:justify-start">
-                            {item.variation_details.attributes.map(
-                              (attr, i) => (
-                                <span
-                                  key={i}
-                                  className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600"
-                                >
-                                  {attr.attribute_name}:{" "}
-                                  {attr.attribute_item_name}
-                                </span>
-                              )
-                            )}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Quantity */}
-                      <div className="flex items-center gap-3">
-                        <span className="font-bold text-xl text-gray-900">
-                          {item.quantity}
-                        </span>
-                        <div className="flex flex-col gap-1">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleUpdateQty(item, item.quantity + 1)
-                            }
-                            className="p-1 hover:bg-gray-100 rounded text-gray-600"
-                          >
-                            <div className="w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-b-[6px] border-b-gray-600" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleUpdateQty(item, item.quantity - 1)
-                            }
-                            className="p-1 hover:bg-gray-100 rounded text-gray-600"
-                          >
-                            <div className="w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[6px] border-t-gray-600" />
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Points */}
-                      <div className="w-24 text-center sm:text-right">
-                        <div className="text-xl font-bold text-gray-900">
-                          {(item.price * item.quantity).toLocaleString()}
-                        </div>
-                      </div>
-
-                      {/* Remove */}
-                      <button
-                        type="button"
-                        onClick={() => handleRemove(item.id)}
-                        className="p-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-colors"
-                      >
-                        <Trash2 size={18} />
-                      </button>
+                      <span className="font-bold text-gray-900 group-hover:text-brand-600 transition-colors flex items-center gap-1">
+                        {group.merchant.merchant_name}
+                        <ChevronRight
+                          size={16}
+                          className="text-gray-400 group-hover:text-brand-600"
+                        />
+                      </span>
+                    </Link>
+                    <div className="text-sm text-gray-500">
+                      {group.item_count} items
                     </div>
-                  ))}
+                  </div>
+
+                  {/* Items */}
+                  <div className="p-6 space-y-6">
+                    {group.items.map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b last:border-0 last:pb-0"
+                      >
+                        {/* Image */}
+                        <div className="w-24 h-24 rounded-xl bg-gray-50 border border-gray-100 flex-shrink-0 overflow-hidden">
+                          <img
+                            src={
+                              item.variation_details?.image?.url ||
+                              "https://placehold.co/100x100?text=Product"
+                            }
+                            alt={item.product_name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+
+                        {/* Details */}
+                        <div className="flex-1 text-center sm:text-left">
+                          <h3 className="text-lg font-bold text-gray-900 mb-1">
+                            {item.product_name}
+                          </h3>
+                          {/* Variation / Attributes */}
+                          {item.variation_details?.attributes && (
+                            <div className="flex flex-wrap gap-2 mt-2 justify-center sm:justify-start">
+                              {item.variation_details.attributes.map(
+                                (attr, i) => (
+                                  <span
+                                    key={i}
+                                    className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600 border border-gray-200"
+                                  >
+                                    <span className="font-medium">
+                                      {attr.attribute_name}:
+                                    </span>{" "}
+                                    {attr.attribute_item_name}
+                                  </span>
+                                )
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Quantity */}
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center border border-gray-200 rounded-lg bg-gray-50">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleUpdateQty(item, item.quantity - 1)
+                              }
+                              className="p-2 hover:bg-gray-200 rounded-l-lg text-gray-600 transition-colors"
+                              disabled={item.quantity <= 1}
+                            >
+                              <Minus size={14} />
+                            </button>
+                            <span className="font-bold text-gray-900 w-8 text-center bg-white h-full py-1.5 border-x border-gray-200">
+                              {item.quantity}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleUpdateQty(item, item.quantity + 1)
+                              }
+                              className="p-2 hover:bg-gray-200 rounded-r-lg text-gray-600 transition-colors"
+                            >
+                              <Plus size={14} />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Points */}
+                        <div className="w-24 text-center sm:text-right">
+                          <div className="text-lg font-bold text-gray-900">
+                            {(item.price * item.quantity).toLocaleString()}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {item.price} pts/each
+                          </div>
+                        </div>
+
+                        {/* Remove */}
+                        <button
+                          type="button"
+                          onClick={() => handleRemove(item.id)}
+                          className="p-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-colors"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              ))}
+
               <div className="flex items-center justify-end gap-4">
-                {items.length > 0 && (
+                {allItems.length > 0 && (
                   <button
                     type="button"
                     onClick={handleClearCart}
@@ -342,6 +390,7 @@ const CartPage = () => {
                   </button>
                 )}
               </div>
+
               {/* Shipping Form Card */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                 <h3 className="text-lg font-bold text-gray-900 mb-4">
@@ -450,7 +499,6 @@ const CartPage = () => {
                     <span>Shipping (In Points)</span>
                     <span className="font-semibold">{shippingPoints}</span>
                   </div>
-                  {/* Tax and Platform Fees removed */}
                 </div>
 
                 <div className="border-t border-white/20 pt-4 mb-6">

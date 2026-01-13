@@ -2,11 +2,19 @@ import React, { useState, useEffect } from "react";
 import ProductCard from "./components/ProductCard";
 import { Search, SlidersHorizontal } from "lucide-react";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
-import { useGetProductsQuery } from "../../../redux/features/merchant/product/productApi";
+import { useSearchParams } from "react-router"; // Assuming react-router is used based on other files
+import {
+  useGetProductsQuery,
+  useGetMerchantProductsQuery,
+} from "../../../redux/features/merchant/product/productApi";
 import { useGetAllCategoriesQuery } from "../../../redux/features/admin/category/categoryApi";
 import ProductSkeleton from "../../../components/skeleton/ProductSkeleton";
 
 const MaxRedeemMall = () => {
+  const [searchParams] = useSearchParams();
+  const stylesParams = searchParams.get("merchant_id"); // "merchant_id"
+  const merchantId = stylesParams ? parseInt(stylesParams) : null;
+
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
@@ -21,19 +29,36 @@ const MaxRedeemMall = () => {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Fetch Products using API
-  const {
-    data: productsData,
-    isLoading: isLoadingProducts,
-    isFetching: isFetchingProducts,
-  } = useGetProductsQuery({
+  // Query Params for API
+  const queryParams = {
     page,
     per_page: 12,
     search: debouncedSearch,
     category_id: selectedCategoryId,
-    status: "active", // Member sees approved products
-    // merchant_id: "", // filter by specific merchant for member view
-  });
+    status: "active",
+  };
+
+  // Fetch Products using generic API or Merchant specific API
+  const {
+    data: generalData,
+    isLoading: isLoadingGeneral,
+    isFetching: isFetchingGeneral,
+  } = useGetProductsQuery(queryParams, { skip: !!merchantId });
+
+  const {
+    data: merchantData,
+    isLoading: isLoadingMerchant,
+    isFetching: isFetchingMerchant,
+  } = useGetMerchantProductsQuery(
+    { merchant_id: merchantId, ...queryParams },
+    { skip: !merchantId }
+  );
+
+  const productsData = merchantId ? merchantData : generalData;
+  const isLoadingProducts = merchantId ? isLoadingMerchant : isLoadingGeneral;
+  const isFetchingProducts = merchantId
+    ? isFetchingMerchant
+    : isFetchingGeneral;
 
   // Fetch Categories for filter
   const { data: categoriesData } = useGetAllCategoriesQuery();
