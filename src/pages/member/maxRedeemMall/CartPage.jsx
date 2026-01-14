@@ -248,6 +248,21 @@ const CartPage = () => {
             className="grid grid-cols-1 lg:grid-cols-3 gap-8"
           >
             <div className="lg:col-span-2 space-y-6">
+              <div className="flex justify-between items-center bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+                <div>Total {allItems.length} Items</div>
+
+                <div className="">
+                  {allItems.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={handleClearCart}
+                      className="text-sm text-red-600 hover:text-red-700 font-medium flex items-center gap-1"
+                    >
+                      <Trash2 size={16} /> Clear Cart
+                    </button>
+                  )}
+                </div>
+              </div>
               {/* Dynamic Merchant Groups */}
               {cartByMerchant.map((group) => (
                 <div
@@ -379,22 +394,10 @@ const CartPage = () => {
                 </div>
               ))}
 
-              <div className="flex items-center justify-end gap-4">
-                {allItems.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={handleClearCart}
-                    className="text-sm text-red-600 hover:text-red-700 font-medium flex items-center gap-1"
-                  >
-                    <Trash2 size={16} /> Clear Cart
-                  </button>
-                )}
-              </div>
-
               {/* Shipping Form Card */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                 <h3 className="text-lg font-bold text-gray-900 mb-4">
-                  Shipping Information
+                  Shipping and Billing Information
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="md:col-span-2">
@@ -483,7 +486,7 @@ const CartPage = () => {
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-[#4F46E5] rounded-3xl p-6 text-white sticky top-12 shadow-xl">
+              <div className="bg-[#4F46E5] rounded-3xl p-6 text-white sticky top-24 shadow-xl">
                 <h3 className="text-xl font-bold mb-6 border-b border-white/20 pb-4">
                   Order Summary
                 </h3>

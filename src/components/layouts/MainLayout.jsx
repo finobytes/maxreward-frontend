@@ -19,7 +19,7 @@ const LayoutContent = () => {
       };
 
   return (
-    <div className="min-h-screen flex bg-gray-100 overflow-x-hidden">
+    <div className="min-h-screen flex bg-gray-100">
       <Sidebar />
       <Backdrop />
 
@@ -28,7 +28,7 @@ const LayoutContent = () => {
         style={layoutStyle}
       >
         <Header />
-        <div className="p-4 max-w-screen-2xl mx-auto overflow-x-hidden">
+        <div className="p-4 max-w-screen-2xl mx-auto">
           <Outlet />
         </div>
       </div>
