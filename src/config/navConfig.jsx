@@ -167,6 +167,11 @@ export const NAV_CONFIG = {
       path: "/merchant/member-registration",
     },
     {
+      icon: <QrCode />,
+      name: "Show QR Code",
+      path: "/merchant/qr-code",
+    },
+    {
       icon: <Users />,
       name: "Merchant Staff",
       path: "/merchant/merchant-staff",

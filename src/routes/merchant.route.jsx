@@ -31,6 +31,7 @@ import PendingOrder from "../pages/merchant/orders/PendingOrder";
 import CompleteOrder from "../pages/merchant/orders/CompleteOrder";
 import ReturnOrder from "../pages/merchant/orders/ReturnOrder";
 import CancleOrder from "../pages/merchant/orders/CancleOrder";
+import QrCode from "../pages/merchant/qrCode/QrCode";
 
 export const merchantRoute = [
   {
@@ -40,6 +41,10 @@ export const merchantRoute = [
   {
     path: "member-registration",
     element: <MemberRegistration />,
+  },
+  {
+    path: "qr-code",
+    element: <QrCode />,
   },
   {
     path: "merchant-staff",
