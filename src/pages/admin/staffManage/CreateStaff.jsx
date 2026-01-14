@@ -11,8 +11,9 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router";
 import { z } from "zod";
 import { useCreateAdminStaffMutation } from "../../../redux/features/admin/adminStaff/adminStaffApi";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { nidPlaceholder, profilePlaceholder } from "../../../assets/assets";
+import { useGetAllRolesQuery } from "../../../redux/features/admin/rolePermission/rolePermissionApi";
 
 // Schema Validation (Zod)
 const adminStaffSchema = z.object({
@@ -28,15 +29,18 @@ const adminStaffSchema = z.object({
   designation: z.string().min(2, "Designation is required"),
   address: z.string().min(3, "Address is required"),
   gender: z.enum(["male", "female", "others"]),
+  role: z.string().min(1, "Role is required"),
   status: z.enum(["active", "inactive"]),
 });
 
 const CreateAdminStaff = () => {
   const [profilePicture, setProfilePicture] = useState(null);
   const [nationalIdCard, setNationalIdCard] = useState([]);
+  const [roles, setRoles] = useState([]);
 
   const navigate = useNavigate();
   const [createAdminStaff, { isLoading }] = useCreateAdminStaffMutation();
+  const { data: rolesData, isLoading: isLoadingRoles } = useGetAllRolesQuery();
 
   const {
     register,
@@ -53,9 +57,16 @@ const CreateAdminStaff = () => {
       designation: "",
       address: "",
       gender: "male",
+      role: "",
       status: "active",
     },
   });
+
+  useEffect(() => {
+    if (rolesData?.success === true) {
+      setRoles(rolesData.data?.admin || []);
+    }
+  }, [rolesData]);
 
   // Form Submit
   const onSubmit = async (formData) => {
@@ -89,6 +100,7 @@ const CreateAdminStaff = () => {
       formDataToSend.append("designation", formData.designation);
       formDataToSend.append("address", formData.address);
       formDataToSend.append("gender", formData.gender);
+      formDataToSend.append("role", formData.role);
       formDataToSend.append("status", formData.status);
 
       // Append profile picture
@@ -225,6 +237,22 @@ const CreateAdminStaff = () => {
                   { value: "female", label: "Female" },
                   { value: "others", label: "Others" },
                 ]}
+              />
+            </div>
+
+            {/* Role */}
+            <div>
+              <Label htmlFor="role">Role</Label>
+              <Select
+                {...register("role")}
+                placeholder={
+                  isLoadingRoles ? "Loading roles..." : "Select Role"
+                }
+                disabled={isLoadingRoles || roles.length === 0}
+                options={roles.map((role) => ({
+                  value: role.name,
+                  label: role.name,
+                }))}
               />
             </div>
 

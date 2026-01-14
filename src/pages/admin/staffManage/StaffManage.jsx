@@ -45,7 +45,7 @@ const StaffManage = () => {
   // Fetch all roles for dropdown
   const { data: rolesData, isLoading: isLoadingRoles } = useGetAllRolesQuery();
 
-  console.log("roles", roles);
+  // console.log("roles", roles);
 
   useEffect(() => {
     if (rolesData?.success === true) {
@@ -256,12 +256,8 @@ const StaffManage = () => {
                     </TableCell>
 
                     <TableCell className="whitespace-normal break-words relative group">
-                      <div className="group-hover:hidden">
-                        {staff?.role?.name || (
-                          <span className="text-gray-500">N/A</span>
-                        )}
-                      </div>
-                      <div className="hidden group-hover:block absolute inset-0 bg-white z-10 p-2">
+                          <span className="text-gray-500">{staff?.roles[0]?.name || "N/A"}</span>
+                      {/* <div className="hidden group-hover:block absolute inset-0 bg-white z-10 p-2">
                         <select
                           className="w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                           defaultValue={staff?.role?.id || ""}
@@ -277,7 +273,7 @@ const StaffManage = () => {
                             </option>
                           ))}
                         </select>
-                      </div>
+                      </div> */}
                     </TableCell>
 
                     <TableCell>
