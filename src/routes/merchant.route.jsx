@@ -27,6 +27,10 @@ import ReferTransaction from "../pages/merchant/PointStatement/Refer/ReferTransa
 import DraftProducts from "../pages/merchant/ProductManagement/DraftProducts";
 import ActiveProducts from "../pages/merchant/ProductManagement/ActiveProducts";
 import InactiveProducts from "../pages/merchant/ProductManagement/InactiveProducts";
+import PendingOrder from "../pages/merchant/orders/PendingOrder";
+import CompleteOrder from "../pages/merchant/orders/CompleteOrder";
+import ReturnOrder from "../pages/merchant/orders/ReturnOrder";
+import CancleOrder from "../pages/merchant/orders/CancleOrder";
 
 export const merchantRoute = [
   {
@@ -88,6 +92,22 @@ export const merchantRoute = [
   {
     path: "product/view/:id",
     element: <ProductDetails />,
+  },
+  {
+    path: "orders/pending-order",
+    element: <PendingOrder />,
+  },
+  {
+    path: "orders/complete-order",
+    element: <CompleteOrder />,
+  },
+  {
+    path: "orders/return-order",
+    element: <ReturnOrder />,
+  },
+  {
+    path: "orders/cancel-order",
+    element: <CancleOrder />,
   },
   {
     path: "redeem-mall",
