@@ -6,6 +6,7 @@ import CommunityPoint from "../pages/member/communityPoint/CommunityPoint";
 import DataPrivacyPolicy from "../pages/member/dataPrivacyPolicy/DataPrivacyPolicy";
 import MaxRedeemMall from "../pages/member/maxRedeemMall/MaxRedeemMall";
 import ProductDetailsPage from "../pages/member/maxRedeemMall/ProductDetailsPage";
+import CartPage from "../pages/member/maxRedeemMall/CartPage";
 import MemberDashboard from "../pages/member/memberDashboard/MemberDashboard";
 import MerchantApplication from "../pages/member/merchantApplication/MerchantApplication";
 import AvailableTransaction from "../pages/member/pointStatement/Available/AvailableTransaction";
@@ -24,6 +25,9 @@ import ShowQrCode from "../pages/member/showQrCode/ShowQrCode";
 import TermsAndConditions from "../pages/member/termsAndConditions/TermsAndConditions";
 import Notification from "../pages/member/notification/Notification";
 import NotificationDetails from "../pages/member/notification/NotificationDetails";
+import Orders from "../pages/member/myOrders/Orders";
+import ReturnOrder from "../pages/member/myOrders/ReturnOrder";
+import CancleOrder from "../pages/member/myOrders/CancleOrder";
 
 export const memberRoutes = [
   {
@@ -79,6 +83,10 @@ export const memberRoutes = [
     element: <MaxRedeemMall />,
   },
   {
+    path: "max-redeem-mall/cart",
+    element: <CartPage />,
+  },
+  {
     path: "max-redeem-mall/:id",
     element: <ProductDetailsPage />,
   },
@@ -105,6 +113,18 @@ export const memberRoutes = [
   {
     path: "redeem-transactions",
     element: <RedeemTransactions />,
+  },
+  {
+    path: "orders",
+    element: <Orders />,
+  },
+  {
+    path: "return-order",
+    element: <ReturnOrder />,
+  },
+  {
+    path: "cancel-order",
+    element: <CancleOrder />,
   },
   {
     path: "referred-member-list",

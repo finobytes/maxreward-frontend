@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useParams, Link, useNavigate } from "react-router";
-import MOCK_PRODUCTS from "./MockProducts";
+import { useParams, Link } from "react-router";
 import {
   ChevronRight,
   Heart,
@@ -14,30 +13,19 @@ import {
   Plus,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useGetSingleProductQuery } from "../../../redux/features/merchant/product/productApi";
+import { useAddToCartMutation } from "../../../redux/features/member/maxRedeemMall/maxRedeemApi";
 
 const ProductDetailsPage = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
-  const [product, setProduct] = useState(null);
+  const [addToCartMutation, { isLoading: isAdding }] = useAddToCartMutation();
+  const { data: productData, isLoading } = useGetSingleProductQuery(id);
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedAttributes, setSelectedAttributes] = useState({});
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
 
-  useEffect(() => {
-    if (MOCK_PRODUCTS) {
-      const found = MOCK_PRODUCTS.find((p) => p.id === Number(id));
-      if (found) {
-        setProduct(found);
-        // Default selection for attributes if needed?
-        // Usually better to let user select.
-        // But for images, maybe default to first available.
-      } else {
-        // toast.error("Product not found");
-        // navigate("/member/max-redeem-mall");
-      }
-    }
-  }, [id, navigate]);
+  const product = productData?.data || productData;
 
   // Helper: Find Variation Match
   const currentVariation = useMemo(() => {
@@ -111,12 +99,31 @@ const ProductDetailsPage = () => {
     ) {
       setSelectedImage(displayImages[0]);
     }
-  }, [displayImages]);
+  }, [displayImages, selectedImage]);
 
-  if (!product) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="w-16 h-16 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          Product Not Found
+        </h2>
+        <p className="text-gray-500 mb-6">
+          The product you're looking for doesn't exist or has been removed.
+        </p>
+        <Link
+          to="/member/max-redeem-mall"
+          className="px-6 py-2 bg-brand-600 text-white rounded-lg"
+        >
+          Back to Mall
+        </Link>
       </div>
     );
   }
@@ -139,12 +146,12 @@ const ProductDetailsPage = () => {
     : product.regular_point;
 
   const regularPrice = currentVariation?.regular_price || product.regular_price;
-  const regularPoints =
-    currentVariation?.regular_point || product.regular_point;
 
   const stock = currentVariation
     ? currentVariation.actual_quantity
-    : product.actual_quantity || 0;
+    : product.type === "simple"
+    ? product.variations?.[0]?.actual_quantity || 0
+    : 0;
 
   const handleAttributeSelect = (attrId, itemId) => {
     setSelectedAttributes((prev) => ({
@@ -153,12 +160,31 @@ const ProductDetailsPage = () => {
     }));
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (product.type === "variable" && !isVariationSelected) {
       toast.error("Please select all options");
       return;
     }
-    toast.success("Added to cart successfully!");
+
+    if (quantity > stock) {
+      toast.error(`Only ${stock} items available in stock`);
+      return;
+    }
+
+    const payload = {
+      product_id: product.id,
+      product_variation_id:
+        currentVariation?.id ||
+        (product.type === "simple" ? product.variations?.[0]?.id : null),
+      quantity: quantity,
+    };
+
+    try {
+      await addToCartMutation(payload).unwrap();
+      toast.success("Added to cart successfully");
+    } catch (error) {
+      toast.error(error?.data?.message || "Failed to add to cart");
+    }
   };
 
   return (
@@ -188,9 +214,9 @@ const ProductDetailsPage = () => {
                 alt={product.name}
                 className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500"
               />
-              <button className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur rounded-full hover:bg-brand-50 text-gray-600 hover:text-red-500 shadow-sm transition-colors">
+              {/* <button className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur rounded-full hover:bg-brand-50 text-gray-600 hover:text-red-500 shadow-sm transition-colors">
                 <Heart size={20} />
-              </button>
+              </button> */}
             </div>
             {/* Thumbnails */}
             <div className="grid grid-cols-5 gap-4">
@@ -218,7 +244,7 @@ const ProductDetailsPage = () => {
           <div className="space-y-8">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-white text-xs font-bold px-2 py-1 bg-brand-100 text-brand-700 rounded uppercase tracking-wider">
+                <span className="text-white text-xs font-bold px-2 py-1 bg-brand-100 rounded uppercase tracking-wider">
                   {product.category?.name}
                 </span>
                 {product.sub_category && (
@@ -232,13 +258,13 @@ const ProductDetailsPage = () => {
               </h1>
 
               <div className="flex items-center gap-4 mb-6">
-                <div className="flex items-center text-yellow-400">
+                {/* <div className="flex items-center text-yellow-400">
                   {[1, 2, 3, 4, 5].map((i) => (
                     <Star key={i} size={16} fill="currentColor" />
                   ))}
                 </div>
                 <span className="text-sm text-gray-500">(128 reviews)</span>
-                <div className="h-4 w-[1px] bg-gray-300"></div>
+                <div className="h-4 w-[1px] bg-gray-300"></div> */}
                 <span
                   className={`text-sm font-medium ${
                     stock > 0 ? "text-green-600" : "text-red-600"
@@ -254,7 +280,7 @@ const ProductDetailsPage = () => {
                   <span className="text-2xl">Pts</span>
                 </div>
                 <div className="text-xl text-gray-500 mb-1">or RM {price}</div>
-                {regularPrice > price && (
+                {Number(regularPrice) > Number(price) && (
                   <div className="text-sm text-gray-400 line-through mb-2">
                     RM {regularPrice}
                   </div>
@@ -333,10 +359,11 @@ const ProductDetailsPage = () => {
 
               <button
                 onClick={handleAddToCart}
-                className="flex-1 bg-brand-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-gray-200 hover:bg-brand-700 hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+                disabled={isAdding || stock === 0}
+                className="flex-1 bg-brand-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-gray-200 hover:bg-brand-700 hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed"
               >
                 <ShoppingCart size={20} />
-                Add to Cart
+                {isAdding ? "Adding..." : "Add to Cart"}
               </button>
               <button className="p-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 text-gray-600 transition-colors">
                 <Share2 size={20} />
@@ -364,51 +391,52 @@ const ProductDetailsPage = () => {
                 </span>
               </div>
             </div>
+          </div>
+        </div>
 
-            {/* Tabs (Description, etc) */}
-            <div className="border-t pt-8">
-              <div className="flex gap-6 border-b mb-4">
-                {["description", "specifications", "reviews"].map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={`pb-3 text-sm font-bold uppercase tracking-wide border-b-2 transition-colors ${
-                      activeTab === tab
-                        ? "border-brand-600 text-brand-600"
-                        : "border-transparent text-gray-400 hover:text-gray-600"
-                    }`}
-                  >
-                    {tab}
-                  </button>
-                ))}
-              </div>
+        {/* Tabs (Description, etc) */}
+        <div className="mt-2 md:mt-4 ">
+          {" "}
+          <div className=" border-t pt-8">
+            <div className="flex gap-6 border-b mb-4">
+              {["description", "specifications"].map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`pb-3 text-sm font-bold uppercase tracking-wide border-b-2 transition-colors ${
+                    activeTab === tab
+                      ? "border-brand-600 text-brand-600"
+                      : "border-transparent text-gray-400 hover:text-gray-600"
+                  }`}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
 
-              <div className="prose prose-sm prose-gray max-w-none">
-                {activeTab === "description" && (
-                  <p>{product.description || "No description available."}</p>
-                )}
-                {activeTab === "specifications" && (
-                  <div className="grid grid-cols-1 gap-y-2">
-                    <div className="grid grid-cols-3 border-b py-2">
-                      <span className="font-semibold">Brand</span>{" "}
-                      <span className="col-span-2">{product.brand?.name}</span>
-                    </div>
-                    <div className="grid grid-cols-3 border-b py-2">
-                      <span className="font-semibold">Model</span>{" "}
-                      <span className="col-span-2">{product.model?.name}</span>
-                    </div>
-                    <div className="grid grid-cols-3 border-b py-2">
-                      <span className="font-semibold">Weight</span>{" "}
-                      <span className="col-span-2">
-                        {product.unit_weight} kg
-                      </span>
-                    </div>
+            <div className="prose prose-sm prose-gray max-w-none">
+              {activeTab === "description" && (
+                <p>{product.description || "No description available."}</p>
+              )}
+              {activeTab === "specifications" && (
+                <div className="grid grid-cols-1 gap-y-2">
+                  <div className="grid grid-cols-3 border-b py-2">
+                    <span className="font-semibold">Brand</span>{" "}
+                    <span className="col-span-2">{product.brand?.name}</span>
                   </div>
-                )}
-                {activeTab === "reviews" && (
-                  <p className="text-gray-500 italic">No reviews yet.</p>
-                )}
-              </div>
+                  <div className="grid grid-cols-3 border-b py-2">
+                    <span className="font-semibold">Model</span>{" "}
+                    <span className="col-span-2">{product.model?.name}</span>
+                  </div>
+                  <div className="grid grid-cols-3 border-b py-2">
+                    <span className="font-semibold">Weight</span>{" "}
+                    <span className="col-span-2">{product.unit_weight} kg</span>
+                  </div>
+                </div>
+              )}
+              {activeTab === "reviews" && (
+                <p className="text-gray-500 italic">No reviews yet.</p>
+              )}
             </div>
           </div>
         </div>

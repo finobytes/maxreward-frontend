@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useRef, useState } from "react";
+import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
@@ -19,6 +20,13 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useGetAllBusinessTypesQuery } from "@/redux/features/admin/businessType/businessTypeApi";
 import SearchableSelect from "../../../components/form/SearchableSelect";
+import QrScanner from "react-qr-scanner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "../../../components/ui/dialog";
 
 const ShopWithMerchant = () => {
   const [searchText, setSearchText] = React.useState("");
@@ -44,6 +52,10 @@ const ShopWithMerchant = () => {
     isError: isBusinessTypeError,
   } = useGetAllBusinessTypesQuery();
 
+  // QR Code State
+  const [isQrOpen, setIsQrOpen] = useState(false);
+  const prevSearchRef = useRef(null);
+
   // Separate forms for Simple and Advanced search
   const {
     register: registerSimple,
@@ -64,29 +76,90 @@ const ShopWithMerchant = () => {
   const { data: advancedResult, isFetching: isFilterLoading } =
     useLocateMerchantsQuery(filters, { skip: !filters });
 
-  // Simple Search
-  const onSubmitSimple = async (data) => {
-    try {
-      const code = data.merchantNameOrUniqueNumber?.trim();
-      if (!code) {
-        toast.error("Please enter a valid merchant unique number.");
-        return;
-      }
+  const [isScannerProcessing, setIsScannerProcessing] = useState(false);
 
+  // Validation Schemas
+  const searchSchema = z
+    .string()
+    .min(1, "Please enter a valid merchant unique number.");
+  const qrSchema = z.object({
+    text: z.string().min(1, "Invalid QR code detected."),
+  });
+
+  const handleSearch = async (code) => {
+    // Validate input before API call
+    const validation = searchSchema.safeParse(code);
+    if (!validation.success) {
+      toast.error(validation.error.errors[0].message);
+      return false;
+    }
+
+    try {
       const res = await getMerchantSearch(code).unwrap();
 
       if (res?.id) {
         toast.success(`Merchant "${res.business_name}" found successfully!`);
         navigate("/member/redeem-with-merchant", { state: { merchant: res } });
+        return true;
       } else {
         toast.error("Merchant not found. Please check the code and try again.");
+        return false;
       }
     } catch (error) {
       console.error(error);
       toast.error(
         error?.data?.message || "Failed to retrieve merchant information."
       );
+      return false;
     }
+  };
+
+  const handleScan = async (data) => {
+    if (isScannerProcessing) return;
+
+    if (data?.text && data.text !== prevSearchRef.current) {
+      const validation = qrSchema.safeParse(data);
+      if (!validation.success) return;
+
+      setIsScannerProcessing(true);
+      prevSearchRef.current = data.text;
+
+      const success = await handleSearch(data.text);
+
+      if (success) {
+        setIsQrOpen(false);
+        setIsScannerProcessing(false);
+        prevSearchRef.current = null;
+      } else {
+        setTimeout(() => {
+          setIsScannerProcessing(false);
+          prevSearchRef.current = null;
+        }, 2000);
+      }
+    }
+  };
+
+  const handleQrError = (err) => {
+    console.error("QR Error", err);
+    if (err?.name === "NotAllowedError") {
+      toast.error("Camera access denied. Please allow camera permissions.");
+    } else {
+      toast.error("Issue accessing camera.");
+    }
+  };
+
+  // Reset scanner state when modal opens/closes
+  React.useEffect(() => {
+    if (!isQrOpen) {
+      setIsScannerProcessing(false);
+      prevSearchRef.current = null;
+    }
+  }, [isQrOpen]);
+
+  // Simple Search
+  const onSubmitSimple = async (data) => {
+    const code = data.merchantNameOrUniqueNumber?.trim();
+    await handleSearch(code);
   };
 
   // Advanced Search
@@ -293,7 +366,11 @@ const ShopWithMerchant = () => {
               alt="QR Code"
               className="mb-6 w-28 h-28 object-contain"
             />
-            <PrimaryButton variant="primary" size="md">
+            <PrimaryButton
+              variant="primary"
+              size="md"
+              onClick={() => setIsQrOpen(true)}
+            >
               <QrCode /> Search with QR Code
             </PrimaryButton>
           </div>
@@ -315,6 +392,48 @@ const ShopWithMerchant = () => {
           )}
         </ComponentCard>
       )}
+
+      <Dialog open={isQrOpen} onOpenChange={setIsQrOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Scan Merchant QR Code</DialogTitle>
+          </DialogHeader>
+          <div className="w-full h-[300px] bg-black rounded-lg overflow-hidden relative flex items-center justify-center">
+            {isQrOpen && (
+              <QrScanner
+                delay={500}
+                onError={handleQrError}
+                onScan={handleScan}
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                constraints={{
+                  audio: false,
+                  video: { facingMode: "environment" },
+                }}
+              />
+            )}
+
+            <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center">
+              <div className="relative w-64 h-64 border-2 border-brand-500/80 rounded-lg overflow-hidden shadow-[0_0_0_100vw_rgba(0,0,0,0.5)]">
+                <div className="absolute inset-x-0 w-full h-1 bg-brand-500/80 shadow-[0_0_10px_rgba(34,197,94,0.8)] animate-pulse"></div>
+
+                {isScannerProcessing && (
+                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center backdrop-blur-sm z-10">
+                    <div className="flex flex-col items-center">
+                      <div className="w-10 h-10 border-4 border-white/30 border-t-brand-500 rounded-full animate-spin"></div>
+                      <p className="text-white text-sm mt-3 font-medium">
+                        Verifying...
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <p className="mt-6 text-white text-sm font-medium drop-shadow-md">
+                Align QR code within the frame
+              </p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

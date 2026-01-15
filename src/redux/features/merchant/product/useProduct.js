@@ -1,6 +1,7 @@
+import { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  useGetProductsQuery,
+  useGetMerchantProductsQuery,
   useGenerateVariationsMutation,
   useValidateSkuMutation,
 } from "./productApi";
@@ -42,13 +43,35 @@ export const useProduct = () => {
     merchant_id: filters.merchant_id,
   };
 
+  // Check if we have a merchant_id, if so use the merchant specific endpoint
+  // strictly speaking, useProduct is for the merchant dashboard, so we should expected a merchant_id
+  // or at least favor the merchant endpoint structure if intended for that role.
   const { data, isLoading, isError, error, isFetching } =
-    useGetProductsQuery(queryArgs);
+    useGetMerchantProductsQuery(
+      { ...queryArgs, merchant_id: filters.merchant_id },
+      { skip: !filters.merchant_id } // Skip if no merchant_id is present yet
+    );
 
   const [generateVariations, { isLoading: isGeneratingVariations }] =
     useGenerateVariationsMutation();
   const [validateSku, { isLoading: isValidatingSku }] =
     useValidateSkuMutation();
+
+  const actions = useMemo(
+    () => ({
+      setSearch,
+      setStatus: (value) => dispatch(setStatus(value)),
+      setCategory: (value) => dispatch(setCategory(value)),
+      setBrand: (value) => dispatch(setBrand(value)),
+      setType: (value) => dispatch(setType(value)),
+      setMerchantId: (value) => dispatch(setMerchantId(value)),
+      setCurrentPage: (value) => dispatch(setCurrentPage(value)),
+      resetFilters: () => dispatch(resetFilters()),
+      generateVariations,
+      validateSku,
+    }),
+    [dispatch, generateVariations, validateSku]
+  );
 
   return {
     products: data?.products || [],
@@ -61,18 +84,7 @@ export const useProduct = () => {
     isError,
     error,
     filters,
-    actions: {
-      setSearch, // Component should debounce this
-      setStatus: (value) => dispatch(setStatus(value)),
-      setCategory: (value) => dispatch(setCategory(value)),
-      setBrand: (value) => dispatch(setBrand(value)),
-      setType: (value) => dispatch(setType(value)),
-      setMerchantId: (value) => dispatch(setMerchantId(value)),
-      setCurrentPage: (value) => dispatch(setCurrentPage(value)),
-      resetFilters: () => dispatch(resetFilters()),
-      generateVariations,
-      validateSku,
-    },
+    actions,
     status: {
       isGeneratingVariations,
       isValidatingSku,

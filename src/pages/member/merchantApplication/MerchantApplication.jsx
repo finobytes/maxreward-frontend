@@ -121,11 +121,12 @@ const MerchantApplication = () => {
 
   // Prefill referral code when verifyMeQuery loads
   useEffect(() => {
-    if (data?.referral_code) {
-      setReferralInput(data.referral_code); // this will show it in input
+    if (data?.phone) {
+      setReferralInput(data.phone); // this will show it in input
+      setValue("referralCode", data.phone);
       setPhoneInputValue(data.phone); // this will show it in input
     }
-  }, [data?.referral_code]);
+  }, [data?.phone, setValue]);
 
   // Submit handler
   const onSubmit = async (data) => {
@@ -170,6 +171,7 @@ const MerchantApplication = () => {
     }
   };
   console.log(data?.referral_code);
+
   return (
     <div>
       <PageBreadcrumb
@@ -292,7 +294,6 @@ const MerchantApplication = () => {
                   </p>
                 )}
               </div> */}
-
             </div>
 
             {/* LOGO */}
@@ -379,28 +380,36 @@ const MerchantApplication = () => {
               <div>
                 <Label htmlFor="referralCode">
                   {/* Referral Code / Phone Number  */}
-                  Phone Number 
-                  (<span className="text-red-500">*</span>)
+                  Phone Number (<span className="text-red-500">*</span>)
                 </Label>
-                <Input
-                  id="referralCode"
-                  // placeholder="Enter referral code / Phone Number"
-                  placeholder="Enter Phone Number"
-                  {...register("referralCode")}
-                  // value={referralInput}
-                  value={PhoneInputValue}
-                  onChange={(e) => {
-                    if (Number(annualSalesTurnover) < 1000000) {
-                      setReferralInput(e.target.value);
+                {isLoading ? (
+                  <SkeletonField />
+                ) : (
+                  <Input
+                    id="referralCode"
+                    // placeholder="Enter referral code / Phone Number"
+                    placeholder="Enter Phone Number"
+                    {...register("referralCode")}
+                    // value={referralInput}
+                    value={referralInput}
+                    onChange={(e) => {
+                      if (Number(annualSalesTurnover) < 1000000) {
+                        setReferralInput(e.target.value);
+                        setValue("referralCode", e.target.value, {
+                          shouldValidate: true,
+                        });
+                      }
+                    }}
+                    readOnly={Number(annualSalesTurnover) >= 1000000}
+                    className={
+                      Number(annualSalesTurnover) >= 1000000
+                        ? "bg-gray-100"
+                        : ""
                     }
-                  }}
-                  readOnly={Number(annualSalesTurnover) >= 1000000}
-                  className={
-                    Number(annualSalesTurnover) >= 1000000 ? "bg-gray-100" : ""
-                  }
-                  error={!!errors.referralCode}
-                  hint={errors.referralCode?.message}
-                />
+                    error={!!errors.referralCode}
+                    hint={errors.referralCode?.message}
+                  />
+                )}
 
                 {referralInput && referralInput.length < 3 && (
                   <p className="text-xs text-gray-400 mt-1">

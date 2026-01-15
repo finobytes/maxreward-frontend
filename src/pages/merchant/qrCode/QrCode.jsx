@@ -21,17 +21,17 @@ import {
 import { Skeleton } from "../../../components/ui/skeleton";
 import { toast } from "sonner";
 
-const ShowQrCode = () => {
+const QrCode = () => {
   const { user, token } = useSelector((state) => state.auth);
-  const role = user?.role || "member";
+  const role = user?.role || "merchant";
   const { data, isLoading, error } = useVerifyMeQuery(role, { skip: !token });
-  const qrRef = useRef();
 
   const userData = data?.data || data;
+  const merchant = userData?.merchant;
 
-  // Data to encode in QR
-  // For production, this might be a unique URL or a specific identifier
-  const qrValue = userData?.user_id || userData?.id || "N/A";
+  const qrValue = merchant?.unique_number || userData?.unique_number || "N/A";
+  const displayName = merchant?.business_name || userData?.name || "Merchant";
+  const displayId = merchant?.unique_number || userData?.id;
 
   const handleDownload = () => {
     const svg = document.getElementById("qr-code-svg");
@@ -43,14 +43,14 @@ const ShowQrCode = () => {
     const img = new Image();
 
     img.onload = () => {
-      canvas.width = img.width + 40; // Add padding
+      canvas.width = img.width + 40;
       canvas.height = img.height + 40;
       ctx.fillStyle = "white";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 20, 20);
       const pngFile = canvas.toDataURL("image/png");
       const downloadLink = document.createElement("a");
-      downloadLink.download = `QR_${userData?.name || "Member"}.png`;
+      downloadLink.download = `QR_${displayName.replace(/\s+/g, "_")}.png`;
       downloadLink.href = pngFile;
       downloadLink.click();
       toast.success("QR Code downloaded successfully!");
@@ -63,8 +63,8 @@ const ShowQrCode = () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: "My Max Reward QR Code",
-          text: `Scan my QR code to verify my membership: ${userData?.name}`,
+          title: `${displayName} QR Code`,
+          text: `Scan to pay or verify: ${displayName}`,
           url: window.location.href,
         });
       } catch (err) {
@@ -126,17 +126,6 @@ const ShowQrCode = () => {
       </div>
 
       <Card className="w-full max-w-md shadow-2xl border-none bg-white/80 backdrop-blur-md overflow-hidden animate-in fade-in zoom-in duration-500">
-        {/* <div className="h-2 bg-gradient-to-r from-brand-500 to-brand-600" /> */}
-        {/* <CardHeader className="text-center pb-2">
-          <div className="mx-auto w-12 h-12 bg-brand-100 rounded-full flex items-center justify-center mb-4">
-            <QrIcon className="text-white" size={24} />
-          </div>
-          <CardTitle className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">
-            My Global ID Card
-          </CardTitle>
-          <CardDescription>Scan to identify your membership</CardDescription>
-        </CardHeader> */}
-
         <CardContent className="flex flex-col items-center gap-8 py-8">
           {/* QR Container */}
           <div className="relative p-6 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 group transition-all duration-300 hover:shadow-xl hover:scale-[1.02]">
@@ -151,20 +140,18 @@ const ShowQrCode = () => {
             {/* Name/Logo Overlay in center */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-2 rounded-lg shadow-md border border-gray-50 flex items-center justify-center min-w-[60px]">
               <span className="text-[10px] font-bold text-brand-600 uppercase tracking-wider truncate max-w-[80px]">
-                {userData?.name?.split(" ")[0] || "USER"}
+                {displayName.split(" ")[0]}
               </span>
             </div>
           </div>
 
           <div className="text-center space-y-2">
-            <h3 className="text-xl font-bold text-gray-900">
-              {userData?.name}
-            </h3>
+            <h3 className="text-xl font-bold text-gray-900">{displayName}</h3>
             <p className="text-sm text-gray-500 flex items-center justify-center gap-2">
               <User size={14} className="text-brand-500" />
-              Member ID:{" "}
+              Unique Number:{" "}
               <span className="font-mono font-medium text-gray-700">
-                {userData?.id}
+                {displayId}
               </span>
             </p>
           </div>
@@ -196,4 +183,4 @@ const ShowQrCode = () => {
   );
 };
 
-export default ShowQrCode;
+export default QrCode;

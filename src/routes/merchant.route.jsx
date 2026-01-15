@@ -26,6 +26,12 @@ import AvailableTransaction from "../pages/merchant/PointStatement/Available/Ava
 import ReferTransaction from "../pages/merchant/PointStatement/Refer/ReferTransaction";
 import DraftProducts from "../pages/merchant/ProductManagement/DraftProducts";
 import ActiveProducts from "../pages/merchant/ProductManagement/ActiveProducts";
+import InactiveProducts from "../pages/merchant/ProductManagement/InactiveProducts";
+import PendingOrder from "../pages/merchant/orders/PendingOrder";
+import CompleteOrder from "../pages/merchant/orders/CompleteOrder";
+import ReturnOrder from "../pages/merchant/orders/ReturnOrder";
+import CancleOrder from "../pages/merchant/orders/CancleOrder";
+import QrCode from "../pages/merchant/qrCode/QrCode";
 
 export const merchantRoute = [
   {
@@ -35,6 +41,10 @@ export const merchantRoute = [
   {
     path: "member-registration",
     element: <MemberRegistration />,
+  },
+  {
+    path: "qr-code",
+    element: <QrCode />,
   },
   {
     path: "merchant-staff",
@@ -73,6 +83,10 @@ export const merchantRoute = [
     element: <ActiveProducts />,
   },
   {
+    path: "product/inactive-products",
+    element: <InactiveProducts />,
+  },
+  {
     path: "product/create",
     element: <ProductForm />,
   },
@@ -83,6 +97,22 @@ export const merchantRoute = [
   {
     path: "product/view/:id",
     element: <ProductDetails />,
+  },
+  {
+    path: "orders/pending-order",
+    element: <PendingOrder />,
+  },
+  {
+    path: "orders/complete-order",
+    element: <CompleteOrder />,
+  },
+  {
+    path: "orders/return-order",
+    element: <ReturnOrder />,
+  },
+  {
+    path: "orders/cancel-order",
+    element: <CancleOrder />,
   },
   {
     path: "redeem-mall",

@@ -15,33 +15,70 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useProduct } from "../../../../redux/features/merchant/product/useProduct";
-import { useDeleteProductMutation } from "../../../../redux/features/merchant/product/productApi";
+import {
+  useDeleteProductMutation,
+  useUpdateProductStatusMutation,
+} from "../../../../redux/features/merchant/product/productApi";
+import { useVerifyMeQuery } from "../../../../redux/features/auth/authApi";
+// Pick Member ID
+const pickMemberId = (profile) =>
+  profile?.merchant?.corporate_member?.id ||
+  profile?.merchant?.corporate_member_id ||
+  null;
 
 const ProductList = ({ statusFilter = "", title = "Products" }) => {
+  const { data: memberProfile, isLoading: memberLoading } =
+    useVerifyMeQuery("merchant");
+  // Derive Merchant ID from profile
+  // The structure depends on the API response for 'merchant' role
+  // Typically: profile.id or profile.merchant.id
+  const merchantId =
+    memberProfile?.merchant?.id ||
+    memberProfile?.id ||
+    pickMemberId(memberProfile);
+
   const {
     products,
     pagination,
     isLoading,
-    actions: { setSearch, setStatus, resetFilters, setCurrentPage },
+    actions: {
+      setSearch,
+      setStatus,
+      resetFilters,
+      setCurrentPage,
+      setMerchantId,
+    },
     filters: { search, status },
   } = useProduct();
 
   const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation();
+  const [updateProductStatus, { isLoading: isUpdatingStatus }] =
+    useUpdateProductStatusMutation();
   const [selected, setSelected] = useState([]);
+  const [statusModalOpen, setStatusModalOpen] = useState(false);
+  const [itemToUpdate, setItemToUpdate] = useState(null);
 
-  // Set initial status filter on mount
+  // Set initial status filter and merchant ID on mount/change
   useEffect(() => {
-    // Only set if different to avoid infinite loops or unnecessary fetching
-    // But since we want to enforce the page's context, yes.
-    setStatus(statusFilter);
-    return () => {
-      // Optional: reset on unmount
-      // resetFilters();
-      // Better not to reset on unmount if we want to keep state when navigating back,
-      // but since we have different pages for different statuses, we should probably set it.
-    };
+    if (statusFilter !== undefined) {
+      setStatus(statusFilter);
+    }
   }, [statusFilter]);
+
+  useEffect(() => {
+    if (merchantId) {
+      setMerchantId(merchantId);
+    }
+  }, [merchantId, setMerchantId]);
   // Note: we intentionally don't include setStatus in deps to avoid issues, usually it's stable.
 
   const toggleSelect = (id) => {
@@ -61,6 +98,26 @@ const ProductList = ({ statusFilter = "", title = "Products" }) => {
   const handleDelete = async (id) => {
     if (confirm("Are you sure you want to delete this product?")) {
       await deleteProduct(id);
+    }
+  };
+
+  const handleStatusUpdate = (product, newStatus) => {
+    setItemToUpdate({ ...product, newStatus });
+    setStatusModalOpen(true);
+  };
+
+  const confirmStatusChange = async () => {
+    if (!itemToUpdate) return;
+    try {
+      await updateProductStatus({
+        id: itemToUpdate.id,
+        status: itemToUpdate.newStatus,
+      }).unwrap();
+      setStatusModalOpen(false);
+      setItemToUpdate(null);
+    } catch (err) {
+      console.error("Failed to update status", err);
+      // Optional: add toast error here
     }
   };
 
@@ -285,6 +342,42 @@ const ProductList = ({ statusFilter = "", title = "Products" }) => {
                             <PencilLine size={16} />
                           </Link>
 
+                          {product.status === "draft" && (
+                            <button
+                              onClick={() =>
+                                handleStatusUpdate(product, "active")
+                              }
+                              className="p-2 rounded-md bg-green-50 hover:bg-green-100 text-green-600 transition-colors border border-green-200"
+                              title="Publish (Set to Active)"
+                            >
+                              <span className="font-bold text-xs">PUB</span>
+                            </button>
+                          )}
+
+                          {product.status === "active" && (
+                            <button
+                              onClick={() =>
+                                handleStatusUpdate(product, "inactive")
+                              }
+                              className="p-2 rounded-md bg-yellow-50 hover:bg-yellow-100 text-yellow-600 transition-colors border border-yellow-200"
+                              title="Deactivate"
+                            >
+                              <span className="font-bold text-xs">DEACT</span>
+                            </button>
+                          )}
+
+                          {product.status === "inactive" && (
+                            <button
+                              onClick={() =>
+                                handleStatusUpdate(product, "active")
+                              }
+                              className="p-2 rounded-md bg-green-50 hover:bg-green-100 text-green-600 transition-colors border border-green-200"
+                              title="Activate"
+                            >
+                              <span className="font-bold text-xs">ACT</span>
+                            </button>
+                          )}
+
                           <button
                             onClick={() => handleDelete(product.id)}
                             className="p-2 rounded-md bg-red-50 hover:bg-red-100 text-red-600 transition-colors border border-red-200"
@@ -309,6 +402,61 @@ const ProductList = ({ statusFilter = "", title = "Products" }) => {
           />
         </div>
       </div>
+      {/* Status Update Modal */}
+      <Dialog open={statusModalOpen} onOpenChange={setStatusModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {itemToUpdate?.newStatus === "active"
+                ? "Publish Product"
+                : itemToUpdate?.newStatus === "inactive"
+                ? "Deactivate Product"
+                : "Update Status"}
+            </DialogTitle>
+            <DialogDescription>
+              Are you sure you want to change the status of{" "}
+              <span className="font-semibold text-gray-900">
+                "{itemToUpdate?.name}"
+              </span>{" "}
+              to{" "}
+              <span className="font-semibold uppercase">
+                {itemToUpdate?.newStatus}
+              </span>
+              ?
+              {itemToUpdate?.newStatus === "active" && (
+                <span className="block mt-2 text-green-600">
+                  This product will be visible to all members.
+                </span>
+              )}
+              {itemToUpdate?.newStatus === "inactive" && (
+                <span className="block mt-2 text-yellow-600">
+                  This product will be hidden from members.
+                </span>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <div className="mr-2">
+              <PrimaryButton
+                variant="secondary"
+                onClick={() => setStatusModalOpen(false)}
+                disabled={isUpdatingStatus}
+              >
+                Cancel
+              </PrimaryButton>
+            </div>
+            <PrimaryButton
+              variant={
+                itemToUpdate?.newStatus === "inactive" ? "danger" : "primary"
+              }
+              onClick={confirmStatusChange}
+              loading={isUpdatingStatus}
+            >
+              {itemToUpdate?.newStatus === "active" ? "Publish" : "Confirm"}
+            </PrimaryButton>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -167,6 +167,11 @@ export const NAV_CONFIG = {
       path: "/merchant/member-registration",
     },
     {
+      icon: <QrCode />,
+      name: "Show QR Code",
+      path: "/merchant/qr-code",
+    },
+    {
       icon: <Users />,
       name: "Merchant Staff",
       path: "/merchant/merchant-staff",
@@ -182,6 +187,32 @@ export const NAV_CONFIG = {
         {
           name: "Active Products",
           path: "/merchant/product/active-products",
+        },
+        {
+          name: "Inactive Products",
+          path: "/merchant/product/inactive-products",
+        },
+      ],
+    },
+    {
+      icon: <ShoppingBag />,
+      name: "Orders",
+      subItems: [
+        {
+          name: "Pending Order",
+          path: "/merchant/orders/pending-order",
+        },
+        {
+          name: "Complete Order",
+          path: "/merchant/orders/complete-order",
+        },
+        {
+          name: "Return Order",
+          path: "/merchant/orders/return-order",
+        },
+        {
+          name: "Cancel Order",
+          path: "/merchant/orders/cancel-order",
         },
       ],
     },
@@ -304,6 +335,25 @@ export const NAV_CONFIG = {
       icon: <ShoppingBag />,
       name: "Max Redeem Mall",
       path: "/member/max-redeem-mall",
+    },
+
+    {
+      icon: <ShoppingCart />,
+      name: "My Orders",
+      subItems: [
+        {
+          name: "Orders",
+          path: "/member/orders",
+        },
+        {
+          name: "Return Order",
+          path: "/member/return-order",
+        },
+        {
+          name: "Cancel Order",
+          path: "/member/cancel-order",
+        },
+      ],
     },
     {
       icon: <DollarSign />,

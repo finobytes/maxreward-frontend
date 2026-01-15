@@ -119,6 +119,7 @@ const ProductForm = () => {
   const {
     handleSubmit,
     reset,
+    register,
     watch,
     setValue,
     control,
@@ -222,7 +223,7 @@ const ProductForm = () => {
         model_id: data.model_id || "",
         description: data.description || "",
         status: data.status || "draft",
-        product_type: data.type || "variable",
+        product_type: (data.type || "variable").toLowerCase(),
         images: data.images || [],
 
         regular_price: data.regular_price ? String(data.regular_price) : "",
@@ -332,6 +333,16 @@ const ProductForm = () => {
 
       // --- Simple Product Logic ---
       if (formData.product_type === "simple") {
+        if (isEditMode) {
+          data.append("product_id", id);
+          const simpleVarId =
+            formData.variations?.[0]?.variation_id ||
+            formData.variations?.[0]?.id;
+          if (simpleVarId) {
+            data.append("variation_id", simpleVarId);
+          }
+        }
+
         if (formData.sku) data.append("sku", formData.sku);
 
         // Map variation_* fields to payload
@@ -558,7 +569,14 @@ const ProductForm = () => {
         await createProduct(data).unwrap();
         toast.success("Product created successfully!");
       }
-      navigate("/merchant/product/draft-products");
+      const targetStatus = formData.status || "draft";
+      if (targetStatus === "active") {
+        navigate("/merchant/product/active-products");
+      } else if (targetStatus === "inactive") {
+        navigate("/merchant/product/inactive-products");
+      } else {
+        navigate("/merchant/product/draft-products");
+      }
     } catch (err) {
       console.error("Failed to save product:", err);
       toast.error(
@@ -584,7 +602,20 @@ const ProductForm = () => {
       />
 
       <FormProvider {...methods}>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        <form
+          onSubmit={handleSubmit(onSubmit, (errors) => {
+            console.error("Form Validation Errors:", errors);
+            const errorFields = Object.keys(errors).join(", ");
+            const currentType = getValues("product_type");
+            toast.error(
+              `Validation Error (${currentType}). Check fields: ${errorFields}`
+            );
+          })}
+          className="space-y-8"
+        >
+          <input type="hidden" {...register("product_type")} />
+          <input type="hidden" {...register("status")} />
+
           <ProductBasicInfo
             handleSkuValidation={handleSkuValidation}
             brands={brands}

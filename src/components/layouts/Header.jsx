@@ -4,10 +4,27 @@ import { Link, useNavigate } from "react-router";
 import { useSidebar } from "../../context/SidebarContext";
 import UserDropdown from "../header/UserDropdown";
 import { logo } from "../../assets/assets";
-import { Menu, X, Bell } from "lucide-react";
+import { Menu, X, Bell, ShoppingCart } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useVerifyMeQuery } from "../../redux/features/auth/authApi";
-import { useGetAllNotificationsQuery, useSaveAllUnreadCountMutation } from "../../redux/features/admin/notification/notificationApi";
+
+import {
+  useGetAllNotificationsQuery,
+  useSaveAllUnreadCountMutation,
+} from "../../redux/features/admin/notification/notificationApi";
+import { useGetCartCountQuery } from "../../redux/features/member/maxRedeemMall/maxRedeemApi";
+
+const CartBadge = () => {
+  const { data: count } = useGetCartCountQuery();
+
+  if (!count || count === 0) return null;
+
+  return (
+    <span className="absolute -top-2 -right-3 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-brand-600 px-1 text-[11px] font-bold text-white">
+      {count > 99 ? "99+" : count}
+    </span>
+  );
+};
 
 const Header = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
@@ -30,12 +47,11 @@ const Header = () => {
   const { user, token } = useSelector((state) => state.auth);
   const role = user?.role || "member"; // admin | merchant | member
 
-  const { data, isLoading, refetch } = useVerifyMeQuery(role, { skip: !token });
+  const { data, refetch } = useVerifyMeQuery(role, { skip: !token });
   const { data: notificationData } = useGetAllNotificationsQuery({
     page: 1,
     role,
   });
-
 
   const [saveAllUnreadCount] = useSaveAllUnreadCountMutation();
 
@@ -52,7 +68,7 @@ const Header = () => {
     };
 
   const handleNotificationClick = async () => {
-    if(unreadCount > 0){
+    if (unreadCount > 0) {
       await saveAllUnreadCount(role);
     }
 
@@ -107,6 +123,22 @@ const Header = () => {
             isApplicationMenuOpen ? "flex" : "hidden"
           } items-center justify-between w-full gap-4 px-5 py-3 lg:flex shadow-theme-md lg:justify-end lg:px-0 lg:shadow-none`}
         >
+          {/* Cart Icon for Member */}
+          {role === "member" && (
+            <Link
+              to="/member/max-redeem-mall/cart"
+              className="relative flex items-center justify-center text-gray-500 bg-white border border-gray-200 rounded-full h-11 w-11 hover:bg-gray-100 transition"
+            >
+              <div className="relative">
+                <ShoppingCart size={18} />
+                {/* We need to fetch cart count from store. 
+                    Since header is shared, we should ideally access cart state safely.
+                */}
+                <CartBadge />
+              </div>
+            </Link>
+          )}
+
           <div className="flex items-center gap-2 2xsm:gap-3">
             {/* <!-- Notification Menu Area --> */}
             <button
