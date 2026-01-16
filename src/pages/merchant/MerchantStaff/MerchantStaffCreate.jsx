@@ -14,14 +14,18 @@ import { useNavigate } from "react-router";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
+import { useGetAllRolesQuery } from "../../../redux/features/admin/rolePermission/rolePermissionApi";
+import { useEffect, useState } from "react";
 
 const MerchantStaffCreate = () => {
+  const [roles, setRoles] = useState([]);
   const [createStaff, { isLoading }] = useCreateStaffMutation();
   const navigate = useNavigate();
 
   const { data } = useVerifyMeQuery("merchant");
   console.log("Merchant Data:", data);
   const merchant_id = data?.merchant_id || data?.id;
+  const { data: rolesData, isLoading: isLoadingRoles } = useGetAllRolesQuery();
 
   const {
     register,
@@ -39,11 +43,18 @@ const MerchantStaffCreate = () => {
       email: "",
       password: "",
       gender_type: "male",
+      role: "",
       status: "active",
       town: "",
       country_code: "",
     },
   });
+
+  useEffect(() => {
+    if (rolesData?.success === true) {
+      setRoles(rolesData.data?.merchant || []);
+    }
+  }, [rolesData]);
 
   const onSubmit = async (formData) => {
     try {
@@ -54,6 +65,7 @@ const MerchantStaffCreate = () => {
         email: formData.email,
         password: formData.password,
         gender_type: formData.gender_type,
+        role: formData.role,
         status: formData.status,
         town: formData.town,
         country_code: formData.country_code,
@@ -180,6 +192,22 @@ const MerchantStaffCreate = () => {
                   { value: "female", label: "Female" },
                   { value: "others", label: "Others" },
                 ]}
+              />
+            </div>
+
+            {/* Role */}
+            <div>
+              <Label>Role</Label>
+              <Select
+                {...register("role")}
+                placeholder={
+                  isLoadingRoles ? "Loading roles..." : "Select Role"
+                }
+                disabled={isLoadingRoles || roles.length === 0}
+                options={roles.map((role) => ({
+                  value: role.name,
+                  label: role.name,
+                }))}
               />
             </div>
 

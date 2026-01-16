@@ -108,6 +108,9 @@ const MerchantStaff = () => {
                   Email
                 </TableHead>
                 <TableHead className="text-gray-700 font-medium">
+                  Role
+                </TableHead>
+                <TableHead className="text-gray-700 font-medium">
                   Status
                 </TableHead>
                 <TableHead className="text-gray-700 font-medium text-center">
@@ -118,10 +121,10 @@ const MerchantStaff = () => {
 
             <TableBody>
               {isLoading ? (
-                <MerchantStaffSkeleton rows={8} cols={5} />
+                <MerchantStaffSkeleton rows={8} cols={6} />
               ) : staffs.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-6">
+                  <TableCell colSpan={8} className="text-center py-6">
                     No staff found
                   </TableCell>
                 </TableRow>
@@ -146,6 +149,19 @@ const MerchantStaff = () => {
                     <TableCell>{staff.name}</TableCell>
                     <TableCell>{staff.phone}</TableCell>
                     <TableCell>{staff.email}</TableCell>
+                    <TableCell>
+                      {staff?.roles?.length ? (
+                        typeof staff.roles[0] === "string" ? (
+                          staff.roles[0]
+                        ) : (
+                          staff.roles[0]?.name || (
+                            <span className="text-gray-500">N/A</span>
+                          )
+                        )
+                      ) : (
+                        <span className="text-gray-500">N/A</span>
+                      )}
+                    </TableCell>
                     <TableCell>
                       <StatusBadge status={staff.status} />
                     </TableCell>

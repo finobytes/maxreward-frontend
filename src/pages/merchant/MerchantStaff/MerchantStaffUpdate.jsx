@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import {
   useUpdateStaffMutation,
@@ -14,14 +14,17 @@ import Input from "../../../components/form/input/InputField";
 import Select from "../../../components/form/Select";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
 import { merchantStaffUpdateSchema } from "../../../schemas/merchantStaffUpdateSchema";
+import { useGetAllRolesQuery } from "../../../redux/features/admin/rolePermission/rolePermissionApi";
 
 const MerchantStaffUpdate = () => {
   const { id } = useParams(); // get staff id from URL
   const navigate = useNavigate();
+  const [roles, setRoles] = useState([]);
 
   // API hooks
   const { data: staffData, isLoading: isFetching } = useGetStaffByIdQuery(id);
   const [updateStaff, { isLoading }] = useUpdateStaffMutation();
+  const { data: rolesData, isLoading: isLoadingRoles } = useGetAllRolesQuery();
 
   // form setup
   const {
@@ -29,9 +32,16 @@ const MerchantStaffUpdate = () => {
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
   } = useForm({
     resolver: zodResolver(merchantStaffUpdateSchema),
   });
+
+  useEffect(() => {
+    if (rolesData?.success === true) {
+      setRoles(rolesData.data?.merchant || []);
+    }
+  }, [rolesData]);
 
   // populate form when staff data is loaded
   useEffect(() => {
@@ -46,6 +56,15 @@ const MerchantStaffUpdate = () => {
       });
     }
   }, [staffData, reset]);
+
+  useEffect(() => {
+    if (!staffData?.data || roles.length === 0) return;
+    const roleFromStaff = staffData.data.roles?.[0] || "";
+    const roleName =
+      typeof roleFromStaff === "string" ? roleFromStaff : roleFromStaff?.name;
+    const hasRole = roles.some((role) => role.name === roleName);
+    setValue("role", hasRole ? roleName : "");
+  }, [staffData, roles, setValue]);
 
   const onSubmit = async (formData) => {
     try {
@@ -163,6 +182,22 @@ const MerchantStaffUpdate = () => {
                   { value: "female", label: "Female" },
                   { value: "others", label: "Others" },
                 ]}
+              />
+            </div>
+
+            {/* Role */}
+            <div>
+              <Label>Role</Label>
+              <Select
+                {...register("role")}
+                placeholder={
+                  isLoadingRoles ? "Loading roles..." : "Select Role"
+                }
+                disabled={isLoadingRoles || roles.length === 0}
+                options={roles.map((role) => ({
+                  value: role.name,
+                  label: role.name,
+                }))}
               />
             </div>
 
