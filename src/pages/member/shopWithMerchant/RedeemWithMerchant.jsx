@@ -33,7 +33,7 @@ const RedeemWithMerchant = () => {
   } = useShopWithMerchant();
 
   const activeMerchant = merchant || merchantFromRoute;
-  const availablePoints = verifyData?.user?.wallet?.available_points ?? 0;
+  const availablePoints = verifyData?.wallet?.available_points ?? 0;
 
   useEffect(() => {
     if (merchantFromRoute) {

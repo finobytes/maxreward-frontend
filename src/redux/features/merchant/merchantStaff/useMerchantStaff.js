@@ -25,11 +25,11 @@ export const useMerchantStaff = () => {
 
   const [debouncedSearch, setDebouncedSearch] = useState(search);
   const merchantId =
-    verifyData?.user?.merchant_id || // corporate member
-    verifyData?.user?.merchant?.corporate_member_id || // direct corporate member id
-    verifyData?.user?.member?.id || // member id
-    verifyData?.user?.data?.id || // fallback
-    verifyData?.user?.id; // fallback
+    verifyData?.merchant_id || // corporate member
+    verifyData?.merchant?.corporate_member_id || // direct corporate member id
+    verifyData?.member?.id || // member id
+    verifyData?.data?.id || // fallback
+    verifyData?.id; // fallback
 
 
     // console.log("merchantId", merchantId);

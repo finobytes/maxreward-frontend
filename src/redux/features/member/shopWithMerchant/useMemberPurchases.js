@@ -27,9 +27,9 @@ export const useMemberPurchases = () => {
 
   const resolvedMemberId =
     memberId ||
-    verifyData?.user?.member?.id ||
-    verifyData?.user?.data?.id ||
-    verifyData?.user?.id ||
+    verifyData?.member?.id ||
+    verifyData?.data?.id ||
+    verifyData?.id ||
     user?.id ||
     user?.member_id;
 
