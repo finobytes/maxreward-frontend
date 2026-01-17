@@ -34,11 +34,11 @@ export const useVoucherForm = () => {
   const [createVoucher, { isLoading: creating }] = useCreateVoucherMutation();
   useEffect(() => {
     const memberId =
-      verifyData?.merchant?.corporate_member?.id || // corporate member
-      verifyData?.merchant?.corporate_member_id || // direct corporate member id
-      verifyData?.member?.id || // member id
-      verifyData?.data?.id || // fallback
-      verifyData?.id; // fallback
+      verifyData?.user?.merchant?.corporate_member?.id || // corporate member
+      verifyData?.user?.merchant?.corporate_member_id || // direct corporate member id
+      verifyData?.user?.member?.id || // member id
+      verifyData?.user?.data?.id || // fallback
+      verifyData?.user?.id; // fallback
     if (memberId && memberId !== state.memberId) {
       dispatch(setMemberId(memberId));
     }
@@ -93,9 +93,9 @@ export const useVoucherForm = () => {
       formData.append(
         "member_id",
         state.memberId ||
-          verifyData?.id ||
-          verifyData?.data?.id ||
-          verifyData?.member?.id
+          verifyData?.user?.id ||
+          verifyData?.user?.data?.id ||
+          verifyData?.user?.member?.id
       );
       formData.append("voucher_type", state.voucherType);
       formData.append("payment_method", state.paymentMethod.toLowerCase());

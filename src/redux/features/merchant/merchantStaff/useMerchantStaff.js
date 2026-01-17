@@ -21,7 +21,7 @@ export const useMerchantStaff = () => {
   const role = user?.role || "member"; // admin | merchant | member
   const { data: verifyData, isLoading: verifying } = useVerifyMeQuery(role);
 
-  console.log("verifyData", verifyData)
+  // console.log("verifyData", verifyData)
 
   const [debouncedSearch, setDebouncedSearch] = useState(search);
   const merchantId =
@@ -32,7 +32,7 @@ export const useMerchantStaff = () => {
     verifyData?.user?.id; // fallback
 
 
-    console.log("merchantId", merchantId);
+    // console.log("merchantId", merchantId);
 
   // Debounce search by 600ms
   useEffect(() => {

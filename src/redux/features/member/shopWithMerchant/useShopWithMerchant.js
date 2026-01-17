@@ -36,7 +36,7 @@ export const useShopWithMerchant = () => {
   const [makePurchaseForMember, { isLoading: submittingPurchase }] =
     useMakePurchaseForMemberMutation();
 
-  console.log("availablePoints:", verifyData?.wallet?.available_points);
+  console.log("availablePoints:", verifyData?.user?.wallet?.available_points);
   console.log("verifying Member:", verifyingMember);
 
   // hydrate settings (rm_points and friends)
