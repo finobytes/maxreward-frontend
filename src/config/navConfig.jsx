@@ -154,6 +154,10 @@ export const NAV_CONFIG = {
       icon: <ShieldCheck />,
       subItems: [
         { name: "Role List", path: "/admin/role-permission/role-list" },
+        { name: "Permission List", path: "/admin/role-permission/permission-list" },
+        { name: "Assign Permissions", path: "/admin/role-permission/assign" },
+        { name: "Section List", path: "/admin/role-permission/section-list" },
+        { name: "Action List", path: "/admin/role-permission/action-list" },
       ],
     },
     { name: "Profile", icon: <UserCircle2 />, path: "/admin/profile" },
@@ -289,6 +293,14 @@ export const NAV_CONFIG = {
           name: "Redeem Transactions",
           path: "/merchant/reports/redeem-mall-transactions",
         },
+      ],
+    },
+    {
+      name: "Role Permission",
+      icon: <ShieldCheck />,
+      subItems: [
+        { name: "Role List", path: "/merchant/role-permission/role-list" },
+        { name: "Assign Permissions", path: "/merchant/role-permission/assign" },
       ],
     },
     { icon: <CircleUserRound />, name: "Profile", path: "/merchant/profile" },

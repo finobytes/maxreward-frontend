@@ -17,6 +17,7 @@ import {
   useGetSingleAdminStaffQuery,
   useUpdateAdminStaffMutation,
 } from "../../../redux/features/admin/adminStaff/adminStaffApi";
+import { useGetAllRolesQuery } from "../../../redux/features/admin/rolePermission/rolePermissionApi";
 
 // Zod Schema (same as Create but password optional)
 const adminStaffUpdateSchema = z.object({
@@ -36,6 +37,7 @@ const adminStaffUpdateSchema = z.object({
   designation: z.string().min(2, "Designation is required"),
   address: z.string().min(3, "Address is required"),
   gender: z.enum(["male", "female", "others"]),
+  role: z.string().optional(),
   status: z.enum(["active", "inactive"]),
 });
 
@@ -44,6 +46,7 @@ const StaffUpdate = () => {
   const [nationalIdCard, setNationalIdCard] = useState([]);
   const [existingProfile, setExistingProfile] = useState([]);
   const [existingNid, setExistingNid] = useState([]);
+  const [roles, setRoles] = useState([]);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -52,6 +55,10 @@ const StaffUpdate = () => {
   const { data: staffData, isLoading: isFetching } =
     useGetSingleAdminStaffQuery(id);
   const [updateAdminStaff, { isLoading }] = useUpdateAdminStaffMutation();
+  const { data: rolesData, isLoading: isLoadingRoles } = useGetAllRolesQuery();
+
+
+  // console.log("staffData", staffData);
 
   // React Hook Form
   const {
@@ -59,6 +66,7 @@ const StaffUpdate = () => {
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
   } = useForm({
     resolver: zodResolver(adminStaffUpdateSchema),
     defaultValues: {
@@ -69,9 +77,16 @@ const StaffUpdate = () => {
       address: "",
       password: "",
       gender: "male",
+      role: "",
       status: "active",
     },
   });
+
+  useEffect(() => {
+    if (rolesData?.success === true) {
+      setRoles(rolesData.data?.admin || []);
+    }
+  }, [rolesData]);
 
   // Prefill form when data arrives
   useEffect(() => {
@@ -105,6 +120,15 @@ const StaffUpdate = () => {
       }
     }
   }, [staffData, reset]);
+
+  useEffect(() => {
+    if (!staffData?.data || roles.length === 0) return;
+    const roleFromStaff = staffData.data.roles?.[0] || "";
+    const roleName =
+      typeof roleFromStaff === "string" ? roleFromStaff : roleFromStaff?.name;
+    const hasRole = roles.some((role) => role.name === roleName);
+    setValue("role", hasRole ? roleName : "");
+  }, [staffData, roles, setValue]);
 
   // Submit handler
   const onSubmit = async (formData) => {
@@ -291,6 +315,22 @@ const StaffUpdate = () => {
                   { value: "female", label: "Female" },
                   { value: "others", label: "Others" },
                 ]}
+              />
+            </div>
+
+            {/* Role */}
+            <div>
+              <Label htmlFor="role">Role</Label>
+              <Select
+                {...register("role")}
+                placeholder={
+                  isLoadingRoles ? "Loading roles..." : "Select Role"
+                }
+                disabled={isLoadingRoles || roles.length === 0}
+                options={roles.map((role) => ({
+                  value: role.name,
+                  label: role.name,
+                }))}
               />
             </div>
 
