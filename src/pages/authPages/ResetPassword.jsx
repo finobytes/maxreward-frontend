@@ -1,21 +1,43 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { logo, resetPassBgLeft, resetPassBgRight } from "../../assets/assets";
 import ErrorMsg from "../../components/errorMsg/ErrorMsg";
 import { useNavigate } from "react-router";
+import { useRequestResetCodeMutation } from "../../redux/features/auth/authApi";
+import { toast } from "sonner";
+
+const schema = z.object({
+  userId: z.string().min(1, "User Id / Email Address is required"),
+});
 
 const ResetPassword = () => {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    resolver: zodResolver(schema),
+  });
 
   const navigate = useNavigate();
+  const [requestResetCode, { isLoading }] = useRequestResetCodeMutation();
 
-  const onSubmit = (data) => {
-    console.log("Form Data:", data);
-    navigate("/otp");
+  const onSubmit = async (data) => {
+    try {
+      await requestResetCode({ user_id: data.userId }).unwrap();
+      toast.success("Reset code sent successfully to your email");
+      navigate("/otp", { state: { userId: data.userId } });
+    } catch (err) {
+      const errorMsg = err?.data?.message || "Failed to send reset code";
+      toast.error(errorMsg);
+      setError("userId", {
+        type: "manual",
+        message: errorMsg,
+      });
+    }
   };
 
   return (
@@ -47,8 +69,8 @@ const ResetPassword = () => {
               Forgot Password
             </h2>
             <p className="w-full text-gray-600 mt-2">
-              Please enter email address / user ID you’d like the password reset
-              information sent to
+              Please enter user ID you’d like the password reset information
+              sent to
             </p>
           </div>
 
@@ -62,16 +84,14 @@ const ResetPassword = () => {
                 htmlFor="userId"
                 className="block text-lg font-medium text-gray-900"
               >
-                User Id / Email Address
+                User Id
               </label>
               <div className="mt-2">
                 <input
                   id="userId"
                   name="userId"
                   type="text"
-                  {...register("userId", {
-                    required: "User Id / Email Address is required",
-                  })}
+                  {...register("userId")}
                   autoComplete="username"
                   className={`block w-full rounded-md px-3 py-2 text-base text-gray-900 border ${
                     errors.userId
@@ -90,9 +110,10 @@ const ResetPassword = () => {
             <div>
               <button
                 type="submit"
-                className="w-full rounded-md bg-[#FF5A29] mt-8 px-4 py-2 text-sm sm:text-base font-semibold text-white shadow hover:bg-[#FF5A29]/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF5A29]"
+                disabled={isLoading}
+                className="w-full rounded-md bg-[#FF5A29] mt-8 px-4 py-2 text-sm sm:text-base font-semibold text-white shadow hover:bg-[#FF5A29]/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF5A29] disabled:opacity-50"
               >
-                Send Reset Link
+                {isLoading ? "Sending..." : "Send Reset Code"}
               </button>
             </div>
           </form>

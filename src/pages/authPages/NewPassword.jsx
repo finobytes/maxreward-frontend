@@ -1,22 +1,71 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { logo, resetPassBgLeft, resetPassBgRight } from "../../assets/assets";
 import ErrorMsg from "../../components/errorMsg/ErrorMsg";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
+import { useResetPasswordMutation } from "../../redux/features/auth/authApi";
+import { toast } from "sonner";
+import { Eye, EyeOff } from "lucide-react";
+
+const schema = z
+  .object({
+    newPassword: z.string().min(6, "Password must be at least 6 characters"),
+    confirmPassword: z.string().min(1, "Confirm Password is required"),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 const NewPassword = () => {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    resolver: zodResolver(schema),
+  });
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const { userId, code } = location.state || {};
 
-  const onSubmit = (data) => {
-    console.log("Form Data:", data);
-    navigate("/reset-success");
+  const [resetPassword, { isLoading }] = useResetPasswordMutation();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  useEffect(() => {
+    if (!userId || !code) {
+      navigate("/reset-password");
+    }
+  }, [userId, code, navigate]);
+
+  const onSubmit = async (data) => {
+    try {
+      await resetPassword({
+        user_id: userId,
+        code: code,
+        new_password: data.newPassword,
+        confirmation_password: data.confirmPassword,
+      }).unwrap();
+      toast.success(
+        "Password reset successfully. Please login with your new password.",
+      );
+      navigate("/reset-success");
+    } catch (err) {
+      const errorMsg = err?.data?.message || "Failed to reset password";
+      toast.error(errorMsg);
+      setError("newPassword", {
+        type: "manual",
+        message: errorMsg,
+      });
+    }
   };
+
+  if (!userId || !code) return null;
 
   return (
     <div className="relative min-h-screen bg-gray-50 flex flex-col overflow-hidden">
@@ -61,21 +110,30 @@ const NewPassword = () => {
                 >
                   New Password
                 </label>
-                <div className="mt-2">
+                <div className="mt-2 relative">
                   <input
                     id="newPassword"
                     name="newPassword"
-                    type="password"
-                    {...register("newPassword", {
-                      required: "new Password is required",
-                    })}
-                    autoComplete="username"
-                    className={`block w-full rounded-md px-3 py-2 text-base text-gray-900 border ${
+                    type={showPassword ? "text" : "password"}
+                    {...register("newPassword")}
+                    autoComplete="new-password"
+                    className={`block w-full rounded-md px-3 py-2 pr-10 text-base text-gray-900 border ${
                       errors.newPassword
                         ? "border-red-500 focus:border-red-500 focus:ring-red-500"
                         : "border-gray-300 focus:border-[#FF5A29] focus:ring-[#FF5A29]"
                     } placeholder:text-gray-400 focus:ring-2`}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
                   {errors.newPassword && (
                     <ErrorMsg message={errors.newPassword.message} />
                   )}
@@ -83,26 +141,35 @@ const NewPassword = () => {
               </div>
               <div className="mt-4">
                 <label
-                  htmlFor="newPassword"
+                  htmlFor="confirmPassword"
                   className="block text-sm font-medium text-gray-900"
                 >
                   Confirm Password
                 </label>
-                <div className="mt-2">
+                <div className="mt-2 relative">
                   <input
                     id="confirmPassword"
                     name="confirmPassword"
-                    type="password"
-                    {...register("confirmPassword", {
-                      required: "Confirm Password is required",
-                    })}
-                    autoComplete="username"
-                    className={`block w-full rounded-md px-3 py-2 text-base text-gray-900 border ${
+                    type={showConfirmPassword ? "text" : "password"}
+                    {...register("confirmPassword")}
+                    autoComplete="new-password"
+                    className={`block w-full rounded-md px-3 py-2 pr-10 text-base text-gray-900 border ${
                       errors.confirmPassword
                         ? "border-red-500 focus:border-red-500 focus:ring-red-500"
                         : "border-gray-300 focus:border-[#FF5A29] focus:ring-[#FF5A29]"
                     } placeholder:text-gray-400 focus:ring-2`}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700"
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
                   {errors.confirmPassword && (
                     <ErrorMsg message={errors.confirmPassword.message} />
                   )}
@@ -113,9 +180,10 @@ const NewPassword = () => {
             <div>
               <button
                 type="submit"
-                className="w-full rounded-md bg-[#FF5A29] mt-8 px-4 py-2 text-sm sm:text-base font-semibold text-white shadow hover:bg-[#FF5A29]/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF5A29]"
+                disabled={isLoading}
+                className="w-full rounded-md bg-[#FF5A29] mt-8 px-4 py-2 text-sm sm:text-base font-semibold text-white shadow hover:bg-[#FF5A29]/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF5A29] disabled:opacity-50"
               >
-                Set Password
+                {isLoading ? "Setting Password..." : "Set Password"}
               </button>
             </div>
           </form>
