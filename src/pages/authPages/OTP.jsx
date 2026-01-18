@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,6 +32,7 @@ const OTP = () => {
 
   const [verifyResetCode, { isLoading }] = useVerifyResetCodeMutation();
   const [requestResetCode] = useRequestResetCodeMutation();
+  const [timeLeft, setTimeLeft] = useState(60);
 
   useEffect(() => {
     if (!userId) {
@@ -39,6 +40,16 @@ const OTP = () => {
       navigate("/reset-password");
     }
   }, [userId, navigate]);
+
+  useEffect(() => {
+    if (timeLeft === 0) return;
+
+    const intervalId = setInterval(() => {
+      setTimeLeft((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [timeLeft]);
 
   const onSubmit = async (data) => {
     try {
@@ -57,8 +68,11 @@ const OTP = () => {
 
   const handleResend = async (e) => {
     e.preventDefault();
+    if (timeLeft > 0) return;
+
     try {
       await requestResetCode({ user_id: userId }).unwrap();
+      setTimeLeft(60);
       toast.success("Reset code resent successfully");
     } catch (err) {
       console.error("Failed to resend code", err);
@@ -126,9 +140,14 @@ const OTP = () => {
             <button
               onClick={handleResend}
               type="button"
-              className="block w-full mt-8 text-indigo-500 text-center font-semibold hover:text-indigo-600"
+              disabled={timeLeft > 0}
+              className={`block w-full mt-8 text-center font-semibold ${
+                timeLeft > 0
+                  ? "text-gray-400 cursor-not-allowed"
+                  : "text-indigo-500 hover:text-indigo-600"
+              }`}
             >
-              Resend Code
+              {timeLeft > 0 ? `Resend Code in ${timeLeft}s` : "Resend Code"}
             </button>
 
             <div>

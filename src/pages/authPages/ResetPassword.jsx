@@ -113,7 +113,7 @@ const ResetPassword = () => {
                 disabled={isLoading}
                 className="w-full rounded-md bg-[#FF5A29] mt-8 px-4 py-2 text-sm sm:text-base font-semibold text-white shadow hover:bg-[#FF5A29]/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF5A29] disabled:opacity-50"
               >
-                {isLoading ? "Sending..." : "Send Reset Code"}
+                {isLoading ? "Submiting..." : "Submit"}
               </button>
             </div>
           </form>
