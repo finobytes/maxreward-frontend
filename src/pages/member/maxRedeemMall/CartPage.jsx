@@ -20,7 +20,7 @@ import {
   useUpdateCartItemMutation,
   useRemoveFromCartMutation,
   useClearCartMutation,
-  usePurchaseProductMutation,
+  useCreateOrdersMutation,
 } from "../../../redux/features/member/maxRedeemMall/maxRedeemApi";
 import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
 import Input from "../../../components/form/input/InputField";
@@ -56,8 +56,7 @@ const CartPage = () => {
   const [updateCartItem] = useUpdateCartItemMutation();
   const [removeFromCart] = useRemoveFromCartMutation();
   const [clearCart] = useClearCartMutation();
-  const [purchaseProduct, { isLoading: isPurchasing }] =
-    usePurchaseProductMutation();
+  const [createOrders, { isLoading: isPurchasing }] = useCreateOrdersMutation();
 
   // Parse New API Structure
   const cartByMerchant = cartData?.cart_by_merchant || [];
@@ -137,19 +136,33 @@ const CartPage = () => {
 
     try {
       const payload = {
-        member_id: profileData?.id || profileData?.data?.id,
-        ...formData,
-        // Mapping items for payload, ensuring all required fields are present
-        items: allItems.map((item) => ({
-          product_id: item.product_id,
-          product_variation_id: item.variation_id,
-          quantity: item.quantity,
-          points: item.price,
+        customer_info: {
+          full_name: formData.customer_full_name,
+          email: formData.customer_email,
+          phone: formData.customer_phone,
+          address: formData.customer_address,
+          postcode: formData.customer_postcode,
+          city: formData.customer_city,
+          state: formData.customer_state,
+          country: formData.customer_country,
+        },
+        merchants: cartByMerchant.map((group) => ({
+          merchant_id: group.merchant.merchant_id,
+          // Distributing strict shipping points or defaulting to 0 if not available per merchant
+          // For now sending 0 to match backend min:0 requirement and avoid calculation mismatch if not explicit
+          shipping_points: group.merchant.shipping_points || 0,
+          items: group.items.map((item) => ({
+            product_id: item.product_id,
+            product_variation_id: item.variation_id || null,
+            quantity: item.quantity,
+            points: item.price,
+            name: item.product_name || "Product",
+            sku: item.variation_details?.sku || null,
+          })),
         })),
-        total_points: totalPoints,
       };
 
-      await purchaseProduct(payload).unwrap();
+      await createOrders(payload).unwrap();
 
       toast.success("Order placed successfully!");
       // Assuming backend clears cart after purchase or we do it here.
@@ -157,7 +170,7 @@ const CartPage = () => {
       await clearCart().unwrap();
       navigate("/member/max-redeem-mall");
     } catch (error) {
-      console.error("Purchase failed", error);
+      console.error("Order creation failed", error);
       toast.error(error?.data?.message || "Failed to place order");
     }
   };
@@ -336,7 +349,7 @@ const CartPage = () => {
                                     </span>{" "}
                                     {attr.attribute_item_name}
                                   </span>
-                                )
+                                ),
                               )}
                             </div>
                           )}

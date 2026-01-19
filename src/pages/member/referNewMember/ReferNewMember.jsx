@@ -22,8 +22,7 @@ import { useGetCountriesQuery } from "../../../redux/features/countries/countrie
 const ReferNewMember = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [response, setResponse] = useState(null);
-  const { handleRefer, loading, success, error, resetState } =
-    useReferNewMember();
+  const { handleRefer, loading } = useReferNewMember();
 
   const { data, isLoading } = useVerifyMeQuery();
   const user = data || {};
@@ -213,7 +212,7 @@ const ReferNewMember = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <Label>Referral Code</Label>
-                <Input disabled value={user?.referral_code || ""} readOnly />
+                <Input disabled value={user?.phone || ""} readOnly />
               </div>
               <div>
                 <Label>Referred By</Label>

@@ -50,6 +50,14 @@ export const maxRedeemApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["User", "Wallet", "Cart", "CartCount"],
     }),
+    createOrders: builder.mutation({
+      query: (data) => ({
+        url: "/member/orders",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["User", "Wallet", "Cart", "CartCount"],
+    }),
   }),
 });
 
@@ -61,4 +69,5 @@ export const {
   useRemoveFromCartMutation,
   useClearCartMutation,
   useGetCartCountQuery,
+  useCreateOrdersMutation,
 } = maxRedeemApi;

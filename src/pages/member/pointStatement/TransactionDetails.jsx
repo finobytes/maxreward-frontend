@@ -50,14 +50,13 @@ const TransactionDetails = () => {
   // const isLoading = false;
   // const isError = false;
 
-
   if (isLoading) {
     return (
       <div>
         <PageBreadcrumb
           items={[
             { label: "Home", to: "/member" },
-            { label: "Point Statement", to: "/member/point-statement" },
+            { label: "CP Transaction", to: "/member/cp-transaction" },
             { label: "Transaction Details" },
           ]}
         />
@@ -74,18 +73,20 @@ const TransactionDetails = () => {
         <PageBreadcrumb
           items={[
             { label: "Home", to: "/member" },
-            { label: "Point Statement", to: "/member/point-statement" },
+            { label: "CP Transaction", to: "/member/point-statement" },
             { label: "Transaction Details" },
           ]}
         />
         <div className="text-center text-red-500 py-10 bg-white rounded-xl border border-red-200">
-          <p className="text-lg font-semibold">Failed to load transaction details.</p>
+          <p className="text-lg font-semibold">
+            Failed to load transaction details.
+          </p>
           <Link
             to="/member/point-statement"
             className="mt-4 inline-flex items-center gap-2 text-brand-600 hover:text-brand-700"
           >
             <ArrowLeft size={18} />
-            Back to Point Statement
+            Back to CP Transaction
           </Link>
         </div>
       </div>
@@ -98,7 +99,7 @@ const TransactionDetails = () => {
         <PageBreadcrumb
           items={[
             { label: "Home", to: "/member" },
-            { label: "Point Statement", to: "/member/point-statement" },
+            { label: "CP Transaction", to: "/member/cp-transaction" },
             { label: "Transaction Details" },
           ]}
         />
@@ -117,7 +118,7 @@ const TransactionDetails = () => {
       <PageBreadcrumb
         items={[
           { label: "Home", to: "/member" },
-          { label: "Point Statement", to: "/member/point-statement" },
+          { label: "CP Transaction", to: "/member/cp-transaction" },
           { label: "Transaction Details" },
         ]}
       />
@@ -125,11 +126,11 @@ const TransactionDetails = () => {
       {/* Back Button */}
       <div className="mb-4">
         <Link
-          to="/member/point-statement"
+          to="/member/cp-transaction"
           className="inline-flex items-center gap-2 text-gray-600 hover:text-brand-600 transition-colors"
         >
           <ArrowLeft size={18} />
-          <span className="font-medium">Back to Point Statement</span>
+          <span className="font-medium">Back to CP Transaction</span>
         </Link>
       </div>
 
@@ -176,7 +177,10 @@ const TransactionDetails = () => {
             <InfoCard
               icon={<DollarSign className="text-brand-600" />}
               label="Transaction Type"
-              value={typeMapping[transaction.transaction_type] || transaction.transaction_type}
+              value={
+                typeMapping[transaction.transaction_type] ||
+                transaction.transaction_type
+              }
             />
             <InfoCard
               icon={
