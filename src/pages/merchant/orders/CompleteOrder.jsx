@@ -34,6 +34,24 @@ const RETURN_REASONS = [
   { label: "Other reason", value: "other" },
 ];
 
+const formatDate = (value) => {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "-";
+  return date.toLocaleDateString();
+};
+
+const getApiErrorMessage = (err, fallback) => {
+  if (err?.data?.message) return err.data.message;
+  const errors = err?.data?.errors;
+  if (errors && typeof errors === "object") {
+    const firstKey = Object.keys(errors)[0];
+    const firstMessage = errors[firstKey]?.[0];
+    if (firstMessage) return firstMessage;
+  }
+  return fallback;
+};
+
 const CompleteOrder = () => {
   const [page, setPage] = useState(1);
   const { data, isLoading, error } = useGetMerchantOrdersQuery({
@@ -52,6 +70,12 @@ const CompleteOrder = () => {
   const orders = data?.data?.data || [];
   const meta = data?.data || {};
 
+  const resetModalState = () => {
+    setSelectedOrder(null);
+    setReasonType("");
+    setReasonDetails("");
+  };
+
   const handleReturnClick = (order) => {
     setSelectedOrder(order);
     setReasonType(RETURN_REASONS[0].value);
@@ -59,17 +83,33 @@ const CompleteOrder = () => {
     setModalOpen(true);
   };
 
+  const handleModalChange = (open) => {
+    setModalOpen(open);
+    if (!open) resetModalState();
+  };
+
   const submitReturn = async () => {
+    if (!selectedOrder?.order_number) {
+      toast.error("Please select an order to return.");
+      return;
+    }
+    if (!reasonType) {
+      toast.error("Please select a return reason.");
+      return;
+    }
     try {
       await acceptReturn({
         orderNumber: selectedOrder.order_number,
         reason_type: reasonType,
-        reason_details: reasonDetails,
+        ...(reasonDetails?.trim()
+          ? { reason_details: reasonDetails.trim() }
+          : {}),
       }).unwrap();
       toast.success("Return processed successfully");
       setModalOpen(false);
+      resetModalState();
     } catch (err) {
-      toast.error(err?.data?.message || "Failed to process return");
+      toast.error(getApiErrorMessage(err, "Failed to process return"));
     }
   };
 
@@ -125,7 +165,7 @@ const CompleteOrder = () => {
                       {order.order_number}
                     </TableCell>
                     <TableCell>
-                      {new Date(order.created_at).toLocaleDateString()}
+                      {formatDate(order.created_at)}
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col">
@@ -183,7 +223,7 @@ const CompleteOrder = () => {
       </div>
 
       {/* Return Modal */}
-      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+      <Dialog open={modalOpen} onOpenChange={handleModalChange}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
@@ -225,16 +265,16 @@ const CompleteOrder = () => {
           <DialogFooter>
             <PrimaryButton
               variant="secondary"
-              onClick={() => setModalOpen(false)}
+              onClick={() => handleModalChange(false)}
             >
               Cancel
             </PrimaryButton>
             <PrimaryButton
               variant="danger"
               onClick={submitReturn}
-              loading={isProcessing}
+              disabled={isProcessing || !selectedOrder?.order_number}
             >
-              Process Refund
+              {isProcessing ? "Processing..." : "Process Refund"}
             </PrimaryButton>
           </DialogFooter>
         </DialogContent>

@@ -3,12 +3,26 @@ import { baseApi } from "../../../api/baseApi";
 export const memberOrderApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getMyOrders: builder.query({
-      query: (params) => ({
+      query: ({ page = 1, per_page = 20, status, ...rest } = {}) => ({
         url: "/member/orders",
         method: "GET",
-        params,
+        params: {
+          page,
+          per_page,
+          ...rest,
+          ...(status ? { status } : {}),
+        },
       }),
-      providesTags: ["MemberOrder"],
+      providesTags: (result) => {
+        const orders = result?.data?.data || [];
+        return [
+          "MemberOrder",
+          ...orders
+            .map((order) => order?.order_number)
+            .filter(Boolean)
+            .map((orderNumber) => ({ type: "MemberOrder", id: orderNumber })),
+        ];
+      },
     }),
     getMemberOrderDetails: builder.query({
       query: (orderNumber) => `/member/orders/${orderNumber}`,
@@ -20,7 +34,10 @@ export const memberOrderApi = baseApi.injectEndpoints({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["MemberOrder"],
+      invalidatesTags: (result, error, { orderNumber }) => [
+        "MemberOrder",
+        { type: "MemberOrder", id: orderNumber },
+      ],
     }),
     requestReturnOrder: builder.mutation({
       query: ({ orderNumber, ...body }) => ({
@@ -28,7 +45,10 @@ export const memberOrderApi = baseApi.injectEndpoints({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["MemberOrder"],
+      invalidatesTags: (result, error, { orderNumber }) => [
+        "MemberOrder",
+        { type: "MemberOrder", id: orderNumber },
+      ],
     }),
   }),
 });

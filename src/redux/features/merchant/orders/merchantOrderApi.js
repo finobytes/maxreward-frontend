@@ -3,12 +3,26 @@ import { baseApi } from "../../../api/baseApi";
 export const merchantOrderApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getMerchantOrders: builder.query({
-      query: (params) => ({
+      query: ({ page = 1, per_page = 20, status, ...rest } = {}) => ({
         url: "/merchant/orders",
         method: "GET",
-        params,
+        params: {
+          page,
+          per_page,
+          ...rest,
+          ...(status ? { status } : {}),
+        },
       }),
-      providesTags: ["MerchantOrder"],
+      providesTags: (result) => {
+        const orders = result?.data?.data || [];
+        return [
+          "MerchantOrder",
+          ...orders
+            .map((order) => order?.order_number)
+            .filter(Boolean)
+            .map((orderNumber) => ({ type: "MerchantOrder", id: orderNumber })),
+        ];
+      },
     }),
     completeOrder: builder.mutation({
       query: ({ orderNumber, ...body }) => ({
@@ -16,7 +30,10 @@ export const merchantOrderApi = baseApi.injectEndpoints({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["MerchantOrder"],
+      invalidatesTags: (result, error, { orderNumber }) => [
+        "MerchantOrder",
+        { type: "MerchantOrder", id: orderNumber },
+      ],
     }),
     acceptReturnOrder: builder.mutation({
       query: ({ orderNumber, ...body }) => ({
@@ -24,7 +41,10 @@ export const merchantOrderApi = baseApi.injectEndpoints({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["MerchantOrder"],
+      invalidatesTags: (result, error, { orderNumber }) => [
+        "MerchantOrder",
+        { type: "MerchantOrder", id: orderNumber },
+      ],
     }),
   }),
 });

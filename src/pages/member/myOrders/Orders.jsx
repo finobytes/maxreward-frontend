@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Eye, XCircle, RotateCcw } from "lucide-react"; // Icons
 import {
   useGetMyOrdersQuery,
+  useGetMemberOrderDetailsQuery,
   useCancelMemberOrderMutation,
   useRequestReturnOrderMutation,
 } from "../../../redux/features/member/orders/memberOrderApi";
@@ -24,7 +25,6 @@ import {
 } from "@/components/ui/dialog";
 import StatusBadge from "../../../components/table/StatusBadge"; // Verify path
 import Pagination from "../../../components/table/Pagination"; // Verify path
-import SearchInput from "../../../components/form/form-elements/SearchInput"; // Verify path
 import PrimaryButton from "../../../components/ui/PrimaryButton"; // Verify path
 
 const CANCEL_REASONS = [
@@ -43,13 +43,38 @@ const RETURN_REASONS = [
   { label: "Other reason", value: "other" },
 ];
 
+const formatDate = (value) => {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "-";
+  return date.toLocaleDateString();
+};
+
+const formatDateTime = (value) => {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "-";
+  return date.toLocaleString();
+};
+
+const getApiErrorMessage = (err, fallback) => {
+  if (err?.data?.message) return err.data.message;
+  const errors = err?.data?.errors;
+  if (errors && typeof errors === "object") {
+    const firstKey = Object.keys(errors)[0];
+    const firstMessage = errors[firstKey]?.[0];
+    if (firstMessage) return firstMessage;
+  }
+  return fallback;
+};
+
 const Orders = () => {
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState("");
   const { data, isLoading, error } = useGetMyOrdersQuery({
     page,
-    status: statusFilter,
     per_page: 10,
+    ...(statusFilter ? { status: statusFilter } : {}),
   });
   const [cancelOrder, { isLoading: isCancelling }] =
     useCancelMemberOrderMutation();
@@ -59,11 +84,28 @@ const Orders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const [returnModalOpen, setReturnModalOpen] = useState(false);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [detailsOrderNumber, setDetailsOrderNumber] = useState(null);
   const [reasonType, setReasonType] = useState("");
   const [reasonDetails, setReasonDetails] = useState("");
 
+  const {
+    data: detailsData,
+    isLoading: isDetailsLoading,
+    error: detailsError,
+  } = useGetMemberOrderDetailsQuery(detailsOrderNumber, {
+    skip: !detailsOrderNumber,
+  });
+
   const orders = data?.data?.data || [];
   const meta = data?.data || {};
+  const orderDetails = detailsData?.data?.order;
+
+  const resetActionState = () => {
+    setSelectedOrder(null);
+    setReasonType("");
+    setReasonDetails("");
+  };
 
   const handleCancelClick = (order) => {
     setSelectedOrder(order);
@@ -79,31 +121,73 @@ const Orders = () => {
     setReturnModalOpen(true);
   };
 
+  const handleDetailsClick = (order) => {
+    setDetailsOrderNumber(order.order_number);
+    setDetailsModalOpen(true);
+  };
+
+  const handleCancelModalChange = (open) => {
+    setCancelModalOpen(open);
+    if (!open) resetActionState();
+  };
+
+  const handleReturnModalChange = (open) => {
+    setReturnModalOpen(open);
+    if (!open) resetActionState();
+  };
+
+  const handleDetailsModalChange = (open) => {
+    setDetailsModalOpen(open);
+    if (!open) setDetailsOrderNumber(null);
+  };
+
   const submitCancel = async () => {
+    if (!selectedOrder?.order_number) {
+      toast.error("Please select an order to cancel.");
+      return;
+    }
+    if (!reasonType) {
+      toast.error("Please select a cancellation reason.");
+      return;
+    }
     try {
       await cancelOrder({
         orderNumber: selectedOrder.order_number, // Ensure backend expects order_number path param
         reason_type: reasonType,
-        reason_details: reasonDetails,
+        ...(reasonDetails?.trim()
+          ? { reason_details: reasonDetails.trim() }
+          : {}),
       }).unwrap();
       toast.success("Order cancelled successfully");
       setCancelModalOpen(false);
+      resetActionState();
     } catch (err) {
-      toast.error(err?.data?.message || "Failed to cancel order");
+      toast.error(getApiErrorMessage(err, "Failed to cancel order"));
     }
   };
 
   const submitReturn = async () => {
+    if (!selectedOrder?.order_number) {
+      toast.error("Please select an order to return.");
+      return;
+    }
+    if (!reasonType) {
+      toast.error("Please select a return reason.");
+      return;
+    }
     try {
       await requestReturn({
         orderNumber: selectedOrder.order_number,
         reason_type: reasonType,
-        reason_details: reasonDetails,
+        ...(reasonDetails?.trim()
+          ? { reason_details: reasonDetails.trim() }
+          : {}),
       }).unwrap();
       toast.success("Return requested successfully");
       setReturnModalOpen(false);
+      resetActionState();
     } catch (err) {
-      toast.error(err?.data?.message || "Failed to request return");
+      toast.error(getApiErrorMessage(err, "Failed to request return"));
     }
   };
 
@@ -178,7 +262,7 @@ const Orders = () => {
                       {order.order_number}
                     </TableCell>
                     <TableCell>
-                      {new Date(order.created_at).toLocaleDateString()}
+                      {formatDate(order.created_at)}
                     </TableCell>
                     <TableCell>{order.merchant?.name || "N/A"}</TableCell>
                     <TableCell>
@@ -192,10 +276,13 @@ const Orders = () => {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        {/* View Details - Placeholder for now, could link to a details page */}
-                        {/* <button className="p-2 hover:bg-gray-100 rounded-full text-gray-500">
-                            <Eye size={18} />
-                        </button> */}
+                        <button
+                          onClick={() => handleDetailsClick(order)}
+                          className="p-2 hover:bg-gray-50 text-gray-600 rounded-md transition-colors flex items-center gap-1 text-xs font-medium border border-gray-200"
+                          title="View Details"
+                        >
+                          <Eye size={14} /> View
+                        </button>
 
                         {order.status === "pending" && (
                           <button
@@ -234,8 +321,152 @@ const Orders = () => {
         </div>
       </div>
 
+      {/* Order Details Modal */}
+      <Dialog open={detailsModalOpen} onOpenChange={handleDetailsModalChange}>
+        <DialogContent className="sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>
+              Order Details{" "}
+              {detailsOrderNumber ? `#${detailsOrderNumber}` : ""}
+            </DialogTitle>
+            <DialogDescription>
+              Review order information, items, and status.
+            </DialogDescription>
+          </DialogHeader>
+          {isDetailsLoading ? (
+            <div className="py-10 text-center text-gray-500">Loading...</div>
+          ) : detailsError ? (
+            <div className="py-10 text-center text-red-500">
+              Failed to load order details.
+            </div>
+          ) : !orderDetails ? (
+            <div className="py-10 text-center text-gray-500">
+              No order details found.
+            </div>
+          ) : (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <DetailItem
+                  label="Order Number"
+                  value={orderDetails.order_number || "-"}
+                  mono
+                />
+                <DetailItem
+                  label="Status"
+                  value={<StatusBadge status={orderDetails.status} />}
+                />
+                <DetailItem
+                  label="Placed On"
+                  value={formatDateTime(orderDetails.created_at)}
+                />
+                <DetailItem
+                  label="Merchant"
+                  value={orderDetails.merchant?.name || "-"}
+                />
+                <DetailItem
+                  label="Tracking Number"
+                  value={orderDetails.tracking_number || "-"}
+                  mono
+                />
+                <DetailItem
+                  label="Total"
+                  value={
+                    orderDetails.total_amount_display ||
+                    (orderDetails.total_points != null
+                      ? `${orderDetails.total_points} pts`
+                      : "-")
+                  }
+                />
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold text-gray-800">Items</h3>
+                {orderDetails.items?.length ? (
+                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Product</TableHead>
+                          <TableHead>Variation</TableHead>
+                          <TableHead>Qty</TableHead>
+                          <TableHead>Total</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {orderDetails.items.map((item, index) => {
+                          const name =
+                            item?.product?.name ||
+                            item?.product_name ||
+                            item?.name ||
+                            "Item";
+                          const variation =
+                            item?.productVariation?.name ||
+                            item?.product_variation?.name ||
+                            item?.variation?.name ||
+                            "-";
+                          const quantity = item?.quantity ?? item?.qty ?? "-";
+                          const total =
+                            item?.total_points ??
+                            item?.points ??
+                            item?.total_amount_display ??
+                            "-";
+                          return (
+                            <TableRow key={item?.id || index}>
+                              <TableCell className="font-medium">
+                                {name}
+                              </TableCell>
+                              <TableCell>{variation}</TableCell>
+                              <TableCell>{quantity}</TableCell>
+                              <TableCell>
+                                {typeof total === "number"
+                                  ? `${total} pts`
+                                  : total}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
+                ) : (
+                  <div className="text-sm text-gray-500">No items found.</div>
+                )}
+              </div>
+
+              {orderDetails.cancelReason && (
+                <div className="space-y-2">
+                  <h3 className="text-sm font-semibold text-gray-800">
+                    Return/Cancellation Reason
+                  </h3>
+                  <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 space-y-1 text-sm">
+                    <p className="text-gray-700">
+                      <span className="font-medium">Type:</span>{" "}
+                      {orderDetails.cancelReason.reason_type
+                        ?.replace(/_/g, " ")
+                        ?.toUpperCase() || "-"}
+                    </p>
+                    <p className="text-gray-700">
+                      <span className="font-medium">Details:</span>{" "}
+                      {orderDetails.cancelReason.reason_details || "-"}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <PrimaryButton
+              variant="secondary"
+              onClick={() => handleDetailsModalChange(false)}
+            >
+              Close
+            </PrimaryButton>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Cancel Modal */}
-      <Dialog open={cancelModalOpen} onOpenChange={setCancelModalOpen}>
+      <Dialog open={cancelModalOpen} onOpenChange={handleCancelModalChange}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
@@ -277,23 +508,23 @@ const Orders = () => {
           <DialogFooter>
             <PrimaryButton
               variant="secondary"
-              onClick={() => setCancelModalOpen(false)}
+              onClick={() => handleCancelModalChange(false)}
             >
               None, Keep Order
             </PrimaryButton>
             <PrimaryButton
               variant="danger"
               onClick={submitCancel}
-              loading={isCancelling}
+              disabled={isCancelling || !selectedOrder?.order_number}
             >
-              Yes, Cancel Order
+              {isCancelling ? "Cancelling..." : "Yes, Cancel Order"}
             </PrimaryButton>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Return Modal */}
-      <Dialog open={returnModalOpen} onOpenChange={setReturnModalOpen}>
+      <Dialog open={returnModalOpen} onOpenChange={handleReturnModalChange}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
@@ -335,16 +566,16 @@ const Orders = () => {
           <DialogFooter>
             <PrimaryButton
               variant="secondary"
-              onClick={() => setReturnModalOpen(false)}
+              onClick={() => handleReturnModalChange(false)}
             >
               Cancel
             </PrimaryButton>
             <PrimaryButton
               variant="primary"
               onClick={submitReturn}
-              loading={isReturning}
+              disabled={isReturning || !selectedOrder?.order_number}
             >
-              Submit Return
+              {isReturning ? "Submitting..." : "Submit Return"}
             </PrimaryButton>
           </DialogFooter>
         </DialogContent>
@@ -352,5 +583,18 @@ const Orders = () => {
     </div>
   );
 };
+
+const DetailItem = ({ label, value, mono = false }) => (
+  <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+    <p className="text-xs text-gray-500">{label}</p>
+    <div
+      className={
+        mono ? "font-mono text-sm text-gray-900" : "text-sm text-gray-900"
+      }
+    >
+      {value ?? "-"}
+    </div>
+  </div>
+);
 
 export default Orders;

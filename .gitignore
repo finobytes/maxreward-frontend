@@ -12,6 +12,7 @@ dist
 dist-ssr
 .htaccess
 *.local
+AGENTS.md
 
 # Editor directories and files
 .vscode/*

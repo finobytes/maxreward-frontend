@@ -11,6 +11,13 @@ import {
 import StatusBadge from "../../../components/table/StatusBadge";
 import Pagination from "../../../components/table/Pagination";
 
+const formatDate = (value) => {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "-";
+  return date.toLocaleDateString();
+};
+
 const CancleOrder = () => {
   const [page, setPage] = useState(1);
   const { data, isLoading, error } = useGetMyOrdersQuery({
@@ -73,7 +80,7 @@ const CancleOrder = () => {
                       {order.order_number}
                     </TableCell>
                     <TableCell>
-                      {new Date(order.created_at).toLocaleDateString()}
+                      {formatDate(order.created_at)}
                     </TableCell>
                     <TableCell>{order.merchant?.name || "N/A"}</TableCell>
                     <TableCell>

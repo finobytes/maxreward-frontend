@@ -25,6 +25,24 @@ import StatusBadge from "../../../components/table/StatusBadge";
 import Pagination from "../../../components/table/Pagination";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
 
+const formatDate = (value) => {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "-";
+  return date.toLocaleDateString();
+};
+
+const getApiErrorMessage = (err, fallback) => {
+  if (err?.data?.message) return err.data.message;
+  const errors = err?.data?.errors;
+  if (errors && typeof errors === "object") {
+    const firstKey = Object.keys(errors)[0];
+    const firstMessage = errors[firstKey]?.[0];
+    if (firstMessage) return firstMessage;
+  }
+  return fallback;
+};
+
 const PendingOrder = () => {
   const [page, setPage] = useState(1);
   const { data, isLoading, error } = useGetMerchantOrdersQuery({
@@ -42,22 +60,40 @@ const PendingOrder = () => {
   const orders = data?.data?.data || [];
   const meta = data?.data || {};
 
+  const resetModalState = () => {
+    setSelectedOrder(null);
+    setTrackingNumber("");
+  };
+
   const handleCompleteClick = (order) => {
     setSelectedOrder(order);
     setTrackingNumber("");
     setModalOpen(true);
   };
 
+  const handleModalChange = (open) => {
+    setModalOpen(open);
+    if (!open) resetModalState();
+  };
+
   const submitComplete = async () => {
+    if (!selectedOrder?.order_number) {
+      toast.error("Please select an order to complete.");
+      return;
+    }
     try {
-      await completeOrder({
+      const payload = {
         orderNumber: selectedOrder.order_number,
-        tracking_number: trackingNumber,
-      }).unwrap();
+        ...(trackingNumber?.trim()
+          ? { tracking_number: trackingNumber.trim() }
+          : {}),
+      };
+      await completeOrder(payload).unwrap();
       toast.success("Order completed successfully");
       setModalOpen(false);
+      resetModalState();
     } catch (err) {
-      toast.error(err?.data?.message || "Failed to complete order");
+      toast.error(getApiErrorMessage(err, "Failed to complete order"));
     }
   };
 
@@ -112,7 +148,7 @@ const PendingOrder = () => {
                       {order.order_number}
                     </TableCell>
                     <TableCell>
-                      {new Date(order.created_at).toLocaleDateString()}
+                      {formatDate(order.created_at)}
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col">
@@ -161,7 +197,7 @@ const PendingOrder = () => {
       </div>
 
       {/* Complete Modal */}
-      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+      <Dialog open={modalOpen} onOpenChange={handleModalChange}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
@@ -189,16 +225,16 @@ const PendingOrder = () => {
           <DialogFooter>
             <PrimaryButton
               variant="secondary"
-              onClick={() => setModalOpen(false)}
+              onClick={() => handleModalChange(false)}
             >
               Cancel
             </PrimaryButton>
             <PrimaryButton
               variant="primary"
               onClick={submitComplete}
-              loading={isCompleting}
+              disabled={isCompleting || !selectedOrder?.order_number}
             >
-              Complete Order
+              {isCompleting ? "Completing..." : "Complete Order"}
             </PrimaryButton>
           </DialogFooter>
         </DialogContent>
