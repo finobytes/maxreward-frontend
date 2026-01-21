@@ -43,18 +43,90 @@ const RETURN_REASONS = [
   { label: "Other reason", value: "other" },
 ];
 
+const dateFormatter = new Intl.DateTimeFormat(undefined, {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+});
+const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+const numberFormatter = new Intl.NumberFormat();
+
+const toNumber = (value) => {
+  if (value === null || value === undefined || value === "") return null;
+  const parsed = Number(value);
+  return Number.isNaN(parsed) ? null : parsed;
+};
+
 const formatDate = (value) => {
   if (!value) return "-";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "-";
-  return date.toLocaleDateString();
+  return dateFormatter.format(date);
 };
 
 const formatDateTime = (value) => {
   if (!value) return "-";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "-";
-  return date.toLocaleString();
+  return dateTimeFormatter.format(date);
+};
+
+const formatPoints = (value) => {
+  const numeric = toNumber(value);
+  if (numeric === null) return "-";
+  return `${numberFormatter.format(numeric)} pts`;
+};
+
+const getMerchantName = (merchant) =>
+  merchant?.business_name || merchant?.name || merchant?.businessName || "N/A";
+
+const getItemsCount = (order) => {
+  const count = order?.items_count ?? order?.items?.length;
+  return typeof count === "number" ? count : null;
+};
+
+const getItemsLabel = (order) => {
+  const count = getItemsCount(order);
+  if (count === null) return "-";
+  return `${count} ${count === 1 ? "item" : "items"}`;
+};
+
+const getTotalPointsValue = (order) =>
+  toNumber(order?.total_points ?? order?.totalPoints ?? order?.total);
+
+const getShippingPointsValue = (order) =>
+  toNumber(order?.shipping_points ?? order?.shippingPoints);
+
+const getOrderTotalDisplay = (order) => {
+  if (order?.total_amount_display) return order.total_amount_display;
+  const totalPoints = getTotalPointsValue(order);
+  return totalPoints !== null ? formatPoints(totalPoints) : "-";
+};
+
+const getOrderShippingDisplay = (order) => {
+  const shippingPoints = getShippingPointsValue(order);
+  if (shippingPoints === null || shippingPoints === 0) return null;
+  return formatPoints(shippingPoints);
+};
+
+const normalizeStatus = (status) =>
+  typeof status === "string" ? status.toLowerCase() : "";
+
+const getLineItemPoints = (item) => {
+  const lineTotal = toNumber(item?.total_points ?? item?.totalPoints);
+  if (lineTotal !== null) return lineTotal;
+  const pointsEach = toNumber(item?.points ?? item?.point);
+  const quantity = toNumber(item?.quantity ?? item?.qty);
+  if (pointsEach !== null && quantity !== null) {
+    return pointsEach * quantity;
+  }
+  return pointsEach;
 };
 
 const getApiErrorMessage = (err, fallback) => {
@@ -100,6 +172,8 @@ const Orders = () => {
   const orders = data?.data?.data || [];
   const meta = data?.data || {};
   const orderDetails = detailsData?.data?.order;
+  const orderDetailsTotalDisplay = getOrderTotalDisplay(orderDetails);
+  const orderDetailsShippingDisplay = getOrderShippingDisplay(orderDetails);
 
   const resetActionState = () => {
     setSelectedOrder(null);
@@ -222,10 +296,11 @@ const Orders = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Order ID</TableHead>
+                <TableHead>Order Number</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Merchant</TableHead>
-                <TableHead>Total Amount</TableHead>
+                <TableHead>Items</TableHead>
+                <TableHead>Total Points</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -233,14 +308,14 @@ const Orders = () => {
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8">
+                  <TableCell colSpan={7} className="text-center py-8">
                     Loading...
                   </TableCell>
                 </TableRow>
               ) : error ? (
                 <TableRow>
                   <TableCell
-                    colSpan={6}
+                    colSpan={7}
                     className="text-center py-8 text-red-500"
                   >
                     Failed to load orders.
@@ -249,63 +324,81 @@ const Orders = () => {
               ) : orders.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={6}
+                    colSpan={7}
                     className="text-center py-8 text-gray-500"
                   >
                     No orders found.
                   </TableCell>
                 </TableRow>
               ) : (
-                orders.map((order) => (
-                  <TableRow key={order.id}>
-                    <TableCell className="font-medium">
-                      {order.order_number}
-                    </TableCell>
-                    <TableCell>
-                      {formatDate(order.created_at)}
-                    </TableCell>
-                    <TableCell>{order.merchant?.name || "N/A"}</TableCell>
-                    <TableCell>
-                      <span className="font-semibold">
-                        {order.total_amount_display ||
-                          `${order.total_points} pts`}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge status={order.status} />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <button
-                          onClick={() => handleDetailsClick(order)}
-                          className="p-2 hover:bg-gray-50 text-gray-600 rounded-md transition-colors flex items-center gap-1 text-xs font-medium border border-gray-200"
-                          title="View Details"
+                orders.map((order) => {
+                  const normalizedStatus = normalizeStatus(order.status);
+                  const shippingDisplay = getOrderShippingDisplay(order);
+                  return (
+                    <TableRow key={order.id}>
+                      <TableCell className="font-medium">
+                        <span
+                          className="font-mono text-xs sm:text-sm"
+                          title={order.order_number || "Order number unavailable"}
                         >
-                          <Eye size={14} /> View
-                        </button>
+                          {order.order_number || "-"}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        {formatDate(order.created_at)}
+                      </TableCell>
+                      <TableCell>{getMerchantName(order.merchant)}</TableCell>
+                      <TableCell className="text-sm">
+                        {getItemsLabel(order)}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col">
+                          <span className="font-semibold">
+                            {getOrderTotalDisplay(order)}
+                          </span>
+                          {shippingDisplay && (
+                            <span className="text-xs text-gray-500">
+                              Shipping: {shippingDisplay}
+                            </span>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge status={order.status} />
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <button
+                            onClick={() => handleDetailsClick(order)}
+                            className="p-2 hover:bg-gray-50 text-gray-600 rounded-md transition-colors flex items-center gap-1 text-xs font-medium border border-gray-200"
+                            title="View Details"
+                          >
+                            <Eye size={14} /> View
+                          </button>
 
-                        {order.status === "pending" && (
-                          <button
-                            onClick={() => handleCancelClick(order)}
-                            className="p-2 hover:bg-red-50 text-red-600 rounded-md transition-colors flex items-center gap-1 text-xs font-medium border border-red-200"
-                            title="Cancel Order"
-                          >
-                            <XCircle size={14} /> Cancel
-                          </button>
-                        )}
-                        {order.status === "completed" && (
-                          <button
-                            onClick={() => handleReturnClick(order)}
-                            className="p-2 hover:bg-blue-50 text-blue-600 rounded-md transition-colors flex items-center gap-1 text-xs font-medium border border-blue-200"
-                            title="Request Return"
-                          >
-                            <RotateCcw size={14} /> Return
-                          </button>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
+                          {normalizedStatus === "pending" && (
+                            <button
+                              onClick={() => handleCancelClick(order)}
+                              className="p-2 hover:bg-red-50 text-red-600 rounded-md transition-colors flex items-center gap-1 text-xs font-medium border border-red-200"
+                              title="Cancel Order"
+                            >
+                              <XCircle size={14} /> Cancel
+                            </button>
+                          )}
+                          {normalizedStatus === "completed" && (
+                            <button
+                              onClick={() => handleReturnClick(order)}
+                              className="p-2 hover:bg-blue-50 text-blue-600 rounded-md transition-colors flex items-center gap-1 text-xs font-medium border border-blue-200"
+                              title="Request Return"
+                            >
+                              <RotateCcw size={14} /> Return
+                            </button>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>
@@ -361,7 +454,7 @@ const Orders = () => {
                 />
                 <DetailItem
                   label="Merchant"
-                  value={orderDetails.merchant?.name || "-"}
+                  value={getMerchantName(orderDetails.merchant)}
                 />
                 <DetailItem
                   label="Tracking Number"
@@ -371,10 +464,14 @@ const Orders = () => {
                 <DetailItem
                   label="Total"
                   value={
-                    orderDetails.total_amount_display ||
-                    (orderDetails.total_points != null
-                      ? `${orderDetails.total_points} pts`
-                      : "-")
+                    <div className="space-y-1">
+                      <div>{orderDetailsTotalDisplay}</div>
+                      {orderDetailsShippingDisplay && (
+                        <div className="text-xs text-gray-500">
+                          Shipping: {orderDetailsShippingDisplay}
+                        </div>
+                      )}
+                    </div>
                   }
                 />
               </div>
@@ -387,9 +484,9 @@ const Orders = () => {
                       <TableHeader>
                         <TableRow>
                           <TableHead>Product</TableHead>
-                          <TableHead>Variation</TableHead>
+                          <TableHead>SKU / Variant</TableHead>
                           <TableHead>Qty</TableHead>
-                          <TableHead>Total</TableHead>
+                          <TableHead>Points</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -399,28 +496,30 @@ const Orders = () => {
                             item?.product_name ||
                             item?.name ||
                             "Item";
-                          const variation =
+                          const skuOrVariant =
+                            item?.sku ||
                             item?.productVariation?.name ||
                             item?.product_variation?.name ||
                             item?.variation?.name ||
                             "-";
+                          const skuClassName = item?.sku
+                            ? "text-xs font-mono text-gray-700"
+                            : "text-sm text-gray-700";
                           const quantity = item?.quantity ?? item?.qty ?? "-";
-                          const total =
-                            item?.total_points ??
-                            item?.points ??
-                            item?.total_amount_display ??
-                            "-";
+                          const linePoints = getLineItemPoints(item);
                           return (
                             <TableRow key={item?.id || index}>
                               <TableCell className="font-medium">
                                 {name}
                               </TableCell>
-                              <TableCell>{variation}</TableCell>
+                              <TableCell className={skuClassName}>
+                                {skuOrVariant}
+                              </TableCell>
                               <TableCell>{quantity}</TableCell>
                               <TableCell>
-                                {typeof total === "number"
-                                  ? `${total} pts`
-                                  : total}
+                                {linePoints !== null
+                                  ? formatPoints(linePoints)
+                                  : "-"}
                               </TableCell>
                             </TableRow>
                           );
