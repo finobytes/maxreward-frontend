@@ -26,6 +26,7 @@ import TermsAndConditions from "../pages/member/termsAndConditions/TermsAndCondi
 import Notification from "../pages/member/notification/Notification";
 import NotificationDetails from "../pages/member/notification/NotificationDetails";
 import Orders from "../pages/member/myOrders/Orders";
+import OrderDetails from "../pages/member/myOrders/OrderDetails";
 import ReturnOrder from "../pages/member/myOrders/ReturnOrder";
 import CancleOrder from "../pages/member/myOrders/CancleOrder";
 
@@ -117,6 +118,10 @@ export const memberRoutes = [
   {
     path: "orders",
     element: <Orders />,
+  },
+  {
+    path: "orders/:orderNumber",
+    element: <OrderDetails />,
   },
   {
     path: "return-order",

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { Eye, XCircle, RotateCcw } from "lucide-react"; // Icons
+import { Link } from "react-router";
+import { Eye, XCircle, RotateCcw } from "lucide-react";
 import {
   useGetMyOrdersQuery,
-  useGetMemberOrderDetailsQuery,
   useCancelMemberOrderMutation,
   useRequestReturnOrderMutation,
 } from "../../../redux/features/member/orders/memberOrderApi";
@@ -23,9 +23,25 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import StatusBadge from "../../../components/table/StatusBadge"; // Verify path
-import Pagination from "../../../components/table/Pagination"; // Verify path
-import PrimaryButton from "../../../components/ui/PrimaryButton"; // Verify path
+import StatusBadge from "../../../components/table/StatusBadge";
+import Pagination from "../../../components/table/Pagination";
+import PrimaryButton from "../../../components/ui/PrimaryButton";
+import {
+  formatDate,
+  getItemsLabel,
+  getMerchantName,
+  getOrderShippingDisplay,
+  getOrderTotalDisplay,
+  normalizeStatus,
+} from "./orderUtils";
+
+const STATUS_FILTERS = [
+  { value: "", label: "All" },
+  { value: "pending", label: "Pending" },
+  { value: "completed", label: "Completed" },
+  { value: "cancelled", label: "Cancelled" },
+  { value: "returned", label: "Returned" },
+];
 
 const CANCEL_REASONS = [
   { label: "Customer requested cancellation", value: "customer_request" },
@@ -43,92 +59,6 @@ const RETURN_REASONS = [
   { label: "Other reason", value: "other" },
 ];
 
-const dateFormatter = new Intl.DateTimeFormat(undefined, {
-  year: "numeric",
-  month: "short",
-  day: "numeric",
-});
-const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
-  year: "numeric",
-  month: "short",
-  day: "numeric",
-  hour: "2-digit",
-  minute: "2-digit",
-});
-const numberFormatter = new Intl.NumberFormat();
-
-const toNumber = (value) => {
-  if (value === null || value === undefined || value === "") return null;
-  const parsed = Number(value);
-  return Number.isNaN(parsed) ? null : parsed;
-};
-
-const formatDate = (value) => {
-  if (!value) return "-";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "-";
-  return dateFormatter.format(date);
-};
-
-const formatDateTime = (value) => {
-  if (!value) return "-";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "-";
-  return dateTimeFormatter.format(date);
-};
-
-const formatPoints = (value) => {
-  const numeric = toNumber(value);
-  if (numeric === null) return "-";
-  return `${numberFormatter.format(numeric)} pts`;
-};
-
-const getMerchantName = (merchant) =>
-  merchant?.business_name || merchant?.name || merchant?.businessName || "N/A";
-
-const getItemsCount = (order) => {
-  const count = order?.items_count ?? order?.items?.length;
-  return typeof count === "number" ? count : null;
-};
-
-const getItemsLabel = (order) => {
-  const count = getItemsCount(order);
-  if (count === null) return "-";
-  return `${count} ${count === 1 ? "item" : "items"}`;
-};
-
-const getTotalPointsValue = (order) =>
-  toNumber(order?.total_points ?? order?.totalPoints ?? order?.total);
-
-const getShippingPointsValue = (order) =>
-  toNumber(order?.shipping_points ?? order?.shippingPoints);
-
-const getOrderTotalDisplay = (order) => {
-  if (order?.total_amount_display) return order.total_amount_display;
-  const totalPoints = getTotalPointsValue(order);
-  return totalPoints !== null ? formatPoints(totalPoints) : "-";
-};
-
-const getOrderShippingDisplay = (order) => {
-  const shippingPoints = getShippingPointsValue(order);
-  if (shippingPoints === null || shippingPoints === 0) return null;
-  return formatPoints(shippingPoints);
-};
-
-const normalizeStatus = (status) =>
-  typeof status === "string" ? status.toLowerCase() : "";
-
-const getLineItemPoints = (item) => {
-  const lineTotal = toNumber(item?.total_points ?? item?.totalPoints);
-  if (lineTotal !== null) return lineTotal;
-  const pointsEach = toNumber(item?.points ?? item?.point);
-  const quantity = toNumber(item?.quantity ?? item?.qty);
-  if (pointsEach !== null && quantity !== null) {
-    return pointsEach * quantity;
-  }
-  return pointsEach;
-};
-
 const getApiErrorMessage = (err, fallback) => {
   if (err?.data?.message) return err.data.message;
   const errors = err?.data?.errors;
@@ -139,6 +69,238 @@ const getApiErrorMessage = (err, fallback) => {
   }
   return fallback;
 };
+
+const StatusFilterBar = ({ value, onChange }) => (
+  <div className="flex flex-wrap gap-2">
+    {STATUS_FILTERS.map((filter) => {
+      const isActive = value === filter.value;
+      return (
+        <button
+          key={filter.value || "all"}
+          type="button"
+          onClick={() => onChange(filter.value)}
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            isActive
+              ? "bg-brand-600 text-white"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+          }`}
+        >
+          {filter.label}
+        </button>
+      );
+    })}
+  </div>
+);
+
+const TableStateRow = ({ colSpan, className = "", children }) => (
+  <TableRow>
+    <TableCell
+      colSpan={colSpan}
+      className={`text-center py-8 ${className}`}
+    >
+      {children}
+    </TableCell>
+  </TableRow>
+);
+
+const OrderRow = ({ order, onCancel, onReturn }) => {
+  const normalizedStatus = normalizeStatus(order?.status);
+  const shippingDisplay = getOrderShippingDisplay(order);
+  const orderNumber = order?.order_number || "";
+  const viewPath = orderNumber
+    ? `/member/orders/${encodeURIComponent(orderNumber)}`
+    : null;
+  const viewActionClass =
+    "p-2 hover:bg-gray-50 text-gray-600 rounded-md transition-colors flex items-center gap-1 text-xs font-medium border border-gray-200";
+
+  return (
+    <TableRow>
+      <TableCell className="font-medium">
+        <span
+          className="font-mono text-xs sm:text-sm"
+          title={orderNumber ? orderNumber : "Order number unavailable"}
+        >
+          {orderNumber || "-"}
+        </span>
+      </TableCell>
+      <TableCell>{formatDate(order?.created_at)}</TableCell>
+      <TableCell>{getMerchantName(order?.merchant)}</TableCell>
+      <TableCell className="text-sm">{getItemsLabel(order)}</TableCell>
+      <TableCell>
+        <div className="flex flex-col">
+          <span className="font-semibold">{getOrderTotalDisplay(order)}</span>
+          {shippingDisplay && (
+            <span className="text-xs text-gray-500">
+              Shipping: {shippingDisplay}
+            </span>
+          )}
+        </div>
+      </TableCell>
+      <TableCell>
+        <StatusBadge status={order?.status} />
+      </TableCell>
+      <TableCell className="text-right">
+        <div className="flex justify-end gap-2">
+          {viewPath ? (
+            <Link to={viewPath} className={viewActionClass} title="View Details">
+              <Eye size={14} /> View
+            </Link>
+          ) : (
+            <span
+              className={`${viewActionClass} cursor-not-allowed text-gray-400 bg-gray-50`}
+              title="Order number unavailable"
+              aria-disabled="true"
+            >
+              <Eye size={14} /> View
+            </span>
+          )}
+
+          {normalizedStatus === "pending" && (
+            <button
+              type="button"
+              onClick={() => onCancel(order)}
+              className="p-2 hover:bg-red-50 text-red-600 rounded-md transition-colors flex items-center gap-1 text-xs font-medium border border-red-200"
+              title="Cancel Order"
+            >
+              <XCircle size={14} /> Cancel
+            </button>
+          )}
+          {normalizedStatus === "completed" && (
+            <button
+              type="button"
+              onClick={() => onReturn(order)}
+              className="p-2 hover:bg-blue-50 text-blue-600 rounded-md transition-colors flex items-center gap-1 text-xs font-medium border border-blue-200"
+              title="Request Return"
+            >
+              <RotateCcw size={14} /> Return
+            </button>
+          )}
+        </div>
+      </TableCell>
+    </TableRow>
+  );
+};
+
+const OrdersTable = ({ orders, isLoading, error, onCancel, onReturn }) => {
+  const renderRows = () => {
+    if (isLoading) {
+      return <TableStateRow colSpan={7}>Loading...</TableStateRow>;
+    }
+
+    if (error) {
+      return (
+        <TableStateRow colSpan={7} className="text-red-500">
+          Failed to load orders.
+        </TableStateRow>
+      );
+    }
+
+    if (!orders.length) {
+      return (
+        <TableStateRow colSpan={7} className="text-gray-500">
+          No orders found.
+        </TableStateRow>
+      );
+    }
+
+    return orders.map((order, index) => (
+      <OrderRow
+        key={order?.id || order?.order_number || index}
+        order={order}
+        onCancel={onCancel}
+        onReturn={onReturn}
+      />
+    ));
+  };
+
+  return (
+    <div className="relative overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Order Number</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead>Merchant</TableHead>
+            <TableHead>Items</TableHead>
+            <TableHead>Total Points</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>{renderRows()}</TableBody>
+      </Table>
+    </div>
+  );
+};
+
+const ReasonModal = ({
+  open,
+  onOpenChange,
+  title,
+  description,
+  reasons,
+  reasonType,
+  reasonDetails,
+  onReasonTypeChange,
+  onReasonDetailsChange,
+  confirmLabel,
+  confirmLoadingLabel,
+  confirmVariant,
+  confirmLoading,
+  confirmDisabled,
+  secondaryLabel,
+  textareaPlaceholder,
+  onConfirm,
+}) => (
+  <Dialog open={open} onOpenChange={onOpenChange}>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>{title}</DialogTitle>
+        <DialogDescription>{description}</DialogDescription>
+      </DialogHeader>
+      <div className="space-y-4 py-4">
+        <div>
+          <label className="block text-sm font-medium mb-1">Reason</label>
+          <select
+            className="w-full border rounded-md p-2 text-sm bg-white"
+            value={reasonType}
+            onChange={(e) => onReasonTypeChange(e.target.value)}
+          >
+            {reasons.map((reason) => (
+              <option key={reason.value} value={reason.value}>
+                {reason.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Additional Details
+          </label>
+          <textarea
+            className="w-full border rounded-md p-2 text-sm"
+            rows={3}
+            placeholder={textareaPlaceholder}
+            value={reasonDetails}
+            onChange={(e) => onReasonDetailsChange(e.target.value)}
+          />
+        </div>
+      </div>
+      <DialogFooter>
+        <PrimaryButton variant="secondary" onClick={() => onOpenChange(false)}>
+          {secondaryLabel}
+        </PrimaryButton>
+        <PrimaryButton
+          variant={confirmVariant}
+          onClick={onConfirm}
+          disabled={confirmLoading || confirmDisabled}
+        >
+          {confirmLoading ? confirmLoadingLabel : confirmLabel}
+        </PrimaryButton>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+);
 
 const Orders = () => {
   const [page, setPage] = useState(1);
@@ -156,24 +318,12 @@ const Orders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const [returnModalOpen, setReturnModalOpen] = useState(false);
-  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
-  const [detailsOrderNumber, setDetailsOrderNumber] = useState(null);
   const [reasonType, setReasonType] = useState("");
   const [reasonDetails, setReasonDetails] = useState("");
 
-  const {
-    data: detailsData,
-    isLoading: isDetailsLoading,
-    error: detailsError,
-  } = useGetMemberOrderDetailsQuery(detailsOrderNumber, {
-    skip: !detailsOrderNumber,
-  });
-
   const orders = data?.data?.data || [];
   const meta = data?.data || {};
-  const orderDetails = detailsData?.data?.order;
-  const orderDetailsTotalDisplay = getOrderTotalDisplay(orderDetails);
-  const orderDetailsShippingDisplay = getOrderShippingDisplay(orderDetails);
+  const selectedOrderNumber = selectedOrder?.order_number || "";
 
   const resetActionState = () => {
     setSelectedOrder(null);
@@ -181,23 +331,25 @@ const Orders = () => {
     setReasonDetails("");
   };
 
+  const handleFilterChange = (nextStatus) => {
+    setStatusFilter(nextStatus);
+    setPage(1);
+  };
+
   const handleCancelClick = (order) => {
+    if (!order?.order_number) return;
     setSelectedOrder(order);
-    setReasonType(CANCEL_REASONS[0].value);
+    setReasonType(CANCEL_REASONS[0]?.value || "");
     setReasonDetails("");
     setCancelModalOpen(true);
   };
 
   const handleReturnClick = (order) => {
+    if (!order?.order_number) return;
     setSelectedOrder(order);
-    setReasonType(RETURN_REASONS[0].value);
+    setReasonType(RETURN_REASONS[0]?.value || "");
     setReasonDetails("");
     setReturnModalOpen(true);
-  };
-
-  const handleDetailsClick = (order) => {
-    setDetailsOrderNumber(order.order_number);
-    setDetailsModalOpen(true);
   };
 
   const handleCancelModalChange = (open) => {
@@ -210,13 +362,8 @@ const Orders = () => {
     if (!open) resetActionState();
   };
 
-  const handleDetailsModalChange = (open) => {
-    setDetailsModalOpen(open);
-    if (!open) setDetailsOrderNumber(null);
-  };
-
   const submitCancel = async () => {
-    if (!selectedOrder?.order_number) {
+    if (!selectedOrderNumber) {
       toast.error("Please select an order to cancel.");
       return;
     }
@@ -226,7 +373,7 @@ const Orders = () => {
     }
     try {
       await cancelOrder({
-        orderNumber: selectedOrder.order_number, // Ensure backend expects order_number path param
+        orderNumber: selectedOrderNumber,
         reason_type: reasonType,
         ...(reasonDetails?.trim()
           ? { reason_details: reasonDetails.trim() }
@@ -241,7 +388,7 @@ const Orders = () => {
   };
 
   const submitReturn = async () => {
-    if (!selectedOrder?.order_number) {
+    if (!selectedOrderNumber) {
       toast.error("Please select an order to return.");
       return;
     }
@@ -251,7 +398,7 @@ const Orders = () => {
     }
     try {
       await requestReturn({
-        orderNumber: selectedOrder.order_number,
+        orderNumber: selectedOrderNumber,
         reason_type: reasonType,
         ...(reasonDetails?.trim()
           ? { reason_details: reasonDetails.trim() }
@@ -272,139 +419,16 @@ const Orders = () => {
       </div>
 
       <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
-        {/* Filters - Simplified for now as API mainly filters by Status */}
-        <div className="flex gap-2">
-          {["", "pending", "completed", "cancelled", "returned"].map((s) => (
-            <button
-              key={s}
-              onClick={() => {
-                setStatusFilter(s);
-                setPage(1);
-              }}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                statusFilter === s
-                  ? "bg-brand-600 text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
-            >
-              {s === "" ? "All" : s.charAt(0).toUpperCase() + s.slice(1)}
-            </button>
-          ))}
-        </div>
+        <StatusFilterBar value={statusFilter} onChange={handleFilterChange} />
 
-        <div className="relative overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Order Number</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Merchant</TableHead>
-                <TableHead>Items</TableHead>
-                <TableHead>Total Points</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8">
-                    Loading...
-                  </TableCell>
-                </TableRow>
-              ) : error ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={7}
-                    className="text-center py-8 text-red-500"
-                  >
-                    Failed to load orders.
-                  </TableCell>
-                </TableRow>
-              ) : orders.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={7}
-                    className="text-center py-8 text-gray-500"
-                  >
-                    No orders found.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                orders.map((order) => {
-                  const normalizedStatus = normalizeStatus(order.status);
-                  const shippingDisplay = getOrderShippingDisplay(order);
-                  return (
-                    <TableRow key={order.id}>
-                      <TableCell className="font-medium">
-                        <span
-                          className="font-mono text-xs sm:text-sm"
-                          title={order.order_number || "Order number unavailable"}
-                        >
-                          {order.order_number || "-"}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        {formatDate(order.created_at)}
-                      </TableCell>
-                      <TableCell>{getMerchantName(order.merchant)}</TableCell>
-                      <TableCell className="text-sm">
-                        {getItemsLabel(order)}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-col">
-                          <span className="font-semibold">
-                            {getOrderTotalDisplay(order)}
-                          </span>
-                          {shippingDisplay && (
-                            <span className="text-xs text-gray-500">
-                              Shipping: {shippingDisplay}
-                            </span>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <StatusBadge status={order.status} />
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <button
-                            onClick={() => handleDetailsClick(order)}
-                            className="p-2 hover:bg-gray-50 text-gray-600 rounded-md transition-colors flex items-center gap-1 text-xs font-medium border border-gray-200"
-                            title="View Details"
-                          >
-                            <Eye size={14} /> View
-                          </button>
+        <OrdersTable
+          orders={orders}
+          isLoading={isLoading}
+          error={error}
+          onCancel={handleCancelClick}
+          onReturn={handleReturnClick}
+        />
 
-                          {normalizedStatus === "pending" && (
-                            <button
-                              onClick={() => handleCancelClick(order)}
-                              className="p-2 hover:bg-red-50 text-red-600 rounded-md transition-colors flex items-center gap-1 text-xs font-medium border border-red-200"
-                              title="Cancel Order"
-                            >
-                              <XCircle size={14} /> Cancel
-                            </button>
-                          )}
-                          {normalizedStatus === "completed" && (
-                            <button
-                              onClick={() => handleReturnClick(order)}
-                              className="p-2 hover:bg-blue-50 text-blue-600 rounded-md transition-colors flex items-center gap-1 text-xs font-medium border border-blue-200"
-                              title="Request Return"
-                            >
-                              <RotateCcw size={14} /> Return
-                            </button>
-                          )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              )}
-            </TableBody>
-          </Table>
-        </div>
-
-        {/* Pagination */}
         <div className="flex justify-end">
           <Pagination
             currentPage={meta.current_page || 1}
@@ -414,286 +438,47 @@ const Orders = () => {
         </div>
       </div>
 
-      {/* Order Details Modal */}
-      <Dialog open={detailsModalOpen} onOpenChange={handleDetailsModalChange}>
-        <DialogContent className="sm:max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>
-              Order Details{" "}
-              {detailsOrderNumber ? `#${detailsOrderNumber}` : ""}
-            </DialogTitle>
-            <DialogDescription>
-              Review order information, items, and status.
-            </DialogDescription>
-          </DialogHeader>
-          {isDetailsLoading ? (
-            <div className="py-10 text-center text-gray-500">Loading...</div>
-          ) : detailsError ? (
-            <div className="py-10 text-center text-red-500">
-              Failed to load order details.
-            </div>
-          ) : !orderDetails ? (
-            <div className="py-10 text-center text-gray-500">
-              No order details found.
-            </div>
-          ) : (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <DetailItem
-                  label="Order Number"
-                  value={orderDetails.order_number || "-"}
-                  mono
-                />
-                <DetailItem
-                  label="Status"
-                  value={<StatusBadge status={orderDetails.status} />}
-                />
-                <DetailItem
-                  label="Placed On"
-                  value={formatDateTime(orderDetails.created_at)}
-                />
-                <DetailItem
-                  label="Merchant"
-                  value={getMerchantName(orderDetails.merchant)}
-                />
-                <DetailItem
-                  label="Tracking Number"
-                  value={orderDetails.tracking_number || "-"}
-                  mono
-                />
-                <DetailItem
-                  label="Total"
-                  value={
-                    <div className="space-y-1">
-                      <div>{orderDetailsTotalDisplay}</div>
-                      {orderDetailsShippingDisplay && (
-                        <div className="text-xs text-gray-500">
-                          Shipping: {orderDetailsShippingDisplay}
-                        </div>
-                      )}
-                    </div>
-                  }
-                />
-              </div>
+      <ReasonModal
+        open={cancelModalOpen}
+        onOpenChange={handleCancelModalChange}
+        title={`Cancel Order #${selectedOrderNumber}`}
+        description="Are you sure you want to cancel this order? This action cannot be undone. Points will be refunded."
+        reasons={CANCEL_REASONS}
+        reasonType={reasonType}
+        reasonDetails={reasonDetails}
+        onReasonTypeChange={setReasonType}
+        onReasonDetailsChange={setReasonDetails}
+        confirmLabel="Yes, Cancel Order"
+        confirmLoadingLabel="Cancelling..."
+        confirmVariant="danger"
+        confirmLoading={isCancelling}
+        confirmDisabled={!selectedOrderNumber}
+        secondaryLabel="None, Keep Order"
+        textareaPlaceholder="Please provide more details..."
+        onConfirm={submitCancel}
+      />
 
-              <div className="space-y-2">
-                <h3 className="text-sm font-semibold text-gray-800">Items</h3>
-                {orderDetails.items?.length ? (
-                  <div className="border border-gray-200 rounded-lg overflow-hidden">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Product</TableHead>
-                          <TableHead>SKU / Variant</TableHead>
-                          <TableHead>Qty</TableHead>
-                          <TableHead>Points</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {orderDetails.items.map((item, index) => {
-                          const name =
-                            item?.product?.name ||
-                            item?.product_name ||
-                            item?.name ||
-                            "Item";
-                          const skuOrVariant =
-                            item?.sku ||
-                            item?.productVariation?.name ||
-                            item?.product_variation?.name ||
-                            item?.variation?.name ||
-                            "-";
-                          const skuClassName = item?.sku
-                            ? "text-xs font-mono text-gray-700"
-                            : "text-sm text-gray-700";
-                          const quantity = item?.quantity ?? item?.qty ?? "-";
-                          const linePoints = getLineItemPoints(item);
-                          return (
-                            <TableRow key={item?.id || index}>
-                              <TableCell className="font-medium">
-                                {name}
-                              </TableCell>
-                              <TableCell className={skuClassName}>
-                                {skuOrVariant}
-                              </TableCell>
-                              <TableCell>{quantity}</TableCell>
-                              <TableCell>
-                                {linePoints !== null
-                                  ? formatPoints(linePoints)
-                                  : "-"}
-                              </TableCell>
-                            </TableRow>
-                          );
-                        })}
-                      </TableBody>
-                    </Table>
-                  </div>
-                ) : (
-                  <div className="text-sm text-gray-500">No items found.</div>
-                )}
-              </div>
-
-              {orderDetails.cancelReason && (
-                <div className="space-y-2">
-                  <h3 className="text-sm font-semibold text-gray-800">
-                    Return/Cancellation Reason
-                  </h3>
-                  <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 space-y-1 text-sm">
-                    <p className="text-gray-700">
-                      <span className="font-medium">Type:</span>{" "}
-                      {orderDetails.cancelReason.reason_type
-                        ?.replace(/_/g, " ")
-                        ?.toUpperCase() || "-"}
-                    </p>
-                    <p className="text-gray-700">
-                      <span className="font-medium">Details:</span>{" "}
-                      {orderDetails.cancelReason.reason_details || "-"}
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-          <DialogFooter>
-            <PrimaryButton
-              variant="secondary"
-              onClick={() => handleDetailsModalChange(false)}
-            >
-              Close
-            </PrimaryButton>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Cancel Modal */}
-      <Dialog open={cancelModalOpen} onOpenChange={handleCancelModalChange}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              Cancel Order #{selectedOrder?.order_number}
-            </DialogTitle>
-            <DialogDescription>
-              Are you sure you want to cancel this order? This action cannot be
-              undone. Points will be refunded.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Reason</label>
-              <select
-                className="w-full border rounded-md p-2 text-sm bg-white"
-                value={reasonType}
-                onChange={(e) => setReasonType(e.target.value)}
-              >
-                {CANCEL_REASONS.map((r) => (
-                  <option key={r.value} value={r.value}>
-                    {r.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Additional Details
-              </label>
-              <textarea
-                className="w-full border rounded-md p-2 text-sm"
-                rows={3}
-                placeholder="Please provide more details..."
-                value={reasonDetails}
-                onChange={(e) => setReasonDetails(e.target.value)}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <PrimaryButton
-              variant="secondary"
-              onClick={() => handleCancelModalChange(false)}
-            >
-              None, Keep Order
-            </PrimaryButton>
-            <PrimaryButton
-              variant="danger"
-              onClick={submitCancel}
-              disabled={isCancelling || !selectedOrder?.order_number}
-            >
-              {isCancelling ? "Cancelling..." : "Yes, Cancel Order"}
-            </PrimaryButton>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Return Modal */}
-      <Dialog open={returnModalOpen} onOpenChange={handleReturnModalChange}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              Request Return for #{selectedOrder?.order_number}
-            </DialogTitle>
-            <DialogDescription>
-              Submit a return request. If approved or processed, points will be
-              refunded.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Reason</label>
-              <select
-                className="w-full border rounded-md p-2 text-sm bg-white"
-                value={reasonType}
-                onChange={(e) => setReasonType(e.target.value)}
-              >
-                {RETURN_REASONS.map((r) => (
-                  <option key={r.value} value={r.value}>
-                    {r.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Additional Details
-              </label>
-              <textarea
-                className="w-full border rounded-md p-2 text-sm"
-                rows={3}
-                placeholder="Please explain why you are returning..."
-                value={reasonDetails}
-                onChange={(e) => setReasonDetails(e.target.value)}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <PrimaryButton
-              variant="secondary"
-              onClick={() => handleReturnModalChange(false)}
-            >
-              Cancel
-            </PrimaryButton>
-            <PrimaryButton
-              variant="primary"
-              onClick={submitReturn}
-              disabled={isReturning || !selectedOrder?.order_number}
-            >
-              {isReturning ? "Submitting..." : "Submit Return"}
-            </PrimaryButton>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ReasonModal
+        open={returnModalOpen}
+        onOpenChange={handleReturnModalChange}
+        title={`Request Return for #${selectedOrderNumber}`}
+        description="Submit a return request. If approved or processed, points will be refunded."
+        reasons={RETURN_REASONS}
+        reasonType={reasonType}
+        reasonDetails={reasonDetails}
+        onReasonTypeChange={setReasonType}
+        onReasonDetailsChange={setReasonDetails}
+        confirmLabel="Submit Return"
+        confirmLoadingLabel="Submitting..."
+        confirmVariant="primary"
+        confirmLoading={isReturning}
+        confirmDisabled={!selectedOrderNumber}
+        secondaryLabel="Cancel"
+        textareaPlaceholder="Please explain why you are returning..."
+        onConfirm={submitReturn}
+      />
     </div>
   );
 };
-
-const DetailItem = ({ label, value, mono = false }) => (
-  <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
-    <p className="text-xs text-gray-500">{label}</p>
-    <div
-      className={
-        mono ? "font-mono text-sm text-gray-900" : "text-sm text-gray-900"
-      }
-    >
-      {value ?? "-"}
-    </div>
-  </div>
-);
 
 export default Orders;

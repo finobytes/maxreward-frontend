@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { Link } from "react-router";
+import { Eye } from "lucide-react";
 import { useGetMyOrdersQuery } from "../../../redux/features/member/orders/memberOrderApi";
 import {
   Table,
@@ -10,12 +12,124 @@ import {
 } from "@/components/ui/table";
 import StatusBadge from "../../../components/table/StatusBadge";
 import Pagination from "../../../components/table/Pagination";
+import {
+  formatDate,
+  getItemsLabel,
+  getMerchantName,
+  getOrderShippingDisplay,
+  getOrderTotalDisplay,
+} from "./orderUtils";
 
-const formatDate = (value) => {
-  if (!value) return "-";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "-";
-  return date.toLocaleDateString();
+const TableStateRow = ({ colSpan, className = "", children }) => (
+  <TableRow>
+    <TableCell
+      colSpan={colSpan}
+      className={`text-center py-8 ${className}`}
+    >
+      {children}
+    </TableCell>
+  </TableRow>
+);
+
+const OrderRow = ({ order }) => {
+  const shippingDisplay = getOrderShippingDisplay(order);
+  const orderNumber = order?.order_number || "";
+  const viewPath = orderNumber
+    ? `/member/orders/${encodeURIComponent(orderNumber)}`
+    : null;
+  const viewActionClass =
+    "p-2 hover:bg-gray-50 text-gray-600 rounded-md transition-colors flex items-center gap-1 text-xs font-medium border border-gray-200";
+
+  return (
+    <TableRow>
+      <TableCell className="font-medium">
+        <span
+          className="font-mono text-xs sm:text-sm"
+          title={orderNumber ? orderNumber : "Order number unavailable"}
+        >
+          {orderNumber || "-"}
+        </span>
+      </TableCell>
+      <TableCell>{formatDate(order?.created_at)}</TableCell>
+      <TableCell>{getMerchantName(order?.merchant)}</TableCell>
+      <TableCell className="text-sm">{getItemsLabel(order)}</TableCell>
+      <TableCell>
+        <div className="flex flex-col">
+          <span className="font-semibold">{getOrderTotalDisplay(order)}</span>
+          {shippingDisplay && (
+            <span className="text-xs text-gray-500">
+              Shipping: {shippingDisplay}
+            </span>
+          )}
+        </div>
+      </TableCell>
+      <TableCell>
+        <StatusBadge status={order?.status} />
+      </TableCell>
+      <TableCell className="text-right">
+        {viewPath ? (
+          <Link to={viewPath} className={viewActionClass} title="View Details">
+            <Eye size={14} /> View
+          </Link>
+        ) : (
+          <span
+            className={`${viewActionClass} cursor-not-allowed text-gray-400 bg-gray-50`}
+            title="Order number unavailable"
+            aria-disabled="true"
+          >
+            <Eye size={14} /> View
+          </span>
+        )}
+      </TableCell>
+    </TableRow>
+  );
+};
+
+const OrdersTable = ({ orders, isLoading, error }) => {
+  const renderRows = () => {
+    if (isLoading) {
+      return <TableStateRow colSpan={7}>Loading...</TableStateRow>;
+    }
+
+    if (error) {
+      return (
+        <TableStateRow colSpan={7} className="text-red-500">
+          Failed to load orders.
+        </TableStateRow>
+      );
+    }
+
+    if (!orders.length) {
+      return (
+        <TableStateRow colSpan={7} className="text-gray-500">
+          No returned orders found.
+        </TableStateRow>
+      );
+    }
+
+    return orders.map((order, index) => (
+      <OrderRow key={order?.id || order?.order_number || index} order={order} />
+    ));
+  };
+
+  return (
+    <div className="relative overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Order Number</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead>Merchant</TableHead>
+            <TableHead>Items</TableHead>
+            <TableHead>Total Points</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>{renderRows()}</TableBody>
+      </Table>
+    </div>
+  );
 };
 
 const ReturnOrder = () => {
@@ -36,73 +150,7 @@ const ReturnOrder = () => {
       </div>
 
       <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
-        <div className="relative overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Order ID</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Merchant</TableHead>
-                <TableHead>Total Amount</TableHead>
-                <TableHead>Refunded Points</TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8">
-                    Loading...
-                  </TableCell>
-                </TableRow>
-              ) : error ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="text-center py-8 text-red-500"
-                  >
-                    Failed to load orders.
-                  </TableCell>
-                </TableRow>
-              ) : orders.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="text-center py-8 text-gray-500"
-                  >
-                    No returned orders found.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                orders.map((order) => (
-                  <TableRow key={order.id}>
-                    <TableCell className="font-medium">
-                      {order.order_number}
-                    </TableCell>
-                    <TableCell>
-                      {formatDate(order.created_at)}
-                    </TableCell>
-                    <TableCell>{order.merchant?.name || "N/A"}</TableCell>
-                    <TableCell>
-                      <span className="font-semibold">
-                        {order.total_amount_display ||
-                          `${order.total_points} pts`}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-green-600 font-medium">
-                        +{order.total_points} pts
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge status={order.status} />
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+        <OrdersTable orders={orders} isLoading={isLoading} error={error} />
 
         <div className="flex justify-end">
           <Pagination
