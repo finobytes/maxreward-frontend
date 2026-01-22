@@ -154,7 +154,10 @@ export const NAV_CONFIG = {
       icon: <ShieldCheck />,
       subItems: [
         { name: "Role List", path: "/admin/role-permission/role-list" },
-        { name: "Permission List", path: "/admin/role-permission/permission-list" },
+        {
+          name: "Permission List",
+          path: "/admin/role-permission/permission-list",
+        },
         { name: "Assign Permissions", path: "/admin/role-permission/assign" },
         { name: "Section List", path: "/admin/role-permission/section-list" },
         { name: "Action List", path: "/admin/role-permission/action-list" },
@@ -300,7 +303,10 @@ export const NAV_CONFIG = {
       icon: <ShieldCheck />,
       subItems: [
         { name: "Role List", path: "/merchant/role-permission/role-list" },
-        { name: "Assign Permissions", path: "/merchant/role-permission/assign" },
+        {
+          name: "Assign Permissions",
+          path: "/merchant/role-permission/assign",
+        },
       ],
     },
     { icon: <CircleUserRound />, name: "Profile", path: "/merchant/profile" },
@@ -348,24 +354,10 @@ export const NAV_CONFIG = {
       name: "Max Redeem Mall",
       path: "/member/max-redeem-mall",
     },
-
     {
       icon: <ShoppingCart />,
       name: "My Orders",
-      subItems: [
-        {
-          name: "Orders",
-          path: "/member/orders",
-        },
-        {
-          name: "Return Order",
-          path: "/member/return-order",
-        },
-        {
-          name: "Cancel Order",
-          path: "/member/cancel-order",
-        },
-      ],
+      path: "/member/orders",
     },
     {
       icon: <DollarSign />,

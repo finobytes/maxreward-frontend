@@ -94,10 +94,7 @@ const StatusFilterBar = ({ value, onChange }) => (
 
 const TableStateRow = ({ colSpan, className = "", children }) => (
   <TableRow>
-    <TableCell
-      colSpan={colSpan}
-      className={`text-center py-8 ${className}`}
-    >
+    <TableCell colSpan={colSpan} className={`text-center py-8 ${className}`}>
       {children}
     </TableCell>
   </TableRow>
@@ -142,7 +139,11 @@ const OrderRow = ({ order, onCancel, onReturn }) => {
       <TableCell className="text-right">
         <div className="flex justify-end gap-2">
           {viewPath ? (
-            <Link to={viewPath} className={viewActionClass} title="View Details">
+            <Link
+              to={viewPath}
+              className={viewActionClass}
+              title="View Details"
+            >
               <Eye size={14} /> View
             </Link>
           ) : (
@@ -429,7 +430,7 @@ const Orders = () => {
           onReturn={handleReturnClick}
         />
 
-        <div className="flex justify-end">
+        <div className="">
           <Pagination
             currentPage={meta.current_page || 1}
             totalPages={meta.last_page || 1}
