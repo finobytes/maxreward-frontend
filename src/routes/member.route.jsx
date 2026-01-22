@@ -27,8 +27,6 @@ import Notification from "../pages/member/notification/Notification";
 import NotificationDetails from "../pages/member/notification/NotificationDetails";
 import Orders from "../pages/member/myOrders/Orders";
 import OrderDetails from "../pages/member/myOrders/OrderDetails";
-import ReturnOrder from "../pages/member/myOrders/ReturnOrder";
-import CancleOrder from "../pages/member/myOrders/CancleOrder";
 
 export const memberRoutes = [
   {
@@ -122,14 +120,6 @@ export const memberRoutes = [
   {
     path: "orders/:orderNumber",
     element: <OrderDetails />,
-  },
-  {
-    path: "return-order",
-    element: <ReturnOrder />,
-  },
-  {
-    path: "cancel-order",
-    element: <CancleOrder />,
   },
   {
     path: "referred-member-list",
