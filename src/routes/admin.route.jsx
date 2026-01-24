@@ -53,6 +53,9 @@ import PermissionList from "../pages/admin/rolePermission/PermissionList";
 import AssignPermissionsToRole from "../pages/admin/rolePermission/AssignPermissionsToRole";
 import SectionList from "../pages/admin/rolePermission/SectionList";
 import ActionList from "../pages/admin/rolePermission/ActionList";
+import path from "path";
+import ShippingZone from "../pages/admin/ShippingZone/ShippingZone";
+import ShippingMethods from "../pages/admin/ShippingMethods/ShippingMethods";
 
 export const adminRoutes = [
   {
@@ -110,6 +113,14 @@ export const adminRoutes = [
   {
     path: "e-commerce/attribute-item",
     element: <AttributeItem />,
+  },
+  {
+    path: "e-commerce/shipping-zone",
+    element: <ShippingZone />,
+  },
+  {
+    path: "e-commerce/shipping-methods",
+    element: <ShippingMethods />,
   },
   {
     path: "cp-transaction",

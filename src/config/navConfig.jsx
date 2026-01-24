@@ -62,6 +62,11 @@ export const NAV_CONFIG = {
         { name: "Gender", path: "/admin/e-commerce/gender" },
         { name: "Attribute", path: "/admin/e-commerce/attribute" },
         { name: "Attribute Item", path: "/admin/e-commerce/attribute-item" },
+        {
+          name: "Shipping Methods",
+          path: "/admin/e-commerce/shipping-methods",
+        },
+        { name: "Shipping Zone", path: "/admin/e-commerce/shipping-zone" },
       ],
     },
     {
