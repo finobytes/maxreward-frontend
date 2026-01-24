@@ -26,6 +26,7 @@ import {
 import StatusBadge from "../../../components/table/StatusBadge";
 import Pagination from "../../../components/table/Pagination";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
+import SearchInput from "../../../components/form/form-elements/SearchInput";
 import {
   formatDate,
   getItemsLabel,
@@ -306,10 +307,13 @@ const ReasonModal = ({
 const Orders = () => {
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState("");
+  const [search, setSearch] = useState("");
+  const trimmedSearch = search.trim();
   const { data, isLoading, error } = useGetMyOrdersQuery({
     page,
     per_page: 10,
     ...(statusFilter ? { status: statusFilter } : {}),
+    ...(trimmedSearch ? { search: trimmedSearch } : {}),
   });
   const [cancelOrder, { isLoading: isCancelling }] =
     useCancelMemberOrderMutation();
@@ -334,6 +338,11 @@ const Orders = () => {
 
   const handleFilterChange = (nextStatus) => {
     setStatusFilter(nextStatus);
+    setPage(1);
+  };
+
+  const handleSearchChange = (event) => {
+    setSearch(event.target.value);
     setPage(1);
   };
 
@@ -420,7 +429,14 @@ const Orders = () => {
       </div>
 
       <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
-        <StatusFilterBar value={statusFilter} onChange={handleFilterChange} />
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <SearchInput
+            value={search}
+            onChange={handleSearchChange}
+            placeholder="Search by order number or merchant..."
+          />
+          <StatusFilterBar value={statusFilter} onChange={handleFilterChange} />
+        </div>
 
         <OrdersTable
           orders={orders}

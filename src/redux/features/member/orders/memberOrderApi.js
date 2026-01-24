@@ -3,7 +3,7 @@ import { baseApi } from "../../../api/baseApi";
 export const memberOrderApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getMyOrders: builder.query({
-      query: ({ page = 1, per_page = 20, status, ...rest } = {}) => ({
+      query: ({ page = 1, per_page = 20, status, search, ...rest } = {}) => ({
         url: "/member/orders",
         method: "GET",
         params: {
@@ -11,6 +11,7 @@ export const memberOrderApi = baseApi.injectEndpoints({
           per_page,
           ...rest,
           ...(status ? { status } : {}),
+          ...(search ? { search } : {}),
         },
       }),
       providesTags: (result) => {
