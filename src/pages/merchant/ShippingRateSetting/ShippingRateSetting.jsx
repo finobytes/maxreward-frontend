@@ -12,6 +12,7 @@ import DropdownSelect from "../../../components/ui/dropdown/DropdownSelect";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
 import Pagination from "../../../components/table/Pagination";
 import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSkeleton";
+import BulkActionBar from "../../../components/table/BulkActionBar";
 import {
   Table,
   TableBody,
@@ -31,7 +32,6 @@ import {
 import { toast } from "sonner";
 import {
   useBulkCreateShippingRatesMutation,
-  useBulkDeleteShippingRatesMutation,
   useCreateShippingRateMutation,
   useDeleteShippingRateMutation,
   useGetShippingRateOptionsQuery,
@@ -59,11 +59,6 @@ const createBulkCreateState = () => ({
   free_shipping_min_order: "",
 });
 
-const createBulkDeleteState = () => ({
-  zone_id: "",
-  method_id: "",
-});
-
 const toInputValue = (value) =>
   value === null || value === undefined ? "" : String(value);
 
@@ -81,13 +76,15 @@ const ShippingRateSetting = () => {
   const [editId, setEditId] = useState(null);
   const [togglingId, setTogglingId] = useState(null);
 
+  const [selectedRates, setSelectedRates] = useState([]);
   const [isBulkCreateOpen, setIsBulkCreateOpen] = useState(false);
   const [isBulkDeleteOpen, setIsBulkDeleteOpen] = useState(false);
+  const [isBulkDeleteProcessing, setIsBulkDeleteProcessing] = useState(false);
   const [bulkCreateData, setBulkCreateData] = useState(createBulkCreateState());
-  const [bulkDeleteData, setBulkDeleteData] = useState(createBulkDeleteState());
 
   useEffect(() => {
     setPage(1);
+    setSelectedRates([]);
   }, [zoneFilter, methodFilter, statusFilter, perPage]);
 
   const {
@@ -116,8 +113,6 @@ const ShippingRateSetting = () => {
   const [toggleShippingRateStatus] = useToggleShippingRateStatusMutation();
   const [bulkCreateShippingRates, { isLoading: isBulkCreating }] =
     useBulkCreateShippingRatesMutation();
-  const [bulkDeleteShippingRates, { isLoading: isBulkDeleting }] =
-    useBulkDeleteShippingRatesMutation();
 
   const zones = optionsResponse?.data?.zones || [];
   const methods = optionsResponse?.data?.methods || [];
@@ -279,6 +274,26 @@ const ShippingRateSetting = () => {
     setStatusFilter("");
     setPerPage(10);
     setPage(1);
+    setSelectedRates([]);
+  };
+
+  const handlePageChange = (nextPage) => {
+    setPage(nextPage);
+    setSelectedRates([]);
+  };
+
+  const toggleSelectAll = (checked) => {
+    if (checked) {
+      setSelectedRates(rates.map((rate) => rate.id));
+    } else {
+      setSelectedRates([]);
+    }
+  };
+
+  const toggleSelect = (id) => {
+    setSelectedRates((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
   };
 
   const openBulkCreateModal = () => {
@@ -287,7 +302,10 @@ const ShippingRateSetting = () => {
   };
 
   const openBulkDeleteModal = () => {
-    setBulkDeleteData(createBulkDeleteState());
+    if (!selectedRates.length) {
+      toast.error("Please select at least one shipping rate.");
+      return;
+    }
     setIsBulkDeleteOpen(true);
   };
 
@@ -414,28 +432,36 @@ const ShippingRateSetting = () => {
   const submitBulkDelete = async (e) => {
     e.preventDefault();
 
-    if (!bulkDeleteData.zone_id || !bulkDeleteData.method_id) {
-      toast.error("Please select both zone and method.");
+    if (!selectedRates.length) {
+      toast.error("Please select at least one shipping rate.");
       return;
     }
 
-    const payload = {
-      zone_id: Number(bulkDeleteData.zone_id),
-      method_id: Number(bulkDeleteData.method_id),
-    };
-
     try {
-      const response = await bulkDeleteShippingRates(payload).unwrap();
-      toast.success(
-        response?.message || "Shipping rates deleted successfully."
+      setIsBulkDeleteProcessing(true);
+      const results = await Promise.allSettled(
+        selectedRates.map((id) => deleteShippingRate(id).unwrap())
       );
+      const successCount = results.filter(
+        (result) => result.status === "fulfilled"
+      ).length;
+      const failureCount = results.length - successCount;
+
+      if (successCount > 0) {
+        toast.success(`${successCount} shipping rate(s) deleted successfully.`);
+      }
+      if (failureCount > 0) {
+        toast.error(`${failureCount} shipping rate(s) failed to delete.`);
+      }
       setIsBulkDeleteOpen(false);
-      setBulkDeleteData(createBulkDeleteState());
+      setSelectedRates([]);
       refetch();
     } catch (error) {
       toast.error(
         error?.data?.message || "Failed to delete shipping rates."
       );
+    } finally {
+      setIsBulkDeleteProcessing(false);
     }
   };
 
@@ -465,14 +491,6 @@ const ShippingRateSetting = () => {
               disabled={isOptionsLoading}
             >
               <Plus size={16} /> Bulk Create
-            </PrimaryButton>
-
-            <PrimaryButton
-              variant="danger"
-              onClick={openBulkDeleteModal}
-              disabled={isOptionsLoading}
-            >
-              <Trash2Icon size={16} /> Bulk Delete
             </PrimaryButton>
           </div>
 
@@ -521,10 +539,25 @@ const ShippingRateSetting = () => {
           </div>
         </div>
 
+        {/* Bulk Actions */}
+        {selectedRates.length > 0 && (
+          <BulkActionBar
+            selectedCount={selectedRates.length}
+            actions={[
+              {
+                label: "Delete",
+                variant: "danger",
+                icon: "delete",
+                onClick: openBulkDeleteModal,
+              },
+            ]}
+          />
+        )}
+
         {/* Table */}
         <div className="mt-4 overflow-x-auto">
           {isLoading ? (
-            <MerchantStaffSkeleton rows={8} cols={8} />
+            <MerchantStaffSkeleton rows={8} cols={9} />
           ) : isError ? (
             <div className="p-6 text-center text-red-500">
               Failed to load shipping rates.
@@ -537,6 +570,17 @@ const ShippingRateSetting = () => {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>
+                    <input
+                      type="checkbox"
+                      checked={
+                        rates.length > 0 &&
+                        selectedRates.length === rates.length
+                      }
+                      onChange={(e) => toggleSelectAll(e.target.checked)}
+                      className="w-4 h-4 rounded"
+                    />
+                  </TableHead>
                   <TableHead>S/N</TableHead>
                   <TableHead>Zone</TableHead>
                   <TableHead>Method</TableHead>
@@ -560,6 +604,14 @@ const ShippingRateSetting = () => {
 
                   return (
                     <TableRow key={rate.id}>
+                      <TableCell>
+                        <input
+                          type="checkbox"
+                          checked={selectedRates.includes(rate.id)}
+                          onChange={() => toggleSelect(rate.id)}
+                          className="w-4 h-4 rounded"
+                        />
+                      </TableCell>
                       <TableCell>
                         {(currentPage - 1) * currentPerPage + (idx + 1)}
                       </TableCell>
@@ -625,7 +677,7 @@ const ShippingRateSetting = () => {
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
-          onPageChange={setPage}
+          onPageChange={handlePageChange}
         />
       </div>
 
@@ -1047,67 +1099,21 @@ const ShippingRateSetting = () => {
       <Dialog open={isBulkDeleteOpen} onOpenChange={setIsBulkDeleteOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Bulk Delete Shipping Rates</DialogTitle>
+            <DialogTitle>Delete Selected Shipping Rates</DialogTitle>
             <DialogDescription>
-              Delete all rates for a zone and method combination.
+              {`You are about to delete ${selectedRates.length} shipping rate(s). This action cannot be undone.`}
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={submitBulkDelete} className="space-y-4 mt-3">
-            <div>
-              <label className="text-sm font-medium">Zone</label>
-              <select
-                value={bulkDeleteData.zone_id}
-                onChange={(e) =>
-                  setBulkDeleteData({
-                    ...bulkDeleteData,
-                    zone_id: e.target.value,
-                  })
-                }
-                className="mt-1 w-full border rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                required
-                disabled={isOptionsLoading}
-              >
-                <option value="">Select zone</option>
-                {zoneOptions.map((zone) => (
-                  <option key={zone.value} value={zone.value}>
-                    {zone.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium">Method</label>
-              <select
-                value={bulkDeleteData.method_id}
-                onChange={(e) =>
-                  setBulkDeleteData({
-                    ...bulkDeleteData,
-                    method_id: e.target.value,
-                  })
-                }
-                className="mt-1 w-full border rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                required
-                disabled={isOptionsLoading}
-              >
-                <option value="">Select method</option>
-                {methodOptions.map((method) => (
-                  <option key={method.value} value={method.value}>
-                    {method.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
             <div className="flex justify-end gap-3">
               <PrimaryButton
                 type="button"
                 variant="secondary"
                 onClick={() =>
-                  !isBulkDeleting && setIsBulkDeleteOpen(false)
+                  !isBulkDeleteProcessing && setIsBulkDeleteOpen(false)
                 }
-                disabled={isBulkDeleting}
+                disabled={isBulkDeleteProcessing}
               >
                 Cancel
               </PrimaryButton>
@@ -1115,12 +1121,12 @@ const ShippingRateSetting = () => {
               <PrimaryButton
                 type="submit"
                 variant="danger"
-                disabled={isBulkDeleting}
+                disabled={isBulkDeleteProcessing}
               >
-                {isBulkDeleting ? (
+                {isBulkDeleteProcessing ? (
                   <Loader className="w-4 h-4 animate-spin" />
                 ) : (
-                  "Bulk Delete"
+                  "Delete Selected"
                 )}
               </PrimaryButton>
             </div>
