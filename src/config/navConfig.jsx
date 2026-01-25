@@ -314,6 +314,11 @@ export const NAV_CONFIG = {
         },
       ],
     },
+    {
+      name: "Shipping Rate Settings",
+      icon: <Settings />,
+      path: "/merchant/shipping-rate-settings",
+    },
     { icon: <CircleUserRound />, name: "Profile", path: "/merchant/profile" },
 
     { name: "Logout", icon: <LogOut />, path: "/login" },

@@ -34,6 +34,7 @@ import CompleteOrder from "../pages/merchant/orders/CompleteOrder";
 import ReturnOrder from "../pages/merchant/orders/ReturnOrder";
 import CancleOrder from "../pages/merchant/orders/CancleOrder";
 import QrCode from "../pages/merchant/qrCode/QrCode";
+import ShippingRateSetting from "../pages/merchant/ShippingRateSetting/ShippingRateSetting";
 
 export const merchantRoute = [
   {
@@ -176,6 +177,10 @@ export const merchantRoute = [
   {
     path: "notification/:id",
     element: <NotificationDetails />,
+  },
+  {
+    path: "shipping-rate-settings",
+    element: <ShippingRateSetting />,
   },
   {
     path: "role-permission/assign",
