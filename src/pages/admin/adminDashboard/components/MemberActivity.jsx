@@ -11,7 +11,7 @@ import {
   visits,
 } from "../../../../assets/assets";
 
-const MemberActivity = () => {
+const MemberActivity = ({ stats = {} }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   function toggleDropdown() {
@@ -21,6 +21,42 @@ const MemberActivity = () => {
   function closeDropdown() {
     setIsOpen(false);
   }
+  const formatValue = (value) =>
+    Number.isFinite(Number(value)) ? Number(value).toLocaleString() : "0";
+
+  const activityItems = [
+    {
+      icon: visits,
+      label: "Total Active Members",
+      value: stats.total_active_members,
+    },
+    {
+      icon: totalIncome,
+      label: "Total Points Earned",
+      value: stats.total_points_earned,
+    },
+    {
+      icon: totalSales,
+      label: "Total Transactions",
+      value: stats.total_transactions,
+    },
+    {
+      icon: totalRevenue,
+      label: "New Members (Last 7 Days)",
+      value: stats.new_members_last_7_days,
+    },
+    {
+      icon: totalProfit,
+      label: "Total Members",
+      value: stats.total_members,
+    },
+    {
+      icon: totalProducts,
+      label: "Approved Merchants",
+      value: stats.total_merchants,
+    },
+  ];
+
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 sm:px-4 sm:pt-6 2xl:px-6 shadow-md">
       <div className="flex items-center justify-between">
@@ -69,102 +105,26 @@ const MemberActivity = () => {
       <div className="max-w-full overflow-x-auto custom-scrollbar">
         <div className=" max-h-[390px]">
           <div className="mt-4 space-y-2">
-            <div className=" flex justify-between">
-              <div className="flex items-center gap-4 mb-4">
-                <div>
-                  <img src={visits} alt="Visits" className="" />
+            {activityItems.map((item) => (
+              <div key={item.label} className=" flex justify-between">
+                <div className="flex items-center gap-4 mb-4">
+                  <div>
+                    <img src={item.icon} alt={item.label} className="" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-800">{item.label}</p>
+                    <p className="text-xs text-gray-500">
+                      Trend data unavailable
+                    </p>
+                  </div>
                 </div>
                 <div>
-                  <p className="text-ms text-gray-800">Total Active Members</p>
-                  <p className="text-xs text-gray-600">
-                    Increased by <span className="text-green-500">1.75%</span>
+                  <p className="text-sm font-bold text-gray-800">
+                    {formatValue(item.value)}
                   </p>
                 </div>
               </div>
-              <div>
-                <p className="text-sm font-bold text-gray-800">23,124</p>
-              </div>
-            </div>
-            <div className=" flex justify-between">
-              <div className="flex items-center gap-4 mb-4">
-                <div>
-                  <img src={totalIncome} alt="Total Products" className="" />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-800">Total Points Earned</p>
-                  <p className="text-xs text-gray-600">
-                    Increased by <span className="text-green-500">1.75%</span>
-                  </p>
-                </div>
-              </div>
-              <div>
-                <p className="text-sm font-bold text-gray-800">23,124</p>
-              </div>
-            </div>
-            <div className=" flex justify-between">
-              <div className="flex items-center gap-4 mb-4">
-                <div>
-                  <img src={totalSales} alt="Total Sales" className="" />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-800">Total Visits</p>
-                  <p className="text-xs text-gray-600">
-                    Increased by <span className="text-green-500">1.75%</span>
-                  </p>
-                </div>
-              </div>
-              <div>
-                <p className="text-sm font-bold text-gray-800">23,124</p>
-              </div>
-            </div>
-            <div className=" flex justify-between">
-              <div className="flex items-center gap-4 mb-4">
-                <div>
-                  <img src={totalRevenue} alt="Total Revenue" className="" />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-800">New Member Joined</p>
-                  <p className="text-xs text-gray-600">
-                    Increased by <span className="text-green-500">1.75%</span>
-                  </p>
-                </div>
-              </div>
-              <div>
-                <p className="text-sm font-bold text-gray-800">23,124</p>
-              </div>
-            </div>
-            <div className=" flex justify-between">
-              <div className="flex items-center gap-4 mb-4">
-                <div>
-                  <img src={totalProfit} alt="Total Profit" className="" />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-800">Total Online Now</p>
-                  <p className="text-xs text-gray-600">
-                    Increased by <span className="text-green-500">1.75%</span>
-                  </p>
-                </div>
-              </div>
-              <div>
-                <p className="text-sm font-bold text-gray-800">23,124</p>
-              </div>
-            </div>
-            <div className=" flex justify-between">
-              <div className="flex items-center gap-4 mb-4">
-                <div>
-                  <img src={totalProducts} alt="Total Income" className="" />
-                </div>
-                <div className="">
-                  <p className="text-sm text-gray-800">Total Purchases</p>
-                  <p className="text-xs text-gray-600">
-                    Increased by <span className="text-green-500">1.75%</span>
-                  </p>
-                </div>
-              </div>
-              <div>
-                <p className="text-sm font-bold text-gray-800">23,124</p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>

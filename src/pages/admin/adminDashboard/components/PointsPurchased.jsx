@@ -4,7 +4,7 @@ import { Dropdown } from "../../../../components/ui/dropdown/Dropdown";
 import { DropdownItem } from "../../../../components/ui/dropdown/DropdownItem";
 import { kebabMenu } from "../../../../assets/assets";
 
-const PointsPurchased = () => {
+const PointsPurchased = ({ max = 0, refer = 0, total = undefined }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   function toggleDropdown() {
@@ -14,11 +14,14 @@ const PointsPurchased = () => {
   function closeDropdown() {
     setIsOpen(false);
   }
-  const max = 18235;
-  const refer = 12743;
-  const total = max + refer;
+  const maxValue = Number.isFinite(Number(max)) ? Number(max) : 0;
+  const referValue = Number.isFinite(Number(refer)) ? Number(refer) : 0;
+  const derivedTotal = maxValue + referValue;
+  const totalValue = Number.isFinite(Number(total))
+    ? Number(total)
+    : derivedTotal;
 
-  const series = [max, refer]; // Max, Refer
+  const series = [maxValue, referValue]; // Max, Refer
 
   const options = {
     chart: {
@@ -36,10 +39,10 @@ const PointsPurchased = () => {
             show: true,
             total: {
               show: true,
-              label: "Total Visitors",
+              label: "Total Vouchers",
               fontSize: "14px",
               color: "#6B7280",
-              formatter: () => total.toLocaleString(),
+              formatter: () => totalValue.toLocaleString(),
             },
             value: {
               show: false,
@@ -62,7 +65,7 @@ const PointsPurchased = () => {
     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white relative shadow-md">
       <div className="flex items-center justify-between px-4">
         <h3 className="text-lg font-semibold text-gray-800 mb-4 px-5 pt-5 sm:px-6 sm:pt-6">
-          Voucher Purchased
+          Vouchers Purchased
         </h3>
 
         <div className="relative inline-block">
@@ -110,9 +113,9 @@ const PointsPurchased = () => {
         <Chart options={options} series={series} type="donut" height={280} />
       </div>
       <div className="absolute top-2/5 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-        <h3 className="text-center text-lg">Total Voucher</h3>
+        <h3 className="text-center text-lg">Total Vouchers</h3>
         <p className="text-center text-gray-600 text-2xl">
-          {total.toLocaleString()}
+          {totalValue.toLocaleString()}
         </p>
       </div>
       {/* Custom Legend */}
@@ -125,10 +128,13 @@ const PointsPurchased = () => {
           </div>
           <div className="flex items-center gap-6">
             <span className="text-sm font-medium text-green-500">
-              {((max / total) * 100).toFixed(2)}%
+              {totalValue > 0
+                ? ((maxValue / totalValue) * 100).toFixed(2)
+                : "0.00"}
+              %
             </span>
             <span className="text-gray-800 font-semibold">
-              {max.toLocaleString()}
+              {maxValue.toLocaleString()}
             </span>
           </div>
         </div>
@@ -140,10 +146,13 @@ const PointsPurchased = () => {
           </div>
           <div className="flex items-center gap-6">
             <span className="text-sm font-medium text-red-500">
-              {((refer / total) * 100).toFixed(2)}%
+              {totalValue > 0
+                ? ((referValue / totalValue) * 100).toFixed(2)
+                : "0.00"}
+              %
             </span>
             <span className="text-gray-800 font-semibold">
-              {refer.toLocaleString()}
+              {referValue.toLocaleString()}
             </span>
           </div>
         </div>

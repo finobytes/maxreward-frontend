@@ -8,7 +8,13 @@ export const dashboardApi = baseApi.injectEndpoints({
       transformResponse: (response) => response?.data || response,
       providesTags: ["DashboardStats"],
     }),
+    // GET admin real-time transactions
+    getRealTimeTransactions: builder.query({
+      query: () => "/admin/real-time-transactions",
+      transformResponse: (response) => response?.data || response,
+    }),
   }),
 });
 
-export const { useGetDashboardStatsQuery } = dashboardApi;
+export const { useGetDashboardStatsQuery, useGetRealTimeTransactionsQuery } =
+  dashboardApi;

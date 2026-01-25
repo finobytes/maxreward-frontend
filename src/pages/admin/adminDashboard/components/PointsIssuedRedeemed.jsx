@@ -1,15 +1,17 @@
-import React from "react";
 import Chart from "react-apexcharts";
 
-const PointsIssuedRedeemed = () => {
-  const redeemed = 186758;
-  const issued = 232389;
-  const liability = issued - redeemed;
+const PointsIssuedRedeemed = ({ issued = 0, redeemed = 0, liability }) => {
+  const issuedValue = Number.isFinite(Number(issued)) ? Number(issued) : 0;
+  const redeemedValue = Number.isFinite(Number(redeemed)) ? Number(redeemed) : 0;
+  const liabilityValue = Number.isFinite(Number(liability))
+    ? Number(liability)
+    : Math.max(0, issuedValue - redeemedValue);
+  const total = issuedValue + redeemedValue;
+  const series =
+    total > 0
+      ? [(redeemedValue / total) * 100, (issuedValue / total) * 100]
+      : [0, 0];
 
-  const series = [
-    45, // Redeemed %
-    55, // Issued %
-  ];
   const options = {
     chart: {
       type: "radialBar",
@@ -39,7 +41,7 @@ const PointsIssuedRedeemed = () => {
             fontSize: "14px",
             fontWeight: 500,
             color: "#111827",
-            formatter: () => liability.toLocaleString(),
+            formatter: () => liabilityValue.toLocaleString(),
           },
         },
       },
@@ -66,14 +68,18 @@ const PointsIssuedRedeemed = () => {
             <span className="w-2 h-2 rounded-full bg-indigo-500 mr-2"></span>
             Points Redeemed
           </span>
-          <p className="font-semibold text-gray-800">186,758</p>
+          <p className="font-semibold text-gray-800">
+            {redeemedValue.toLocaleString()}
+          </p>
         </div>
         <div>
           <span className="flex items-center justify-center text-sm text-gray-600">
             <span className="w-2 h-2 rounded-full bg-orange-500 mr-2"></span>
             Points Issued
           </span>
-          <p className="font-semibold text-gray-800">232,389</p>
+          <p className="font-semibold text-gray-800">
+            {issuedValue.toLocaleString()}
+          </p>
         </div>
       </div>
     </div>
