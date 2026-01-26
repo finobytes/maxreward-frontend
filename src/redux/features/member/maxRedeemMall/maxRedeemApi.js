@@ -58,6 +58,16 @@ export const maxRedeemApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["User", "Wallet", "Cart", "CartCount"],
     }),
+    calculateShipping: builder.mutation({
+      query: (data) => ({
+        url: "/member/calculate-shipping",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    getActiveMemberShippingMethods: builder.query({
+      query: () => "/shipping-methods/active",
+    }),
   }),
 });
 
@@ -70,4 +80,6 @@ export const {
   useClearCartMutation,
   useGetCartCountQuery,
   useCreateOrdersMutation,
+  useCalculateShippingMutation,
+  useGetActiveMemberShippingMethodsQuery,
 } = maxRedeemApi;
