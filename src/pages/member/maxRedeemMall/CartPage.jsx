@@ -160,9 +160,12 @@ const CartPage = () => {
   const [shippingMethodError, setShippingMethodError] = useState(false);
   const shippingRequestIdRef = useRef(0);
   const lastShippingPayloadRef = useRef(null);
+  const postcodeWarningMethodRef = useRef("");
   const [shippingQuote, setShippingQuote] = useState({
     totalPoints: 0,
     byMerchant: {},
+    perMerchantErrors: {},
+    detectedZone: null,
     status: "idle",
     error: null,
   });
@@ -178,6 +181,14 @@ const CartPage = () => {
   const handleShippingMethodChange = (value) => {
     setSelectedShippingMethodId(value);
     setShippingMethodError((prev) => (prev ? !value : prev));
+    if (
+      value &&
+      !customerPostcode &&
+      postcodeWarningMethodRef.current !== value
+    ) {
+      toast.warning("Please enter a postcode to calculate shipping.");
+      postcodeWarningMethodRef.current = value;
+    }
   };
 
   const selectedShippingMethod = useMemo(
@@ -229,6 +240,22 @@ const CartPage = () => {
     }
   }, [cartByMerchant]);
 
+  useEffect(() => {
+    if (customerPostcode && postcodeWarningMethodRef.current) {
+      postcodeWarningMethodRef.current = "";
+    }
+  }, [customerPostcode]);
+
+  useEffect(() => {
+    if (!customerPostcode || selectedShippingMethodId) {
+      setShippingMethodError(false);
+      return;
+    }
+    if (shippingMethodOptions.length > 0) {
+      setShippingMethodError(true);
+    }
+  }, [customerPostcode, selectedShippingMethodId, shippingMethodOptions]);
+
   const normalizeShippingResponse = useCallback((response) => {
     const payload = response?.data ?? response ?? {};
     const merchantsPayload =
@@ -241,23 +268,50 @@ const CartPage = () => {
       payload?.merchant_shipping ??
       [];
     const byMerchant = {};
+    const perMerchantErrors = {};
+    let detectedZoneFromMerchants = null;
     if (Array.isArray(merchantsPayload)) {
       merchantsPayload.forEach((merchant) => {
         const merchantId =
           merchant?.merchant_id ??
           merchant?.merchant?.merchant_id ??
           merchant?.id;
-        const points = Number(
+        if (!detectedZoneFromMerchants) {
+          detectedZoneFromMerchants =
+            merchant?.shipping_zone_name ??
+            merchant?.shipping_zone?.name ??
+            merchant?.zone?.name ??
+            null;
+        }
+        const rawPoints =
           merchant?.shipping_points ??
-            merchant?.points ??
-            merchant?.shipping_cost ??
-            merchant?.shipping
-        );
-        if (merchantId && Number.isFinite(points)) {
+          merchant?.points ??
+          merchant?.shipping_cost ??
+          merchant?.shipping ??
+          (merchant?.is_free_shipping ? 0 : undefined);
+        const points = Number(rawPoints);
+        if (!merchantId) return;
+        if (Number.isFinite(points)) {
           byMerchant[merchantId] = points;
+          return;
+        }
+        const merchantMessage = merchant?.message ?? merchant?.error;
+        if (merchantMessage) {
+          perMerchantErrors[merchantId] = merchantMessage;
         }
       });
     }
+
+    if (payload?.merchant_id && payload?.message) {
+      perMerchantErrors[payload.merchant_id] = payload.message;
+    }
+
+    const detectedZone =
+      payload?.detected_zone ??
+      payload?.data?.detected_zone ??
+      payload?.data?.data?.detected_zone ??
+      (detectedZoneFromMerchants ? { name: detectedZoneFromMerchants } : null) ??
+      (payload?.zone ? { name: payload.zone } : null);
 
     const totalFromPayload = Number(
       payload?.total_shipping_points ??
@@ -278,7 +332,26 @@ const CartPage = () => {
     return {
       totalPoints: Number.isFinite(totalPoints) ? totalPoints : 0,
       byMerchant,
+      perMerchantErrors,
+      detectedZone,
     };
+  }, []);
+
+  const buildShippingErrorMessage = useCallback((error, normalized) => {
+    const apiMessage = error?.data?.message;
+    if (apiMessage) return apiMessage;
+    const merchantId = error?.data?.merchant_id ?? null;
+    const zoneName =
+      error?.data?.zone ??
+      normalized?.detectedZone?.name ??
+      normalized?.detectedZone?.code;
+    if (merchantId && zoneName) {
+      return `No shipping rate found for merchant ${merchantId} in ${zoneName}.`;
+    }
+    if (merchantId) {
+      return `No shipping rate found for merchant ${merchantId}.`;
+    }
+    return error?.message || "Failed to calculate shipping. Please try again.";
   }, []);
 
   const runShippingCalculation = useCallback(
@@ -288,39 +361,49 @@ const CartPage = () => {
       setShippingQuote({
         totalPoints: 0,
         byMerchant: {},
+        perMerchantErrors: {},
+        detectedZone: null,
         status: "calculating",
         error: null,
       });
 
       try {
         const response = await calculateShipping(payload).unwrap();
-        if (response?.success === false) {
-          throw new Error(
-            response?.message || "Failed to calculate shipping."
-          );
-        }
         if (requestId !== shippingRequestIdRef.current) return;
         const normalized = normalizeShippingResponse(response);
+        if (response?.success === false) {
+          setShippingQuote({
+            totalPoints: normalized.totalPoints,
+            byMerchant: normalized.byMerchant,
+            perMerchantErrors: normalized.perMerchantErrors,
+            detectedZone: normalized.detectedZone,
+            status: "error",
+            error: response?.message || "Failed to calculate shipping.",
+          });
+          return;
+        }
         setShippingQuote({
           totalPoints: normalized.totalPoints,
           byMerchant: normalized.byMerchant,
+          perMerchantErrors: normalized.perMerchantErrors,
+          detectedZone: normalized.detectedZone,
           status: "ready",
           error: null,
         });
       } catch (error) {
         if (requestId !== shippingRequestIdRef.current) return;
+        const normalized = normalizeShippingResponse(error?.data ?? {});
         setShippingQuote({
-          totalPoints: 0,
-          byMerchant: {},
+          totalPoints: normalized.totalPoints,
+          byMerchant: normalized.byMerchant,
+          perMerchantErrors: normalized.perMerchantErrors,
+          detectedZone: normalized.detectedZone,
           status: "error",
-          error:
-            error?.data?.message ||
-            error?.message ||
-            "Failed to calculate shipping. Please try again.",
+          error: buildShippingErrorMessage(error, normalized),
         });
       }
     },
-    [calculateShipping, normalizeShippingResponse]
+    [buildShippingErrorMessage, calculateShipping, normalizeShippingResponse]
   );
 
   const retryCalculateShipping = useCallback(() => {
@@ -373,7 +456,14 @@ const CartPage = () => {
       setShippingQuote((prev) =>
         prev.status === "idle" && !prev.error
           ? prev
-          : { totalPoints: 0, byMerchant: {}, status: "idle", error: null }
+          : {
+              totalPoints: 0,
+              byMerchant: {},
+              perMerchantErrors: {},
+              detectedZone: null,
+              status: "idle",
+              error: null,
+            }
       );
       return;
     }
@@ -381,7 +471,14 @@ const CartPage = () => {
     setShippingQuote((prev) =>
       prev.status === "calculating"
         ? prev
-        : { totalPoints: 0, byMerchant: {}, status: "calculating", error: null }
+        : {
+            totalPoints: 0,
+            byMerchant: {},
+            perMerchantErrors: {},
+            detectedZone: null,
+            status: "calculating",
+            error: null,
+          }
     );
 
     const timeout = setTimeout(() => {
@@ -406,6 +503,29 @@ const CartPage = () => {
   const isShippingCalculationBlocked =
     needsShippingCalculation &&
     (!customerPostcode || !isShippingSelectionComplete);
+  const shouldWarnPostcode =
+    needsShippingCalculation &&
+    Boolean(selectedShippingMethodId) &&
+    !customerPostcode;
+  const detectedZoneName =
+    shippingQuote?.detectedZone?.name ??
+    shippingQuote?.detectedZone?.code ??
+    null;
+  const hasPerMerchantShippingErrors =
+    Object.keys(shippingQuote?.perMerchantErrors ?? {}).length > 0;
+  const shippingBlockedMessage = useMemo(() => {
+    if (!needsShippingCalculation) return null;
+    if (!selectedShippingMethodId && !customerPostcode) {
+      return "Select a shipping method and enter a postcode to calculate shipping.";
+    }
+    if (!selectedShippingMethodId) {
+      return "Select a shipping method to calculate shipping.";
+    }
+    if (!customerPostcode) {
+      return "Enter your postcode to calculate shipping.";
+    }
+    return null;
+  }, [customerPostcode, needsShippingCalculation, selectedShippingMethodId]);
 
   const shippingPoints =
     needsShippingCalculation &&
@@ -448,6 +568,9 @@ const CartPage = () => {
     if (isShippingMethodsUnavailable) {
       toast.error("Shipping methods are unavailable. Please try again later.");
       return;
+    }
+    if (!selectedShippingMethodId && shippingMethodOptions.length > 0) {
+      setShippingMethodError(true);
     }
     if (!customerPostcode) {
       toast.error("Please enter a postcode to calculate shipping");
@@ -690,6 +813,17 @@ const CartPage = () => {
                         Shipping method is required.
                       </p>
                     ) : null}
+                    {shouldWarnPostcode ? (
+                      <p className="mt-1.5 text-xs text-amber-600">
+                        Enter your postcode to calculate shipping.
+                      </p>
+                    ) : null}
+                    {detectedZoneName &&
+                    (isShippingQuoteReady || isShippingQuoteError) ? (
+                      <p className="mt-1.5 text-xs text-gray-600">
+                        Detected shipping zone: {detectedZoneName}
+                      </p>
+                    ) : null}
                     {showShippingMethodsError ? (
                       <div className="mt-1.5 flex items-center gap-2 text-xs text-error-500">
                         <span>Failed to load shipping methods.</span>
@@ -706,6 +840,24 @@ const CartPage = () => {
                       <p className="mt-1.5 text-xs text-gray-500">
                         No active shipping methods available.
                       </p>
+                    ) : null}
+                    {isShippingQuoteError ? (
+                      <div className="mt-2 rounded-lg border border-error-100 bg-error-50 px-3 py-2 text-xs text-error-600">
+                        <p>{shippingQuote.error}</p>
+                        {hasPerMerchantShippingErrors ? (
+                          <p className="mt-1 text-[11px] text-error-500">
+                            Some merchants do not have a shipping rate. Review
+                            the merchant sections below.
+                          </p>
+                        ) : null}
+                        <button
+                          type="button"
+                          onClick={retryCalculateShipping}
+                          className="mt-1 underline underline-offset-2"
+                        >
+                          Retry
+                        </button>
+                      </div>
                     ) : null}
                   </div>
 
@@ -737,6 +889,17 @@ const CartPage = () => {
                             Enter your postcode to calculate shipping.
                           </p>
                         ) : null}
+                        {isShippingCalculating ? (
+                          <p className="text-xs text-gray-500 pt-1">
+                            Calculating shipping for your postcode...
+                          </p>
+                        ) : null}
+                        {detectedZoneName &&
+                        (isShippingQuoteReady || isShippingQuoteError) ? (
+                          <p className="text-xs text-gray-500 pt-1">
+                            Shipping zone: {detectedZoneName}
+                          </p>
+                        ) : null}
                       </>
                     ) : (
                       <>
@@ -758,6 +921,8 @@ const CartPage = () => {
                 const merchantId = getMerchantId(group);
                 const merchantShippingPoints =
                   shippingQuote.byMerchant?.[merchantId];
+                const merchantShippingError =
+                  shippingQuote.perMerchantErrors?.[merchantId];
 
                 return (
                   <div
@@ -834,8 +999,15 @@ const CartPage = () => {
                               : isShippingQuoteReady &&
                                 Number.isFinite(merchantShippingPoints)
                               ? Number(merchantShippingPoints).toLocaleString()
+                              : !isShippingCalculating && merchantShippingError
+                              ? "Unavailable"
                               : "--"}
                           </p>
+                          {!isShippingCalculating && merchantShippingError ? (
+                            <p className="mt-1 text-[11px] leading-snug text-error-500">
+                              {merchantShippingError}
+                            </p>
+                          ) : null}
                         </div>
                       </div>
                     </div>
@@ -1051,32 +1223,45 @@ const CartPage = () => {
                         : "--"}
                     </span>
                   </div>
-                  {isShippingCalculationBlocked && (
+                  {isShippingCalculationBlocked && shippingBlockedMessage ? (
                     <p className="text-[11px] text-white/70">
-                      Select a shipping method and enter a postcode to
-                      calculate shipping.
+                      {shippingBlockedMessage}
                     </p>
-                  )}
+                  ) : null}
                   {isShippingCalculating && (
                     <p className="text-[11px] text-white/70">
                       Calculating shipping based on your selections...
                     </p>
                   )}
-                  {isShippingQuoteError && (
-                    <div className="text-[11px] text-red-200 flex items-center gap-2">
-                      <span>
-                        {shippingQuote.error ||
-                          "Failed to calculate shipping."}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={retryCalculateShipping}
-                        className="underline underline-offset-2"
-                      >
-                        Retry
-                      </button>
+                  {detectedZoneName &&
+                  (isShippingQuoteReady || isShippingQuoteError) ? (
+                    <p className="text-[11px] text-white/70">
+                      Shipping zone: {detectedZoneName}
+                    </p>
+                  ) : null}
+                  {isShippingQuoteError ? (
+                    <div className="text-[11px] text-red-200 space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span>
+                          {shippingQuote.error ||
+                            "Failed to calculate shipping."}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={retryCalculateShipping}
+                          className="underline underline-offset-2"
+                        >
+                          Retry
+                        </button>
+                      </div>
+                      {hasPerMerchantShippingErrors ? (
+                        <p>
+                          Some merchants do not have a shipping rate for this
+                          postcode.
+                        </p>
+                      ) : null}
                     </div>
-                  )}
+                  ) : null}
                 </div>
 
                 <div className="border-t border-white/20 pt-4 mb-6">
