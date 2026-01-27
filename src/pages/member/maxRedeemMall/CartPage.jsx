@@ -234,6 +234,9 @@ const CartPage = () => {
     const merchantsPayload =
       payload?.merchants ??
       payload?.data?.merchants ??
+      payload?.shipping_by_merchant ??
+      payload?.data?.shipping_by_merchant ??
+      payload?.data?.data?.shipping_by_merchant ??
       payload?.shipping ??
       payload?.merchant_shipping ??
       [];
