@@ -903,7 +903,7 @@ const ShippingRateSetting = () => {
 
       {/* Bulk Create Modal */}
       <Dialog open={isBulkCreateOpen} onOpenChange={setIsBulkCreateOpen}>
-        <DialogContent className="sm:max-w-3xl">
+        <DialogContent className="sm:max-w-3xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Bulk Create Shipping Rates</DialogTitle>
             <DialogDescription>
@@ -986,45 +986,59 @@ const ShippingRateSetting = () => {
                 {bulkCreateData.weight_ranges.map((range, idx) => (
                   <div
                     key={`range-${idx}`}
-                    className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end"
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end"
                   >
-                    <InputField
-                      type="number"
-                      min="0"
-                      value={range.from}
-                      onChange={(e) =>
-                        updateWeightRange(idx, "from", e.target.value)
-                      }
-                      placeholder="From"
-                    />
-                    <InputField
-                      type="number"
-                      min="0"
-                      value={range.to}
-                      onChange={(e) =>
-                        updateWeightRange(idx, "to", e.target.value)
-                      }
-                      placeholder="To"
-                    />
-                    <InputField
-                      type="number"
-                      min="0"
-                      value={range.base}
-                      onChange={(e) =>
-                        updateWeightRange(idx, "base", e.target.value)
-                      }
-                      placeholder="Base"
-                    />
-                    <InputField
-                      type="number"
-                      min="0"
-                      value={range.per_kg}
-                      onChange={(e) =>
-                        updateWeightRange(idx, "per_kg", e.target.value)
-                      }
-                      placeholder="Per Kg"
-                    />
-                    <div className="flex gap-2">
+                    <div className="min-w-0">
+                      <InputField
+                        type="number"
+                        min="0"
+                        value={range.from}
+                        onChange={(e) =>
+                          updateWeightRange(idx, "from", e.target.value)
+                        }
+                        placeholder="From"
+                        aria-label={`Weight from for range ${idx + 1}`}
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <InputField
+                        type="number"
+                        min="0"
+                        value={range.to}
+                        onChange={(e) =>
+                          updateWeightRange(idx, "to", e.target.value)
+                        }
+                        placeholder="To"
+                        aria-label={`Weight to for range ${idx + 1}`}
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <InputField
+                        type="number"
+                        min="0"
+                        value={range.base}
+                        onChange={(e) =>
+                          updateWeightRange(idx, "base", e.target.value)
+                        }
+                        placeholder="Base"
+                        aria-label={`Base points for range ${idx + 1}`}
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <InputField
+                        type="number"
+                        min="0"
+                        value={range.per_kg}
+                        onChange={(e) =>
+                          updateWeightRange(idx, "per_kg", e.target.value)
+                        }
+                        placeholder="Per Kg"
+                        aria-label={`Per kilogram points for range ${
+                          idx + 1
+                        }`}
+                      />
+                    </div>
+                    <div className="flex gap-2 sm:col-span-2 lg:col-span-1">
                       <PrimaryButton
                         type="button"
                         variant="secondary"
