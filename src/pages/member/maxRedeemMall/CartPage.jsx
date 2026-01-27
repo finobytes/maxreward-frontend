@@ -192,7 +192,7 @@ const CartPage = () => {
         customer_postcode: member.postcode || "",
         customer_city: member.city || "",
         customer_state: member.state || "",
-        customer_country: member.country_code || "",
+        customer_country: "",
       });
     }
   }, [profileData, reset]);
