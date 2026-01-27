@@ -75,9 +75,14 @@ const CartPage = () => {
   } = useGetActiveMemberShippingMethodsQuery();
 
   // Parse New API Structure
-  const cartByMerchant = cartData?.cart_by_merchant || [];
-  const allItems =
-    cartByMerchant.flatMap((group) => group.items || []) || [];
+  const cartByMerchant = useMemo(
+    () => cartData?.cart_by_merchant ?? [],
+    [cartData]
+  );
+  const allItems = useMemo(
+    () => cartByMerchant.flatMap((group) => group.items || []),
+    [cartByMerchant]
+  );
 
   // Use summary from API if available, else fallback
   const cartTotal = cartData?.summary?.total_amount || 0;
@@ -116,39 +121,43 @@ const CartPage = () => {
 
   const customerPostcode = (watch("customer_postcode") || "").trim();
 
-  const shippingMethodsPayload =
-    shippingMethodsResponse?.data?.data ?? shippingMethodsResponse?.data ?? [];
-  const shippingMethods = Array.isArray(shippingMethodsPayload)
-    ? shippingMethodsPayload
-    : [];
+  const shippingMethods = useMemo(() => {
+    const payload =
+      shippingMethodsResponse?.data?.data ?? shippingMethodsResponse?.data ?? [];
+    return Array.isArray(payload) ? payload : [];
+  }, [shippingMethodsResponse]);
   const hasShippingMethodsError =
     isShippingMethodsError || shippingMethodsResponse?.success === false;
-  const shippingMethodOptions = shippingMethods
-    .filter((method) => method?.id !== null && method?.id !== undefined)
-    .map((method) => {
-      const minDays = method?.min_days;
-      const maxDays = method?.max_days;
-      const hasDays =
-        minDays !== null &&
-        minDays !== undefined &&
-        maxDays !== null &&
-        maxDays !== undefined;
-      const label = hasDays
-        ? `${method?.name || "Shipping"} (${minDays}-${maxDays} days)`
-        : method?.name || "Shipping";
-      return {
-        label,
-        value: String(method?.id),
-      };
-    });
+  const shippingMethodOptions = useMemo(
+    () =>
+      shippingMethods
+        .filter((method) => method?.id !== null && method?.id !== undefined)
+        .map((method) => {
+          const minDays = method?.min_days;
+          const maxDays = method?.max_days;
+          const hasDays =
+            minDays !== null &&
+            minDays !== undefined &&
+            maxDays !== null &&
+            maxDays !== undefined;
+          const label = hasDays
+            ? `${method?.name || "Shipping"} (${minDays}-${maxDays} days)`
+            : method?.name || "Shipping";
+          return {
+            label,
+            value: String(method?.id),
+          };
+        }),
+    [shippingMethods]
+  );
   const isShippingMethodsEmpty =
     !isLoadingShippingMethods && shippingMethodOptions.length === 0;
   const showShippingMethodsError =
     hasShippingMethodsError && shippingMethodOptions.length === 0;
   const isShippingMethodsUnavailable = isShippingMethodsEmpty;
 
-  const [merchantShippingMethods, setMerchantShippingMethods] = useState({});
-  const [merchantShippingErrors, setMerchantShippingErrors] = useState({});
+  const [selectedShippingMethodId, setSelectedShippingMethodId] = useState("");
+  const [shippingMethodError, setShippingMethodError] = useState(false);
   const shippingRequestIdRef = useRef(0);
   const lastShippingPayloadRef = useRef(null);
   const [shippingQuote, setShippingQuote] = useState({
@@ -166,19 +175,18 @@ const CartPage = () => {
     []
   );
 
-  const handleMerchantShippingChange = (merchantId, value) => {
-    if (!merchantId) return;
-    setMerchantShippingMethods((prev) => ({
-      ...prev,
-      [merchantId]: value,
-    }));
-    setMerchantShippingErrors((prev) => {
-      if (!prev[merchantId]) return prev;
-      const next = { ...prev };
-      delete next[merchantId];
-      return next;
-    });
+  const handleShippingMethodChange = (value) => {
+    setSelectedShippingMethodId(value);
+    setShippingMethodError((prev) => (prev ? !value : prev));
   };
+
+  const selectedShippingMethod = useMemo(
+    () =>
+      shippingMethods.find(
+        (method) => String(method?.id) === String(selectedShippingMethodId)
+      ) ?? null,
+    [shippingMethods, selectedShippingMethodId]
+  );
 
   // Pre-fill form from profile
   useEffect(() => {
@@ -198,60 +206,28 @@ const CartPage = () => {
   }, [profileData, reset]);
 
   useEffect(() => {
-    if (!cartByMerchant.length) {
-      setMerchantShippingMethods({});
-      setMerchantShippingErrors({});
+    if (!shippingMethodOptions.length) {
+      setSelectedShippingMethodId("");
+      setShippingMethodError(false);
       return;
     }
-    setMerchantShippingMethods((prev) => {
-      const next = {};
-      cartByMerchant.forEach((group) => {
-        const merchantId = getMerchantId(group);
-        if (merchantId && prev[merchantId]) {
-          next[merchantId] = prev[merchantId];
-        }
-      });
-      return next;
-    });
-    setMerchantShippingErrors((prev) => {
-      const next = {};
-      cartByMerchant.forEach((group) => {
-        const merchantId = getMerchantId(group);
-        if (merchantId && prev[merchantId]) {
-          next[merchantId] = prev[merchantId];
-        }
-      });
-      return next;
-    });
-  }, [cartByMerchant, getMerchantId]);
+
+    const isCurrentSelectionValid = shippingMethodOptions.some(
+      (option) => option.value === String(selectedShippingMethodId)
+    );
+    if (isCurrentSelectionValid) return;
+
+    const nextValue =
+      shippingMethodOptions.length === 1 ? shippingMethodOptions[0].value : "";
+    setSelectedShippingMethodId(nextValue);
+    setShippingMethodError(false);
+  }, [shippingMethodOptions, selectedShippingMethodId]);
 
   useEffect(() => {
-    if (shippingMethodOptions.length !== 1 || !cartByMerchant.length) return;
-    const defaultMethodId = shippingMethodOptions[0].value;
-    setMerchantShippingMethods((prev) => {
-      let changed = false;
-      const next = { ...prev };
-      cartByMerchant.forEach((group) => {
-        const merchantId = getMerchantId(group);
-        if (merchantId && !next[merchantId]) {
-          next[merchantId] = defaultMethodId;
-          changed = true;
-        }
-      });
-      return changed ? next : prev;
-    });
-    setMerchantShippingErrors((prev) => {
-      if (!Object.keys(prev).length) return prev;
-      const next = { ...prev };
-      cartByMerchant.forEach((group) => {
-        const merchantId = getMerchantId(group);
-        if (merchantId && next[merchantId]) {
-          delete next[merchantId];
-        }
-      });
-      return next;
-    });
-  }, [shippingMethodOptions, cartByMerchant, getMerchantId]);
+    if (!cartByMerchant.length) {
+      setShippingMethodError(false);
+    }
+  }, [cartByMerchant]);
 
   const normalizeShippingResponse = useCallback((response) => {
     const payload = response?.data ?? response ?? {};
@@ -351,18 +327,24 @@ const CartPage = () => {
   }, [runShippingCalculation]);
 
   const shippingCalculationPayload = useMemo(() => {
-    if (!customerPostcode || !cartByMerchant.length) return null;
-    const isSelectionComplete = cartByMerchant.every((group) => {
-      const merchantId = getMerchantId(group);
-      return merchantId && merchantShippingMethods[merchantId];
-    });
-    if (!isSelectionComplete) return null;
+    if (
+      !customerPostcode ||
+      !cartByMerchant.length ||
+      !selectedShippingMethodId
+    ) {
+      return null;
+    }
+
+    const hasInvalidMerchant = cartByMerchant.some(
+      (group) => !getMerchantId(group)
+    );
+    if (hasInvalidMerchant) return null;
 
     const merchants = cartByMerchant.map((group) => {
       const merchantId = getMerchantId(group);
       return {
         merchant_id: merchantId,
-        shipping_method_id: Number(merchantShippingMethods[merchantId]),
+        shipping_method_id: Number(selectedShippingMethodId),
         items: (group.items || []).map((item) => ({
           product_id: item.product_id,
           product_variation_id:
@@ -376,7 +358,12 @@ const CartPage = () => {
       customer_postcode: customerPostcode,
       merchants,
     };
-  }, [cartByMerchant, customerPostcode, merchantShippingMethods, getMerchantId]);
+  }, [
+    cartByMerchant,
+    customerPostcode,
+    selectedShippingMethodId,
+    getMerchantId,
+  ]);
 
   useEffect(() => {
     if (!shippingCalculationPayload) {
@@ -401,10 +388,11 @@ const CartPage = () => {
     return () => clearTimeout(timeout);
   }, [shippingCalculationPayload, runShippingCalculation]);
 
-  const isShippingSelectionComplete = cartByMerchant.every((group) => {
-    const merchantId = getMerchantId(group);
-    return merchantId && merchantShippingMethods[merchantId];
-  });
+  const cartHasValidMerchants = cartByMerchant.every(
+    (group) => !!getMerchantId(group)
+  );
+  const isShippingSelectionComplete =
+    Boolean(selectedShippingMethodId) && cartHasValidMerchants;
   const needsShippingCalculation = allItems.length > 0;
   const isShippingQuoteReady = shippingQuote.status === "ready";
   const isShippingQuoteError = shippingQuote.status === "error";
@@ -463,27 +451,18 @@ const CartPage = () => {
       return;
     }
 
-    const missingShippingSelections = {};
-    let hasInvalidMerchant = false;
-    cartByMerchant.forEach((group) => {
-      const merchantId = getMerchantId(group);
-      if (!merchantId) {
-        hasInvalidMerchant = true;
-        return;
-      }
-      if (!merchantShippingMethods[merchantId]) {
-        missingShippingSelections[merchantId] = true;
-      }
-    });
+    const hasInvalidMerchant = cartByMerchant.some(
+      (group) => !getMerchantId(group)
+    );
     if (hasInvalidMerchant) {
       toast.error(
         "Some cart items are missing merchant details. Please refresh and try again."
       );
       return;
     }
-    if (Object.keys(missingShippingSelections).length > 0) {
-      setMerchantShippingErrors(missingShippingSelections);
-      toast.error("Please select a shipping method for each merchant");
+    if (!selectedShippingMethodId) {
+      setShippingMethodError(true);
+      toast.error("Please select a shipping method");
       return;
     }
 
@@ -518,7 +497,7 @@ const CartPage = () => {
           const merchantId = getMerchantId(group);
           return {
             merchant_id: merchantId,
-            shipping_method_id: Number(merchantShippingMethods[merchantId]),
+            shipping_method_id: Number(selectedShippingMethodId),
             items: (group.items || []).map((item) => ({
               product_id: item.product_id,
               product_variation_id:
@@ -655,17 +634,127 @@ const CartPage = () => {
                   )}
                 </div>
               </div>
+
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-2">
+                  <div>
+                    <h2 className="text-base font-semibold text-gray-900">
+                      Shipping Method
+                    </h2>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Choose one shipping method. We will apply it to every
+                      merchant in your cart.
+                    </p>
+                  </div>
+                  <div
+                    className={`text-[11px] font-semibold px-3 py-1 rounded-full border ${
+                      selectedShippingMethod
+                        ? "text-emerald-700 bg-emerald-50 border-emerald-100"
+                        : "text-amber-700 bg-amber-50 border-amber-100"
+                    }`}
+                  >
+                    {selectedShippingMethod
+                      ? "applied to all merchants"
+                      : "selection required"}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-[minmax(0,320px)_1fr] gap-4 items-start">
+                  <div>
+                    <Label htmlFor="shipping_method_global">
+                      Shipping Method
+                    </Label>
+                    <Select
+                      id="shipping_method_global"
+                      placeholder={
+                        isLoadingShippingMethods
+                          ? "Loading shipping methods..."
+                          : "Select shipping method"
+                      }
+                      options={shippingMethodOptions}
+                      value={selectedShippingMethodId}
+                      onChange={(event) =>
+                        handleShippingMethodChange(event.target.value)
+                      }
+                      disabled={
+                        isLoadingShippingMethods ||
+                        shippingMethodOptions.length === 0
+                      }
+                      error={shippingMethodError}
+                    />
+                    {shippingMethodError ? (
+                      <p className="mt-1.5 text-xs text-error-500">
+                        Shipping method is required.
+                      </p>
+                    ) : null}
+                    {showShippingMethodsError ? (
+                      <div className="mt-1.5 flex items-center gap-2 text-xs text-error-500">
+                        <span>Failed to load shipping methods.</span>
+                        <button
+                          type="button"
+                          onClick={refetchShippingMethods}
+                          className="underline underline-offset-2"
+                        >
+                          Retry
+                        </button>
+                      </div>
+                    ) : null}
+                    {isShippingMethodsEmpty && !showShippingMethodsError ? (
+                      <p className="mt-1.5 text-xs text-gray-500">
+                        No active shipping methods available.
+                      </p>
+                    ) : null}
+                  </div>
+
+                  <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-4 text-sm text-gray-600 space-y-1">
+                    {selectedShippingMethod ? (
+                      <>
+                        <p className="font-semibold text-gray-900">
+                          {selectedShippingMethod.name}
+                        </p>
+                        {selectedShippingMethod?.min_days !== null &&
+                        selectedShippingMethod?.min_days !== undefined &&
+                        selectedShippingMethod?.max_days !== null &&
+                        selectedShippingMethod?.max_days !== undefined ? (
+                          <p>
+                            Estimated delivery: {selectedShippingMethod.min_days}
+                            -{selectedShippingMethod.max_days} days
+                          </p>
+                        ) : null}
+                        {selectedShippingMethod?.description ? (
+                          <p>{selectedShippingMethod.description}</p>
+                        ) : (
+                          <p>
+                            This method will be used for all merchants in this
+                            order.
+                          </p>
+                        )}
+                        {!customerPostcode ? (
+                          <p className="text-xs text-gray-500 pt-1">
+                            Enter your postcode to calculate shipping.
+                          </p>
+                        ) : null}
+                      </>
+                    ) : (
+                      <>
+                        <p className="font-semibold text-gray-900">
+                          Select a shipping method
+                        </p>
+                        <p>
+                          We will calculate shipping after you choose a method
+                          and enter your postcode.
+                        </p>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               {/* Dynamic Merchant Groups */}
               {cartByMerchant.map((group) => {
                 const merchantId = getMerchantId(group);
-                const selectedMethodId =
-                  merchantShippingMethods[merchantId] || "";
-                const selectedMethod = shippingMethods.find(
-                  (method) => String(method?.id) === String(selectedMethodId)
-                );
                 const merchantShippingPoints =
                   shippingQuote.byMerchant?.[merchantId];
-                const showMerchantError = merchantShippingErrors[merchantId];
 
                 return (
                   <div
@@ -702,82 +791,48 @@ const CartPage = () => {
                     </div>
 
                     <div className="px-6 py-4 border-b border-gray-100">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-                        <div>
-                          <Label htmlFor={`shipping_method_${merchantId}`}>
-                            Shipping Method
-                          </Label>
-                          <Select
-                            id={`shipping_method_${merchantId}`}
-                            placeholder={
-                              isLoadingShippingMethods
-                                ? "Loading shipping methods..."
-                                : "Select shipping method"
-                            }
-                            options={shippingMethodOptions}
-                            value={selectedMethodId}
-                            onChange={(event) =>
-                              handleMerchantShippingChange(
-                                merchantId,
-                                event.target.value
-                              )
-                            }
-                            disabled={
-                              isLoadingShippingMethods ||
-                              shippingMethodOptions.length === 0
-                            }
-                            error={!!showMerchantError}
-                          />
-                          {showMerchantError ? (
-                            <p className="mt-1.5 text-xs text-error-500">
-                              Shipping method is required.
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                        <div className="space-y-1">
+                          <p className="text-sm font-semibold text-gray-900">
+                            Shipping
+                          </p>
+                          {selectedShippingMethod ? (
+                            <>
+                              <p className="text-xs text-gray-500">
+                                {selectedShippingMethod.name} applied to all
+                                merchants.
+                              </p>
+                              {selectedShippingMethod?.min_days !== null &&
+                              selectedShippingMethod?.min_days !== undefined &&
+                              selectedShippingMethod?.max_days !== null &&
+                              selectedShippingMethod?.max_days !== undefined ? (
+                                <p className="text-xs text-gray-500">
+                                  Estimated delivery:{" "}
+                                  {selectedShippingMethod.min_days}-
+                                  {selectedShippingMethod.max_days} days
+                                </p>
+                              ) : null}
+                            </>
+                          ) : (
+                            <p className="text-xs text-gray-500">
+                              Select a shipping method above to calculate
+                              shipping.
                             </p>
-                          ) : null}
-                          {showShippingMethodsError ? (
-                            <div className="mt-1.5 flex items-center gap-2 text-xs text-error-500">
-                              <span>
-                                Failed to load shipping methods.
-                              </span>
-                              <button
-                                type="button"
-                                onClick={refetchShippingMethods}
-                                className="underline underline-offset-2"
-                              >
-                                Retry
-                              </button>
-                            </div>
-                          ) : null}
-                          {isShippingMethodsEmpty && !showShippingMethodsError ? (
-                            <p className="mt-1.5 text-xs text-gray-500">
-                              No active shipping methods available.
-                            </p>
-                          ) : null}
+                          )}
                         </div>
-                        <div className="text-xs text-gray-500 space-y-1">
-                          {selectedMethod?.min_days !== null &&
-                          selectedMethod?.min_days !== undefined &&
-                          selectedMethod?.max_days !== null &&
-                          selectedMethod?.max_days !== undefined ? (
-                            <p>
-                              Estimated delivery: {selectedMethod.min_days}-
-                              {selectedMethod.max_days} days
-                            </p>
-                          ) : null}
-                          {selectedMethod?.description ? (
-                            <p>{selectedMethod.description}</p>
-                          ) : null}
-                          {isShippingQuoteReady &&
-                          Number.isFinite(merchantShippingPoints) ? (
-                            <p>
-                              Shipping points:{" "}
-                              {Number(merchantShippingPoints).toLocaleString()}
-                            </p>
-                          ) : null}
-                          {!selectedMethod ? (
-                            <p>
-                              Select a shipping method to calculate shipping.
-                            </p>
-                          ) : null}
+
+                        <div className="min-w-[150px] rounded-xl border border-gray-100 bg-gray-50/70 px-4 py-3 text-right">
+                          <p className="text-[11px] uppercase tracking-wide text-gray-400">
+                            Shipping Points
+                          </p>
+                          <p className="text-base font-semibold text-gray-900">
+                            {isShippingCalculating
+                              ? "Calculating..."
+                              : isShippingQuoteReady &&
+                                Number.isFinite(merchantShippingPoints)
+                              ? Number(merchantShippingPoints).toLocaleString()
+                              : "--"}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -995,8 +1050,8 @@ const CartPage = () => {
                   </div>
                   {isShippingCalculationBlocked && (
                     <p className="text-[11px] text-white/70">
-                      Select shipping methods and enter a postcode to calculate
-                      shipping.
+                      Select a shipping method and enter a postcode to
+                      calculate shipping.
                     </p>
                   )}
                   {isShippingCalculating && (
