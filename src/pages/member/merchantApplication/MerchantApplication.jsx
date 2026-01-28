@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useCreateMerchantMutation } from "@/redux/features/admin/merchantManagement/merchantManagementApi";
 import PageBreadcrumb from "@/components/common/PageBreadcrumb";
 import ComponentCard from "@/components/common/ComponentCard";
@@ -24,6 +25,16 @@ import { useGetCorporateMemberReferralCodeQuery } from "../../../redux/features/
 import { useGetCountriesQuery } from "../../../redux/features/countries/countriesApi";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+
+const merchantApplicationSchema = merchantSchema.extend({
+  email: z
+    .string()
+    .min(1, "Email address is required")
+    .email("Invalid email address"),
+  authorized_person_name: z
+    .string()
+    .min(1, "Authorized person name is required"),
+});
 
 const MerchantApplication = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -87,7 +98,7 @@ const MerchantApplication = () => {
     setValue,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(merchantSchema),
+    resolver: zodResolver(merchantApplicationSchema),
     defaultValues: {
       status: "pending",
       referralCode: "",
@@ -335,11 +346,18 @@ const MerchantApplication = () => {
           <ComponentCard title="Authorized Person Information">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <Label>Authorized Person Name</Label>
+                <Label>
+                  Authorized Person Name (<span className="text-red-500">*</span>)
+                </Label>
                 <Input
                   {...register("authorized_person_name")}
                   placeholder="Name"
                 />
+                {errors.authorized_person_name && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.authorized_person_name.message}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -385,8 +403,15 @@ const MerchantApplication = () => {
               </div>
 
               <div>
-                <Label>Email Address</Label>
+                <Label>
+                  Email Address (<span className="text-red-500">*</span>)
+                </Label>
                 <Input {...register("email")} placeholder="Email Address" />
+                {errors.email && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.email.message}
+                  </p>
+                )}
               </div>
             </div>
           </ComponentCard>

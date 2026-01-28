@@ -28,6 +28,13 @@ const merchantRegistrationSchema = merchantSchema.extend({
   referralCode: z.string().min(3, {
     message: "Referral code is required and must be at least 3 characters",
   }),
+  email: z
+    .string()
+    .min(1, "Email address is required")
+    .email("Invalid email address"),
+  authorized_person_name: z
+    .string()
+    .min(1, "Authorized person name is required"),
 });
 
 const MerchantRegistrationForm = () => {
@@ -321,11 +328,18 @@ const MerchantRegistrationForm = () => {
           <ComponentCard title="Authorized Person Information">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <Label>Authorized Person Name</Label>
+                <Label>
+                  Authorized Person Name (<span className="text-red-500">*</span>)
+                </Label>
                 <Input
                   {...register("authorized_person_name")}
                   placeholder="Authorized Person Name"
                 />
+                {errors.authorized_person_name && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.authorized_person_name.message}
+                  </p>
+                )}
               </div>
               <div>
                 <Label>Designation</Label>
@@ -368,8 +382,15 @@ const MerchantRegistrationForm = () => {
                 )}
               </div>
               <div>
-                <Label>Email Address</Label>
+                <Label>
+                  Email Address (<span className="text-red-500">*</span>)
+                </Label>
                 <Input {...register("email")} placeholder="Email Address" />
+                {errors.email && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.email.message}
+                  </p>
+                )}
               </div>
             </div>
           </ComponentCard>
