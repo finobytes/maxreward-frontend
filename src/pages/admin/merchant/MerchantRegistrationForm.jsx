@@ -56,6 +56,9 @@ const MerchantRegistrationForm = () => {
   });
 
   const [businessLogo, setBusinessLogo] = useState(null);
+  const [logoError, setLogoError] = useState("");
+  const [logoTouched, setLogoTouched] = useState(false);
+  const [dropzoneKey, setDropzoneKey] = useState(0);
 
   const [createMerchant, { isLoading: isCreating }] =
     useCreateMerchantMutation();
@@ -106,6 +109,13 @@ const MerchantRegistrationForm = () => {
 
   const onSubmit = async (data) => {
     try {
+      if (!businessLogo) {
+        setLogoTouched(true);
+        setLogoError("Company logo is required");
+        toast.error("Company logo is required");
+        return;
+      }
+
       if (!memberData?.id || isError) {
         setError("referralCode", {
           type: "manual",
@@ -142,6 +152,10 @@ const MerchantRegistrationForm = () => {
       reset();
       setReferralInput("");
       setDebouncedReferral("");
+      setBusinessLogo(null);
+      setLogoError("");
+      setLogoTouched(false);
+      setDropzoneKey((prev) => prev + 1);
       navigate("/admin/merchant/pending-merchant");
     } catch (err) {
       console.error("Create Error:", err);
@@ -286,12 +300,17 @@ const MerchantRegistrationForm = () => {
             <div className="md:col-span-1">
               <Label>Upload Company Logo</Label>
               <Dropzone
+                key={`business-logo-${dropzoneKey}`}
                 multiple={false}
                 maxFileSizeMB={5}
                 required
-                validationMessage="Company logo is required"
+                validationMessage={logoTouched ? logoError : ""}
                 placeholderImage={companyLogoPlaceholder}
-                onFilesChange={(file) => setBusinessLogo(file ?? null)}
+                onFilesChange={(file) => {
+                  setLogoTouched(true);
+                  setBusinessLogo(file ?? null);
+                  setLogoError(file ? "" : "Company logo is required");
+                }}
               />
             </div>
           </div>
@@ -434,7 +453,13 @@ const MerchantRegistrationForm = () => {
               <PrimaryButton
                 variant="secondary"
                 type="button"
-                onClick={() => reset()}
+                onClick={() => {
+                  reset();
+                  setBusinessLogo(null);
+                  setLogoError("");
+                  setLogoTouched(false);
+                  setDropzoneKey((prev) => prev + 1);
+                }}
               >
                 Reset
               </PrimaryButton>

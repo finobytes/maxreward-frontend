@@ -31,6 +31,9 @@ const MerchantApplication = () => {
   const role = user?.role;
 
   const [businessLogo, setBusinessLogo] = useState(null);
+  const [logoError, setLogoError] = useState("");
+  const [logoTouched, setLogoTouched] = useState(false);
+  const [dropzoneKey, setDropzoneKey] = useState(0);
   const [createMerchant, { isLoading: isCreating }] =
     useCreateMerchantMutation();
 
@@ -131,6 +134,13 @@ const MerchantApplication = () => {
   // Submit handler
   const onSubmit = async (data) => {
     try {
+      if (!businessLogo) {
+        setLogoTouched(true);
+        setLogoError("Company logo is required");
+        toast.error("Company logo is required");
+        return;
+      }
+
       data.merchant_created_by = role === "admin" ? "admin" : "general_member";
 
       const formData = new FormData();
@@ -158,6 +168,10 @@ const MerchantApplication = () => {
 
       reset();
       setReferralInput("");
+      setBusinessLogo(null);
+      setLogoError("");
+      setLogoTouched(false);
+      setDropzoneKey((prev) => prev + 1);
     } catch (err) {
       console.error("Create Error:", err);
 
@@ -300,11 +314,17 @@ const MerchantApplication = () => {
             <div className="md:col-span-1">
               <Label>Upload Company Logo</Label>
               <Dropzone
+                key={`business-logo-${dropzoneKey}`}
                 multiple={false}
                 maxFileSizeMB={5}
                 required
+                validationMessage={logoTouched ? logoError : ""}
                 placeholderImage={companyLogoPlaceholder}
-                onFilesChange={(file) => setBusinessLogo(file ?? null)}
+                onFilesChange={(file) => {
+                  setLogoTouched(true);
+                  setBusinessLogo(file ?? null);
+                  setLogoError(file ? "" : "Company logo is required");
+                }}
               />
             </div>
           </div>
@@ -466,6 +486,10 @@ const MerchantApplication = () => {
                 onClick={() => {
                   reset();
                   setReferralInput("");
+                  setBusinessLogo(null);
+                  setLogoError("");
+                  setLogoTouched(false);
+                  setDropzoneKey((prev) => prev + 1);
                 }}
               >
                 Reset
