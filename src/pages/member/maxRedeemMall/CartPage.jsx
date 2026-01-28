@@ -648,7 +648,7 @@ const CartPage = () => {
       // Assuming backend clears cart after purchase or we do it here.
       // Safe to call clearCart typically if backend doesn't auto-clear or as a safeguard.
       await clearCart().unwrap();
-      navigate("/member/max-redeem-mall");
+      navigate("/member/orders");
     } catch (error) {
       console.error("Order creation failed", error);
       toast.error(
