@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { CreditCard, Hand, Users, UserCheck } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import Pagination from "../../../../components/table/Pagination";
 import PrimaryButton from "../../../../components/ui/PrimaryButton";
 import SearchInput from "../../../../components/form/form-elements/SearchInput";
-import { usePointStatementMember } from "../../../../redux/features/member/pointStatement/usePointStatementMember";
+import {
+  useGetAvailableTransactionsQuery,
+  useGetReferTransactionsQuery,
+} from "../../../../redux/features/member/pointStatement/pointStatementMemberApi";
 
 // Format Date + Time
 const formatDateTime = (value) => {
@@ -37,22 +41,43 @@ const typeMapping = {
 const Statements = ({ merchantData }) => {
   const memberId = merchantData?.data?.merchant?.corporate_member?.id;
 
+  const [activeTab, setActiveTab] = useState("available");
+  const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage, setEntriesPerPage] = useState("10");
   const [search, setSearch] = useState("");
+  const perPage = Number(entriesPerPage) || 10;
 
-  const { transactions, meta, isLoading, isFetching, error, changePage } =
-    usePointStatementMember(memberId);
+  const queryArgs = {
+    memberId,
+    page: currentPage,
+    perPage,
+  };
 
-  const currentPage = meta?.currentPage || 1;
-  const totalPages = meta?.lastPage || 1;
+  const availableQuery = useGetAvailableTransactionsQuery(queryArgs, {
+    skip: !memberId || activeTab !== "available",
+  });
+  const referQuery = useGetReferTransactionsQuery(queryArgs, {
+    skip: !memberId || activeTab !== "refer",
+  });
+  const activeQuery = activeTab === "available" ? availableQuery : referQuery;
+
+  const transactions = activeQuery?.data?.data?.data ?? [];
+  const metaSource = activeQuery?.data?.data ?? {};
+  const meta = {
+    currentPage: metaSource.current_page ?? currentPage,
+    lastPage: metaSource.last_page ?? 1,
+    perPage: metaSource.per_page ?? perPage,
+    total: metaSource.total ?? transactions.length,
+  };
+  const isLoading = activeQuery?.isLoading || activeQuery?.isFetching;
 
   const wallet = merchantData ? merchantData?.corporate_member?.wallet : {};
 
   // Filter by search
   const filteredTransactions = transactions.filter((item) =>
     Object.values(item).some((value) =>
-      value?.toString().toLowerCase().includes(search.toLowerCase())
-    )
+      value?.toString().toLowerCase().includes(search.toLowerCase()),
+    ),
   );
 
   return (
@@ -125,18 +150,34 @@ const Statements = ({ merchantData }) => {
 
         {/* Filters */}
         <div className="mt-10 flex flex-col lg:flex-row items-start lg:items-center justify-between mb-4 gap-4">
-          <div className="flex items-center gap-2">
+          <Tabs
+            value={activeTab}
+            onValueChange={(value) => {
+              setActiveTab(value);
+              setCurrentPage(1);
+            }}
+          >
+            <TabsList>
+              <TabsTrigger value="available">Available</TabsTrigger>
+              <TabsTrigger value="refer">Refer</TabsTrigger>
+            </TabsList>
+          </Tabs>
+
+          {/* <div className="flex items-center gap-2">
             <span className="text-sm text-gray-600">Show</span>
             <select
               value={entriesPerPage}
-              onChange={(e) => setEntriesPerPage(e.target.value)}
+              onChange={(e) => {
+                setEntriesPerPage(e.target.value);
+                setCurrentPage(1);
+              }}
               className="border rounded-md px-2 py-1 text-sm"
             >
               <option value="10">10</option>
               <option value="25">25</option>
               <option value="50">50</option>
             </select>
-          </div>
+          </div> */}
 
           <div className="w-full lg:w-auto">
             <SearchInput
@@ -167,10 +208,10 @@ const Statements = ({ merchantData }) => {
                     Loading Transactions...
                   </td>
                 </tr>
-              ) : error ? (
+              ) : activeQuery?.error ? (
                 <tr>
                   <td colSpan={5} className="text-center py-6 text-red-500">
-                    {error?.data?.message || "Failed to load data"}
+                    {activeQuery?.error?.data?.message || "Failed to load data"}
                   </td>
                 </tr>
               ) : filteredTransactions.length === 0 ? (
@@ -189,7 +230,7 @@ const Statements = ({ merchantData }) => {
                       className="border-b border-gray-100 hover:bg-gray-50 transition"
                     >
                       <td className="py-3 px-4">
-                        {(currentPage - 1) * meta?.perPage + idx + 1}
+                        {(meta.currentPage - 1) * meta.perPage + idx + 1}
                       </td>
 
                       <td className="py-3 px-4">
@@ -231,9 +272,9 @@ const Statements = ({ merchantData }) => {
 
         {/* Pagination */}
         <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={changePage}
+          currentPage={meta.currentPage}
+          totalPages={meta.lastPage}
+          onPageChange={(page) => setCurrentPage(page)}
         />
       </div>
     </div>
