@@ -26,7 +26,7 @@ const ProductBasicInfo = ({
 
   // Filter subcategories based on selected category
   const filteredSubCategories = subCategories.filter(
-    (sub) => sub.category_id == selectedCategoryId
+    (sub) => sub.category_id == selectedCategoryId,
   );
 
   const handleNumberChange = (e, onChange, pointName = null, syncTo = null) => {
@@ -219,7 +219,7 @@ const ProductBasicInfo = ({
                 {...registerWithPoints(
                   "regular_price",
                   "regular_point",
-                  "variation_regular_price"
+                  "variation_regular_price",
                 )}
                 error={!!errors.regular_price}
                 hint={errors.regular_price?.message}
@@ -245,7 +245,7 @@ const ProductBasicInfo = ({
                 {...registerWithPoints(
                   "sale_price",
                   "sale_point",
-                  "variation_sale_price"
+                  "variation_sale_price",
                 )}
               />
             </div>
@@ -261,7 +261,7 @@ const ProductBasicInfo = ({
 
             {/* 12. Unit Weight */}
             <div>
-              <Label htmlFor="unit_weight">Unit Weight (kg)</Label>
+              <Label htmlFor="unit_weight">Unit Weight (gm)</Label>
               <Input type="text" {...registerNumber("unit_weight")} />
             </div>
           </>

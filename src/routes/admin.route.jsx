@@ -49,6 +49,13 @@ import Gender from "../pages/admin/e-commerce/Gender/Gender";
 import Attribute from "../pages/admin/e-commerce/Attribute/Attribute";
 import AttributeItem from "../pages/admin/e-commerce/AttributeItem/AttributeItem";
 import RoleList from "../pages/admin/rolePermission/RoleList";
+import PermissionList from "../pages/admin/rolePermission/PermissionList";
+import AssignPermissionsToRole from "../pages/admin/rolePermission/AssignPermissionsToRole";
+import SectionList from "../pages/admin/rolePermission/SectionList";
+import ActionList from "../pages/admin/rolePermission/ActionList";
+import path from "path";
+import ShippingZone from "../pages/admin/ShippingZone/ShippingZone";
+import ShippingMethods from "../pages/admin/ShippingMethods/ShippingMethods";
 
 export const adminRoutes = [
   {
@@ -106,6 +113,14 @@ export const adminRoutes = [
   {
     path: "e-commerce/attribute-item",
     element: <AttributeItem />,
+  },
+  {
+    path: "e-commerce/shipping-zone",
+    element: <ShippingZone />,
+  },
+  {
+    path: "e-commerce/shipping-methods",
+    element: <ShippingMethods />,
   },
   {
     path: "cp-transaction",
@@ -248,6 +263,22 @@ export const adminRoutes = [
   {
     path: "role-permission/role-list",
     element: <RoleList />,
+  },
+  {
+    path: "role-permission/permission-list",
+    element: <PermissionList />,
+  },
+  {
+    path: "role-permission/assign",
+    element: <AssignPermissionsToRole />,
+  },
+  {
+    path: "role-permission/section-list",
+    element: <SectionList />,
+  },
+  {
+    path: "role-permission/action-list",
+    element: <ActionList />,
   },
   {
     path: "profile",

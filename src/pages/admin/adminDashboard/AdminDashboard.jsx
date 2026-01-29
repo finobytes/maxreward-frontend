@@ -6,22 +6,33 @@ import MemberActivity from "./components/MemberActivity";
 import PointsIssuedRedeemed from "./components/PointsIssuedRedeemed";
 import PointsRedeemed from "./components/PointsRedeemed";
 import PointsPurchased from "./components/PointsPurchased";
-import AudienceReport from "./components/AudienceReport";
-import MemberOnboard from "./components/MemberOnboard";
-import VisitorsByGender from "./components/VisitorsByGender";
-import { useGetDashboardStatsQuery } from "../../../redux/features/admin/dashboard/dashboardApi";
+import {
+  useGetDashboardStatsQuery,
+  useGetRealTimeTransactionsQuery,
+} from "../../../redux/features/admin/dashboard/dashboardApi";
 import AdminDashboardSkeleton from "../../../components/skeleton/AdminDashboardSkeleton";
-import { FileClock } from "lucide-react";
 
 const AdminDashboard = () => {
   const { data, isLoading, isError } = useGetDashboardStatsQuery();
+  const {
+    data: realTimeTransactions,
+    isLoading: isRealTimeLoading,
+    isError: isRealTimeError,
+  } = useGetRealTimeTransactionsQuery();
+  const dashboard = data ?? {};
   const stats = {
-    total_members: data?.total_members ?? 0,
-    total_merchants: data?.approved_merchants ?? 0,
-    total_transactions: data?.total_transactions ?? 0,
-    pending_merchants: data?.pending_merchants ?? 0,
-    total_pending_vouchers: data?.total_pending_vouchers ?? 0,
+    total_members: dashboard?.total_members ?? 0,
+    total_active_members: dashboard?.total_active_members ?? 0,
+    new_members_last_7_days: dashboard?.new_members_last_7_days ?? 0,
+    total_merchants: dashboard?.approved_merchants ?? 0,
+    total_transactions: dashboard?.total_transactions ?? 0,
+    pending_merchants: dashboard?.pending_merchants ?? 0,
+    total_points_earned: dashboard?.total_points_earned ?? 0,
+    total_pending_vouchers: dashboard?.total_pending_vouchers ?? 0,
   };
+  const pointsRedeemedStats = dashboard?.points_redeemed_statistics ?? {};
+  const pointsIssuedVsRedeemed = dashboard?.points_issued_vs_redeemed ?? {};
+  const voucherStats = dashboard?.voucher_statistics ?? {};
 
   const cardsData = [
     {
@@ -99,16 +110,34 @@ const AdminDashboard = () => {
       </div>
       <div className="mt-6 grid grid-cols-1 lg:grid-cols-4 gap-4">
         <div className="lg:col-span-3">
-          <RealTimeTransactions />
+          <RealTimeTransactions
+            labels={realTimeTransactions?.labels}
+            purchased={realTimeTransactions?.purchased}
+            redeemed={realTimeTransactions?.redeemed}
+            isLoading={isRealTimeLoading}
+            isError={isRealTimeError}
+          />
         </div>
         <div className="lg:col-span-1">
-          <MemberActivity />
+          <MemberActivity stats={stats} />
         </div>
       </div>
       <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <PointsIssuedRedeemed />
-        <PointsRedeemed />
-        <PointsPurchased />
+        <PointsIssuedRedeemed
+          issued={pointsIssuedVsRedeemed?.points_issued}
+          redeemed={pointsIssuedVsRedeemed?.points_redeemed}
+          liability={pointsIssuedVsRedeemed?.points_liability}
+        />
+        <PointsRedeemed
+          shopping={pointsRedeemedStats?.shopping_points_redeemed}
+          newRegistration={pointsRedeemedStats?.new_registration_points_redeemed}
+          total={pointsRedeemedStats?.total_points_redeemed}
+        />
+        <PointsPurchased
+          max={voucherStats?.max_vouchers_purchased}
+          refer={voucherStats?.refer_vouchers_purchased}
+          total={voucherStats?.total_vouchers_purchased}
+        />
       </div>
       {/* <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <AudienceReport />

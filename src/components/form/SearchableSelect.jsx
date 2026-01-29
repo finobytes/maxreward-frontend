@@ -1,10 +1,10 @@
-import React, { useState, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { ChevronDown } from "lucide-react";
 import {
   Popover,
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandInput,
@@ -13,6 +13,7 @@ import {
   CommandGroup,
   CommandItem,
 } from "@/components/ui/command";
+import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const SearchableSelect = React.forwardRef(
@@ -34,34 +35,55 @@ const SearchableSelect = React.forwardRef(
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState("");
 
-    // Support both {label, value} and {id, name} format
-    const normalizedOptions = options.map((opt) => ({
-      value: opt.value ?? opt.id,
-      label: opt.label ?? opt.name ?? opt.country,
-    }));
+    const normalizedOptions = useMemo(
+      () =>
+        (options || [])
+          .map((opt) => {
+            if (opt === null || opt === undefined) return null;
+            if (
+              typeof opt === "string" ||
+              typeof opt === "number" ||
+              typeof opt === "boolean"
+            ) {
+              return { value: opt, label: String(opt) };
+            }
+            const value = opt.value ?? opt.id ?? opt.key;
+            const label =
+              opt.label ??
+              opt.name ??
+              opt.country ??
+              opt.title ??
+              opt.business_name ??
+              opt.businessName ??
+              "";
+            const safeValue =
+              value ?? (label !== "" ? label : undefined);
+            if (safeValue === undefined || safeValue === null) return null;
+            return { value: safeValue, label: String(label || safeValue) };
+          })
+          .filter(Boolean),
+      [options]
+    );
 
     const selected =
       normalizedOptions.find((o) => String(o.value) === String(value)) || null;
 
-    // Filter items based on search query
     const filteredOptions = useMemo(() => {
       if (!query) return normalizedOptions;
+      const needle = query.toLowerCase();
       return normalizedOptions.filter((item) =>
-        item.label.toLowerCase().includes(query.toLowerCase())
+        item.label.toLowerCase().includes(needle)
       );
     }, [query, normalizedOptions]);
 
     const handleSelect = (item) => {
-      // Trigger onChange in react-hook-form compatible format
-      if (onChange) {
-        // Call onChange with just the value (Controller expects this)
-        onChange(item.value);
-      }
+      onChange?.(item.value);
       setOpen(false);
       setQuery("");
     };
 
     const buttonClasses = cn(
+      buttonVariants({ variant: "outline" }),
       "w-full justify-between h-11 text-left font-normal border",
       disabled && "opacity-40 cursor-not-allowed bg-gray-100",
       error
@@ -70,27 +92,42 @@ const SearchableSelect = React.forwardRef(
       className
     );
 
+    useEffect(() => {
+      if (!open) setQuery("");
+    }, [open]);
+
     return (
-      <Popover open={open} onOpenChange={disabled ? undefined : setOpen}>
+      <Popover
+        open={open}
+        onOpenChange={(nextOpen) => {
+          if (disabled) return;
+          setOpen(nextOpen);
+        }}
+      >
         <PopoverTrigger asChild>
-          <Button
+          <button
             ref={ref}
             id={id}
-            variant="outline"
+            name={name}
+            type="button"
             className={buttonClasses}
             disabled={disabled}
-            type="button"
             onBlur={onBlur}
+            aria-expanded={open}
+            aria-haspopup="listbox"
           >
             <span className={cn("truncate", !selected && "text-gray-400")}>
               {selected ? selected.label : placeholder}
             </span>
-            <span className="text-gray-500 text-xs ml-2">▼</span>
-          </Button>
+            <ChevronDown className="h-4 w-4 text-gray-500" />
+          </button>
         </PopoverTrigger>
 
-        <PopoverContent className="w-full p-0" align="start">
-          <Command>
+        <PopoverContent
+          className="w-[var(--radix-popover-trigger-width)] p-0"
+          align="start"
+        >
+          <Command shouldFilter={false}>
             <CommandInput
               value={query}
               onValueChange={setQuery}
@@ -99,11 +136,11 @@ const SearchableSelect = React.forwardRef(
 
             <CommandList>
               <CommandEmpty>No results found.</CommandEmpty>
-
               <CommandGroup>
                 {filteredOptions.map((item) => (
                   <CommandItem
                     key={item.value}
+                    value={item.label}
                     onSelect={() => handleSelect(item)}
                     className="cursor-pointer"
                   >

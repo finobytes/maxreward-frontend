@@ -26,8 +26,7 @@ import TermsAndConditions from "../pages/member/termsAndConditions/TermsAndCondi
 import Notification from "../pages/member/notification/Notification";
 import NotificationDetails from "../pages/member/notification/NotificationDetails";
 import Orders from "../pages/member/myOrders/Orders";
-import ReturnOrder from "../pages/member/myOrders/ReturnOrder";
-import CancleOrder from "../pages/member/myOrders/CancleOrder";
+import OrderDetails from "../pages/member/myOrders/OrderDetails";
 
 export const memberRoutes = [
   {
@@ -119,12 +118,8 @@ export const memberRoutes = [
     element: <Orders />,
   },
   {
-    path: "return-order",
-    element: <ReturnOrder />,
-  },
-  {
-    path: "cancel-order",
-    element: <CancleOrder />,
+    path: "orders/:orderNumber",
+    element: <OrderDetails />,
   },
   {
     path: "referred-member-list",

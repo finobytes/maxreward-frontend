@@ -1,4 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router";
 import {
@@ -7,7 +13,6 @@ import {
   Minus,
   ArrowLeft,
   ShoppingBag,
-  Store,
   ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -20,11 +25,14 @@ import {
   useUpdateCartItemMutation,
   useRemoveFromCartMutation,
   useClearCartMutation,
-  usePurchaseProductMutation,
+  useCreateOrdersMutation,
+  useCalculateShippingMutation,
+  useGetActiveMemberShippingMethodsQuery,
 } from "../../../redux/features/member/maxRedeemMall/maxRedeemApi";
 import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
 import Input from "../../../components/form/input/InputField";
 import Label from "../../../components/form/Label";
+import Select from "../../../components/form/Select";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
 import {
   Dialog,
@@ -56,12 +64,25 @@ const CartPage = () => {
   const [updateCartItem] = useUpdateCartItemMutation();
   const [removeFromCart] = useRemoveFromCartMutation();
   const [clearCart] = useClearCartMutation();
-  const [purchaseProduct, { isLoading: isPurchasing }] =
-    usePurchaseProductMutation();
+  const [createOrders, { isLoading: isPurchasing }] = useCreateOrdersMutation();
+  const [calculateShipping, { isLoading: isCalculatingShipping }] =
+    useCalculateShippingMutation();
+  const {
+    data: shippingMethodsResponse,
+    isLoading: isLoadingShippingMethods,
+    isError: isShippingMethodsError,
+    refetch: refetchShippingMethods,
+  } = useGetActiveMemberShippingMethodsQuery();
 
   // Parse New API Structure
-  const cartByMerchant = cartData?.cart_by_merchant || [];
-  const allItems = cartByMerchant.flatMap((group) => group.items) || [];
+  const cartByMerchant = useMemo(
+    () => cartData?.cart_by_merchant ?? [],
+    [cartData]
+  );
+  const allItems = useMemo(
+    () => cartByMerchant.flatMap((group) => group.items || []),
+    [cartByMerchant]
+  );
 
   // Use summary from API if available, else fallback
   const cartTotal = cartData?.summary?.total_amount || 0;
@@ -94,8 +115,89 @@ const CartPage = () => {
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
   } = methods;
+
+  const customerPostcode = (watch("customer_postcode") || "").trim();
+
+  const shippingMethods = useMemo(() => {
+    const payload =
+      shippingMethodsResponse?.data?.data ?? shippingMethodsResponse?.data ?? [];
+    return Array.isArray(payload) ? payload : [];
+  }, [shippingMethodsResponse]);
+  const hasShippingMethodsError =
+    isShippingMethodsError || shippingMethodsResponse?.success === false;
+  const shippingMethodOptions = useMemo(
+    () =>
+      shippingMethods
+        .filter((method) => method?.id !== null && method?.id !== undefined)
+        .map((method) => {
+          const minDays = method?.min_days;
+          const maxDays = method?.max_days;
+          const hasDays =
+            minDays !== null &&
+            minDays !== undefined &&
+            maxDays !== null &&
+            maxDays !== undefined;
+          const label = hasDays
+            ? `${method?.name || "Shipping"} (${minDays}-${maxDays} days)`
+            : method?.name || "Shipping";
+          return {
+            label,
+            value: String(method?.id),
+          };
+        }),
+    [shippingMethods]
+  );
+  const isShippingMethodsEmpty =
+    !isLoadingShippingMethods && shippingMethodOptions.length === 0;
+  const showShippingMethodsError =
+    hasShippingMethodsError && shippingMethodOptions.length === 0;
+  const isShippingMethodsUnavailable = isShippingMethodsEmpty;
+
+  const [selectedShippingMethodId, setSelectedShippingMethodId] = useState("");
+  const [shippingMethodError, setShippingMethodError] = useState(false);
+  const shippingRequestIdRef = useRef(0);
+  const lastShippingPayloadRef = useRef(null);
+  const postcodeWarningMethodRef = useRef("");
+  const [shippingQuote, setShippingQuote] = useState({
+    totalPoints: 0,
+    byMerchant: {},
+    perMerchantErrors: {},
+    detectedZone: null,
+    status: "idle",
+    error: null,
+  });
+  const getMerchantId = useCallback(
+    (group) =>
+      group?.merchant?.merchant_id ??
+      group?.merchant_id ??
+      group?.merchant?.id ??
+      group?.id,
+    []
+  );
+
+  const handleShippingMethodChange = (value) => {
+    setSelectedShippingMethodId(value);
+    setShippingMethodError((prev) => (prev ? !value : prev));
+    if (
+      value &&
+      !customerPostcode &&
+      postcodeWarningMethodRef.current !== value
+    ) {
+      toast.warning("Please enter a postcode to calculate shipping.");
+      postcodeWarningMethodRef.current = value;
+    }
+  };
+
+  const selectedShippingMethod = useMemo(
+    () =>
+      shippingMethods.find(
+        (method) => String(method?.id) === String(selectedShippingMethodId)
+      ) ?? null,
+    [shippingMethods, selectedShippingMethodId]
+  );
 
   // Pre-fill form from profile
   useEffect(() => {
@@ -109,21 +211,346 @@ const CartPage = () => {
         customer_postcode: member.postcode || "",
         customer_city: member.city || "",
         customer_state: member.state || "",
-        customer_country: member.country_code || "",
+        customer_country: "",
       });
     }
   }, [profileData, reset]);
 
+  useEffect(() => {
+    if (!shippingMethodOptions.length) {
+      setSelectedShippingMethodId("");
+      setShippingMethodError(false);
+      return;
+    }
+
+    const isCurrentSelectionValid = shippingMethodOptions.some(
+      (option) => option.value === String(selectedShippingMethodId)
+    );
+    if (isCurrentSelectionValid) return;
+
+    const nextValue =
+      shippingMethodOptions.length === 1 ? shippingMethodOptions[0].value : "";
+    setSelectedShippingMethodId(nextValue);
+    setShippingMethodError(false);
+  }, [shippingMethodOptions, selectedShippingMethodId]);
+
+  useEffect(() => {
+    if (!cartByMerchant.length) {
+      setShippingMethodError(false);
+    }
+  }, [cartByMerchant]);
+
+  useEffect(() => {
+    if (customerPostcode && postcodeWarningMethodRef.current) {
+      postcodeWarningMethodRef.current = "";
+    }
+  }, [customerPostcode]);
+
+  useEffect(() => {
+    if (!customerPostcode || selectedShippingMethodId) {
+      setShippingMethodError(false);
+      return;
+    }
+    if (shippingMethodOptions.length > 0) {
+      setShippingMethodError(true);
+    }
+  }, [customerPostcode, selectedShippingMethodId, shippingMethodOptions]);
+
+  const normalizeShippingResponse = useCallback((response) => {
+    const payload = response?.data ?? response ?? {};
+    const merchantsPayload =
+      payload?.merchants ??
+      payload?.data?.merchants ??
+      payload?.shipping_by_merchant ??
+      payload?.data?.shipping_by_merchant ??
+      payload?.data?.data?.shipping_by_merchant ??
+      payload?.shipping ??
+      payload?.merchant_shipping ??
+      [];
+    const byMerchant = {};
+    const perMerchantErrors = {};
+    let detectedZoneFromMerchants = null;
+    if (Array.isArray(merchantsPayload)) {
+      merchantsPayload.forEach((merchant) => {
+        const merchantId =
+          merchant?.merchant_id ??
+          merchant?.merchant?.merchant_id ??
+          merchant?.id;
+        if (!detectedZoneFromMerchants) {
+          detectedZoneFromMerchants =
+            merchant?.shipping_zone_name ??
+            merchant?.shipping_zone?.name ??
+            merchant?.zone?.name ??
+            null;
+        }
+        const rawPoints =
+          merchant?.shipping_points ??
+          merchant?.points ??
+          merchant?.shipping_cost ??
+          merchant?.shipping ??
+          (merchant?.is_free_shipping ? 0 : undefined);
+        const points = Number(rawPoints);
+        if (!merchantId) return;
+        if (Number.isFinite(points)) {
+          byMerchant[merchantId] = points;
+          return;
+        }
+        const merchantMessage = merchant?.message ?? merchant?.error;
+        if (merchantMessage) {
+          perMerchantErrors[merchantId] = merchantMessage;
+        }
+      });
+    }
+
+    if (payload?.merchant_id && payload?.message) {
+      perMerchantErrors[payload.merchant_id] = payload.message;
+    }
+
+    const detectedZone =
+      payload?.detected_zone ??
+      payload?.data?.detected_zone ??
+      payload?.data?.data?.detected_zone ??
+      (detectedZoneFromMerchants ? { name: detectedZoneFromMerchants } : null) ??
+      (payload?.zone ? { name: payload.zone } : null);
+
+    const totalFromPayload = Number(
+      payload?.total_shipping_points ??
+        payload?.shipping_points ??
+        payload?.total_shipping ??
+        payload?.total ??
+        payload?.shipping_cost ??
+        payload?.data?.total_shipping_points
+    );
+    const totalFromMerchants = Object.values(byMerchant).reduce(
+      (sum, value) => sum + (Number.isFinite(value) ? value : 0),
+      0
+    );
+    const totalPoints = Number.isFinite(totalFromPayload)
+      ? totalFromPayload
+      : totalFromMerchants;
+
+    return {
+      totalPoints: Number.isFinite(totalPoints) ? totalPoints : 0,
+      byMerchant,
+      perMerchantErrors,
+      detectedZone,
+    };
+  }, []);
+
+  const buildShippingErrorMessage = useCallback((error, normalized) => {
+    const apiMessage = error?.data?.message;
+    if (apiMessage) return apiMessage;
+    const merchantId = error?.data?.merchant_id ?? null;
+    const zoneName =
+      error?.data?.zone ??
+      normalized?.detectedZone?.name ??
+      normalized?.detectedZone?.code;
+    if (merchantId && zoneName) {
+      return `No shipping rate found for merchant ${merchantId} in ${zoneName}.`;
+    }
+    if (merchantId) {
+      return `No shipping rate found for merchant ${merchantId}.`;
+    }
+    return error?.message || "Failed to calculate shipping. Please try again.";
+  }, []);
+
+  const runShippingCalculation = useCallback(
+    async (payload) => {
+      const requestId = ++shippingRequestIdRef.current;
+      lastShippingPayloadRef.current = payload;
+      setShippingQuote({
+        totalPoints: 0,
+        byMerchant: {},
+        perMerchantErrors: {},
+        detectedZone: null,
+        status: "calculating",
+        error: null,
+      });
+
+      try {
+        const response = await calculateShipping(payload).unwrap();
+        if (requestId !== shippingRequestIdRef.current) return;
+        const normalized = normalizeShippingResponse(response);
+        if (response?.success === false) {
+          setShippingQuote({
+            totalPoints: normalized.totalPoints,
+            byMerchant: normalized.byMerchant,
+            perMerchantErrors: normalized.perMerchantErrors,
+            detectedZone: normalized.detectedZone,
+            status: "error",
+            error: response?.message || "Failed to calculate shipping.",
+          });
+          return;
+        }
+        setShippingQuote({
+          totalPoints: normalized.totalPoints,
+          byMerchant: normalized.byMerchant,
+          perMerchantErrors: normalized.perMerchantErrors,
+          detectedZone: normalized.detectedZone,
+          status: "ready",
+          error: null,
+        });
+      } catch (error) {
+        if (requestId !== shippingRequestIdRef.current) return;
+        const normalized = normalizeShippingResponse(error?.data ?? {});
+        setShippingQuote({
+          totalPoints: normalized.totalPoints,
+          byMerchant: normalized.byMerchant,
+          perMerchantErrors: normalized.perMerchantErrors,
+          detectedZone: normalized.detectedZone,
+          status: "error",
+          error: buildShippingErrorMessage(error, normalized),
+        });
+      }
+    },
+    [buildShippingErrorMessage, calculateShipping, normalizeShippingResponse]
+  );
+
+  const retryCalculateShipping = useCallback(() => {
+    if (lastShippingPayloadRef.current) {
+      runShippingCalculation(lastShippingPayloadRef.current);
+    }
+  }, [runShippingCalculation]);
+
+  const shippingCalculationPayload = useMemo(() => {
+    if (
+      !customerPostcode ||
+      !cartByMerchant.length ||
+      !selectedShippingMethodId
+    ) {
+      return null;
+    }
+
+    const hasInvalidMerchant = cartByMerchant.some(
+      (group) => !getMerchantId(group)
+    );
+    if (hasInvalidMerchant) return null;
+
+    const merchants = cartByMerchant.map((group) => {
+      const merchantId = getMerchantId(group);
+      return {
+        merchant_id: merchantId,
+        shipping_method_id: Number(selectedShippingMethodId),
+        items: (group.items || []).map((item) => ({
+          product_id: item.product_id,
+          product_variation_id:
+            item.variation_id ?? item.product_variation_id ?? null,
+          quantity: item.quantity,
+        })),
+      };
+    });
+
+    return {
+      customer_postcode: customerPostcode,
+      merchants,
+    };
+  }, [
+    cartByMerchant,
+    customerPostcode,
+    selectedShippingMethodId,
+    getMerchantId,
+  ]);
+
+  useEffect(() => {
+    if (!shippingCalculationPayload) {
+      setShippingQuote((prev) =>
+        prev.status === "idle" && !prev.error
+          ? prev
+          : {
+              totalPoints: 0,
+              byMerchant: {},
+              perMerchantErrors: {},
+              detectedZone: null,
+              status: "idle",
+              error: null,
+            }
+      );
+      return;
+    }
+
+    setShippingQuote((prev) =>
+      prev.status === "calculating"
+        ? prev
+        : {
+            totalPoints: 0,
+            byMerchant: {},
+            perMerchantErrors: {},
+            detectedZone: null,
+            status: "calculating",
+            error: null,
+          }
+    );
+
+    const timeout = setTimeout(() => {
+      runShippingCalculation(shippingCalculationPayload);
+    }, 400);
+
+    return () => clearTimeout(timeout);
+  }, [shippingCalculationPayload, runShippingCalculation]);
+
+  const cartHasValidMerchants = cartByMerchant.every(
+    (group) => !!getMerchantId(group)
+  );
+  const isShippingSelectionComplete =
+    Boolean(selectedShippingMethodId) && cartHasValidMerchants;
+  const needsShippingCalculation = allItems.length > 0;
+  const isShippingQuoteReady = shippingQuote.status === "ready";
+  const isShippingQuoteError = shippingQuote.status === "error";
+  const isShippingCalculating =
+    shippingQuote.status === "calculating" || isCalculatingShipping;
+  const isShippingCalculationReady =
+    isShippingQuoteReady && !isShippingCalculating;
+  const isShippingCalculationBlocked =
+    needsShippingCalculation &&
+    (!customerPostcode || !isShippingSelectionComplete);
+  const shouldWarnPostcode =
+    needsShippingCalculation &&
+    Boolean(selectedShippingMethodId) &&
+    !customerPostcode;
+  const detectedZoneName =
+    shippingQuote?.detectedZone?.name ??
+    shippingQuote?.detectedZone?.code ??
+    null;
+  const hasPerMerchantShippingErrors =
+    Object.keys(shippingQuote?.perMerchantErrors ?? {}).length > 0;
+  const shippingBlockedMessage = useMemo(() => {
+    if (!needsShippingCalculation) return null;
+    if (!selectedShippingMethodId && !customerPostcode) {
+      return "Select a shipping method and enter a postcode to calculate shipping.";
+    }
+    if (!selectedShippingMethodId) {
+      return "Select a shipping method to calculate shipping.";
+    }
+    if (!customerPostcode) {
+      return "Enter your postcode to calculate shipping.";
+    }
+    return null;
+  }, [customerPostcode, needsShippingCalculation, selectedShippingMethodId]);
+
+  const shippingPoints =
+    needsShippingCalculation &&
+    isShippingQuoteReady &&
+    Number.isFinite(shippingQuote.totalPoints)
+      ? shippingQuote.totalPoints
+      : 0;
+
   // Calculations
-  const subtotalPoints = cartTotal;
-  const shippingPoints = allItems.length > 0 ? 120 : 0;
+  const subtotalPoints = Number(cartTotal) || 0;
+  const availablePointsValue = Number(availablePoints) || 0;
   // const taxPoints = allItems.length > 0 ? 80 : 0; // Removed as per request
   // const platformFees = allItems.length > 0 ? 200 : 0; // Removed as per request
 
   const totalPoints = subtotalPoints + shippingPoints;
-  const newAvailablePoints = availablePoints - totalPoints;
-
-  const insufficientPoints = newAvailablePoints < 0;
+  const newAvailablePoints = availablePointsValue - totalPoints;
+  const insufficientPoints = isShippingQuoteReady
+    ? newAvailablePoints < 0
+    : false;
+  const totalPointsDisplay = isShippingQuoteReady
+    ? totalPoints.toLocaleString()
+    : "--";
+  const newAvailablePointsDisplay = isShippingQuoteReady
+    ? newAvailablePoints.toLocaleString()
+    : "--";
 
   const onSubmit = async (formData) => {
     if (allItems.length === 0) {
@@ -134,31 +561,101 @@ const CartPage = () => {
       toast.error("Insufficient points to complete this purchase");
       return;
     }
+    if (isLoadingShippingMethods) {
+      toast.error("Loading shipping methods. Please wait.");
+      return;
+    }
+    if (isShippingMethodsUnavailable) {
+      toast.error("Shipping methods are unavailable. Please try again later.");
+      return;
+    }
+    if (!selectedShippingMethodId && shippingMethodOptions.length > 0) {
+      setShippingMethodError(true);
+    }
+    if (!customerPostcode) {
+      toast.error("Please enter a postcode to calculate shipping");
+      return;
+    }
+
+    const hasInvalidMerchant = cartByMerchant.some(
+      (group) => !getMerchantId(group)
+    );
+    if (hasInvalidMerchant) {
+      toast.error(
+        "Some cart items are missing merchant details. Please refresh and try again."
+      );
+      return;
+    }
+    if (!selectedShippingMethodId) {
+      setShippingMethodError(true);
+      toast.error("Please select a shipping method");
+      return;
+    }
+
+    if (isShippingCalculating) {
+      toast.error("Calculating shipping. Please wait.");
+      return;
+    }
+    if (isShippingQuoteError) {
+      toast.error(
+        shippingQuote.error || "Failed to calculate shipping. Try again."
+      );
+      return;
+    }
+    if (needsShippingCalculation && !isShippingCalculationReady) {
+      toast.error("Shipping calculation is not ready yet.");
+      return;
+    }
 
     try {
       const payload = {
-        member_id: profileData?.id || profileData?.data?.id,
-        ...formData,
-        // Mapping items for payload, ensuring all required fields are present
-        items: allItems.map((item) => ({
-          product_id: item.product_id,
-          product_variation_id: item.variation_id,
-          quantity: item.quantity,
-          points: item.price,
-        })),
-        total_points: totalPoints,
+        customer_info: {
+          full_name: formData.customer_full_name,
+          email: formData.customer_email,
+          phone: formData.customer_phone,
+          address: formData.customer_address,
+          postcode: customerPostcode || formData.customer_postcode,
+          city: formData.customer_city,
+          state: formData.customer_state,
+          country: formData.customer_country,
+        },
+        merchants: cartByMerchant.map((group) => {
+          const merchantId = getMerchantId(group);
+          return {
+            merchant_id: merchantId,
+            shipping_method_id: Number(selectedShippingMethodId),
+            items: (group.items || []).map((item) => ({
+              product_id: item.product_id,
+              product_variation_id:
+                item.variation_id ?? item.product_variation_id ?? null,
+              quantity: item.quantity,
+              points: item.price,
+              name: item.product_name || "Product",
+              sku: item.variation_details?.sku || null,
+            })),
+          };
+        }),
       };
 
-      await purchaseProduct(payload).unwrap();
+      const orderResponse = await createOrders(payload).unwrap();
+      if (orderResponse?.success === false) {
+        throw new Error(
+          orderResponse?.message || "Failed to place order. Please try again."
+        );
+      }
 
       toast.success("Order placed successfully!");
       // Assuming backend clears cart after purchase or we do it here.
       // Safe to call clearCart typically if backend doesn't auto-clear or as a safeguard.
       await clearCart().unwrap();
-      navigate("/member/max-redeem-mall");
+      navigate("/member/orders");
     } catch (error) {
-      console.error("Purchase failed", error);
-      toast.error(error?.data?.message || "Failed to place order");
+      console.error("Order creation failed", error);
+      toast.error(
+        error?.data?.message ||
+          error?.message ||
+          "Failed to place order"
+      );
     }
   };
 
@@ -263,136 +760,354 @@ const CartPage = () => {
                   )}
                 </div>
               </div>
-              {/* Dynamic Merchant Groups */}
-              {cartByMerchant.map((group) => (
-                <div
-                  key={group.merchant.merchant_id}
-                  className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
-                >
-                  {/* Merchant Header */}
-                  <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
-                    <Link
-                      to={`/member/max-redeem-mall?merchant_id=${group.merchant.merchant_id}`}
-                      className="flex items-center gap-3 group hover:opacity-80 transition-opacity"
-                    >
-                      <div className="w-8 h-8 rounded-full bg-white border border-gray-200 overflow-hidden flex-shrink-0">
-                        <img
-                          src={
-                            group.merchant.merchant_logo ||
-                            "https://placehold.co/100x100?text=Logo"
-                          }
-                          alt={group.merchant.merchant_name}
-                          className="w-full h-full object-cover"
-                        />
+
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-2">
+                  <div>
+                    <h2 className="text-base font-semibold text-gray-900">
+                      Shipping Method
+                    </h2>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Choose one shipping method. We will apply it to every
+                      merchant in your cart.
+                    </p>
+                  </div>
+                  <div
+                    className={`text-[11px] font-semibold px-3 py-1 rounded-full border ${
+                      selectedShippingMethod
+                        ? "text-emerald-700 bg-emerald-50 border-emerald-100"
+                        : "text-amber-700 bg-amber-50 border-amber-100"
+                    }`}
+                  >
+                    {selectedShippingMethod
+                      ? "applied to all merchants"
+                      : "selection required"}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-[minmax(0,320px)_1fr] gap-4 items-start">
+                  <div>
+                    <Label htmlFor="shipping_method_global">
+                      Shipping Method
+                    </Label>
+                    <Select
+                      id="shipping_method_global"
+                      placeholder={
+                        isLoadingShippingMethods
+                          ? "Loading shipping methods..."
+                          : "Select shipping method"
+                      }
+                      options={shippingMethodOptions}
+                      value={selectedShippingMethodId}
+                      onChange={(event) =>
+                        handleShippingMethodChange(event.target.value)
+                      }
+                      disabled={
+                        isLoadingShippingMethods ||
+                        shippingMethodOptions.length === 0
+                      }
+                      error={shippingMethodError}
+                    />
+                    {shippingMethodError ? (
+                      <p className="mt-1.5 text-xs text-error-500">
+                        Shipping method is required.
+                      </p>
+                    ) : null}
+                    {shouldWarnPostcode ? (
+                      <p className="mt-1.5 text-xs text-amber-600">
+                        Enter your postcode to calculate shipping.
+                      </p>
+                    ) : null}
+                    {detectedZoneName &&
+                    (isShippingQuoteReady || isShippingQuoteError) ? (
+                      <p className="mt-1.5 text-xs text-gray-600">
+                        Detected shipping zone: {detectedZoneName}
+                      </p>
+                    ) : null}
+                    {showShippingMethodsError ? (
+                      <div className="mt-1.5 flex items-center gap-2 text-xs text-error-500">
+                        <span>Failed to load shipping methods.</span>
+                        <button
+                          type="button"
+                          onClick={refetchShippingMethods}
+                          className="underline underline-offset-2"
+                        >
+                          Retry
+                        </button>
                       </div>
-                      <span className="font-bold text-gray-900 group-hover:text-brand-600 transition-colors flex items-center gap-1">
-                        {group.merchant.merchant_name}
-                        <ChevronRight
-                          size={16}
-                          className="text-gray-400 group-hover:text-brand-600"
-                        />
-                      </span>
-                    </Link>
-                    <div className="text-sm text-gray-500">
-                      {group.item_count} items
-                    </div>
+                    ) : null}
+                    {isShippingMethodsEmpty && !showShippingMethodsError ? (
+                      <p className="mt-1.5 text-xs text-gray-500">
+                        No active shipping methods available.
+                      </p>
+                    ) : null}
+                    {isShippingQuoteError ? (
+                      <div className="mt-2 rounded-lg border border-error-100 bg-error-50 px-3 py-2 text-xs text-error-600">
+                        <p>{shippingQuote.error}</p>
+                        {hasPerMerchantShippingErrors ? (
+                          <p className="mt-1 text-[11px] text-error-500">
+                            Some merchants do not have a shipping rate. Review
+                            the merchant sections below.
+                          </p>
+                        ) : null}
+                        <button
+                          type="button"
+                          onClick={retryCalculateShipping}
+                          className="mt-1 underline underline-offset-2"
+                        >
+                          Retry
+                        </button>
+                      </div>
+                    ) : null}
                   </div>
 
-                  {/* Items */}
-                  <div className="p-6 space-y-6">
-                    {group.items.map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b last:border-0 last:pb-0"
+                  <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-4 text-sm text-gray-600 space-y-1">
+                    {selectedShippingMethod ? (
+                      <>
+                        <p className="font-semibold text-gray-900">
+                          {selectedShippingMethod.name}
+                        </p>
+                        {selectedShippingMethod?.min_days !== null &&
+                        selectedShippingMethod?.min_days !== undefined &&
+                        selectedShippingMethod?.max_days !== null &&
+                        selectedShippingMethod?.max_days !== undefined ? (
+                          <p>
+                            Estimated delivery: {selectedShippingMethod.min_days}
+                            -{selectedShippingMethod.max_days} days
+                          </p>
+                        ) : null}
+                        {selectedShippingMethod?.description ? (
+                          <p>{selectedShippingMethod.description}</p>
+                        ) : (
+                          <p>
+                            This method will be used for all merchants in this
+                            order.
+                          </p>
+                        )}
+                        {!customerPostcode ? (
+                          <p className="text-xs text-gray-500 pt-1">
+                            Enter your postcode to calculate shipping.
+                          </p>
+                        ) : null}
+                        {isShippingCalculating ? (
+                          <p className="text-xs text-gray-500 pt-1">
+                            Calculating shipping for your postcode...
+                          </p>
+                        ) : null}
+                        {detectedZoneName &&
+                        (isShippingQuoteReady || isShippingQuoteError) ? (
+                          <p className="text-xs text-gray-500 pt-1">
+                            Shipping zone: {detectedZoneName}
+                          </p>
+                        ) : null}
+                      </>
+                    ) : (
+                      <>
+                        <p className="font-semibold text-gray-900">
+                          Select a shipping method
+                        </p>
+                        <p>
+                          We will calculate shipping after you choose a method
+                          and enter your postcode.
+                        </p>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Dynamic Merchant Groups */}
+              {cartByMerchant.map((group) => {
+                const merchantId = getMerchantId(group);
+                const merchantShippingPoints =
+                  shippingQuote.byMerchant?.[merchantId];
+                const merchantShippingError =
+                  shippingQuote.perMerchantErrors?.[merchantId];
+
+                return (
+                  <div
+                    key={merchantId}
+                    className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+                  >
+                    {/* Merchant Header */}
+                    <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
+                      <Link
+                        to={`/member/max-redeem-mall?merchant_id=${merchantId}`}
+                        className="flex items-center gap-3 group hover:opacity-80 transition-opacity"
                       >
-                        {/* Image */}
-                        <div className="w-24 h-24 rounded-xl bg-gray-50 border border-gray-100 flex-shrink-0 overflow-hidden">
+                        <div className="w-8 h-8 rounded-full bg-white border border-gray-200 overflow-hidden flex-shrink-0">
                           <img
                             src={
-                              item.variation_details?.image?.url ||
-                              "https://placehold.co/100x100?text=Product"
+                              group.merchant.merchant_logo ||
+                              "https://placehold.co/100x100?text=Logo"
                             }
-                            alt={item.product_name}
+                            alt={group.merchant.merchant_name}
                             className="w-full h-full object-cover"
                           />
                         </div>
+                        <span className="font-bold text-gray-900 group-hover:text-brand-600 transition-colors flex items-center gap-1">
+                          {group.merchant.merchant_name}
+                          <ChevronRight
+                            size={16}
+                            className="text-gray-400 group-hover:text-brand-600"
+                          />
+                        </span>
+                      </Link>
+                      <div className="text-sm text-gray-500">
+                        {group.item_count} items
+                      </div>
+                    </div>
 
-                        {/* Details */}
-                        <div className="flex-1 text-center sm:text-left">
-                          <h3 className="text-lg font-bold text-gray-900 mb-1">
-                            {item.product_name}
-                          </h3>
-                          {/* Variation / Attributes */}
-                          {item.variation_details?.attributes && (
-                            <div className="flex flex-wrap gap-2 mt-2 justify-center sm:justify-start">
-                              {item.variation_details.attributes.map(
-                                (attr, i) => (
-                                  <span
-                                    key={i}
-                                    className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600 border border-gray-200"
-                                  >
-                                    <span className="font-medium">
-                                      {attr.attribute_name}:
-                                    </span>{" "}
-                                    {attr.attribute_item_name}
-                                  </span>
-                                )
-                              )}
-                            </div>
+                    <div className="px-6 py-4 border-b border-gray-100">
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                        <div className="space-y-1">
+                          <p className="text-sm font-semibold text-gray-900">
+                            Shipping
+                          </p>
+                          {selectedShippingMethod ? (
+                            <>
+                              <p className="text-xs text-gray-500">
+                                {selectedShippingMethod.name} applied to all
+                                merchants.
+                              </p>
+                              {selectedShippingMethod?.min_days !== null &&
+                              selectedShippingMethod?.min_days !== undefined &&
+                              selectedShippingMethod?.max_days !== null &&
+                              selectedShippingMethod?.max_days !== undefined ? (
+                                <p className="text-xs text-gray-500">
+                                  Estimated delivery:{" "}
+                                  {selectedShippingMethod.min_days}-
+                                  {selectedShippingMethod.max_days} days
+                                </p>
+                              ) : null}
+                            </>
+                          ) : (
+                            <p className="text-xs text-gray-500">
+                              Select a shipping method above to calculate
+                              shipping.
+                            </p>
                           )}
                         </div>
 
-                        {/* Quantity */}
-                        <div className="flex items-center gap-3">
-                          <div className="flex items-center border border-gray-200 rounded-lg bg-gray-50">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleUpdateQty(item, item.quantity - 1)
-                              }
-                              className="p-2 hover:bg-gray-200 rounded-l-lg text-gray-600 transition-colors"
-                              disabled={item.quantity <= 1}
-                            >
-                              <Minus size={14} />
-                            </button>
-                            <span className="font-bold text-gray-900 w-8 text-center bg-white h-full py-1.5 border-x border-gray-200">
-                              {item.quantity}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleUpdateQty(item, item.quantity + 1)
-                              }
-                              className="p-2 hover:bg-gray-200 rounded-r-lg text-gray-600 transition-colors"
-                            >
-                              <Plus size={14} />
-                            </button>
-                          </div>
+                        <div className="min-w-[150px] rounded-xl border border-gray-100 bg-gray-50/70 px-4 py-3 text-right">
+                          <p className="text-[11px] uppercase tracking-wide text-gray-400">
+                            Shipping Points
+                          </p>
+                          <p className="text-base font-semibold text-gray-900">
+                            {isShippingCalculating
+                              ? "Calculating..."
+                              : isShippingQuoteReady &&
+                                Number.isFinite(merchantShippingPoints)
+                              ? Number(merchantShippingPoints).toLocaleString()
+                              : !isShippingCalculating && merchantShippingError
+                              ? "Unavailable"
+                              : "--"}
+                          </p>
+                          {!isShippingCalculating && merchantShippingError ? (
+                            <p className="mt-1 text-[11px] leading-snug text-error-500">
+                              {merchantShippingError}
+                            </p>
+                          ) : null}
                         </div>
-
-                        {/* Points */}
-                        <div className="w-24 text-center sm:text-right">
-                          <div className="text-lg font-bold text-gray-900">
-                            {(item.price * item.quantity).toLocaleString()}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {item.price} pts/each
-                          </div>
-                        </div>
-
-                        {/* Remove */}
-                        <button
-                          type="button"
-                          onClick={() => handleRemove(item.id)}
-                          className="p-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-colors"
-                        >
-                          <Trash2 size={18} />
-                        </button>
                       </div>
-                    ))}
+                    </div>
+
+                    {/* Items */}
+                    <div className="p-6 space-y-6">
+                      {(group.items || []).map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b last:border-0 last:pb-0"
+                        >
+                          {/* Image */}
+                          <div className="w-24 h-24 rounded-xl bg-gray-50 border border-gray-100 flex-shrink-0 overflow-hidden">
+                            <img
+                              src={
+                                item.variation_details?.image?.url ||
+                                "https://placehold.co/100x100?text=Product"
+                              }
+                              alt={item.product_name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+
+                          {/* Details */}
+                          <div className="flex-1 text-center sm:text-left">
+                            <h3 className="text-lg font-bold text-gray-900 mb-1">
+                              {item.product_name}
+                            </h3>
+                            {/* Variation / Attributes */}
+                            {item.variation_details?.attributes && (
+                              <div className="flex flex-wrap gap-2 mt-2 justify-center sm:justify-start">
+                                {item.variation_details.attributes.map(
+                                  (attr, i) => (
+                                    <span
+                                      key={i}
+                                      className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600 border border-gray-200"
+                                    >
+                                      <span className="font-medium">
+                                        {attr.attribute_name}:
+                                      </span>{" "}
+                                      {attr.attribute_item_name}
+                                    </span>
+                                  ),
+                                )}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Quantity */}
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center border border-gray-200 rounded-lg bg-gray-50">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleUpdateQty(item, item.quantity - 1)
+                                }
+                                className="p-2 hover:bg-gray-200 rounded-l-lg text-gray-600 transition-colors"
+                                disabled={item.quantity <= 1}
+                              >
+                                <Minus size={14} />
+                              </button>
+                              <span className="font-bold text-gray-900 w-8 text-center bg-white h-full py-1.5 border-x border-gray-200">
+                                {item.quantity}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleUpdateQty(item, item.quantity + 1)
+                                }
+                                className="p-2 hover:bg-gray-200 rounded-r-lg text-gray-600 transition-colors"
+                              >
+                                <Plus size={14} />
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Points */}
+                          <div className="w-24 text-center sm:text-right">
+                            <div className="text-lg font-bold text-gray-900">
+                              {(item.price * item.quantity).toLocaleString()}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {item.price} pts/each
+                            </div>
+                          </div>
+
+                          {/* Remove */}
+                          <button
+                            type="button"
+                            onClick={() => handleRemove(item.id)}
+                            className="p-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-colors"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
 
               {/* Shipping Form Card */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
@@ -500,20 +1215,65 @@ const CartPage = () => {
                   </div>
                   <div className="flex justify-between items-center text-white/80">
                     <span>Shipping (In Points)</span>
-                    <span className="font-semibold">{shippingPoints}</span>
+                    <span className="font-semibold">
+                      {isShippingCalculating
+                        ? "Calculating..."
+                        : isShippingQuoteReady
+                        ? shippingPoints.toLocaleString()
+                        : "--"}
+                    </span>
                   </div>
+                  {isShippingCalculationBlocked && shippingBlockedMessage ? (
+                    <p className="text-[11px] text-white/70">
+                      {shippingBlockedMessage}
+                    </p>
+                  ) : null}
+                  {isShippingCalculating && (
+                    <p className="text-[11px] text-white/70">
+                      Calculating shipping based on your selections...
+                    </p>
+                  )}
+                  {detectedZoneName &&
+                  (isShippingQuoteReady || isShippingQuoteError) ? (
+                    <p className="text-[11px] text-white/70">
+                      Shipping zone: {detectedZoneName}
+                    </p>
+                  ) : null}
+                  {isShippingQuoteError ? (
+                    <div className="text-[11px] text-red-200 space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span>
+                          {shippingQuote.error ||
+                            "Failed to calculate shipping."}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={retryCalculateShipping}
+                          className="underline underline-offset-2"
+                        >
+                          Retry
+                        </button>
+                      </div>
+                      {hasPerMerchantShippingErrors ? (
+                        <p>
+                          Some merchants do not have a shipping rate for this
+                          postcode.
+                        </p>
+                      ) : null}
+                    </div>
+                  ) : null}
                 </div>
 
                 <div className="border-t border-white/20 pt-4 mb-6">
                   <div className="flex justify-between items-center mb-2">
                     <span className="font-medium">Total (In Points)</span>
                     <span className="text-xl font-bold">
-                      {totalPoints.toLocaleString()}
+                      {totalPointsDisplay}
                     </span>
                   </div>
                   <div className="flex justify-between items-center text-white/90 text-sm">
                     <span>Available Points</span>
-                    <span>{Number(availablePoints).toLocaleString()}</span>
+                    <span>{availablePointsValue.toLocaleString()}</span>
                   </div>
                 </div>
 
@@ -527,7 +1287,7 @@ const CartPage = () => {
                         insufficientPoints ? "text-red-300" : "text-white"
                       }`}
                     >
-                      {newAvailablePoints.toLocaleString()}
+                      {newAvailablePointsDisplay}
                     </span>
                   </div>
                   {insufficientPoints && (
@@ -542,11 +1302,21 @@ const CartPage = () => {
 
                 <PrimaryButton
                   type="submit"
-                  disabled={isPurchasing || insufficientPoints || isLoadingCart}
+                  disabled={
+                    isPurchasing ||
+                    insufficientPoints ||
+                    isLoadingCart ||
+                    isLoadingShippingMethods ||
+                    isShippingMethodsUnavailable ||
+                    isShippingCalculating ||
+                    isShippingCalculationBlocked ||
+                    isShippingQuoteError ||
+                    (needsShippingCalculation && !isShippingCalculationReady)
+                  }
                   className="w-full bg-[#FA5D29] hover:bg-[#E54818] text-white border-0 font-bold py-4 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center justify-between px-6"
                 >
                   <span className="text-lg">
-                    {totalPoints.toLocaleString()}
+                    {totalPointsDisplay}
                   </span>
                   <span className="flex items-center gap-2">
                     Confirm Order <ArrowLeft className="rotate-180" size={20} />

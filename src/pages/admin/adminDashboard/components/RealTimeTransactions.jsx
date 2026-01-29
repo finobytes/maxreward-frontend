@@ -1,6 +1,40 @@
 import Chart from "react-apexcharts";
 
-const RealTimeTransactions = () => {
+const defaultLabels = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+const normalizeSeries = (values, count) => {
+  const safeValues = Array.isArray(values)
+    ? values.map((value) => (Number.isFinite(Number(value)) ? Number(value) : 0))
+    : [];
+  if (!count) return safeValues;
+  if (safeValues.length >= count) return safeValues.slice(0, count);
+  return safeValues.concat(Array.from({ length: count - safeValues.length }, () => 0));
+};
+
+const RealTimeTransactions = ({
+  labels,
+  purchased,
+  redeemed,
+  isLoading = false,
+  isError = false,
+}) => {
+  const chartLabels =
+    Array.isArray(labels) && labels.length > 0 ? labels : defaultLabels;
+  const purchasedSeries = normalizeSeries(purchased, chartLabels.length);
+  const redeemedSeries = normalizeSeries(redeemed, chartLabels.length);
   const options = {
     colors: ["#FF5A29", "#6366F1"], // Redeemed = orange, Purchased = purple
     chart: {
@@ -26,38 +60,12 @@ const RealTimeTransactions = () => {
     dataLabels: {
       enabled: false,
     },
-    labels: [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ],
+    labels: chartLabels,
     markers: {
       size: 4,
     },
     xaxis: {
-      categories: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ],
+      categories: chartLabels,
       axisBorder: { show: false },
       axisTicks: { show: false },
     },
@@ -87,12 +95,12 @@ const RealTimeTransactions = () => {
     {
       name: "Redeemed",
       type: "column",
-      data: [30, 20, 30, 40, 20, 30, 15, 30, 55, 30, 20, 25],
+      data: redeemedSeries,
     },
     {
       name: "Purchased",
       type: "line",
-      data: [28, 25, 35, 32, 38, 33, 20, 50, 60, 35, 40, 50],
+      data: purchasedSeries,
     },
   ];
 
@@ -104,7 +112,17 @@ const RealTimeTransactions = () => {
         </h3>
       </div>
       <div className="w-full">
-        <Chart options={options} series={series} type="line" height={388} />
+        {isLoading ? (
+          <div className="min-h-[388px] flex items-center justify-center text-sm text-gray-500">
+            Loading transactions...
+          </div>
+        ) : isError ? (
+          <div className="min-h-[388px] flex items-center justify-center text-sm text-red-500">
+            Failed to load real-time transactions.
+          </div>
+        ) : (
+          <Chart options={options} series={series} type="line" height={388} />
+        )}
       </div>
     </div>
   );

@@ -1,19 +1,86 @@
-import React from "react";
-import { useForm } from "react-hook-form";
+import React, { useEffect, useState } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { logo, resetPassBgLeft, resetPassBgRight } from "../../assets/assets";
 import ErrorMsg from "../../components/errorMsg/ErrorMsg";
-import { Link } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import OTPInput from "../../components/form/form-elements/OTPInput";
+import { toast } from "sonner";
+import {
+  useVerifyResetCodeMutation,
+  useRequestResetCodeMutation,
+} from "../../redux/features/auth/authApi";
+
+const schema = z.object({
+  code: z.string().length(6, "Code must be 6 digits"),
+});
 
 const OTP = () => {
   const {
-    register,
+    control,
     handleSubmit,
+    setError,
     formState: { errors },
-  } = useForm();
-  const onSubmit = (data) => {
-    console.log("Form Data:", data);
+  } = useForm({
+    resolver: zodResolver(schema),
+  });
+
+  const navigate = useNavigate();
+  const location = useLocation();
+  const userId = location.state?.userId;
+
+  const [verifyResetCode, { isLoading }] = useVerifyResetCodeMutation();
+  const [requestResetCode] = useRequestResetCodeMutation();
+  const [timeLeft, setTimeLeft] = useState(60);
+
+  useEffect(() => {
+    if (!userId) {
+      // Redirect to start if no user ID provided
+      navigate("/reset-password");
+    }
+  }, [userId, navigate]);
+
+  useEffect(() => {
+    if (timeLeft === 0) return;
+
+    const intervalId = setInterval(() => {
+      setTimeLeft((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [timeLeft]);
+
+  const onSubmit = async (data) => {
+    try {
+      await verifyResetCode({ user_id: userId, code: data.code }).unwrap();
+      toast.success("Code verified successfully");
+      navigate("/new-password", { state: { userId, code: data.code } });
+    } catch (err) {
+      const errorMsg = err?.data?.message || "Invalid or expired code";
+      toast.error(errorMsg);
+      setError("code", {
+        type: "manual",
+        message: errorMsg,
+      });
+    }
   };
+
+  const handleResend = async (e) => {
+    e.preventDefault();
+    if (timeLeft > 0) return;
+
+    try {
+      await requestResetCode({ user_id: userId }).unwrap();
+      setTimeLeft(60);
+      toast.success("Reset code resent successfully");
+    } catch (err) {
+      console.error("Failed to resend code", err);
+      toast.error(err?.data?.message || "Failed to resend code");
+    }
+  };
+
+  if (!userId) return null; // Avoid rendering if redirecting
 
   return (
     <div className="relative min-h-screen bg-gray-50 flex flex-col overflow-hidden">
@@ -55,23 +122,42 @@ const OTP = () => {
             onSubmit={handleSubmit(onSubmit)}
             className="mt-6 space-y-5 w-full"
           >
-            <div className="mt-2 flex justify-center">
-              <OTPInput />
+            <div className="mt-2 flex flex-col items-center justify-center">
+              <Controller
+                name="code"
+                control={control}
+                render={({ field: { onChange } }) => (
+                  <OTPInput length={6} onChange={onChange} />
+                )}
+              />
+              {errors.code && (
+                <div className="mt-2 w-full text-center">
+                  <ErrorMsg message={errors.code.message} />
+                </div>
+              )}
             </div>
 
-            <Link
-              to="#"
-              className="block mt-8 text-indigo-500 text-center font-semibold"
+            <button
+              onClick={handleResend}
+              type="button"
+              disabled={timeLeft > 0}
+              className={`block w-full mt-8 text-center font-semibold ${
+                timeLeft > 0
+                  ? "text-gray-400 cursor-not-allowed"
+                  : "text-indigo-500 hover:text-indigo-600"
+              }`}
             >
-              Resend Code
-            </Link>
+              {timeLeft > 0 ? `Resend Code in ${timeLeft}s` : "Resend Code"}
+            </button>
+
             <div>
-              <Link
-                to="/new-password"
-                className="w-full block text-center rounded-md bg-[#FF5A29] mt-8 px-4 py-2 text-sm sm:text-base font-semibold text-white shadow hover:bg-[#FF5A29]/80"
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full block text-center rounded-md bg-[#FF5A29] mt-8 px-4 py-2 text-sm sm:text-base font-semibold text-white shadow hover:bg-[#FF5A29]/80 disabled:opacity-50"
               >
-                Continue
-              </Link>
+                {isLoading ? "Verifying..." : "Continue"}
+              </button>
             </div>
           </form>
         </div>

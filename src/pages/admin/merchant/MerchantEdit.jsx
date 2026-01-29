@@ -6,6 +6,7 @@ import {
   useGetMerchantByIdQuery,
   useUpdateMerchantMutation,
 } from "@/redux/features/admin/merchantManagement/merchantManagementApi";
+import { useGetAllBusinessTypesQuery } from "@/redux/features/admin/businessType/businessTypeApi";
 import PageBreadcrumb from "@/components/common/PageBreadcrumb";
 import ComponentCard from "@/components/common/ComponentCard";
 import Label from "@/components/form/Label";
@@ -47,6 +48,12 @@ const MerchantEdit = () => {
       skip: !merchantData?.data?.merchant?.corporate_member?.referral_code,
     }
   );
+
+  const {
+    data: businessTypes,
+    isLoading: isBusinessTypeLoading,
+    isError: isBusinessTypeError,
+  } = useGetAllBusinessTypesQuery();
   const {
     register,
     handleSubmit,
@@ -176,17 +183,32 @@ const MerchantEdit = () => {
               </div>
               <div>
                 <Label>Product/Service</Label>
-                <Select
-                  {...register("business_type")}
-                  options={[
-                    { value: "Retail", label: "Retail" },
-                    { value: "Service", label: "Service" },
-                    { value: "Super Shop", label: "Super Shop" },
-                  ]}
-                />
-                {errors.business_type && (
+                {isBusinessTypeLoading ? (
+                  <div className="animate-pulse space-y-2">
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                  </div>
+                ) : isBusinessTypeError ? (
+                  <p className="text-red-500 text-sm">
+                    Failed to load product/service type
+                  </p>
+                ) : (
+                  <Select
+                    defaultValue=""
+                    {...register("business_type_id")}
+                    options={[
+                      ...(businessTypes?.data?.business_types?.map((type) => ({
+                        value: type.id,
+                        label: type.name,
+                      })) || []),
+                    ]}
+                    placeholder="Select Product/Service Type"
+                  />
+                )}
+
+                {errors.business_type_id && (
                   <p className="text-red-500 text-xs mt-1">
-                    {errors.business_type.message}
+                    {errors.business_type_id.message}
                   </p>
                 )}
               </div>

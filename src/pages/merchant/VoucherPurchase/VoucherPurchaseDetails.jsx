@@ -34,7 +34,7 @@ const VoucherPurchaseDetails = () => {
       <PageBreadcrumb
         items={[
           { label: "Home", to: "/" },
-          { label: "Voucher Purchase", to: "/admin/voucher-manage" },
+          { label: "Voucher Purchase", to: "/merchant/voucher-purchase" },
           { label: "Voucher Details" },
         ]}
       />

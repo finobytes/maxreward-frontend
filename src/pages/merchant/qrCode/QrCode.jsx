@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
 import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
 import QRCode from "react-qr-code";

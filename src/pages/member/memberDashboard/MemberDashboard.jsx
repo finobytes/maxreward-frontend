@@ -128,7 +128,7 @@ const MemberDashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4">
         {/* Membership Card should take 1 column on all screens, stays the same */}
         <div className="2xl:col-span-1">
-          <MembershipCard data={data} />
+          <MembershipCard data={data} role="member" />
         </div>
 
         {/* Dashboard Cards wrapper should take 2 columns on 2XL screens */}

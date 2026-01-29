@@ -214,10 +214,10 @@ const ProductDetails = () => {
                     product.unit_weight ? `${product.unit_weight} kg` : "-"
                   }
                 />
-                <DetailItem
+                {/* <DetailItem
                   label="Actual Qty"
                   value={product.actual_quantity || "0"}
-                />
+                /> */}
                 <DetailItem
                   label="Cost Price"
                   value={product.cost_price ? `RM ${product.cost_price}` : "-"}

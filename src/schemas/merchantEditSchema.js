@@ -6,7 +6,11 @@ export const merchantEditSchema = z.object({
   business_name: z.string().min(1, "Business name is required"),
   address: z.string().min(3, "Company address is required"),
   state: optionalText,
-  business_type: z.string().min(1, "Business type is required"),
+  business_type_id: z
+    .union([z.string(), z.number()])
+    .refine((value) => `${value}`.trim() !== "", {
+      message: "Business type is required",
+    }),
   annual_sales_turnover: optionalText,
   reward_budget: optionalText,
   authorized_person_name: z

@@ -62,6 +62,11 @@ export const NAV_CONFIG = {
         { name: "Gender", path: "/admin/e-commerce/gender" },
         { name: "Attribute", path: "/admin/e-commerce/attribute" },
         { name: "Attribute Item", path: "/admin/e-commerce/attribute-item" },
+        {
+          name: "Shipping Methods",
+          path: "/admin/e-commerce/shipping-methods",
+        },
+        { name: "Shipping Zone", path: "/admin/e-commerce/shipping-zone" },
       ],
     },
     {
@@ -154,6 +159,13 @@ export const NAV_CONFIG = {
       icon: <ShieldCheck />,
       subItems: [
         { name: "Role List", path: "/admin/role-permission/role-list" },
+        {
+          name: "Permission List",
+          path: "/admin/role-permission/permission-list",
+        },
+        { name: "Assign Permissions", path: "/admin/role-permission/assign" },
+        { name: "Section List", path: "/admin/role-permission/section-list" },
+        { name: "Action List", path: "/admin/role-permission/action-list" },
       ],
     },
     { name: "Profile", icon: <UserCircle2 />, path: "/admin/profile" },
@@ -291,6 +303,22 @@ export const NAV_CONFIG = {
         },
       ],
     },
+    {
+      name: "Role Permission",
+      icon: <ShieldCheck />,
+      subItems: [
+        { name: "Role List", path: "/merchant/role-permission/role-list" },
+        {
+          name: "Assign Permissions",
+          path: "/merchant/role-permission/assign",
+        },
+      ],
+    },
+    {
+      name: "Shipping Rate Settings",
+      icon: <Settings />,
+      path: "/merchant/shipping-rate-settings",
+    },
     { icon: <CircleUserRound />, name: "Profile", path: "/merchant/profile" },
 
     { name: "Logout", icon: <LogOut />, path: "/login" },
@@ -336,24 +364,10 @@ export const NAV_CONFIG = {
       name: "Max Redeem Mall",
       path: "/member/max-redeem-mall",
     },
-
     {
       icon: <ShoppingCart />,
       name: "My Orders",
-      subItems: [
-        {
-          name: "Orders",
-          path: "/member/orders",
-        },
-        {
-          name: "Return Order",
-          path: "/member/return-order",
-        },
-        {
-          name: "Cancel Order",
-          path: "/member/cancel-order",
-        },
-      ],
+      path: "/member/orders",
     },
     {
       icon: <DollarSign />,

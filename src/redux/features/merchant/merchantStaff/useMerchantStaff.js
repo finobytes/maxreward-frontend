@@ -20,6 +20,9 @@ export const useMerchantStaff = () => {
   const { user } = useSelector((state) => state.auth);
   const role = user?.role || "member"; // admin | merchant | member
   const { data: verifyData, isLoading: verifying } = useVerifyMeQuery(role);
+
+  // console.log("verifyData", verifyData)
+
   const [debouncedSearch, setDebouncedSearch] = useState(search);
   const merchantId =
     verifyData?.merchant_id || // corporate member
@@ -27,6 +30,9 @@ export const useMerchantStaff = () => {
     verifyData?.member?.id || // member id
     verifyData?.data?.id || // fallback
     verifyData?.id; // fallback
+
+
+    // console.log("merchantId", merchantId);
 
   // Debounce search by 600ms
   useEffect(() => {

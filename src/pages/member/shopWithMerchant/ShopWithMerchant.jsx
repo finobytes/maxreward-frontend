@@ -51,6 +51,14 @@ const ShopWithMerchant = () => {
     isLoading: isBusinessTypeLoading,
     isError: isBusinessTypeError,
   } = useGetAllBusinessTypesQuery();
+  const businessTypeOptions = React.useMemo(
+    () =>
+      businessTypes?.data?.business_types?.map((type) => ({
+        value: type.id,
+        label: type.name,
+      })) || [],
+    [businessTypes]
+  );
 
   // QR Code State
   const [isQrOpen, setIsQrOpen] = useState(false);
@@ -332,7 +340,7 @@ const ShopWithMerchant = () => {
                         onChange={(val) =>
                           setAdvancedValue("business_type_id", val)
                         }
-                        options={businessTypes?.data?.business_types || []}
+                        options={businessTypeOptions}
                         placeholder="Select Product/Service Type"
                       />
                     )}

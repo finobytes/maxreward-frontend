@@ -23,6 +23,8 @@ export const merchantStaffSchema = z.object({
     errorMap: () => ({ message: "Please select a gender" }),
   }),
 
+  role: z.string().min(1, { message: "Role is required" }),
+
   status: z.enum(["active", "inactive"], {
     errorMap: () => ({ message: "Please select a status" }),
   }),
