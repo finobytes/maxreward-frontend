@@ -82,7 +82,7 @@ const MerchantDashboard = () => {
       </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4">
         <div className="2xl:col-span-1">
-          <MembershipCard data={data} />
+          <MembershipCard data={data} role="merchant" />
         </div>
         <div className="2xl:col-span-2">
           <div className="grid grid-cols-2 md:grid-cols-2 2xl:grid-cols-3 gap-4">
