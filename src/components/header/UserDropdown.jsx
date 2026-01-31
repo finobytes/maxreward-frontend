@@ -21,6 +21,20 @@ export default function UserDropdown({ user, role }) {
   const profileImage =
     user?.merchant?.business_logo || user?.image || userImage;
   const email = user?.merchant?.email || user?.email || "Email not available";
+  const roleName = user?.roles?.[0]?.name;
+  const memberType = user?.member_type;
+  const userType = user?.type;
+  const normalizedType = (userType || role || "").toString().toLowerCase();
+  const isTypeOnly = normalizedType === "admin" || normalizedType === "merchant";
+  const rawRoleLabel = isTypeOnly
+    ? userType || role
+    : roleName || memberType || userType || role;
+  const roleLabel = rawRoleLabel
+    ? rawRoleLabel
+        .toString()
+        .replace(/[_-]+/g, " ")
+        .replace(/\b\w/g, (char) => char.toUpperCase())
+    : null;
 
   const handleLogout = async () => {
     try {
@@ -58,7 +72,14 @@ export default function UserDropdown({ user, role }) {
           <img src={profileImage} alt="User" />
         </span>
 
-        <span className="block mr-1 font-medium text-theme-sm">{userName}</span>
+        <span className="flex flex-col items-start mr-1">
+          <span className="block font-medium text-theme-sm">{userName}</span>
+          {roleLabel && (
+            <span className="mt-0.5 text-[11px] text-gray-500">
+              {roleLabel}
+            </span>
+          )}
+        </span>
         <svg
           className={`stroke-gray-500 transition-transform duration-200 ${
             isOpen ? "rotate-180" : ""
@@ -88,6 +109,11 @@ export default function UserDropdown({ user, role }) {
           <span className="block font-medium text-gray-700 text-theme-sm ">
             {userName}
           </span>
+          {roleLabel && (
+            <span className="mt-0.5 block text-[11px] text-gray-500">
+              {roleLabel}
+            </span>
+          )}
           <span className="mt-0.5 block text-theme-xs text-gray-500 ">
             {email}
           </span>
