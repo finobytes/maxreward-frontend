@@ -1,6 +1,10 @@
 import React from "react";
 import { userCardCenterLogo } from "../../assets/assets";
+import { Wifi } from "lucide-react";
 
+/**
+ * Utility to pick the first valid string from arguments.
+ */
 const pickFirst = (...values) => {
   for (const value of values) {
     if (value === 0) return "0";
@@ -12,18 +16,38 @@ const pickFirst = (...values) => {
   return "";
 };
 
+/**
+ * Formats a phone number or string into groups of 4 for a credit card look.
+ * Example: "1234567890" -> "1234 5678 90" (approx)
+ */
+const formatCardNumber = (str) => {
+  if (!str) return "•••• •••• •••• ••••";
+  // Remove non-digits to be safe, or just space it out
+  const clean = str.replace(/\D/g, "");
+  // If it looks like a phone, maybe keep standard phone format?
+  // User asked for "like debit or credit card", so spacing is key.
+  // visual grouping: 4-4-4-4 or similar.
+  const groups = clean.match(/.{1,4}/g);
+  return groups ? groups.join(" ") : str;
+};
+
 const buildMembershipView = (data, role) => {
   const branding = data?.branding || {};
   const brandingType = branding?.type;
   const isMerchantRole = role === "merchant";
   const merchantInfo = data?.merchant || {};
 
-  const memberName = pickFirst(data?.name, data?.user_name, data?.email, "Member");
+  const memberName = pickFirst(
+    data?.name,
+    data?.user_name,
+    data?.email,
+    "MEMBER",
+  );
   const memberPhone = pickFirst(
     data?.phone,
     merchantInfo?.phone,
     data?.user_name,
-    "N/A"
+    "0000000000",
   );
 
   let titleName = memberName;
@@ -48,67 +72,125 @@ const buildMembershipView = (data, role) => {
         data?.name,
         data?.user_name,
         data?.email,
-        "N/A"
+        "AUTHORIZED SIGNATURE",
       )
-    : pickFirst(data?.name, data?.user_name, data?.email, "N/A");
-
-  const logoAlt = pickFirst(
-    isMerchantRole ? merchantInfo?.business_name : branding?.name,
-    memberName,
-    "Membership logo"
-  );
+    : pickFirst(
+        data?.name,
+        data?.user_name,
+        data?.email,
+        "AUTHORIZED SIGNATURE",
+      );
 
   return {
     titleName,
     showMaxReward,
     logoSrc: logoSrc || userCardCenterLogo,
-    logoAlt,
+    logoAlt: titleName || "Card Logo",
     memberPhone,
     rightText,
   };
 };
 
+const EmvChip = () => (
+  <div className="w-12 h-9 rounded bg-gradient-to-br from-yellow-200 via-yellow-400 to-yellow-600 border border-yellow-600 shadow-md relative overflow-hidden">
+    {/* Chip Circuit Lines */}
+    <div className="absolute inset-x-0 top-1/2 h-[1px] bg-yellow-800/40 -translate-y-1/2"></div>
+    <div className="absolute inset-y-0 left-1/2 w-[1px] bg-yellow-800/40 -translate-x-1/2"></div>
+    <div className="absolute top-1/2 left-1/2 w-3/5 h-3/5 border border-yellow-800/40 rounded-[1px] -translate-x-1/2 -translate-y-1/2"></div>
+    <div className="absolute top-1/2 left-0 w-2 h-[1px] bg-yellow-800/30"></div>
+    <div className="absolute top-1/2 right-0 w-2 h-[1px] bg-yellow-800/30"></div>
+  </div>
+);
+
 const MembershipCard = ({ data, role = "member" }) => {
   const view = buildMembershipView(data, role);
-  const titleText = view.showMaxReward
-    ? `${view.titleName} MAX REWARD`
-    : view.titleName;
+  const formattedNumber = formatCardNumber(view.memberPhone);
 
   return (
-    <div className="w-full h-auto bg-[#735DFFB2] rounded-xl shadow-lg flex flex-col justify-between py-6">
-      <h2
-        className="font-bold text-center text-white leading-tight px-3 break-words"
-        style={{
-          fontSize: "clamp(1.5rem, 2vw + 0.5rem, 2rem)", // scales smoothly
-        }}
-        title={titleText}
+    <div className="w-full max-w-md mx-auto relative perspective-1000 group">
+      {/* Card Container */}
+      <div
+        className="
+          relative w-full aspect-[1.586/1] 
+          bg-gradient-to-br from-slate-900 via-slate-800 to-black 
+          text-white rounded-2xl shadow-2xl overflow-hidden
+          border border-white/10
+          transition-transform duration-500 hover:scale-[1.02] hover:shadow-brand-500/20
+        "
       >
-        {view.titleName}
-        {view.showMaxReward && (
-          <span className="text-brand-500"> MAX REWARD</span>
-        )}
-      </h2>
-      <div className="flex flex-col justify-center items-center py-3">
-        <img
-          src={view.logoSrc}
-          alt={view.logoAlt}
-          className="h-14 w-auto object-contain"
-          loading="lazy"
-          decoding="async"
-          onError={(event) => {
-            if (event.currentTarget.src !== userCardCenterLogo) {
-              event.currentTarget.src = userCardCenterLogo;
-            }
-          }}
-        />
-      </div>
-      <div className="bg-white flex justify-between items-center px-4 py-2 text-brand-500 font-bold text-lg sm:text-xl md:text-2xl">
-        <span className="truncate max-w-[50%]" title={view.memberPhone}>
-          {view.memberPhone}
-        </span>
-        <span className="truncate text-right max-w-[55%]" title={view.rightText}>
-          {view.rightText}
-        </span>
+        {/* Decorative Background Elements */}
+        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-brand-500/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-60 h-60 bg-blue-500/20 rounded-full blur-3xl"></div>
+
+        {/* Glass Sheen */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-50 pointer-events-none"></div>
+
+        {/* Content Content - Flex Column */}
+        <div className="relative h-full flex flex-col justify-between p-6 sm:p-7 z-10">
+          {/* TOP ROW: Chip, Wifi, Logo */}
+          <div className="flex justify-between items-start">
+            <div className="flex flex-col gap-4">
+              <EmvChip />
+              <Wifi className="w-6 h-6 text-white/50 rotate-90" />
+            </div>
+
+            {/* Logo Area */}
+            <div className="flex flex-col items-end">
+              <div className="h-10 sm:h-12 flex items-center justify-center p-1 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 shadow-sm">
+                <img
+                  src={view.logoSrc}
+                  alt={view.logoAlt}
+                  className="h-full w-auto object-contain max-w-[100px]"
+                  onError={(e) => {
+                    if (e.currentTarget.src !== userCardCenterLogo) {
+                      e.currentTarget.src = userCardCenterLogo;
+                    }
+                  }}
+                />
+              </div>
+              <div className="text-[10px] sm:text-xs font-semibold tracking-widest text-white/60 mt-1 uppercase">
+                {view.showMaxReward ? "Max Reward" : "Membership"}
+              </div>
+            </div>
+          </div>
+
+          {/* MIDDLE / BOTTOM: Number & Name */}
+          <div className="mt-auto">
+            {/* Card Number */}
+            <div className="mb-4">
+              <div
+                className="font-mono text-xl sm:text-2xl md:text-3xl tracking-widest text-white drop-shadow-md"
+                style={{ wordSpacing: "0.2em" }}
+              >
+                {formattedNumber}
+              </div>
+              <div className="text-[10px] sm:text-xs text-white/50 uppercase tracking-wider mt-1 ml-1">
+                Member ID
+              </div>
+            </div>
+
+            {/* Bottom Row info */}
+            <div className="flex justify-between items-end">
+              <div>
+                <div className="text-[9px] sm:text-[10px] text-white/60 uppercase mb-0.5">
+                  Card Holder
+                </div>
+                <div className="font-outfit font-medium text-sm sm:text-base md:text-lg tracking-wide uppercase truncate max-w-[200px]">
+                  {view.rightText}
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center mr-2">
+                <div className="text-[8px] text-white/60 uppercase leading-none mb-0.5">
+                  Valid Thru
+                </div>
+                <div className="font-mono text-sm sm:text-base font-semibold">
+                  12/30
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
