@@ -112,15 +112,15 @@ const MembershipCard = ({ data, role = "member" }) => {
       <div
         className="
           relative w-full aspect-[1.586/1] 
-          bg-gradient-to-br from-slate-900 via-slate-800 to-black 
+          bg-gradient-to-br from-brand-500 via-orange-600 to-red-700 
           text-white rounded-2xl shadow-2xl overflow-hidden
-          border border-white/10
-          transition-transform duration-500 hover:scale-[1.02] hover:shadow-brand-500/20
+          border border-white/20
+          transition-transform duration-500 hover:scale-[1.02] hover:shadow-brand-500/40
         "
       >
         {/* Decorative Background Elements */}
-        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-brand-500/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-60 h-60 bg-blue-500/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-60 h-60 bg-yellow-500/20 rounded-full blur-3xl"></div>
 
         {/* Glass Sheen */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-50 pointer-events-none"></div>
@@ -181,12 +181,12 @@ const MembershipCard = ({ data, role = "member" }) => {
               </div>
 
               <div className="flex flex-col items-center mr-2">
-                <div className="text-[8px] text-white/60 uppercase leading-none mb-0.5">
+                {/* <div className="text-[8px] text-white/60 uppercase leading-none mb-0.5">
                   Valid Thru
                 </div>
                 <div className="font-mono text-sm sm:text-base font-semibold">
                   12/30
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
