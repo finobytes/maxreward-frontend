@@ -17,7 +17,10 @@ export default function UserDropdown({ user, role }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const userName = user?.merchant?.business_name || user?.name || "User";
+  const userName = user?.name || user?.merchant?.business_name || "User";
+
+  console.log("UserDropdown user:", user);
+  console.log("UserDropdown Name:", userName);
   const profileImage =
     user?.merchant?.business_logo || user?.image || userImage;
   const email = user?.merchant?.email || user?.email || "Email not available";
@@ -25,7 +28,8 @@ export default function UserDropdown({ user, role }) {
   const memberType = user?.member_type;
   const userType = user?.type;
   const normalizedType = (userType || role || "").toString().toLowerCase();
-  const isTypeOnly = normalizedType === "admin" || normalizedType === "merchant";
+  const isTypeOnly =
+    normalizedType === "admin" || normalizedType === "merchant";
   const rawRoleLabel = isTypeOnly
     ? userType || role
     : roleName || memberType || userType || role;
