@@ -85,6 +85,7 @@ const MerchantApplication = () => {
   });
   // Fetch current user's referral code
   const { data, isLoading } = useVerifyMeQuery();
+  console.log(data?.sponsored_member_info?.sponsor_member?.phone);
 
   // -----------------------------
   // FORM HANDLING WITH REACT-HOOK-FORM + ZOD
@@ -135,12 +136,15 @@ const MerchantApplication = () => {
 
   // Prefill referral code when verifyMeQuery loads
   useEffect(() => {
-    if (data?.phone) {
-      setReferralInput(data.phone); // this will show it in input
-      setValue("referralCode", data.phone);
-      setPhoneInputValue(data.phone); // this will show it in input
+    if (data?.sponsored_member_info?.sponsor_member?.phone) {
+      setReferralInput(data?.sponsored_member_info?.sponsor_member?.phone); // this will show it in input
+      setValue(
+        "referralCode",
+        data?.sponsored_member_info?.sponsor_member?.phone,
+      );
+      setPhoneInputValue(data?.sponsored_member_info?.sponsor_member?.phone); // this will show it in input
     }
-  }, [data?.phone, setValue]);
+  }, [data?.sponsored_member_info?.sponsor_member?.phone, setValue]);
 
   // Submit handler
   const onSubmit = async (data) => {
@@ -347,7 +351,8 @@ const MerchantApplication = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <Label>
-                  Authorized Person Name (<span className="text-red-500">*</span>)
+                  Authorized Person Name (
+                  <span className="text-red-500">*</span>)
                 </Label>
                 <Input
                   {...register("authorized_person_name")}
