@@ -1,51 +1,17 @@
-import React, { useRef } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
 import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
-import { useLazyGetMemberByUsernameQuery } from "../../../redux/features/member/referNewMember/referNewMemberApi";
-import { useNavigate } from "react-router";
 import QRCode from "react-qr-code";
-import QrScanner from "react-qr-scanner";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardFooter,
-} from "../../../components/ui/card";
+import { Card, CardContent, CardFooter } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
-import {
-  Download,
-  Share2,
-  User,
-  Loader2,
-  ScanLine,
-  QrCode as QrIcon,
-  SwitchCamera,
-  Image as ImageIcon,
-  Camera,
-} from "lucide-react";
+import { Download, Share2, User, QrCode as QrIcon } from "lucide-react";
 import { Skeleton } from "../../../components/ui/skeleton";
 import { toast } from "sonner";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "../../../components/ui/dialog";
 
 const ShowQrCode = () => {
   const { user, token } = useSelector((state) => state.auth);
   const role = user?.role || "member";
   const { data, isLoading, error } = useVerifyMeQuery(role, { skip: !token });
-  const [getMemberByUsername] = useLazyGetMemberByUsernameQuery();
-  const navigate = useNavigate();
-
-  const [isQrOpen, setIsQrOpen] = React.useState(false);
-  const [isScannerProcessing, setIsScannerProcessing] = React.useState(false);
-  const [facingMode, setFacingMode] = React.useState("environment"); // "user" or "environment"
-  const [legacyMode, setLegacyMode] = React.useState(false); // For file upload
-  const prevSearchRef = useRef(null);
 
   const userData = data?.data || data;
 
@@ -55,7 +21,7 @@ const ShowQrCode = () => {
   // This allows "Google Scanner" (native camera) to recognize it as a link
   const origin = window.location.origin;
   const qrValue = userData?.user_name
-    ? `${origin}/member/public-referral?ref=${userData.user_name}`
+    ? `${origin}/public-referral?ref=${userData.user_name}`
     : "N/A";
 
   const handleDownload = () => {
@@ -98,70 +64,6 @@ const ShowQrCode = () => {
     } else {
       toast.info("Sharing is not supported on this browser.");
     }
-  };
-
-  const handleScan = async (data) => {
-    if (isScannerProcessing) return;
-
-    if (data?.text && data.text !== prevSearchRef.current) {
-      let username = data.text;
-
-      // Check if it's a URL and extract 'ref' param
-      try {
-        const url = new URL(data.text);
-        const ref = url.searchParams.get("ref");
-        if (ref) username = ref;
-      } catch {
-        // Not a URL, use raw text
-      }
-
-      setIsScannerProcessing(true);
-      prevSearchRef.current = data.text; // Store raw text to prevent duplicate scans
-
-      try {
-        const res = await getMemberByUsername(username).unwrap();
-
-        if (res.success) {
-          toast.success(`Member found: ${res.data.name}`);
-          setIsQrOpen(false);
-          navigate("/member/public-referral", {
-            state: { referrer: res.data },
-          });
-        } else {
-          toast.error("Member not found");
-        }
-      } catch (err) {
-        console.error(err);
-        toast.error(err?.data?.message || "Failed to find member");
-      } finally {
-        setTimeout(() => {
-          setIsScannerProcessing(false);
-          prevSearchRef.current = null;
-        }, 2000);
-      }
-    }
-  };
-
-  const handleQrError = (err) => {
-    console.error("QR Error", err);
-    if (err?.name === "NotAllowedError") {
-      toast.error("Camera access denied.");
-    } else {
-      // Often generic errors in legacy mode if cancelled
-    }
-  };
-
-  React.useEffect(() => {
-    if (!isQrOpen) {
-      setIsScannerProcessing(false);
-      prevSearchRef.current = null;
-      setLegacyMode(false); // Reset to camera mode
-    }
-  }, [isQrOpen]);
-
-  // Toggle Camera
-  const switchCamera = () => {
-    setFacingMode((prev) => (prev === "environment" ? "user" : "environment"));
   };
 
   if (isLoading) {
@@ -276,119 +178,7 @@ const ShowQrCode = () => {
             Share
           </Button>
         </CardFooter>
-
-        <div className="px-8 pb-8 w-full">
-          <Button
-            variant="default"
-            className="w-full h-12 rounded-xl bg-gray-900 hover:bg-black text-white"
-            onClick={() => setIsQrOpen(true)}
-          >
-            <ScanLine className="mr-2" size={18} />
-            Scan Referral QR
-          </Button>
-        </div>
       </Card>
-
-      <Dialog open={isQrOpen} onOpenChange={setIsQrOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Scan Initial QR Code</DialogTitle>
-          </DialogHeader>
-          <div className="w-full h-[300px] bg-black rounded-lg overflow-hidden relative flex items-center justify-center">
-            {isQrOpen && (
-              <QrScanner
-                delay={500}
-                onError={handleQrError}
-                onScan={handleScan}
-                legacyMode={legacyMode}
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                constraints={{
-                  audio: false,
-                  video: { facingMode: facingMode },
-                }}
-              />
-            )}
-
-            <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center">
-              {/* Overlay only shows in Camera mode */}
-              {!legacyMode && (
-                <>
-                  <div className="relative w-64 h-64 border-2 border-brand-500/80 rounded-lg overflow-hidden shadow-[0_0_0_100vw_rgba(0,0,0,0.5)]">
-                    <div className="absolute inset-x-0 w-full h-1 bg-brand-500/80 shadow-[0_0_10px_rgba(34,197,94,0.8)] animate-pulse"></div>
-                    {isScannerProcessing && (
-                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center backdrop-blur-sm z-10">
-                        <Loader2
-                          className="animate-spin text-white"
-                          size={32}
-                        />
-                      </div>
-                    )}
-                  </div>
-                  <p className="mt-6 text-white text-sm font-medium drop-shadow-md">
-                    Align QR code within the frame
-                  </p>
-                </>
-              )}
-
-              {/* Processing Overlay for Legacy Mode */}
-              {legacyMode && isScannerProcessing && (
-                <div className="absolute inset-0 bg-black/50 flex items-center justify-center backdrop-blur-sm z-10">
-                  <div className="flex flex-col items-center">
-                    <Loader2 className="animate-spin text-white" size={32} />
-                    <p className="text-white mt-2">Processing Image...</p>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Controls */}
-            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-4 px-4 z-20">
-              <Button
-                size="icon"
-                variant="secondary"
-                className="rounded-full h-10 w-10 bg-white/20 backdrop-blur-sm border-white/20 hover:bg-white/40 text-white"
-                onClick={() => setLegacyMode(!legacyMode)}
-                title={legacyMode ? "Switch to Camera" : "Upload Image"}
-              >
-                {legacyMode ? <Camera size={20} /> : <ImageIcon size={20} />}
-              </Button>
-
-              {!legacyMode && (
-                <Button
-                  size="icon"
-                  variant="secondary"
-                  className="rounded-full h-10 w-10 bg-white/20 backdrop-blur-sm border-white/20 hover:bg-white/40 text-white"
-                  onClick={switchCamera}
-                  title="Switch Camera"
-                >
-                  <SwitchCamera size={20} />
-                </Button>
-              )}
-            </div>
-
-            {legacyMode && !isScannerProcessing && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="bg-white/90 p-4 rounded-lg shadow-lg text-center pointer-events-auto">
-                  <p className="text-sm font-medium text-gray-800 mb-2">
-                    Upload QR Image
-                  </p>
-                  <Button
-                    size="sm"
-                    onClick={() =>
-                      document.querySelector('input[type="button"]')?.click()
-                    }
-                  >
-                    Select Image
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {/* Removed duplicate overlay block */}
-          </div>
-        </DialogContent>
-      </Dialog>
-
       <p className="mt-8 text-sm text-gray-400 font-medium">
         Max Reward Membership Identification
       </p>

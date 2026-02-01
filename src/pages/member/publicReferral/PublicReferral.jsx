@@ -127,14 +127,11 @@ const PublicReferral = () => {
           Invalid Referral Link
         </h2>
         <p className="text-gray-500 mt-2">
-          We could not identify the referrer. Please try scanning the QR code
-          again.
+          We could not identify the referrer. Please request a valid QR code
+          from your referrer.
         </p>
-        <PrimaryButton
-          className="mt-4"
-          onClick={() => navigate("/member/show-qr-code")}
-        >
-          Try Again
+        <PrimaryButton className="mt-4" onClick={() => navigate("/login")}>
+          Go to Login
         </PrimaryButton>
       </div>
     );
@@ -291,8 +288,8 @@ const PublicReferral = () => {
         open={dialogOpen}
         onClose={() => {
           setDialogOpen(false);
-          // Optionally navigate back after success?
-          // navigate("/member/show-qr-code");
+          // Navigate to login so the new user can use their credentials
+          navigate("/login");
         }}
         response={response}
       />

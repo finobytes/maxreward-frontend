@@ -9,6 +9,7 @@ import { adminRoutes } from "./admin.route";
 import { memberRoutes } from "./member.route";
 import ProtectedRoute from "../components/layouts/ProtectedRoute";
 import { merchantRoute } from "./merchant.route";
+import PublicReferral from "../pages/member/publicReferral/PublicReferral";
 
 const router = createBrowserRouter([
   {
@@ -59,8 +60,11 @@ const router = createBrowserRouter([
     element: <NewPassword />,
   },
   {
-    path: "/reset-success",
     element: <ResetSuccess />,
+  },
+  {
+    path: "/public-referral",
+    element: <PublicReferral />,
   },
 ]);
 
