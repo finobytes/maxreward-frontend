@@ -18,9 +18,6 @@ export default function UserDropdown({ user, role }) {
   const navigate = useNavigate();
 
   const userName = user?.name || user?.merchant?.business_name || "User";
-
-  console.log("UserDropdown user:", user);
-  console.log("UserDropdown Name:", userName);
   const profileImage =
     user?.merchant?.business_logo || user?.image || userImage;
   const email = user?.merchant?.email || user?.email || "Email not available";
