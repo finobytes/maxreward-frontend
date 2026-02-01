@@ -27,6 +27,7 @@ import Notification from "../pages/member/notification/Notification";
 import NotificationDetails from "../pages/member/notification/NotificationDetails";
 import Orders from "../pages/member/myOrders/Orders";
 import OrderDetails from "../pages/member/myOrders/OrderDetails";
+import PublicReferral from "../pages/member/publicReferral/PublicReferral";
 
 export const memberRoutes = [
   {
@@ -40,6 +41,10 @@ export const memberRoutes = [
   {
     path: "show-qr-code",
     element: <ShowQrCode />,
+  },
+  {
+    path: "public-referral",
+    element: <PublicReferral />,
   },
   // {
   //   path: "point-statement",

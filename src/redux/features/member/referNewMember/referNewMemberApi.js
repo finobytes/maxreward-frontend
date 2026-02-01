@@ -55,6 +55,15 @@ export const referNewMemberApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Member"],
     }),
+
+    // 4️⃣ Get Member by Username
+    getMemberByUsername: builder.query({
+      query: (username) => ({
+        url: `/member/username/${username}`,
+        method: "GET",
+      }),
+      providesTags: ["Member"],
+    }),
   }),
 });
 
@@ -63,4 +72,6 @@ export const {
   useGetReferredMembersQuery,
   useGetSponsoredMembersQuery,
   useGetReferralTreeForMemberQuery,
+  useGetMemberByUsernameQuery,
+  useLazyGetMemberByUsernameQuery,
 } = referNewMemberApi;
