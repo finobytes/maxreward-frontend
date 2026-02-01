@@ -14,7 +14,7 @@ import PrimaryButton from "../../../components/ui/PrimaryButton";
 import SearchableSelect from "@/components/form/SearchableSelect";
 
 import { useReferNewMember } from "../../../redux/features/member/referNewMember/useReferNewMember";
-import { useGetMemberByUsernameQuery } from "../../../redux/features/member/referNewMember/referNewMemberApi";
+import { useGetPublicMemberByUsernameQuery } from "../../../redux/features/member/referNewMember/referNewMemberApi";
 import { useGetCountriesQuery } from "../../../redux/features/countries/countriesApi";
 import { referNewMemberSchema } from "../../../schemas/referNewMember.schema";
 import ReferSuccessDialog from "../referNewMember/components/ReferSuccessDialog";
@@ -35,11 +35,15 @@ const PublicReferral = () => {
 
   // Fetch if we have a queryRef but no state
   const { data: apiReferrerData, isLoading: isFetchingReferrer } =
-    useGetMemberByUsernameQuery(queryRef, {
+    useGetPublicMemberByUsernameQuery(queryRef, {
       skip: !!stateReferrer || !queryRef,
     });
 
-  const referrer = stateReferrer || apiReferrerData?.data;
+  // The API returns data directly in the response object
+  const referrer = stateReferrer || apiReferrerData;
+  console.log("stateReferrer", stateReferrer);
+  console.log("apiReferrerData", apiReferrerData);
+  console.log("referrer", referrer);
 
   const { handleRefer, loading } = useReferNewMember();
   const { data: countries, isLoading: countriesLoading } =
@@ -151,8 +155,8 @@ const PublicReferral = () => {
             </div>
             <div>
               You are registering a new member referred by:{" "}
-              <span className="font-bold">{referrer.name}</span> (
-              {referrer.user_name})
+              <span className="font-bold">{referrer?.data?.name}</span> (
+              {referrer?.data?.user_name})
             </div>
           </div>
 
@@ -261,11 +265,15 @@ const PublicReferral = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
               <Label>Referred By Name</Label>
-              <Input disabled value={referrer.name || ""} readOnly />
+              <Input disabled value={referrer?.data?.name || ""} readOnly />
             </div>
             <div>
               <Label>Referred By ID</Label>
-              <Input disabled value={referrer.user_name || ""} readOnly />
+              <Input
+                disabled
+                value={referrer?.data?.user_name || ""}
+                readOnly
+              />
             </div>
           </div>
 

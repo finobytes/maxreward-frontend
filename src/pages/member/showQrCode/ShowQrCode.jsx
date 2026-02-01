@@ -14,6 +14,7 @@ const ShowQrCode = () => {
   const { data, isLoading, error } = useVerifyMeQuery(role, { skip: !token });
 
   const userData = data?.data || data;
+  console.log("userData", userData);
 
   // Data to encode in QR
   // For production, this might be a unique URL or a specific identifier
@@ -23,7 +24,7 @@ const ShowQrCode = () => {
   const qrValue = userData?.user_name
     ? `${origin}/public-referral?ref=${userData.user_name}`
     : "N/A";
-
+  console.log("qrValue", qrValue);
   const handleDownload = () => {
     const svg = document.getElementById("qr-code-svg");
     if (!svg) return;
