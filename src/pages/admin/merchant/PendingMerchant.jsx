@@ -153,7 +153,7 @@ const PendingMerchant = () => {
 
   const toggleSelect = (id) => {
     setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
 
@@ -289,7 +289,7 @@ const PendingMerchant = () => {
                       </TableCell>
                       <TableCell>
                         {merchant?.staffs?.find(
-                          (staff) => staff?.type === "merchant"
+                          (staff) => staff?.type === "merchant",
                         )?.user_name || "N/A"}
                       </TableCell>
                       <TableCell>{merchant?.business_name}</TableCell>
@@ -310,7 +310,7 @@ const PendingMerchant = () => {
                       </TableCell>
                       <TableCell className="py-4 flex gap-2">
                         <Link
-                          to={`/admin/merchant/details/${merchant?.id}`}
+                          to={`/admin/pending-merchant/details/${merchant?.id}`}
                           className="p-2 rounded-md bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
                         >
                           <Eye size={16} />
@@ -331,8 +331,8 @@ const PendingMerchant = () => {
                           {isCurrentMerchantSubmitting
                             ? "Submitting..."
                             : isRejected
-                            ? "Rejected"
-                            : "Reject"}
+                              ? "Rejected"
+                              : "Reject"}
                         </button>
                       </TableCell>
                     </TableRow>
