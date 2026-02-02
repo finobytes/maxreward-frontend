@@ -120,8 +120,7 @@ const ShippingZone = () => {
 
   const zones =
     shippingZonesResponse?.data?.data || shippingZonesResponse?.data || [];
-  const meta =
-    shippingZonesResponse?.meta || shippingZonesResponse?.data || {};
+  const meta = shippingZonesResponse?.meta || shippingZonesResponse?.data || {};
   const currentPage = meta?.current_page || page;
   const currentPerPage = meta?.per_page || perPage;
   const totalPages =
@@ -178,7 +177,7 @@ const ShippingZone = () => {
       toast.success(
         editId
           ? "Shipping zone updated successfully!"
-          : "Shipping zone created successfully!"
+          : "Shipping zone created successfully!",
       );
       setIsModalOpen(false);
       setFormData(initialFormState);
@@ -186,7 +185,7 @@ const ShippingZone = () => {
       refetch();
     } catch (error) {
       toast.error(
-        error?.data?.message || "Failed to save shipping zone. Try again."
+        error?.data?.message || "Failed to save shipping zone. Try again.",
       );
     }
   };
@@ -205,9 +204,7 @@ const ShippingZone = () => {
       setDeleteId(null);
       refetch();
     } catch (error) {
-      toast.error(
-        error?.data?.message || "Failed to delete shipping zone."
-      );
+      toast.error(error?.data?.message || "Failed to delete shipping zone.");
     }
   };
 
@@ -343,9 +340,7 @@ const ShippingZone = () => {
                       <TableCell>
                         {(currentPage - 1) * currentPerPage + (idx + 1)}
                       </TableCell>
-                      <TableCell className="font-medium">
-                        {zone.name}
-                      </TableCell>
+                      <TableCell className="font-medium">{zone.name}</TableCell>
                       <TableCell className="text-xs text-gray-600">
                         {zone.zone_code}
                       </TableCell>
@@ -424,7 +419,7 @@ const ShippingZone = () => {
 
       {/* Create / Edit Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent>
+        <DialogContent scrollable>
           <DialogHeader>
             <DialogTitle>
               {editId ? "Edit Shipping Zone" : "Create Shipping Zone"}
@@ -494,9 +489,7 @@ const ShippingZone = () => {
             </div>
 
             <div>
-              <label className="text-sm font-medium">
-                Postcode Prefixes
-              </label>
+              <label className="text-sm font-medium">Postcode Prefixes</label>
               <textarea
                 value={formData.postcodesText}
                 onChange={(e) =>
@@ -529,11 +522,13 @@ const ShippingZone = () => {
               </label>
             </div>
 
-            <div className="flex justify-end gap-3">
+            <div className="flex justify-end gap-3 pt-2">
               <PrimaryButton
                 type="button"
                 variant="secondary"
-                onClick={() => !isCreating && !isUpdating && setIsModalOpen(false)}
+                onClick={() =>
+                  !isCreating && !isUpdating && setIsModalOpen(false)
+                }
                 disabled={isCreating || isUpdating}
               >
                 Cancel
