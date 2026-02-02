@@ -64,6 +64,25 @@ export const referNewMemberApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Member"],
     }),
+    // 5️⃣ Refer a new member QR
+    referNewMemberQr: builder.mutation({
+      query: ({ referral_code, ...data }) => {
+        const payload = {
+          name: data.name,
+          phone: data.phone,
+          email: data.email,
+          country_id: data.country_id,
+          country_code: data.country_code,
+          refer_type: "qr_code",
+        };
+
+        return {
+          url: `/member/refer-new-member-qr?referral_code=${referral_code}`,
+          method: "POST",
+          body: payload,
+        };
+      },
+    }),
   }),
 });
 
@@ -74,4 +93,5 @@ export const {
   useGetReferralTreeForMemberQuery,
   useGetPublicMemberByUsernameQuery,
   useLazyGetPublicMemberByUsernameQuery,
+  useReferNewMemberQrMutation,
 } = referNewMemberApi;
