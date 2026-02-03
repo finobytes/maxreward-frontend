@@ -91,17 +91,24 @@ const PublicReferral = () => {
   }, [countriesLoading, countries, setValue]);
 
   const onSubmit = async (data) => {
-    if (!referrer?.id) {
+    if (!referrer?.data?.id) {
       toast.error("Referrer information is missing.");
       return;
     }
 
     try {
       // Pass the referrer's Referral Code explicitly
-      // If we scanned a code, queryRef is the code.
-      // If we navigated internally, we assume referrer.referral_code is available.
+      // We need to use the actual referral_code from the referrer object.
+      // queryRef might be the username/phone (used for lookup), so we shouldn't use it directly as the code.
       const referralCode =
-        queryRef || referrer?.referral_code || referrer?.data?.referral_code;
+        referrer?.data?.referral_code ||
+        referrer?.data?.referral_code ||
+        referrer?.data?.data?.referral_code;
+
+      if (!referralCode) {
+        toast.error("Could not find referrer's referral code.");
+        return;
+      }
 
       const payload = {
         ...data,
@@ -166,8 +173,14 @@ const PublicReferral = () => {
             </div>
             <div>
               You are registering a new member referred by:{" "}
-              <span className="font-bold">{referrer?.data?.name}</span> (
-              {referrer?.data?.referral_code})
+              <span className="font-bold">
+                {referrer?.name || referrer?.data?.name}
+              </span>{" "}
+              (
+              {referrer?.referral_code ||
+                referrer?.data?.referral_code ||
+                referrer?.data?.data?.referral_code}
+              )
             </div>
           </div>
 
@@ -276,13 +289,22 @@ const PublicReferral = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
               <Label>Referred By Name</Label>
-              <Input disabled value={referrer?.data?.name || ""} readOnly />
+              <Input
+                disabled
+                value={referrer?.name || referrer?.data?.name || ""}
+                readOnly
+              />
             </div>
             <div>
               <Label>Referral Code</Label>
               <Input
                 disabled
-                value={referrer?.data?.referral_code || ""}
+                value={
+                  referrer?.referral_code ||
+                  referrer?.data?.referral_code ||
+                  referrer?.data?.data?.referral_code ||
+                  ""
+                }
                 readOnly
               />
             </div>
