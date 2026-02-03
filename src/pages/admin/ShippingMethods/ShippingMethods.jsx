@@ -97,8 +97,7 @@ const ShippingMethods = () => {
     useDeleteShippingMethodMutation();
   const [toggleShippingMethodStatus] = useToggleShippingMethodStatusMutation();
 
-  const methods =
-    methodsResponse?.data?.data || methodsResponse?.data || [];
+  const methods = methodsResponse?.data?.data || methodsResponse?.data || [];
   const meta = methodsResponse?.meta || methodsResponse?.data || {};
   const currentPage = meta?.current_page || page;
   const currentPerPage = meta?.per_page || perPage;
@@ -181,7 +180,7 @@ const ShippingMethods = () => {
       toast.success(
         editId
           ? "Shipping method updated successfully!"
-          : "Shipping method created successfully!"
+          : "Shipping method created successfully!",
       );
       setIsModalOpen(false);
       setFormData(initialFormState);
@@ -189,7 +188,7 @@ const ShippingMethods = () => {
       refetch();
     } catch (error) {
       toast.error(
-        error?.data?.message || "Failed to save shipping method. Try again."
+        error?.data?.message || "Failed to save shipping method. Try again.",
       );
     }
   };
@@ -208,9 +207,7 @@ const ShippingMethods = () => {
       setDeleteId(null);
       refetch();
     } catch (error) {
-      toast.error(
-        error?.data?.message || "Failed to delete shipping method."
-      );
+      toast.error(error?.data?.message || "Failed to delete shipping method.");
     }
   };
 
@@ -397,7 +394,7 @@ const ShippingMethods = () => {
 
       {/* Create / Edit Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent>
+        <DialogContent scrollable>
           <DialogHeader>
             <DialogTitle>
               {editId ? "Edit Shipping Method" : "Create Shipping Method"}
@@ -507,11 +504,13 @@ const ShippingMethods = () => {
               </label>
             </div>
 
-            <div className="flex justify-end gap-3">
+            <div className="flex justify-end gap-3 pt-2">
               <PrimaryButton
                 type="button"
                 variant="secondary"
-                onClick={() => !isCreating && !isUpdating && setIsModalOpen(false)}
+                onClick={() =>
+                  !isCreating && !isUpdating && setIsModalOpen(false)
+                }
                 disabled={isCreating || isUpdating}
               >
                 Cancel
@@ -547,8 +546,8 @@ const ShippingMethods = () => {
                 Delete Shipping Method
               </DialogTitle>
               <DialogDescription className="text-center mt-2">
-                Are you sure you want to delete this shipping method? This action
-                is permanent and cannot be undone.
+                Are you sure you want to delete this shipping method? This
+                action is permanent and cannot be undone.
               </DialogDescription>
             </div>
           </DialogHeader>

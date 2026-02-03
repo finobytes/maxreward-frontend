@@ -13,8 +13,10 @@ import Input from "../../../components/form/input/InputField";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
 import SearchableSelect from "@/components/form/SearchableSelect";
 
-import { useReferNewMember } from "../../../redux/features/member/referNewMember/useReferNewMember";
-import { useGetPublicMemberByUsernameQuery } from "../../../redux/features/member/referNewMember/referNewMemberApi";
+import {
+  useGetPublicMemberByUsernameQuery,
+  useReferNewMemberQrMutation,
+} from "../../../redux/features/member/referNewMember/referNewMemberApi";
 import { useGetCountriesQuery } from "../../../redux/features/countries/countriesApi";
 import { referNewMemberSchema } from "../../../schemas/referNewMember.schema";
 import ReferSuccessDialog from "../referNewMember/components/ReferSuccessDialog";
@@ -45,7 +47,8 @@ const PublicReferral = () => {
   console.log("apiReferrerData", apiReferrerData);
   console.log("referrer", referrer);
 
-  const { handleRefer, loading } = useReferNewMember();
+  const [referNewMemberQr, { isLoading: loading }] =
+    useReferNewMemberQrMutation();
   const { data: countries, isLoading: countriesLoading } =
     useGetCountriesQuery();
 
@@ -88,16 +91,31 @@ const PublicReferral = () => {
   }, [countriesLoading, countries, setValue]);
 
   const onSubmit = async (data) => {
-    if (!referrer?.id) {
+    if (!referrer?.data?.id) {
       toast.error("Referrer information is missing.");
       return;
     }
 
     try {
-      // Pass the referrer's ID explicitly
-      const payload = { ...data, member_id: referrer.id };
+      // Pass the referrer's Referral Code explicitly
+      // We need to use the actual referral_code from the referrer object.
+      // queryRef might be the username/phone (used for lookup), so we shouldn't use it directly as the code.
+      const referralCode =
+        referrer?.data?.referral_code ||
+        referrer?.data?.referral_code ||
+        referrer?.data?.data?.referral_code;
 
-      const res = await handleRefer(payload);
+      if (!referralCode) {
+        toast.error("Could not find referrer's referral code.");
+        return;
+      }
+
+      const payload = {
+        ...data,
+        referral_code: referralCode,
+      };
+
+      const res = await referNewMemberQr(payload).unwrap();
       setResponse(res);
       setDialogOpen(true);
       reset();
@@ -155,8 +173,14 @@ const PublicReferral = () => {
             </div>
             <div>
               You are registering a new member referred by:{" "}
-              <span className="font-bold">{referrer?.data?.name}</span> (
-              {referrer?.data?.user_name})
+              <span className="font-bold">
+                {referrer?.name || referrer?.data?.name}
+              </span>{" "}
+              (
+              {referrer?.referral_code ||
+                referrer?.data?.referral_code ||
+                referrer?.data?.data?.referral_code}
+              )
             </div>
           </div>
 
@@ -265,13 +289,22 @@ const PublicReferral = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
               <Label>Referred By Name</Label>
-              <Input disabled value={referrer?.data?.name || ""} readOnly />
-            </div>
-            <div>
-              <Label>Referred By ID</Label>
               <Input
                 disabled
-                value={referrer?.data?.user_name || ""}
+                value={referrer?.name || referrer?.data?.name || ""}
+                readOnly
+              />
+            </div>
+            <div>
+              <Label>Referral Code</Label>
+              <Input
+                disabled
+                value={
+                  referrer?.referral_code ||
+                  referrer?.data?.referral_code ||
+                  referrer?.data?.data?.referral_code ||
+                  ""
+                }
                 readOnly
               />
             </div>
