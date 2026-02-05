@@ -63,7 +63,7 @@ const Sidebar = () => {
     // hide Merchant Application if member_type === 'corporate'
     if (role === "member" && userType === "corporate") {
       navItems = navItems.filter(
-        (item) => item.name !== "Merchant Application"
+        (item) => item.name !== "Merchant Application",
       );
     }
 
@@ -72,7 +72,7 @@ const Sidebar = () => {
 
   const isActive = useCallback(
     (path) => location.pathname === path,
-    [location.pathname]
+    [location.pathname],
   );
   // restore active menu based on URL (on reload or route change)
   useEffect(() => {
@@ -210,7 +210,7 @@ const Sidebar = () => {
               >
                 <span
                   className={`menu-item-icon-size ${
-                    isActive(nav.path)
+                    activeMainIndex === index
                       ? "menu-item-icon-active"
                       : "menu-item-icon-inactive"
                   }`}
@@ -268,8 +268,8 @@ const Sidebar = () => {
           isExpanded || isMobileOpen
             ? "w-[240px]"
             : isHovered
-            ? "w-[240px]"
-            : "w-[74px]"
+              ? "w-[240px]"
+              : "w-[74px]"
         } 
         ${
           isMobileOpen ? "translate-x-0" : "-translate-x-full"
