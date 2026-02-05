@@ -137,7 +137,6 @@ const MerchantRegistrationForm = () => {
         ...data,
         referralCode: referralValue || data.referralCode,
         merchant_created_by: role === "admin" ? "admin" : "general_member",
-        member_id: memberData.id,
       };
       const formData = new FormData();
 
@@ -153,7 +152,12 @@ const MerchantRegistrationForm = () => {
         formData.append("business_logo", businessLogo);
       }
 
-      await createMerchant(formData).unwrap();
+      const referralCode = memberData?.referral_code;
+
+      await createMerchant({
+        data: formData,
+        referral_code: referralCode,
+      }).unwrap();
 
       toast.success("Merchant created successfully!");
       reset();
@@ -329,7 +333,8 @@ const MerchantRegistrationForm = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <Label>
-                  Authorized Person Name (<span className="text-red-500">*</span>)
+                  Authorized Person Name (
+                  <span className="text-red-500">*</span>)
                 </Label>
                 <Input
                   {...register("authorized_person_name")}

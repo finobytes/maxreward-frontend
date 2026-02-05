@@ -171,13 +171,18 @@ const MerchantApplication = () => {
       }
 
       // Add referral sponsor ID if exists
+      let referralCode = null;
       if (!isError && memberData) {
-        formData.append("member_id", memberData?.id);
+        // formData.append("member_id", memberData?.id);
+        referralCode = memberData?.referral_code;
       }
 
       // gather other form fields as necessary
 
-      await createMerchant(formData).unwrap();
+      await createMerchant({
+        data: formData,
+        referral_code: referralCode,
+      }).unwrap();
 
       toast.success("Merchant application submitted successfully!");
 
