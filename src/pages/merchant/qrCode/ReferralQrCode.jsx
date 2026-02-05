@@ -22,8 +22,10 @@ const ReferralQrCode = () => {
   // Create a permalink for the QR code
   // This allows "Google Scanner" (native camera) to recognize it as a link
   const origin = window.location.origin;
-  const qrValue = userData?.phone
-    ? `${origin}/public-referral?ref=${userData.phone}`
+  const qrValue = userData?.merchant?.corporate_member?.user_name
+    ? `${origin}/public-referral?ref=${
+        userData?.merchant?.corporate_member?.user_name
+      }`
     : "N/A";
   console.log("qrValue", qrValue);
   const handleDownload = () => {
