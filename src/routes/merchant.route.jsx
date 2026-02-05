@@ -33,8 +33,9 @@ import PendingOrder from "../pages/merchant/orders/PendingOrder";
 import CompleteOrder from "../pages/merchant/orders/CompleteOrder";
 import ReturnOrder from "../pages/merchant/orders/ReturnOrder";
 import CancleOrder from "../pages/merchant/orders/CancleOrder";
-import QrCode from "../pages/merchant/qrCode/QrCode";
 import ShippingRateSetting from "../pages/merchant/ShippingRateSetting/ShippingRateSetting";
+import ReferralQrCode from "../pages/merchant/qrCode/ReferralQrCode";
+import PaymentQrCode from "../pages/merchant/qrCode/PaymentQrCode";
 
 export const merchantRoute = [
   {
@@ -46,8 +47,12 @@ export const merchantRoute = [
     element: <MemberRegistration />,
   },
   {
-    path: "qr-code",
-    element: <QrCode />,
+    path: "payment-qr-code",
+    element: <PaymentQrCode />,
+  },
+  {
+    path: "referral-qr-code",
+    element: <ReferralQrCode />,
   },
   {
     path: "merchant-staff",

@@ -148,11 +148,11 @@ const PublicReferral = () => {
         <h2 className="text-xl font-bold text-gray-800">
           Invalid Referral Link
         </h2>
-        <p className="text-gray-500 mt-2">
+        <p className="text-gray-500 mt-2 mb-4">
           We could not identify the referrer. Please request a valid QR code
           from your referrer.
         </p>
-        <PrimaryButton className="mt-4" onClick={() => navigate("/login")}>
+        <PrimaryButton onClick={() => navigate("/login")}>
           Go to Login
         </PrimaryButton>
       </div>

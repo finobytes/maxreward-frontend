@@ -181,7 +181,16 @@ export const NAV_CONFIG = {
     {
       icon: <QrCode />,
       name: "Show QR Code",
-      path: "/merchant/qr-code",
+      subItems: [
+        {
+          name: "Payment QR Code",
+          path: "/merchant/payment-qr-code",
+        },
+        {
+          name: "Referral QR Code",
+          path: "/merchant/referral-qr-code",
+        },
+      ],
     },
     {
       icon: <Users />,
