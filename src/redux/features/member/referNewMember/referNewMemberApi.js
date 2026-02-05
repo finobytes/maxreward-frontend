@@ -13,12 +13,19 @@ export const referNewMemberApi = baseApi.injectEndpoints({
           country_code: data.country_code,
         };
 
+        // For regular member referrals, use member_id in body
         if (data.member_id) {
           payload.member_id = data.member_id;
         }
 
+        // Build URL - for admin, append referral_code as query parameter
+        let url = "/member/refer-new-member";
+        if (data.referral_code) {
+          url += `?referral_code=${data.referral_code}`;
+        }
+
         return {
-          url: "/member/refer-new-member",
+          url: url,
           method: "POST",
           body: payload,
         };
