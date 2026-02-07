@@ -79,8 +79,8 @@ export const NAV_CONFIG = {
           path: "/admin/denomination",
         },
         { name: "Company Info", path: "/admin/company-info" },
-        { name: "Income", path: "/admin/accounts/income" },
-        { name: "Expense", path: "/admin/accounts/expense" },
+        // { name: "Income", path: "/admin/accounts/income" },
+        // { name: "Expense", path: "/admin/accounts/expense" },
       ],
     },
     {
