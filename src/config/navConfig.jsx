@@ -149,10 +149,7 @@ export const NAV_CONFIG = {
     {
       name: "Settings",
       icon: <Settings />,
-      subItems: [
-        { name: "Point", path: "/admin/settings" },
-        { name: "CP Level", path: "/admin/cp-level" },
-      ],
+      path: "/admin/settings",
     },
     {
       name: "Role Permission",

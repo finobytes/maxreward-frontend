@@ -24,7 +24,6 @@ import CompanyInfo from "../pages/admin/CompanyInfo/CompanyInfo";
 import Denomination from "../pages/admin/Denomination/Denomination";
 import BusinessType from "../pages/admin/merchant/BusinessType";
 import PendingMerchantDetails from "../pages/admin/merchant/PendingMerchantDetails";
-import Settings from "../pages/admin/Settings/Settings";
 import Notification from "../pages/admin/Notification/Notification";
 import NotificationDetails from "../pages/admin/Notification/NotificationDetails";
 import VoucherManage from "../pages/admin/VoucherManage/VoucherManage";
@@ -40,7 +39,6 @@ import CommunityPoint from "../pages/admin/communityPoint/CommunityPoint";
 import CommunityPointDetails from "../pages/admin/communityPoint/CommunityPointDetails";
 import MerchantTransaction from "../pages/admin/Transaction/MerchanTransaction";
 import MerchantTransactionDetails from "../pages/admin/Transaction/MerchantTransactionDetails";
-import CPLevel from "../pages/admin/Settings/CPLevel";
 import Category from "../pages/admin/e-commerce/Category/Category";
 import SubCategory from "../pages/admin/e-commerce/SubCategory/SubCategory";
 import Brand from "../pages/admin/e-commerce/Brand/Brand";
@@ -53,9 +51,9 @@ import PermissionList from "../pages/admin/rolePermission/PermissionList";
 import AssignPermissionsToRole from "../pages/admin/rolePermission/AssignPermissionsToRole";
 import SectionList from "../pages/admin/rolePermission/SectionList";
 import ActionList from "../pages/admin/rolePermission/ActionList";
-import path from "path";
 import ShippingZone from "../pages/admin/ShippingZone/ShippingZone";
 import ShippingMethods from "../pages/admin/ShippingMethods/ShippingMethods";
+import Settings from "../pages/admin/Settings/Settings";
 
 export const adminRoutes = [
   {
@@ -255,10 +253,6 @@ export const adminRoutes = [
   {
     path: "settings",
     element: <Settings />,
-  },
-  {
-    path: "cp-level",
-    element: <CPLevel />,
   },
   {
     path: "role-permission/role-list",
