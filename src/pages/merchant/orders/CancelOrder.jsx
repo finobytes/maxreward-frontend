@@ -25,7 +25,7 @@ import {
   sortOrders,
 } from "./orderTableUtils";
 
-const CancleOrder = () => {
+const CancelOrder = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [dateFilter, setDateFilter] = useState("all");
@@ -104,7 +104,11 @@ const CancleOrder = () => {
               }}
               options={PER_PAGE_OPTIONS}
             />
-            <PrimaryButton variant="secondary" size="md" onClick={handleClearFilters}>
+            <PrimaryButton
+              variant="secondary"
+              size="md"
+              onClick={handleClearFilters}
+            >
               Clear
             </PrimaryButton>
           </div>
@@ -164,9 +168,7 @@ const CancleOrder = () => {
                         {order.order_number}
                       </span>
                     </TableCell>
-                    <TableCell>
-                      {formatDate(order.created_at)}
-                    </TableCell>
+                    <TableCell>{formatDate(order.created_at)}</TableCell>
                     <TableCell>
                       <div className="flex flex-col">
                         <span className="font-medium">
@@ -209,4 +211,4 @@ const CancleOrder = () => {
   );
 };
 
-export default CancleOrder;
+export default CancelOrder;

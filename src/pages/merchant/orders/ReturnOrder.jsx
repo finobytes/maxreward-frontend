@@ -1,6 +1,12 @@
-import React, { useMemo, useState } from "react";
-import { Loader } from "lucide-react";
-import { useGetMerchantOrdersQuery } from "../../../redux/features/merchant/orders/merchantOrderApi";
+import React, { useState } from "react";
+import { Plus, Check, X, CheckCheck } from "lucide-react";
+import {
+  useGetMerchantExchangesQuery,
+  useApproveExchangeMutation,
+  useRejectExchangeMutation,
+  useCompleteExchangeMutation,
+} from "../../../redux/features/merchant/orders/merchantOrderApi";
+import { toast } from "sonner";
 import SearchInput from "../../../components/form/form-elements/SearchInput";
 import DropdownSelect from "../../../components/ui/dropdown/DropdownSelect";
 import {
@@ -11,70 +17,215 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import StatusBadge from "../../../components/table/StatusBadge";
 import Pagination from "../../../components/table/Pagination";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
-import {
-  DATE_FILTER_OPTIONS,
-  PER_PAGE_OPTIONS,
-  SORT_OPTIONS,
-  filterOrders,
-  formatDate,
-  formatPoints,
-  getOrderTotalDisplay,
-  sortOrders,
-} from "./orderTableUtils";
+import CreateExchangeModal from "./CreateExchangeModal";
+
+const EXCHANGE_STATUS_OPTIONS = [
+  { label: "All Status", value: "all" },
+  { label: "Pending", value: "pending" },
+  { label: "Approved", value: "approved" },
+  { label: "Rejected", value: "rejected" },
+  { label: "Completed", value: "completed" },
+];
 
 const ReturnOrder = () => {
   const [page, setPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState("all");
   const [search, setSearch] = useState("");
-  const [dateFilter, setDateFilter] = useState("all");
-  const [sortBy, setSortBy] = useState("newest");
-  const [perPage, setPerPage] = useState(10);
-
   const trimmedSearch = search.trim();
-  const { data, isLoading, isFetching, error } = useGetMerchantOrdersQuery({
+
+  const { data, isLoading, error } = useGetMerchantExchangesQuery({
     page,
-    status: "returned",
-    per_page: perPage,
+    per_page: 10,
+    ...(statusFilter !== "all" ? { status: statusFilter } : {}),
     ...(trimmedSearch ? { search: trimmedSearch } : {}),
   });
 
-  const orders = data?.data?.data || [];
-  const meta = data?.data || {};
-  const filteredOrders = useMemo(() => {
-    const filtered = filterOrders(orders, {
-      search: trimmedSearch,
-      dateFilter,
-    });
-    return sortOrders(filtered, sortBy);
-  }, [orders, trimmedSearch, dateFilter, sortBy]);
-  const hasActiveFilters = Boolean(trimmedSearch) || dateFilter !== "all";
+  const [approveExchange, { isLoading: isApproving }] =
+    useApproveExchangeMutation();
+  const [rejectExchange, { isLoading: isRejecting }] =
+    useRejectExchangeMutation();
+  const [completeExchange, { isLoading: isCompleting }] =
+    useCompleteExchangeMutation();
 
-  const handleClearFilters = () => {
-    setSearch("");
-    setDateFilter("all");
-    setSortBy("newest");
-    setPerPage(10);
-    setPage(1);
+  const [selectedExchange, setSelectedExchange] = useState(null);
+  const [rejectModalOpen, setRejectModalOpen] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+
+  const exchanges = data?.data?.data || [];
+  const meta = data?.data || {};
+
+  const handleApprove = async (exchange) => {
+    if (!exchange?.id) return;
+    try {
+      await approveExchange(exchange.id).unwrap();
+      toast.success("Exchange approved");
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to approve exchange");
+    }
+  };
+
+  const handleComplete = async (exchange) => {
+    if (!exchange?.id) return;
+    try {
+      await completeExchange(exchange.id).unwrap();
+      toast.success("Exchange completed");
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to complete exchange");
+    }
+  };
+
+  const handleRejectClick = (exchange) => {
+    setSelectedExchange(exchange);
+    setRejectionReason("");
+    setRejectModalOpen(true);
+  };
+
+  const submitReject = async () => {
+    if (!selectedExchange?.id) return;
+    if (!rejectionReason.trim()) {
+      toast.error("Please enter a rejection reason");
+      return;
+    }
+    try {
+      await rejectExchange({
+        id: selectedExchange.id,
+        rejection_reason: rejectionReason,
+      }).unwrap();
+      toast.success("Exchange rejected");
+      setRejectModalOpen(false);
+      setSelectedExchange(null);
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to reject exchange");
+    }
+  };
+
+  const renderRows = () => {
+    if (isLoading) {
+      return (
+        <TableRow>
+          <TableCell colSpan={7} className="text-center py-8">
+            Loading...
+          </TableCell>
+        </TableRow>
+      );
+    }
+    if (error) {
+      return (
+        <TableRow>
+          <TableCell colSpan={7} className="text-center py-8 text-red-500">
+            Failed to load exchanges.
+          </TableCell>
+        </TableRow>
+      );
+    }
+    if (exchanges.length === 0) {
+      return (
+        <TableRow>
+          <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+            No exchange requests found.
+          </TableCell>
+        </TableRow>
+      );
+    }
+
+    return exchanges.map((exchange) => (
+      <TableRow key={exchange.id}>
+        <TableCell className="font-mono text-xs">
+          {exchange.exchange_number || exchange.id}
+        </TableCell>
+        <TableCell className="font-mono text-xs">
+          {exchange.order?.order_number || "-"}
+        </TableCell>
+        <TableCell>
+          <div className="flex flex-col">
+            <span className="text-sm font-medium">
+              {exchange.old_item?.product_name || "Item"}
+            </span>
+            <span className="text-xs text-gray-500">
+              {exchange.exchange_type}
+            </span>
+          </div>
+        </TableCell>
+        <TableCell>
+          <div className="flex flex-col">
+            <span className="font-medium text-sm">
+              {exchange.order?.member?.name || "Guest"}
+            </span>
+            <span className="text-xs text-gray-500">
+              {exchange.order?.member?.phone}
+            </span>
+          </div>
+        </TableCell>
+        <TableCell>
+          <StatusBadge status={exchange.status} />
+        </TableCell>
+        <TableCell className="text-right">
+          <div className="flex justify-end gap-2">
+            {exchange.status === "pending" && (
+              <>
+                <button
+                  onClick={() => handleApprove(exchange)}
+                  className="p-1.5 hover:bg-green-50 text-green-600 rounded border border-green-200"
+                  title="Approve"
+                  disabled={isApproving}
+                >
+                  <Check size={14} />
+                </button>
+                <button
+                  onClick={() => handleRejectClick(exchange)}
+                  className="p-1.5 hover:bg-red-50 text-red-600 rounded border border-red-200"
+                  title="Reject"
+                >
+                  <X size={14} />
+                </button>
+              </>
+            )}
+            {exchange.status === "approved" && (
+              <button
+                onClick={() => handleComplete(exchange)}
+                className="p-1.5 hover:bg-blue-50 text-blue-600 rounded border border-blue-200"
+                title="Complete"
+                disabled={isCompleting}
+              >
+                <CheckCheck size={14} />
+              </button>
+            )}
+          </div>
+        </TableCell>
+      </TableRow>
+    ));
   };
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 className="text-2xl font-bold text-gray-900">Returned Orders</h1>
+        <h1 className="text-2xl font-bold text-gray-900">
+          Exchange Management
+        </h1>
+        <PrimaryButton
+          className="flex items-center gap-2"
+          onClick={() => setCreateModalOpen(true)}
+        >
+          <Plus size={16} /> New Exchange
+        </PrimaryButton>
       </div>
 
       <div className="relative rounded-xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
-        {isFetching && !isLoading && (
-          <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-sm flex items-center justify-center rounded-xl">
-            <Loader className="w-6 h-6 animate-spin text-gray-500" />
-          </div>
-        )}
-
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <SearchInput
-            placeholder="Search by order ID, member, phone..."
+            placeholder="Search request..."
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
@@ -84,116 +235,29 @@ const ReturnOrder = () => {
 
           <div className="flex flex-wrap items-center gap-3">
             <DropdownSelect
-              value={dateFilter}
+              value={statusFilter}
               onChange={(val) => {
-                setDateFilter(val);
+                setStatusFilter(val);
                 setPage(1);
               }}
-              options={DATE_FILTER_OPTIONS}
+              options={EXCHANGE_STATUS_OPTIONS}
             />
-            <DropdownSelect
-              value={sortBy}
-              onChange={setSortBy}
-              options={SORT_OPTIONS}
-            />
-            <DropdownSelect
-              value={perPage}
-              onChange={(val) => {
-                setPerPage(Number(val));
-                setPage(1);
-              }}
-              options={PER_PAGE_OPTIONS}
-            />
-            <PrimaryButton variant="secondary" size="md" onClick={handleClearFilters}>
-              Clear
-            </PrimaryButton>
           </div>
         </div>
-
-        {hasActiveFilters && (
-          <p className="text-xs text-gray-500">
-            Showing {filteredOrders.length} of {orders.length} orders on this
-            page.
-          </p>
-        )}
 
         <div className="relative overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Order ID</TableHead>
-                <TableHead>Date</TableHead>
+                <TableHead>Exchange ID</TableHead>
+                <TableHead>Order Order</TableHead>
+                <TableHead>New Item / Type</TableHead>
                 <TableHead>Member</TableHead>
-                <TableHead>Total Amount</TableHead>
-                <TableHead>Refunded Points</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8">
-                    Loading...
-                  </TableCell>
-                </TableRow>
-              ) : error ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="text-center py-8 text-red-500"
-                  >
-                    Failed to load orders.
-                  </TableCell>
-                </TableRow>
-              ) : filteredOrders.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="text-center py-8 text-gray-500"
-                  >
-                    {hasActiveFilters
-                      ? "No orders match the current filters."
-                      : "No returned orders found."}
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredOrders.map((order) => (
-                  <TableRow key={order.id}>
-                    <TableCell className="font-medium">
-                      <span className="font-mono text-xs sm:text-sm">
-                        {order.order_number}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      {formatDate(order.created_at)}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-col">
-                        <span className="font-medium">
-                          {order.member?.name || "Guest"}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          {order.member?.phone}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className="font-semibold">
-                        {getOrderTotalDisplay(order)}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-green-600 font-medium">
-                        {formatPoints(order.total_points, { prefix: "+" })}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge status={order.status} />
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
+            <TableBody>{renderRows()}</TableBody>
           </Table>
         </div>
 
@@ -205,6 +269,47 @@ const ReturnOrder = () => {
           />
         </div>
       </div>
+
+      <CreateExchangeModal
+        open={createModalOpen}
+        onOpenChange={setCreateModalOpen}
+        onSuccess={() => {}}
+      />
+
+      <Dialog open={rejectModalOpen} onOpenChange={setRejectModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reject Exchange Request</DialogTitle>
+            <DialogDescription>
+              Please provide a reason for rejecting this exchange request.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <textarea
+              className="w-full border rounded-md p-2 text-sm"
+              rows={3}
+              placeholder="Rejection reason..."
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+            />
+          </div>
+          <DialogFooter>
+            <PrimaryButton
+              variant="secondary"
+              onClick={() => setRejectModalOpen(false)}
+            >
+              Cancel
+            </PrimaryButton>
+            <PrimaryButton
+              variant="danger"
+              onClick={submitReject}
+              disabled={isRejecting || !rejectionReason.trim()}
+            >
+              {isRejecting ? "Rejecting..." : "Reject Exchange"}
+            </PrimaryButton>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

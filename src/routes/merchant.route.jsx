@@ -32,7 +32,7 @@ import InactiveProducts from "../pages/merchant/ProductManagement/InactiveProduc
 import PendingOrder from "../pages/merchant/orders/PendingOrder";
 import CompleteOrder from "../pages/merchant/orders/CompleteOrder";
 import ReturnOrder from "../pages/merchant/orders/ReturnOrder";
-import CancleOrder from "../pages/merchant/orders/CancleOrder";
+import CancelOrder from "../pages/merchant/orders/CancelOrder";
 import ShippingRateSetting from "../pages/merchant/ShippingRateSetting/ShippingRateSetting";
 import ReferralQrCode from "../pages/merchant/qrCode/ReferralQrCode";
 import PaymentQrCode from "../pages/merchant/qrCode/PaymentQrCode";
@@ -120,7 +120,7 @@ export const merchantRoute = [
   },
   {
     path: "orders/cancel-order",
-    element: <CancleOrder />,
+    element: <CancelOrder />,
   },
   {
     path: "redeem-mall",
