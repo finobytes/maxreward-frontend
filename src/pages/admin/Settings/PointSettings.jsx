@@ -27,9 +27,10 @@ const schema = z.object({
   cr_points: z.number().int().min(0, "CR Points required"),
   max_level: z.number().int().min(0, "Max level required"),
   deductable_points: z.number().int().min(0, "Deductible points required"),
+  auto_release_days: z.number().int().min(0, "Auto release days required"),
 });
 
-const SettingsPage = () => {
+const PointSettings = () => {
   const { data, isFetching, isError, error, refetch } =
     useGetCurrentSettingsQuery();
 
@@ -51,6 +52,7 @@ const SettingsPage = () => {
       cr_points: 0,
       max_level: 0,
       deductable_points: 0,
+      auto_release_days: 0,
     },
   });
 
@@ -66,6 +68,7 @@ const SettingsPage = () => {
         cr_points: Number(s.cr_points ?? 0),
         max_level: Number(s.max_level ?? 0),
         deductable_points: Number(s.deductable_points ?? 0),
+        auto_release_days: Number(s.auto_release_days ?? 0),
       });
     }
   }, [data, reset]);
@@ -105,7 +108,7 @@ const SettingsPage = () => {
         <div className="space-y-6">
           {isFetching ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {Array.from({ length: 7 }).map((_, i) => (
+              {Array.from({ length: 8 }).map((_, i) => (
                 <SkeletonField key={i} />
               ))}
             </div>
@@ -122,6 +125,7 @@ const SettingsPage = () => {
                 { name: "cr_points", label: "CR Points" },
                 { name: "max_level", label: "Max Level" },
                 { name: "deductable_points", label: "Deductible Points" },
+                { name: "auto_release_days", label: "Auto Release Days" },
               ].map((field) => (
                 <div key={field.name}>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -185,4 +189,4 @@ const SettingsPage = () => {
   );
 };
 
-export default SettingsPage;
+export default PointSettings;
