@@ -35,7 +35,11 @@ const DetailItem = ({ label, value, mono = false, span = 1 }) => (
     }`}
   >
     <p className="text-xs text-gray-500">{label}</p>
-    <div className={mono ? "font-mono text-sm text-gray-900" : "text-sm text-gray-900"}>
+    <div
+      className={
+        mono ? "font-mono text-sm text-gray-900" : "text-sm text-gray-900"
+      }
+    >
       {value ?? "-"}
     </div>
   </div>
@@ -119,7 +123,7 @@ const OrderDetails = () => {
     skip: !orderNumber,
   });
 
-  const order = detailsData?.data?.order;
+  const order = detailsData?.data;
   const merchant = order?.merchant;
   const cancelReason = getCancelReason(order);
   const reasonDetailsFallback = order?.cancelled_reason;
