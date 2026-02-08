@@ -26,7 +26,8 @@ const STATUS_FILTERS = [
   { value: "pending", label: "Pending" },
   { value: "completed", label: "Completed" },
   { value: "cancelled", label: "Cancelled" },
-  { value: "returned", label: "Returned" },
+  { value: "exchanged", label: "Exchanged" },
+  { value: "shipped", label: "Shipped" },
 ];
 
 const StatusFilterBar = ({ value, onChange }) => (

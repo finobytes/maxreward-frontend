@@ -31,11 +31,12 @@ import RoleList from "../pages/merchant/rolePermission/RoleList";
 import InactiveProducts from "../pages/merchant/ProductManagement/InactiveProducts";
 import PendingOrder from "../pages/merchant/orders/PendingOrder";
 import CompleteOrder from "../pages/merchant/orders/CompleteOrder";
-import ReturnOrder from "../pages/merchant/orders/ReturnOrder";
 import CancelOrder from "../pages/merchant/orders/CancelOrder";
 import ShippingRateSetting from "../pages/merchant/ShippingRateSetting/ShippingRateSetting";
 import ReferralQrCode from "../pages/merchant/qrCode/ReferralQrCode";
 import PaymentQrCode from "../pages/merchant/qrCode/PaymentQrCode";
+import ShippedOrder from "../pages/merchant/orders/ShippedOrder";
+import ExchangedOrder from "../pages/merchant/orders/ExchangedOrder";
 
 export const merchantRoute = [
   {
@@ -115,8 +116,12 @@ export const merchantRoute = [
     element: <CompleteOrder />,
   },
   {
-    path: "orders/return-order",
-    element: <ReturnOrder />,
+    path: "orders/exchanged-order",
+    element: <ExchangedOrder />,
+  },
+  {
+    path: "orders/shipped-order",
+    element: <ShippedOrder />,
   },
   {
     path: "orders/cancel-order",

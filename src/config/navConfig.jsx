@@ -225,12 +225,16 @@ export const NAV_CONFIG = {
           path: "/merchant/orders/complete-order",
         },
         {
-          name: "Return Order",
-          path: "/merchant/orders/return-order",
+          name: "Exchanged Order",
+          path: "/merchant/orders/exchanged-order",
         },
         {
           name: "Cancel Order",
           path: "/merchant/orders/cancel-order",
+        },
+        {
+          name: "Shipped Order",
+          path: "/merchant/orders/shipped-order",
         },
       ],
     },

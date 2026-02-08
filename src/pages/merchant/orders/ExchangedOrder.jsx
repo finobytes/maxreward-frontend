@@ -38,7 +38,7 @@ const EXCHANGE_STATUS_OPTIONS = [
   { label: "Completed", value: "completed" },
 ];
 
-const ReturnOrder = () => {
+const ExchangedOrder = () => {
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState("all");
   const [search, setSearch] = useState("");
@@ -314,4 +314,4 @@ const ReturnOrder = () => {
   );
 };
 
-export default ReturnOrder;
+export default ExchangedOrder;
