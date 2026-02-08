@@ -236,6 +236,10 @@ export const NAV_CONFIG = {
           name: "Shipped Order",
           path: "/merchant/orders/shipped-order",
         },
+        {
+          name: "Eligible Order",
+          path: "/merchant/orders/eligible-order",
+        },
       ],
     },
     {

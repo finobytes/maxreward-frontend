@@ -32,6 +32,7 @@ const getOrderSearchText = (order) =>
     order?.order_number,
     order?.tracking_number,
     order?.member?.name,
+    order?.member_name, // Support flat structure
     order?.member?.phone,
     order?.member?.email,
     order?.total_amount_display,
@@ -115,7 +116,8 @@ export const filterOrders = (orders = [], { search, dateFilter } = {}) => {
       if (!haystack.includes(normalizedSearch)) return false;
     }
 
-    if (!isWithinDateFilter(order?.created_at, dateFilter)) return false;
+    const dateToCheck = order?.created_at || order?.shipped_at;
+    if (!isWithinDateFilter(dateToCheck, dateFilter)) return false;
 
     return true;
   });
@@ -127,8 +129,8 @@ export const sortOrders = (orders = [], sortBy = "newest") => {
   switch (sortBy) {
     case "oldest":
       sorted.sort((a, b) => {
-        const aDate = parseDate(a?.created_at)?.getTime() ?? 0;
-        const bDate = parseDate(b?.created_at)?.getTime() ?? 0;
+        const aDate = parseDate(a?.created_at || a?.shipped_at)?.getTime() ?? 0;
+        const bDate = parseDate(b?.created_at || b?.shipped_at)?.getTime() ?? 0;
         return aDate - bDate;
       });
       break;
@@ -147,8 +149,8 @@ export const sortOrders = (orders = [], sortBy = "newest") => {
     case "newest":
     default:
       sorted.sort((a, b) => {
-        const aDate = parseDate(a?.created_at)?.getTime() ?? 0;
-        const bDate = parseDate(b?.created_at)?.getTime() ?? 0;
+        const aDate = parseDate(a?.created_at || a?.shipped_at)?.getTime() ?? 0;
+        const bDate = parseDate(b?.created_at || b?.shipped_at)?.getTime() ?? 0;
         return bDate - aDate;
       });
       break;

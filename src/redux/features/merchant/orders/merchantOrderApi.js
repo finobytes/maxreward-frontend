@@ -48,6 +48,20 @@ export const merchantOrderApi = baseApi.injectEndpoints({
         { type: "MerchantOrder", id: orderNumber },
       ],
     }),
+    getEligibleOrders: builder.query({
+      query: () => "/merchant/orders/auto-complete/eligible",
+      providesTags: ["EligibleOrders"],
+    }),
+    autoCompleteOrders: builder.mutation({
+      query: () => ({
+        url: "/merchant/orders/auto-complete",
+        method: "POST",
+      }),
+      invalidatesTags: [
+        "EligibleOrders",
+        { type: "MerchantOrder", id: "LIST" },
+      ],
+    }),
 
     // --- Exchanges ---
     getMerchantExchanges: builder.query({
@@ -117,6 +131,8 @@ export const {
   useGetMerchantOrderDetailsQuery,
   useShipOrderMutation,
   useCancelOrderMutation,
+  useGetEligibleOrdersQuery,
+  useAutoCompleteOrdersMutation,
   useGetMerchantExchangesQuery,
   useGetExchangeDetailsQuery,
   useCreateExchangeMutation,

@@ -38,6 +38,7 @@ import PaymentQrCode from "../pages/merchant/qrCode/PaymentQrCode";
 import ShippedOrder from "../pages/merchant/orders/ShippedOrder";
 import ExchangedOrder from "../pages/merchant/orders/ExchangedOrder";
 import MerchantOrderDetails from "../pages/merchant/orders/MerchantOrderDetails";
+import EligibleOrders from "../pages/merchant/orders/EligibleOrders";
 
 export const merchantRoute = [
   {
@@ -123,6 +124,10 @@ export const merchantRoute = [
   {
     path: "orders/shipped-order",
     element: <ShippedOrder />,
+  },
+  {
+    path: "orders/eligible-order",
+    element: <EligibleOrders />,
   },
   {
     path: "orders/cancel-order",
