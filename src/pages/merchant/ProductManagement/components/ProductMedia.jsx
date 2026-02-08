@@ -1,6 +1,7 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import { UploadCloud, X, ImageIcon } from "lucide-react";
+import { toast } from "sonner";
 import ComponentCard from "../../../../components/common/ComponentCard";
 import Label from "../../../../components/form/Label";
 
@@ -42,8 +43,9 @@ const ProductMedia = () => {
           <p className="text-sm font-medium text-gray-700">
             Click or drag images to upload
           </p>
+
           <p className="text-xs text-gray-500 mt-1">
-            You can upload multiple images
+            Max 5 images (JPEG/PNG/WebP, max 5MB)
           </p>
 
           <input
@@ -54,14 +56,41 @@ const ProductMedia = () => {
               if (e.target.files && e.target.files.length > 0) {
                 const newFiles = Array.from(e.target.files);
                 const currentImages = images || [];
-                // Ensure currentImages is an array if it somehow isn't
                 const validCurrentImages = Array.isArray(currentImages)
                   ? currentImages
                   : [];
 
-                setValue("images", [...validCurrentImages, ...newFiles], {
-                  shouldValidate: true,
+                if (validCurrentImages.length + newFiles.length > 5) {
+                  toast.error("You can only upload up to 5 images.");
+                  return;
+                }
+
+                const validFiles = newFiles.filter((file) => {
+                  if (file.size > 5 * 1024 * 1024) {
+                    toast.error(`Image ${file.name} is too large (max 5MB).`);
+                    return false;
+                  }
+                  if (
+                    ![
+                      "image/jpeg",
+                      "image/png",
+                      "image/webp",
+                      "image/jpg",
+                    ].includes(file.type)
+                  ) {
+                    toast.error(
+                      `Image ${file.name} format not supported (JPEG/PNG/WebP only).`,
+                    );
+                    return false;
+                  }
+                  return true;
                 });
+
+                if (validFiles.length > 0) {
+                  setValue("images", [...validCurrentImages, ...validFiles], {
+                    shouldValidate: true,
+                  });
+                }
                 e.target.value = ""; // Reset input
               }
             }}

@@ -19,11 +19,27 @@ const variationSchema = z.object({
     z.object({
       attribute_id: z.coerce.string(),
       attribute_item_id: z.coerce.string(),
-    })
+    }),
   ),
 
   // Images handling is complex in forms, usually array of objects or files
-  images: z.any().optional(),
+  images: z
+    .any()
+    .optional()
+    .refine((files) => {
+      if (!files || !Array.isArray(files)) return true;
+      return files.every((file) => {
+        if (file instanceof File) {
+          return (
+            file.size <= 5 * 1024 * 1024 &&
+            ["image/jpeg", "image/png", "image/webp", "image/jpg"].includes(
+              file.type,
+            )
+          );
+        }
+        return true; // Existing images pass
+      });
+    }, "Images must be JPEG/PNG/WebP and under 5MB"),
   delete_images: z.array(z.string()).optional(),
 });
 
@@ -66,7 +82,25 @@ export const productSchema = z
     // Variable Product Fields
     variations: z.array(variationSchema).optional(),
 
-    images: z.any().optional(),
+    // Images: Validate size (max 5MB) and type if it's a File object
+    images: z
+      .any()
+      .optional()
+      .refine((files) => {
+        if (!files || !Array.isArray(files)) return true;
+        return files.every((file) => {
+          if (file instanceof File) {
+            return (
+              file.size <= 5 * 1024 * 1024 &&
+              ["image/jpeg", "image/png", "image/webp", "image/jpg"].includes(
+                file.type,
+              )
+            );
+          }
+          return true; // Existing images pass
+        });
+      }, "Images must be JPEG/PNG/WebP and under 5MB"),
+
     delete_images: z.any().optional(),
   })
   .superRefine((data, ctx) => {
