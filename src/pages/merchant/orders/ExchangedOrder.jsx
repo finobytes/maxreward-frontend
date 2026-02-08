@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Plus, Check, X, CheckCheck } from "lucide-react";
+import { Link } from "react-router";
+import { Plus, Check, X, CheckCheck, Eye } from "lucide-react";
 import {
   useGetMerchantExchangesQuery,
   useApproveExchangeMutation,
@@ -146,7 +147,16 @@ const ExchangedOrder = () => {
           {exchange.exchange_number || exchange.id}
         </TableCell>
         <TableCell className="font-mono text-xs">
-          {exchange.order?.order_number || "-"}
+          {exchange.order?.order_number ? (
+            <Link
+              to={`/merchant/orders/view/${exchange.order.order_number}`}
+              className="text-brand-600 hover:underline"
+            >
+              {exchange.order.order_number}
+            </Link>
+          ) : (
+            "-"
+          )}
         </TableCell>
         <TableCell>
           <div className="flex flex-col">
@@ -173,6 +183,15 @@ const ExchangedOrder = () => {
         </TableCell>
         <TableCell className="text-right">
           <div className="flex justify-end gap-2">
+            {exchange.order?.order_number && (
+              <Link
+                to={`/merchant/orders/view/${exchange.order.order_number}`}
+                className="p-1.5 hover:bg-gray-50 text-gray-600 rounded border border-gray-200"
+                title="View Order Details"
+              >
+                <Eye size={14} />
+              </Link>
+            )}
             {exchange.status === "pending" && (
               <>
                 <button

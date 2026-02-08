@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { Truck, XCircle, Loader } from "lucide-react";
+import { Link } from "react-router";
+import { Truck, XCircle, Loader, Eye } from "lucide-react";
 import {
   useGetMerchantOrdersQuery,
   useShipOrderMutation,
@@ -202,9 +203,12 @@ const PendingOrder = () => {
     return filteredOrders.map((order) => (
       <TableRow key={order.id}>
         <TableCell className="font-medium">
-          <span className="font-mono text-xs sm:text-sm">
+          <Link
+            to={`/merchant/orders/view/${order.order_number}`}
+            className="font-mono text-xs sm:text-sm text-brand-600 hover:underline"
+          >
             {order.order_number}
-          </span>
+          </Link>
         </TableCell>
         <TableCell>{formatDate(order.created_at)}</TableCell>
         <TableCell>
@@ -221,6 +225,13 @@ const PendingOrder = () => {
         </TableCell>
         <TableCell className="text-right">
           <div className="flex justify-end gap-2">
+            <Link
+              to={`/merchant/orders/view/${order.order_number}`}
+              className="p-2 hover:bg-gray-100 text-gray-600 rounded-md transition-colors flex items-center gap-1 text-xs font-medium border border-gray-200"
+              title="View Details"
+            >
+              <Eye size={14} /> View
+            </Link>
             <button
               onClick={() => handleCancelClick(order)}
               className="p-2 hover:bg-red-50 text-red-600 rounded-md transition-colors flex items-center gap-1 text-xs font-medium border border-red-200"

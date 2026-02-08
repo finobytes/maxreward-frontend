@@ -37,6 +37,7 @@ import ReferralQrCode from "../pages/merchant/qrCode/ReferralQrCode";
 import PaymentQrCode from "../pages/merchant/qrCode/PaymentQrCode";
 import ShippedOrder from "../pages/merchant/orders/ShippedOrder";
 import ExchangedOrder from "../pages/merchant/orders/ExchangedOrder";
+import MerchantOrderDetails from "../pages/merchant/orders/MerchantOrderDetails";
 
 export const merchantRoute = [
   {
@@ -126,6 +127,10 @@ export const merchantRoute = [
   {
     path: "orders/cancel-order",
     element: <CancelOrder />,
+  },
+  {
+    path: "orders/view/:orderNumber",
+    element: <MerchantOrderDetails />,
   },
   {
     path: "redeem-mall",

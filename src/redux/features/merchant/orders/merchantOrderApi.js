@@ -20,6 +20,12 @@ export const merchantOrderApi = baseApi.injectEndpoints({
         ];
       },
     }),
+    getMerchantOrderDetails: builder.query({
+      query: (orderNumber) => `/merchant/orders/${orderNumber}`,
+      providesTags: (result, error, orderNumber) => [
+        { type: "MerchantOrder", id: orderNumber },
+      ],
+    }),
     shipOrder: builder.mutation({
       query: ({ orderNumber, tracking_number }) => ({
         url: `/merchant/orders/${orderNumber}/ship`,
@@ -108,6 +114,7 @@ export const merchantOrderApi = baseApi.injectEndpoints({
 
 export const {
   useGetMerchantOrdersQuery,
+  useGetMerchantOrderDetailsQuery,
   useShipOrderMutation,
   useCancelOrderMutation,
   useGetMerchantExchangesQuery,

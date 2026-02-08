@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { Loader } from "lucide-react";
+import { Link } from "react-router";
+import { Loader, Eye } from "lucide-react";
 import { useGetMerchantOrdersQuery } from "../../../redux/features/merchant/orders/merchantOrderApi";
 import SearchInput from "../../../components/form/form-elements/SearchInput";
 import DropdownSelect from "../../../components/ui/dropdown/DropdownSelect";
@@ -64,7 +65,7 @@ const ShippedOrder = () => {
     if (isLoading) {
       return (
         <TableRow>
-          <TableCell colSpan={6} className="text-center py-8">
+          <TableCell colSpan={7} className="text-center py-8">
             Loading...
           </TableCell>
         </TableRow>
@@ -73,7 +74,7 @@ const ShippedOrder = () => {
     if (error) {
       return (
         <TableRow>
-          <TableCell colSpan={6} className="text-center py-8 text-red-500">
+          <TableCell colSpan={7} className="text-center py-8 text-red-500">
             Failed to load orders.
           </TableCell>
         </TableRow>
@@ -82,7 +83,7 @@ const ShippedOrder = () => {
     if (filteredOrders.length === 0) {
       return (
         <TableRow>
-          <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+          <TableCell colSpan={7} className="text-center py-8 text-gray-500">
             {hasActiveFilters
               ? "No orders match the current filters."
               : "No shipped orders found."}
@@ -94,9 +95,12 @@ const ShippedOrder = () => {
     return filteredOrders.map((order) => (
       <TableRow key={order.id}>
         <TableCell className="font-medium">
-          <span className="font-mono text-xs sm:text-sm">
+          <Link
+            to={`/merchant/orders/view/${order.order_number}`}
+            className="font-mono text-xs sm:text-sm text-brand-600 hover:underline"
+          >
             {order.order_number}
-          </span>
+          </Link>
         </TableCell>
         <TableCell>{formatDate(order.created_at)}</TableCell>
         <TableCell>
@@ -119,6 +123,17 @@ const ShippedOrder = () => {
         </TableCell>
         <TableCell>
           <StatusBadge status={order.status} />
+        </TableCell>
+        <TableCell className="text-right">
+          <div className="flex justify-end gap-2">
+            <Link
+              to={`/merchant/orders/view/${order.order_number}`}
+              className="p-2 hover:bg-gray-100 text-gray-600 rounded-md transition-colors flex items-center gap-1 text-xs font-medium border border-gray-200"
+              title="View Details"
+            >
+              <Eye size={14} /> View
+            </Link>
+          </div>
         </TableCell>
       </TableRow>
     ));
@@ -196,6 +211,7 @@ const ShippedOrder = () => {
                 <TableHead>Tracking</TableHead>
                 <TableHead>Total Amount</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>{renderRows()}</TableBody>
