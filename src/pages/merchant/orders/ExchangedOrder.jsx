@@ -233,10 +233,7 @@ const ExchangedOrder = () => {
         <h1 className="text-2xl font-bold text-gray-900">
           Exchange Management
         </h1>
-        <PrimaryButton
-          className="flex items-center gap-2"
-          onClick={() => setCreateModalOpen(true)}
-        >
+        <PrimaryButton onClick={() => setCreateModalOpen(true)}>
           <Plus size={16} /> New Exchange
         </PrimaryButton>
       </div>
