@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Loader, Eye, CheckCircle2 } from "lucide-react";
+import { Loader, Eye, CheckCircle2, AlertCircle, XCircle } from "lucide-react";
 import { Link } from "react-router";
 import {
   useGetEligibleOrdersQuery,
@@ -24,7 +24,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import StatusBadge from "../../../components/table/StatusBadge";
+
 import Pagination from "../../../components/table/Pagination";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
 import {
@@ -42,6 +42,8 @@ const EligibleOrders = () => {
   const [sortBy, setSortBy] = useState("newest");
   const [perPage, setPerPage] = useState(10);
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [errorDetailsModalOpen, setErrorDetailsModalOpen] = useState(false);
+  const [autoCompleteErrors, setAutoCompleteErrors] = useState(null);
 
   // Fetch eligible orders
   const { data, isLoading, isFetching, error } = useGetEligibleOrdersQuery();
@@ -51,7 +53,7 @@ const EligibleOrders = () => {
     useAutoCompleteOrdersMutation();
 
   const trimmedSearch = search.trim();
-  const allOrders = data?.data?.orders || [];
+  const allOrders = useMemo(() => data?.data?.orders || [], [data]);
   const totalEligible = data?.data?.total_eligible || 0;
 
   // Client-side filtering and pagination since API returns all eligible orders
@@ -60,7 +62,6 @@ const EligibleOrders = () => {
     const filtered = filterOrders(allOrders, {
       search: trimmedSearch,
       dateFilter: "all",
-      isFlatStructure: true, // New flag to handle flat order object
     });
 
     // 2. Sort
@@ -86,11 +87,60 @@ const EligibleOrders = () => {
   const handleAutoComplete = async () => {
     try {
       const result = await autoCompleteOrders().unwrap();
-      const successCount = result?.data?.success || 0;
-      toast.success(`Successfully auto-completed ${successCount} orders.`);
-      setConfirmModalOpen(false);
+
+      if (result?.success) {
+        const successCount = result?.data?.success || 0;
+        const failedCount = result?.data?.failed || 0;
+
+        // Use backend message if available, otherwise fallback
+        const message =
+          result?.message ||
+          `Successfully auto-completed ${successCount} orders.`;
+
+        toast.success(message);
+        setConfirmModalOpen(false);
+
+        // If there were any failures, show them
+        if (failedCount > 0 && result?.data?.errors?.length > 0) {
+          setAutoCompleteErrors(result.data);
+          setErrorDetailsModalOpen(true);
+        }
+      } else {
+        // Handle case where status is 200 but success is false
+        const failedCount = result?.data?.failed || 0;
+        const errorData = result?.data;
+
+        toast.error(
+          result?.message ||
+            "Failed to auto-complete orders. Please try again.",
+        );
+
+        // Show detailed errors if available
+        if (errorData?.errors?.length > 0) {
+          setAutoCompleteErrors(errorData);
+          setErrorDetailsModalOpen(true);
+        }
+
+        setConfirmModalOpen(false);
+      }
     } catch (err) {
-      toast.error(err?.data?.message || "Failed to auto-complete orders.");
+      console.error("Auto-completion error:", err);
+
+      const errorData = err?.data?.data;
+      const errorMessage =
+        err?.data?.message ||
+        err?.error ||
+        "Failed to auto-complete orders. Please try again.";
+
+      toast.error(errorMessage);
+
+      // Show detailed errors if available in the error response
+      if (errorData?.errors?.length > 0) {
+        setAutoCompleteErrors(errorData);
+        setErrorDetailsModalOpen(true);
+      }
+
+      setConfirmModalOpen(false);
     }
   };
 
@@ -108,10 +158,17 @@ const EligibleOrders = () => {
       );
     }
     if (error) {
+      const errorMessage =
+        error?.data?.message ||
+        error?.error ||
+        "Failed to load eligible orders. Please try again later.";
       return (
         <TableRow>
           <TableCell colSpan={6} className="text-center py-8 text-red-500">
-            Failed to load eligible orders.
+            <div className="flex flex-col items-center justify-center gap-2">
+              <AlertCircle size={24} />
+              <p>{errorMessage}</p>
+            </div>
           </TableCell>
         </TableRow>
       );
@@ -283,6 +340,81 @@ const EligibleOrders = () => {
               ) : (
                 "Confirm Auto-Complete"
               )}
+            </PrimaryButton>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Error Details Modal */}
+      <Dialog
+        open={errorDetailsModalOpen}
+        onOpenChange={setErrorDetailsModalOpen}
+      >
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <XCircle size={24} />
+              Auto-Completion Errors
+            </DialogTitle>
+            <DialogDescription>
+              {autoCompleteErrors?.failed || 0} order(s) could not be completed.
+              {autoCompleteErrors?.success > 0 && (
+                <span className="text-green-600 font-medium">
+                  {" "}
+                  {autoCompleteErrors.success} order(s) were successfully
+                  completed.
+                </span>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex-1 overflow-y-auto">
+            {autoCompleteErrors?.errors &&
+            autoCompleteErrors.errors.length > 0 ? (
+              <div className="space-y-3">
+                {autoCompleteErrors.errors.map((error, index) => (
+                  <div
+                    key={error.order_id || index}
+                    className="border border-red-200 bg-red-50 rounded-lg p-4"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <AlertCircle
+                            size={16}
+                            className="text-red-600 flex-shrink-0"
+                          />
+                          <Link
+                            to={`/merchant/orders/view/${error.order_number}`}
+                            className="font-mono text-sm font-semibold text-brand-600 hover:underline"
+                          >
+                            {error.order_number}
+                          </Link>
+                        </div>
+                        <p className="text-sm text-red-800">
+                          {error.error || "Unknown error occurred"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                No error details available.
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="mt-4">
+            <PrimaryButton
+              variant="secondary"
+              onClick={() => {
+                setErrorDetailsModalOpen(false);
+                setAutoCompleteErrors(null);
+              }}
+            >
+              Close
             </PrimaryButton>
           </DialogFooter>
         </DialogContent>
