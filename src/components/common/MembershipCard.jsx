@@ -31,6 +31,42 @@ const formatCardNumber = (str) => {
   return groups ? groups.join(" ") : str;
 };
 
+/**
+ * Formats a date string to MM/YY format (like credit card expiry dates).
+ * Handles various input formats: ISO strings, timestamps, date objects.
+ * Returns a fallback if the date is invalid or missing.
+ */
+const formatJoinDate = (dateInput) => {
+  if (!dateInput) return "••/••";
+
+  try {
+    let date;
+
+    // Handle different date input types
+    if (dateInput instanceof Date) {
+      date = dateInput;
+    } else if (typeof dateInput === "string" || typeof dateInput === "number") {
+      date = new Date(dateInput);
+    } else {
+      return "••/••";
+    }
+
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      return "••/••";
+    }
+
+    // Format as MM/YY
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = String(date.getFullYear()).slice(-2);
+
+    return `${month}/${year}`;
+  } catch (error) {
+    console.error("Error formatting join date:", error);
+    return "••/••";
+  }
+};
+
 const buildMembershipView = (data, role) => {
   const branding = data?.branding || {};
   const brandingType = branding?.type;
@@ -103,8 +139,10 @@ const EmvChip = () => (
 );
 
 const MembershipCard = ({ data, role = "member" }) => {
+  console.log("data", data?.created_at);
   const view = buildMembershipView(data, role);
   const formattedNumber = formatCardNumber(view.memberPhone);
+  const formattedJoinDate = formatJoinDate(data?.created_at);
 
   return (
     <div className="w-full max-w-md mx-auto relative perspective-1000 group">
@@ -180,13 +218,13 @@ const MembershipCard = ({ data, role = "member" }) => {
                 </div>
               </div>
 
-              <div className="flex flex-col items-center mr-2">
-                {/* <div className="text-[8px] text-white/60 uppercase leading-none mb-0.5">
-                  Valid Thru
+              <div className="flex flex-col items-end">
+                <div className="text-[9px] sm:text-[10px] text-white/60 uppercase tracking-wide mb-0.5">
+                  Member Since
                 </div>
-                <div className="font-mono text-sm sm:text-base font-semibold">
-                  12/30
-                </div> */}
+                <div className="font-mono text-base sm:text-lg font-bold tracking-wider">
+                  {formattedJoinDate}
+                </div>
               </div>
             </div>
           </div>

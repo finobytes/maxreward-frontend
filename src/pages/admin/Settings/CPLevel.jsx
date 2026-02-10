@@ -35,15 +35,15 @@ const CPLevel = () => {
   const handleRowClick = (id) => {
     setRows((prev) =>
       prev.map((r) =>
-        r.id === id ? { ...r, isEditing: true } : { ...r, isEditing: false }
-      )
+        r.id === id ? { ...r, isEditing: true } : { ...r, isEditing: false },
+      ),
     );
   };
 
   // Handle table field change
   const handleChange = (id, field, value) => {
     setRows((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, [field]: value } : r))
+      prev.map((r) => (r.id === id ? { ...r, [field]: value } : r)),
     );
   };
 
@@ -63,7 +63,7 @@ const CPLevel = () => {
           level_to: Number(level_to),
           cp_percentage_per_level: Number(cp_percentage_per_level),
           total_percentage_for_range: Number(total_percentage_for_range),
-        })
+        }),
       ),
     };
     try {
@@ -79,16 +79,12 @@ const CPLevel = () => {
       prev.map((r) => ({
         ...r,
         isEditing: false,
-      }))
+      })),
     );
   };
 
   return (
     <div className="space-y-4">
-      <PageBreadcrumb
-        items={[{ label: "Home", to: "/" }, { label: "CP Level" }]}
-      />
-
       <div className="relative rounded-xl border bg-white p-4 shadow-sm">
         <div className="flex justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-800">
@@ -180,7 +176,7 @@ const CPLevel = () => {
                               handleChange(
                                 row.id,
                                 "cp_percentage_per_level",
-                                e.target.value
+                                e.target.value,
                               )
                             }
                           />
@@ -203,7 +199,7 @@ const CPLevel = () => {
                               handleChange(
                                 row.id,
                                 "total_percentage_for_range",
-                                e.target.value
+                                e.target.value,
                               )
                             }
                           />

@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { UploadCloud, X, ImageIcon } from "lucide-react";
+import { toast } from "sonner";
 import ComponentCard from "../../../../components/common/ComponentCard";
 import Label from "../../../../components/form/Label";
 
@@ -113,7 +114,7 @@ const ColorImageGallery = ({ variations = [] }) => {
             Click or drag images to upload
           </p>
           <p className="text-xs text-gray-500 mt-1">
-            You can upload multiple images
+            Max 4 images (JPEG/PNG/WebP, max 5MB)
           </p>
 
           <input
@@ -130,10 +131,38 @@ const ColorImageGallery = ({ variations = [] }) => {
                     ? Array.from(currentImages)
                     : currentImages;
 
-                setValue(`color_images.${activeColor.id}`, [
-                  ...validCurrentImages,
-                  ...newFiles,
-                ]);
+                if (validCurrentImages.length + newFiles.length > 4) {
+                  toast.error("You can only upload up to 4 images per color.");
+                  return;
+                }
+
+                const validFiles = newFiles.filter((file) => {
+                  if (file.size > 5 * 1024 * 1024) {
+                    toast.error(`Image ${file.name} is too large (max 5MB).`);
+                    return false;
+                  }
+                  if (
+                    ![
+                      "image/jpeg",
+                      "image/png",
+                      "image/webp",
+                      "image/jpg",
+                    ].includes(file.type)
+                  ) {
+                    toast.error(
+                      `Image ${file.name} format not supported (JPEG/PNG/WebP only).`,
+                    );
+                    return false;
+                  }
+                  return true;
+                });
+
+                if (validFiles.length > 0) {
+                  setValue(`color_images.${activeColor.id}`, [
+                    ...validCurrentImages,
+                    ...validFiles,
+                  ]);
+                }
                 e.target.value = ""; // Reset input
               }
             }}

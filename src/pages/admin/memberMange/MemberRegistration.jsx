@@ -57,7 +57,7 @@ const MemberRegistration = () => {
 
   const { data: countries, isLoading: countriesLoading } =
     useGetCountriesQuery();
-
+  console.log(memberData?.referral_code, "memberData referral_code");
   const {
     register,
     handleSubmit,
@@ -104,15 +104,25 @@ const MemberRegistration = () => {
   // On form submit
   const onSubmit = async (formData) => {
     try {
-      const payload = { ...formData };
-
-      // Admin logic: must have a valid member_id from the referral lookup
-      if (memberData && memberData.id && !isError) {
-        payload.member_id = memberData.id;
-      } else {
-        toast.error("Invalid referral — member not found!");
+      // Admin logic: must have a valid referral code and member data
+      if (!memberData || isError) {
+        toast.error("Invalid referral code — member not found!");
+        setError("referralCode", {
+          type: "manual",
+          message: "Please enter a valid referral code",
+        });
         return;
       }
+
+      // Prepare payload with referral_code from memberData (API response)
+      const payload = {
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        country_id: formData.country_id,
+        country_code: formData.country_code,
+        referral_code: memberData?.referral_code, // Use referral_code from API response
+      };
 
       const res = await handleRefer(payload);
       toast.success(res?.message || "Member referred successfully!");
@@ -121,30 +131,63 @@ const MemberRegistration = () => {
       setReferralInput("");
       resetState();
     } catch (err) {
+      console.error("Member registration error:", err);
+
       const backendErrors = err?.data?.errors;
       const message = err?.data?.message || "Failed to refer member";
 
-      if (backendErrors) {
-        // Laravel field mapping fix
-        Object.entries(backendErrors).forEach(([field, messages]) => {
-          const fieldName =
-            field === "phone"
-              ? "phone" // Schema uses 'phone'
-              : field === "referral"
-              ? "referralCode"
-              : field;
+      // Handle validation errors from backend
+      if (backendErrors && typeof backendErrors === "object") {
+        // Map backend field names to form field names
+        const fieldMapping = {
+          phone: "phone",
+          email: "email",
+          name: "name",
+          country_id: "country_id",
+          country_code: "country_code",
+          referral: "referralCode",
+          referral_code: "referralCode",
+        };
 
-          setError(fieldName, {
+        let errorCount = 0;
+        const errorMessages = [];
+
+        // Set errors on form fields and collect messages
+        Object.entries(backendErrors).forEach(([field, messages]) => {
+          const mappedField = fieldMapping[field] || field;
+          const errorMessage = Array.isArray(messages) ? messages[0] : messages;
+
+          // Set error on the form field
+          setError(mappedField, {
             type: "server",
-            message: messages[0],
+            message: errorMessage,
           });
+
+          errorMessages.push(errorMessage);
+          errorCount++;
         });
 
-        // Show the first validation message in toast
-        const firstError = Object.values(backendErrors)[0][0];
-        toast.error(firstError);
+        // Show comprehensive toast notification
+        if (errorCount === 1) {
+          toast.error(errorMessages[0]);
+        } else if (errorCount > 1) {
+          toast.error(`${message}: ${errorCount} validation error(s) found`, {
+            description: errorMessages.join(", "),
+            duration: 5000,
+          });
+        }
+      } else if (message) {
+        // Handle general error messages
+        toast.error(message, {
+          description:
+            err?.data?.error || "Please check your input and try again",
+        });
       } else {
-        toast.error(message);
+        // Handle unexpected errors
+        toast.error("An unexpected error occurred", {
+          description:
+            "Please try again or contact support if the issue persists",
+        });
       }
     }
   };

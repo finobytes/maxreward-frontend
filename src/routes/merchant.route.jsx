@@ -31,10 +31,14 @@ import RoleList from "../pages/merchant/rolePermission/RoleList";
 import InactiveProducts from "../pages/merchant/ProductManagement/InactiveProducts";
 import PendingOrder from "../pages/merchant/orders/PendingOrder";
 import CompleteOrder from "../pages/merchant/orders/CompleteOrder";
-import ReturnOrder from "../pages/merchant/orders/ReturnOrder";
-import CancleOrder from "../pages/merchant/orders/CancleOrder";
-import QrCode from "../pages/merchant/qrCode/QrCode";
+import CancelOrder from "../pages/merchant/orders/CancelOrder";
 import ShippingRateSetting from "../pages/merchant/ShippingRateSetting/ShippingRateSetting";
+import ReferralQrCode from "../pages/merchant/qrCode/ReferralQrCode";
+import PaymentQrCode from "../pages/merchant/qrCode/PaymentQrCode";
+import ShippedOrder from "../pages/merchant/orders/ShippedOrder";
+import ExchangedOrder from "../pages/merchant/orders/ExchangedOrder";
+import MerchantOrderDetails from "../pages/merchant/orders/MerchantOrderDetails";
+import EligibleOrders from "../pages/merchant/orders/EligibleOrders";
 
 export const merchantRoute = [
   {
@@ -46,8 +50,12 @@ export const merchantRoute = [
     element: <MemberRegistration />,
   },
   {
-    path: "qr-code",
-    element: <QrCode />,
+    path: "payment-qr-code",
+    element: <PaymentQrCode />,
+  },
+  {
+    path: "referral-qr-code",
+    element: <ReferralQrCode />,
   },
   {
     path: "merchant-staff",
@@ -110,12 +118,24 @@ export const merchantRoute = [
     element: <CompleteOrder />,
   },
   {
-    path: "orders/return-order",
-    element: <ReturnOrder />,
+    path: "orders/exchanged-order",
+    element: <ExchangedOrder />,
+  },
+  {
+    path: "orders/shipped-order",
+    element: <ShippedOrder />,
+  },
+  {
+    path: "orders/eligible-order",
+    element: <EligibleOrders />,
   },
   {
     path: "orders/cancel-order",
-    element: <CancleOrder />,
+    element: <CancelOrder />,
+  },
+  {
+    path: "orders/view/:orderNumber",
+    element: <MerchantOrderDetails />,
   },
   {
     path: "redeem-mall",

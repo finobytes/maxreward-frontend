@@ -79,8 +79,8 @@ export const NAV_CONFIG = {
           path: "/admin/denomination",
         },
         { name: "Company Info", path: "/admin/company-info" },
-        { name: "Income", path: "/admin/accounts/income" },
-        { name: "Expense", path: "/admin/accounts/expense" },
+        // { name: "Income", path: "/admin/accounts/income" },
+        // { name: "Expense", path: "/admin/accounts/expense" },
       ],
     },
     {
@@ -149,10 +149,7 @@ export const NAV_CONFIG = {
     {
       name: "Settings",
       icon: <Settings />,
-      subItems: [
-        { name: "Point", path: "/admin/settings" },
-        { name: "CP Level", path: "/admin/cp-level" },
-      ],
+      path: "/admin/settings",
     },
     {
       name: "Role Permission",
@@ -181,7 +178,16 @@ export const NAV_CONFIG = {
     {
       icon: <QrCode />,
       name: "Show QR Code",
-      path: "/merchant/qr-code",
+      subItems: [
+        {
+          name: "Payment QR Code",
+          path: "/merchant/payment-qr-code",
+        },
+        {
+          name: "Referral QR Code",
+          path: "/merchant/referral-qr-code",
+        },
+      ],
     },
     {
       icon: <Users />,
@@ -219,12 +225,20 @@ export const NAV_CONFIG = {
           path: "/merchant/orders/complete-order",
         },
         {
-          name: "Return Order",
-          path: "/merchant/orders/return-order",
+          name: "Exchanged Order",
+          path: "/merchant/orders/exchanged-order",
         },
         {
           name: "Cancel Order",
           path: "/merchant/orders/cancel-order",
+        },
+        {
+          name: "Shipped Order",
+          path: "/merchant/orders/shipped-order",
+        },
+        {
+          name: "Eligible Order",
+          path: "/merchant/orders/eligible-order",
         },
       ],
     },

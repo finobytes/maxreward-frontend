@@ -62,11 +62,18 @@ export const merchantManagementApi = baseApi.injectEndpoints({
 
     // POST — Create new merchant
     createMerchant: builder.mutation({
-      query: (merchantData) => ({
-        url: `/merchants`,
-        method: "POST",
-        body: merchantData,
-      }),
+      query: ({ data, referral_code }) => {
+        const params = new URLSearchParams();
+        if (referral_code) {
+          params.append("referral_code", referral_code);
+        }
+        const queryString = params.toString();
+        return {
+          url: queryString ? `/merchants?${queryString}` : `/merchants`,
+          method: "POST",
+          body: data,
+        };
+      },
       invalidatesTags: [{ type: "Merchant", id: "LIST" }],
     }),
 

@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { Loader } from "lucide-react";
+import { Link } from "react-router";
+import { Loader, Eye } from "lucide-react";
 import { useGetMerchantOrdersQuery } from "../../../redux/features/merchant/orders/merchantOrderApi";
 import SearchInput from "../../../components/form/form-elements/SearchInput";
 import DropdownSelect from "../../../components/ui/dropdown/DropdownSelect";
@@ -20,12 +21,11 @@ import {
   SORT_OPTIONS,
   filterOrders,
   formatDate,
-  formatPoints,
   getOrderTotalDisplay,
   sortOrders,
 } from "./orderTableUtils";
 
-const ReturnOrder = () => {
+const ShippedOrder = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [dateFilter, setDateFilter] = useState("all");
@@ -35,13 +35,14 @@ const ReturnOrder = () => {
   const trimmedSearch = search.trim();
   const { data, isLoading, isFetching, error } = useGetMerchantOrdersQuery({
     page,
-    status: "returned",
+    status: "shipped",
     per_page: perPage,
     ...(trimmedSearch ? { search: trimmedSearch } : {}),
   });
 
   const orders = data?.data?.data || [];
   const meta = data?.data || {};
+
   const filteredOrders = useMemo(() => {
     const filtered = filterOrders(orders, {
       search: trimmedSearch,
@@ -49,6 +50,7 @@ const ReturnOrder = () => {
     });
     return sortOrders(filtered, sortBy);
   }, [orders, trimmedSearch, dateFilter, sortBy]);
+
   const hasActiveFilters = Boolean(trimmedSearch) || dateFilter !== "all";
 
   const handleClearFilters = () => {
@@ -59,10 +61,88 @@ const ReturnOrder = () => {
     setPage(1);
   };
 
+  const renderRows = () => {
+    if (isLoading) {
+      return (
+        <TableRow>
+          <TableCell colSpan={7} className="text-center py-8">
+            Loading...
+          </TableCell>
+        </TableRow>
+      );
+    }
+    if (error) {
+      return (
+        <TableRow>
+          <TableCell colSpan={7} className="text-center py-8 text-red-500">
+            Failed to load orders.
+          </TableCell>
+        </TableRow>
+      );
+    }
+    if (filteredOrders.length === 0) {
+      return (
+        <TableRow>
+          <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+            {hasActiveFilters
+              ? "No orders match the current filters."
+              : "No shipped orders found."}
+          </TableCell>
+        </TableRow>
+      );
+    }
+
+    return filteredOrders.map((order) => (
+      <TableRow key={order.id}>
+        <TableCell className="font-medium">
+          <Link
+            to={`/merchant/orders/view/${order.order_number}`}
+            className="font-mono text-xs sm:text-sm text-brand-600 hover:underline"
+          >
+            {order.order_number}
+          </Link>
+        </TableCell>
+        <TableCell>{formatDate(order.created_at)}</TableCell>
+        <TableCell>
+          <div className="flex flex-col">
+            <span className="font-medium">{order.member?.name || "Guest"}</span>
+            <span className="text-xs text-gray-500">{order.member?.phone}</span>
+          </div>
+        </TableCell>
+        <TableCell>
+          {order.tracking_number ? (
+            <span className="text-xs font-mono bg-gray-100 px-2 py-1 rounded">
+              {order.tracking_number}
+            </span>
+          ) : (
+            <span className="text-gray-400 text-sm">-</span>
+          )}
+        </TableCell>
+        <TableCell>
+          <span className="font-semibold">{getOrderTotalDisplay(order)}</span>
+        </TableCell>
+        <TableCell>
+          <StatusBadge status={order.status} />
+        </TableCell>
+        <TableCell className="text-right">
+          <div className="flex justify-end gap-2">
+            <Link
+              to={`/merchant/orders/view/${order.order_number}`}
+              className="p-2 hover:bg-gray-100 text-gray-600 rounded-md transition-colors flex items-center gap-1 text-xs font-medium border border-gray-200"
+              title="View Details"
+            >
+              <Eye size={14} /> View
+            </Link>
+          </div>
+        </TableCell>
+      </TableRow>
+    ));
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 className="text-2xl font-bold text-gray-900">Returned Orders</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Shipped Orders</h1>
       </div>
 
       <div className="relative rounded-xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
@@ -104,7 +184,11 @@ const ReturnOrder = () => {
               }}
               options={PER_PAGE_OPTIONS}
             />
-            <PrimaryButton variant="secondary" size="md" onClick={handleClearFilters}>
+            <PrimaryButton
+              variant="secondary"
+              size="md"
+              onClick={handleClearFilters}
+            >
               Clear
             </PrimaryButton>
           </div>
@@ -124,76 +208,13 @@ const ReturnOrder = () => {
                 <TableHead>Order ID</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Member</TableHead>
+                <TableHead>Tracking</TableHead>
                 <TableHead>Total Amount</TableHead>
-                <TableHead>Refunded Points</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8">
-                    Loading...
-                  </TableCell>
-                </TableRow>
-              ) : error ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="text-center py-8 text-red-500"
-                  >
-                    Failed to load orders.
-                  </TableCell>
-                </TableRow>
-              ) : filteredOrders.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="text-center py-8 text-gray-500"
-                  >
-                    {hasActiveFilters
-                      ? "No orders match the current filters."
-                      : "No returned orders found."}
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredOrders.map((order) => (
-                  <TableRow key={order.id}>
-                    <TableCell className="font-medium">
-                      <span className="font-mono text-xs sm:text-sm">
-                        {order.order_number}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      {formatDate(order.created_at)}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-col">
-                        <span className="font-medium">
-                          {order.member?.name || "Guest"}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          {order.member?.phone}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className="font-semibold">
-                        {getOrderTotalDisplay(order)}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-green-600 font-medium">
-                        {formatPoints(order.total_points, { prefix: "+" })}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge status={order.status} />
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
+            <TableBody>{renderRows()}</TableBody>
           </Table>
         </div>
 
@@ -209,4 +230,4 @@ const ReturnOrder = () => {
   );
 };
 
-export default ReturnOrder;
+export default ShippedOrder;

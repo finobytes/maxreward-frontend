@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import StatusBadge from "../../../components/table/StatusBadge";
-import { useGetMemberOrderDetailsQuery } from "../../../redux/features/member/orders/memberOrderApi";
+import { useGetMerchantOrderDetailsQuery } from "../../../redux/features/merchant/orders/merchantOrderApi";
 import {
   formatDateTime,
   formatReasonType,
@@ -22,11 +22,11 @@ import {
   getItemSkuOrVariant,
   getItemsLabel,
   getLineItemPoints,
-  getMerchantName,
+  getMemberName,
   getOrderShippingPointsDisplay,
   getOrderTotalDisplay,
   formatPoints,
-} from "./orderUtils";
+} from "./orderTableUtils";
 
 const DetailItem = ({ label, value, mono = false, span = 1 }) => (
   <div
@@ -113,26 +113,39 @@ const OrderItemsTable = ({ items }) => {
   );
 };
 
-const OrderDetails = () => {
+const getBackLink = (status) => {
+  const s = status?.toLowerCase();
+  if (s === "pending") return "/merchant/orders/pending-order";
+  if (s === "shipped") return "/merchant/orders/shipped-order";
+  if (s === "completed") return "/merchant/orders/complete-order";
+  if (s === "cancelled") return "/merchant/orders/cancel-order";
+  if (s === "returned" || s === "exchanged")
+    return "/merchant/orders/exchanged-order";
+  return "/merchant/orders/pending-order";
+};
+
+const MerchantOrderDetails = () => {
   const { orderNumber } = useParams();
   const {
     data: detailsData,
     isLoading,
     error,
-  } = useGetMemberOrderDetailsQuery(orderNumber, {
+  } = useGetMerchantOrderDetailsQuery(orderNumber, {
     skip: !orderNumber,
   });
 
   const order = detailsData?.data;
-  const merchant = order?.merchant;
+  const member = order?.member;
   const cancelReason = getCancelReason(order);
   const reasonDetailsFallback = order?.cancelled_reason;
   const reasonDetailsValue =
     cancelReason?.reason_details || reasonDetailsFallback || "";
 
+  const backLink = getBackLink(order?.status);
+
   const breadcrumbItems = [
-    { label: "Home", to: "/member" },
-    { label: "My Orders", to: "/member/orders" },
+    { label: "Dashboard", to: "/merchant" },
+    { label: "Orders", to: backLink },
     { label: "Order Details" },
   ];
 
@@ -154,7 +167,7 @@ const OrderDetails = () => {
         <div className="text-center text-red-500 py-10 bg-white rounded-xl border border-red-200">
           <p className="text-lg font-semibold">Failed to load order details.</p>
           <Link
-            to="/member/orders"
+            to={backLink}
             className="mt-4 inline-flex items-center gap-2 text-brand-600 hover:text-brand-700"
           >
             <ArrowLeft size={18} />
@@ -210,22 +223,11 @@ const OrderDetails = () => {
   ].filter(Boolean);
 
   const customerItems = [
-    { label: "Name", value: formatValue(order.customer_full_name) },
-    { label: "Email", value: formatValue(order.customer_email), mono: true },
-    { label: "Phone", value: formatValue(order.customer_phone), mono: true },
+    { label: "Name", value: getMemberName(member) },
+    { label: "Email", value: formatValue(member?.email), mono: true },
+    { label: "Phone", value: formatValue(member?.phone), mono: true },
     { label: "Address", value: getCustomerAddress(order), span: 2 },
   ];
-
-  const merchantItems = [
-    { label: "Business Name", value: getMerchantName(merchant) },
-    { label: "Email", value: formatValue(merchant?.email), mono: true },
-    { label: "Phone", value: formatValue(merchant?.phone), mono: true },
-    merchant?.address && {
-      label: "Address",
-      value: formatValue(merchant.address),
-      span: 2,
-    },
-  ].filter(Boolean);
 
   const reasonItems = [
     cancelReason?.reason_type && {
@@ -253,7 +255,7 @@ const OrderDetails = () => {
 
       <div className="flex items-center justify-between">
         <Link
-          to="/member/orders"
+          to={backLink}
           className="inline-flex items-center gap-2 text-gray-600 hover:text-brand-600 transition-colors"
         >
           <ArrowLeft size={18} />
@@ -266,12 +268,8 @@ const OrderDetails = () => {
           <DetailGrid items={summaryItems} />
         </DetailsSection>
 
-        <DetailsSection title="Customer">
+        <DetailsSection title="Customer Details">
           <DetailGrid items={customerItems} />
-        </DetailsSection>
-
-        <DetailsSection title="Merchant">
-          <DetailGrid items={merchantItems} />
         </DetailsSection>
 
         <DetailsSection title="Items">
@@ -288,4 +286,4 @@ const OrderDetails = () => {
   );
 };
 
-export default OrderDetails;
+export default MerchantOrderDetails;

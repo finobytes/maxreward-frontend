@@ -21,7 +21,7 @@ import {
 import { Skeleton } from "../../../components/ui/skeleton";
 import { toast } from "sonner";
 
-const QrCode = () => {
+const PaymentQrCode = () => {
   const { user, token } = useSelector((state) => state.auth);
   const role = user?.role || "merchant";
   const { data, isLoading, error } = useVerifyMeQuery(role, { skip: !token });
@@ -183,4 +183,4 @@ const QrCode = () => {
   );
 };
 
-export default QrCode;
+export default PaymentQrCode;
