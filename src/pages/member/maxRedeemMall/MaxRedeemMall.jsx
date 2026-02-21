@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import ProductCard from "./components/ProductCard";
 import { Search, SlidersHorizontal } from "lucide-react";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
-import { useSearchParams } from "react-router"; // Assuming react-router is used based on other files
+import { Link, useSearchParams } from "react-router"; // Assuming react-router is used based on other files
 import {
   useGetProductsQuery,
   useGetMerchantProductsQuery,
@@ -51,7 +51,7 @@ const MaxRedeemMall = () => {
     isFetching: isFetchingMerchant,
   } = useGetMerchantProductsQuery(
     { merchant_id: merchantId, ...queryParams },
-    { skip: !merchantId }
+    { skip: !merchantId },
   );
 
   const productsData = merchantId ? merchantData : generalData;
@@ -79,9 +79,9 @@ const MaxRedeemMall = () => {
         <h1 className="text-lg md:text-xl font-extrabold text-gray-900 mb-4 tracking-tight">
           Max Redeem <span className="text-brand-600">Mall</span>
         </h1>
-        <div>
-          <PrimaryButton>View Order Transactions</PrimaryButton>
-        </div>
+        <Link className="ml-auto" to="/member/orders">
+          <PrimaryButton>View Orders</PrimaryButton>
+        </Link>
       </div>
       <hr />
       <div className="w-full mx-auto mt-4">
