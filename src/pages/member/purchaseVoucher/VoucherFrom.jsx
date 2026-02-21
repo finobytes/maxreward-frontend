@@ -14,7 +14,7 @@ import Label from "../../../components/form/Label";
 import Input from "../../../components/form/input/InputField";
 import Dropzone from "../../../components/form/form-elements/Dropzone";
 import VoucherFromSkeleton from "../../../components/skeleton/VoucherFromSkeleton";
-import { paymentProofPlaceholder } from "../../../assets/assets";
+import { fpxLogo, paymentProofPlaceholder } from "../../../assets/assets";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -40,7 +40,7 @@ const voucherSchema = z.object({
         }
         return true;
       },
-      { message: "Payment proof is required for manual method" }
+      { message: "Payment proof is required for manual method" },
     ),
 });
 
@@ -167,10 +167,10 @@ const VoucherForm = () => {
                 ) : (
                   denominations.map((item) => {
                     const isSelected = selectedDenominations.some(
-                      (d) => d.id === item.id
+                      (d) => d.id === item.id,
                     );
                     const selectedItem = selectedDenominations.find(
-                      (d) => d.id === item.id
+                      (d) => d.id === item.id,
                     );
                     const checkboxId = `denom-${item.id}`;
                     return (
@@ -199,7 +199,10 @@ const VoucherForm = () => {
                               onClick={() =>
                                 handleQtyChange(
                                   item.id,
-                                  Math.max(1, (selectedItem?.quantity || 1) - 1)
+                                  Math.max(
+                                    1,
+                                    (selectedItem?.quantity || 1) - 1,
+                                  ),
                                 )
                               }
                               className="p-1 hover:bg-gray-100 rounded border"
@@ -214,7 +217,7 @@ const VoucherForm = () => {
                               onClick={() =>
                                 handleQtyChange(
                                   item.id,
-                                  (selectedItem?.quantity || 1) + 1
+                                  (selectedItem?.quantity || 1) + 1,
                                 )
                               }
                               className="p-1 hover:bg-gray-100 rounded border"
@@ -334,29 +337,10 @@ const VoucherForm = () => {
             {selectedPaymentMethod === "online" && (
               <div>
                 <h3 className="font-semibold text-gray-800 mb-4">
-                  Bank Information
+                  Pay with FPX
                 </h3>
                 <div className="space-y-5">
-                  <div>
-                    <Label>Bank Name</Label>
-                    <Input placeholder="Enter Bank Name" />
-                  </div>
-                  <div>
-                    <Label>Account Holder Name</Label>
-                    <Input placeholder="Enter Account Holder Name" />
-                  </div>
-                  <div>
-                    <Label>Account Number / IBAN</Label>
-                    <Input placeholder="Enter Account Number / IBAN" />
-                  </div>
-                  <div>
-                    <Label>Swift Code</Label>
-                    <Input placeholder="Enter Swift Code" />
-                  </div>
-                  <div>
-                    <Label>Routing Number</Label>
-                    <Input placeholder="Enter Routing Number" />
-                  </div>
+                  <img src={fpxLogo} alt="FPX Logo" />
                 </div>
               </div>
             )}

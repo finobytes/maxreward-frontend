@@ -95,7 +95,7 @@ export const useVoucherForm = () => {
         state.memberId ||
           verifyData?.id ||
           verifyData?.data?.id ||
-          verifyData?.member?.id
+          verifyData?.member?.id,
       );
       formData.append("voucher_type", state.voucherType);
       formData.append("payment_method", state.paymentMethod.toLowerCase());
@@ -105,11 +105,11 @@ export const useVoucherForm = () => {
       denomHistory.forEach((item, index) => {
         formData.append(
           `denomination_history[${index}][denomination_id]`,
-          String(item.denomination_id)
+          String(item.denomination_id),
         );
         formData.append(
           `denomination_history[${index}][quantity]`,
-          String(item.quantity)
+          String(item.quantity),
         );
       });
 
@@ -121,11 +121,15 @@ export const useVoucherForm = () => {
 
       if (res?.success) {
         toast.success(res.message || "Voucher created successfully!");
-        dispatch(resetVoucher());
-        if (role === "member") {
-          navigate("/member/purchase-voucher");
+        if (state.paymentMethod === "online" && res.data?.checkout_url) {
+          window.location.href = res.data.checkout_url;
         } else {
-          navigate("/merchant/voucher-purchase");
+          dispatch(resetVoucher());
+          if (role === "member") {
+            navigate("/member/purchase-voucher");
+          } else {
+            navigate("/merchant/voucher-purchase");
+          }
         }
       } else {
         toast.error(res?.message || "Failed to create voucher.");
