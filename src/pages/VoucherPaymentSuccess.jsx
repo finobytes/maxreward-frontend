@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { useSelector } from "react-redux";
 import { useVerifyPaymentMutation } from "../redux/features/member/voucherPurchase/voucherApi";
@@ -14,6 +14,9 @@ const VoucherPaymentSuccess = () => {
   const [verifyPayment, { isLoading }] = useVerifyPaymentMutation();
   const [status, setStatus] = useState("verifying"); // verifying, success, error
 
+  // Prevent double execution in React Strict Mode
+  const hasVerified = useRef(false);
+
   const redirectPath =
     user?.role === "merchant"
       ? "/merchant/voucher-purchase"
@@ -25,6 +28,9 @@ const VoucherPaymentSuccess = () => {
       navigate("/");
       return;
     }
+
+    if (hasVerified.current) return;
+    hasVerified.current = true;
 
     const verify = async () => {
       try {
