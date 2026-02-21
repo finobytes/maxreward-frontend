@@ -102,6 +102,24 @@ export const voucherApi = baseApi.injectEndpoints({
       invalidatesTags: [{ type: "Voucher", id: "LIST" }],
     }),
 
+    verifyPayment: builder.mutation({
+      query: (data) => ({
+        url: "/member/verify-payment/voucher",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: [{ type: "Voucher", id: "LIST" }],
+    }),
+
+    cancelPayment: builder.mutation({
+      query: (data) => ({
+        url: "/member/cancel-payment/voucher",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: [{ type: "Voucher", id: "LIST" }],
+    }),
+
     // Update voucher
     updateVoucher: builder.mutation({
       query: ({ id, formData }) => ({
@@ -164,4 +182,6 @@ export const {
   useRejectVoucherMutation,
   useDeleteVoucherMutation,
   useGetVoucherByIdForMemberQuery,
+  useVerifyPaymentMutation,
+  useCancelPaymentMutation,
 } = voucherApi;
