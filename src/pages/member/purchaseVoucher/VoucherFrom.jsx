@@ -14,7 +14,7 @@ import Label from "../../../components/form/Label";
 import Input from "../../../components/form/input/InputField";
 import Dropzone from "../../../components/form/form-elements/Dropzone";
 import VoucherFromSkeleton from "../../../components/skeleton/VoucherFromSkeleton";
-import { paymentProofPlaceholder } from "../../../assets/assets";
+import { fpxLogo, paymentProofPlaceholder } from "../../../assets/assets";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -40,7 +40,7 @@ const voucherSchema = z.object({
         }
         return true;
       },
-      { message: "Payment proof is required for manual method" }
+      { message: "Payment proof is required for manual method" },
     ),
 });
 
@@ -167,10 +167,10 @@ const VoucherForm = () => {
                 ) : (
                   denominations.map((item) => {
                     const isSelected = selectedDenominations.some(
-                      (d) => d.id === item.id
+                      (d) => d.id === item.id,
                     );
                     const selectedItem = selectedDenominations.find(
-                      (d) => d.id === item.id
+                      (d) => d.id === item.id,
                     );
                     const checkboxId = `denom-${item.id}`;
                     return (
@@ -199,7 +199,10 @@ const VoucherForm = () => {
                               onClick={() =>
                                 handleQtyChange(
                                   item.id,
-                                  Math.max(1, (selectedItem?.quantity || 1) - 1)
+                                  Math.max(
+                                    1,
+                                    (selectedItem?.quantity || 1) - 1,
+                                  ),
                                 )
                               }
                               className="p-1 hover:bg-gray-100 rounded border"
@@ -214,7 +217,7 @@ const VoucherForm = () => {
                               onClick={() =>
                                 handleQtyChange(
                                   item.id,
-                                  (selectedItem?.quantity || 1) + 1
+                                  (selectedItem?.quantity || 1) + 1,
                                 )
                               }
                               className="p-1 hover:bg-gray-100 rounded border"
@@ -332,30 +335,76 @@ const VoucherForm = () => {
 
             {/* Right Side - Payment Info */}
             {selectedPaymentMethod === "online" && (
-              <div>
-                <h3 className="font-semibold text-gray-800 mb-4">
-                  Bank Information
-                </h3>
-                <div className="space-y-5">
-                  <div>
-                    <Label>Bank Name</Label>
-                    <Input placeholder="Enter Bank Name" />
+              <div className="bg-white border hover:border-blue-200 transition-colors duration-300 rounded-2xl p-6 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] relative overflow-hidden group">
+                {/* Background decorative element */}
+                <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-50 to-transparent rounded-full -mr-20 -mt-20 transition-transform group-hover:scale-110 duration-700 ease-out" />
+
+                <div className="relative z-10">
+                  <div className="flex items-center gap-4 mb-7">
+                    <div className="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex items-center justify-center">
+                      <img
+                        src={fpxLogo}
+                        alt="FPX Logo"
+                        className="h-7 w-auto object-contain"
+                      />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-gray-800 text-lg">
+                        FPX Online Banking
+                      </h3>
+                      <p className="text-sm text-gray-500 font-medium mt-0.5">
+                        Fast, secure & reliable
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <Label>Account Holder Name</Label>
-                    <Input placeholder="Enter Account Holder Name" />
+
+                  <div className="space-y-4 mb-7">
+                    {[
+                      "Real-time processing",
+                      "Supports all major Malaysian banks",
+                      "Bank-level 256-bit encryption",
+                    ].map((feature, i) => (
+                      <div key={i} className="flex items-center gap-3">
+                        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-50 border border-blue-100/50 flex items-center justify-center">
+                          <svg
+                            className="w-3.5 h-3.5 text-blue-600"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2.5}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                        </div>
+                        <span className="text-sm text-gray-600 font-medium">
+                          {feature}
+                        </span>
+                      </div>
+                    ))}
                   </div>
-                  <div>
-                    <Label>Account Number / IBAN</Label>
-                    <Input placeholder="Enter Account Number / IBAN" />
-                  </div>
-                  <div>
-                    <Label>Swift Code</Label>
-                    <Input placeholder="Enter Swift Code" />
-                  </div>
-                  <div>
-                    <Label>Routing Number</Label>
-                    <Input placeholder="Enter Routing Number" />
+
+                  <div className="bg-blue-50/70 rounded-xl p-4 border border-blue-100/50 flex items-start gap-3 mt-auto">
+                    <svg
+                      className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                      />
+                    </svg>
+                    <p className="text-xs text-blue-800 leading-relaxed font-medium">
+                      You will be securely redirected to the FPX payment gateway
+                      upon submission. Do not close your browser.
+                    </p>
                   </div>
                 </div>
               </div>

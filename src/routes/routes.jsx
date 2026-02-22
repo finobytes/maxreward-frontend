@@ -10,6 +10,8 @@ import { memberRoutes } from "./member.route";
 import ProtectedRoute from "../components/layouts/ProtectedRoute";
 import { merchantRoute } from "./merchant.route";
 import PublicReferral from "../pages/member/publicReferral/PublicReferral";
+import VoucherPaymentSuccess from "../pages/VoucherPaymentSuccess";
+import VoucherPaymentCancel from "../pages/VoucherPaymentCancel";
 
 const router = createBrowserRouter([
   {
@@ -65,6 +67,14 @@ const router = createBrowserRouter([
   {
     path: "/public-referral",
     element: <PublicReferral />,
+  },
+  {
+    path: "/voucher/payment/success",
+    element: <VoucherPaymentSuccess />,
+  },
+  {
+    path: "/voucher/payment/cancel",
+    element: <VoucherPaymentCancel />,
   },
 ]);
 
