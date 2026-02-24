@@ -89,6 +89,18 @@ const Sidebar = () => {
       });
     }
 
+    // Check if user has permission matching the nav item's required permission.
+    // Supports both exact match and prefix match:
+    //   navConfig permission: "admin.accounts.voucher"
+    //   user permission:      "admin.accounts.voucher.view" → match (startsWith)
+    //   user permission:      "admin.accounts.voucher"      → match (exact)
+    const hasPermission = (requiredPerm, userPerms) => {
+      return userPerms.some(
+        (userPerm) =>
+          userPerm === requiredPerm || userPerm.startsWith(requiredPerm + "."),
+      );
+    };
+
     // Helper to recursively filter items based on permissions
     const filterNavItems = (items, permissions) => {
       return (
@@ -96,8 +108,8 @@ const Sidebar = () => {
           .filter((item) => {
             // If the item has no specific permission required, it's public (Dashboard, Profile, Logout)
             if (!item.permission) return true;
-            // If the user has explicitly been granted the exact permission
-            if (permissions.includes(item.permission)) return true;
+            // Check if user has any matching permission (exact or prefix)
+            if (hasPermission(item.permission, permissions)) return true;
             // If item has subItems, don't filter it out yet — check children first
             if (item.subItems) return true;
             return false;

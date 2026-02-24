@@ -28,19 +28,27 @@ import {
 } from "lucide-react";
 
 /**
- * Permission naming convention (auto-generated from Section + Action):
+ * Permission naming convention (auto-generated from Section + Sub-Section + Action):
  *
- * For Admin guard:   admin.{section}.{action}
- * For Merchant guard: {section}.{action}
+ * For Admin guard:   admin.{section}.{sub_section}.{action}
+ * For Merchant guard: {section}.{sub_section}.{action}
  *
- * Example Sections:  accounts, e-commerce, reports, merchant manage, member manage, etc.
- * Example Actions:   company info, denomination, voucher, category, shipping zone, etc.
+ * Example:
+ *   Section = "accounts", Sub-section = "voucher", Action = "view"
+ *   → Permission: "admin.accounts.voucher.view"
+ *
+ * In navConfig, we use the BASE permission (without the CRUD action):
+ *   permission: "admin.accounts.voucher"
+ *
+ * The Sidebar uses startsWith matching, so if a user has ANY of:
+ *   admin.accounts.voucher.view, admin.accounts.voucher.create, admin.accounts.voucher.approve
+ * They will see the "Voucher" menu item.
  *
  * How to create:
- * 1. Section List → Create "accounts", "e-commerce", "reports", etc.
- * 2. Action List  → Create "company info", "denomination", "voucher", "category", etc.
- * 3. Permission List → Select Guard + Section + Action → auto-generates name
- *    e.g. Guard="admin", Section="accounts", Action="company info" → "admin.accounts.company info"
+ * 1. Section List → Create sections: "accounts", "e-commerce", "reports", etc.
+ * 2. Action List  → Create sub-sections: "voucher", "denomination", "category", etc.
+ *                 → Create CRUD actions: "view", "create", "edit", "delete", "approve", "reject"
+ * 3. Permission List → Select Guard + Section + Sub-section + Action → auto-generates name
  * 4. Assign Permissions → Select a Role → check the permissions to assign
  */
 
