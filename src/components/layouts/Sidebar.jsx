@@ -60,6 +60,73 @@ const Sidebar = () => {
   const items = useMemo(() => {
     let navItems = NAV_CONFIG[role] || [];
 
+    // For admin-type users (type === "admin"), show all menus without filtering
+    // Only staff users (type === "staff") get permission-based filtering
+    const isMainAdmin = role === "admin" && data?.type === "admin";
+
+    // Extract permissions from roles[].permissions[].name
+    // API response: data.roles[0].permissions[{name: "admin.accounts.company info"}, ...]
+    let userPermissions = [];
+    if (data?.roles && Array.isArray(data.roles)) {
+      data.roles.forEach((roleObj) => {
+        if (roleObj.permissions && Array.isArray(roleObj.permissions)) {
+          roleObj.permissions.forEach((perm) => {
+            if (perm.name && !userPermissions.includes(perm.name)) {
+              userPermissions.push(perm.name);
+            }
+          });
+        }
+      });
+    }
+
+    // Also include any direct permissions if available
+    if (data?.permissions && Array.isArray(data.permissions)) {
+      data.permissions.forEach((perm) => {
+        const permName = typeof perm === "string" ? perm : perm?.name;
+        if (permName && !userPermissions.includes(permName)) {
+          userPermissions.push(permName);
+        }
+      });
+    }
+
+    // Helper to recursively filter items based on permissions
+    const filterNavItems = (items, permissions) => {
+      return (
+        items
+          .filter((item) => {
+            // If the item has no specific permission required, it's public (Dashboard, Profile, Logout)
+            if (!item.permission) return true;
+            // If the user has explicitly been granted the exact permission
+            if (permissions.includes(item.permission)) return true;
+            // If item has subItems, don't filter it out yet — check children first
+            if (item.subItems) return true;
+            return false;
+          })
+          .map((item) => {
+            if (item.subItems) {
+              return {
+                ...item,
+                subItems: filterNavItems(item.subItems, permissions),
+              };
+            }
+            return item;
+          })
+          // Remove parent items that ended up with no accessible subItems
+          .filter((item) => {
+            if (item.subItems && item.subItems.length === 0 && !item.path) {
+              return false;
+            }
+            return true;
+          })
+      );
+    };
+
+    // Only apply permission filtering for staff users who have roles with permissions
+    // Main admin sees everything, member also sees everything (no permission system for member)
+    if (!isMainAdmin && role !== "member" && userPermissions.length > 0) {
+      navItems = filterNavItems(navItems, userPermissions);
+    }
+
     // hide Merchant Application if member_type === 'corporate'
     if (role === "member" && userType === "corporate") {
       navItems = navItems.filter(
@@ -68,7 +135,7 @@ const Sidebar = () => {
     }
 
     return navItems;
-  }, [role, userType]);
+  }, [role, userType, data]);
 
   const isActive = useCallback(
     (path) => location.pathname === path,
