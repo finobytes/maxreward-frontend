@@ -54,8 +54,13 @@ import {
 
 export const NAV_CONFIG = {
   admin: [
-    // Dashboard - always visible (no permission required)
-    { icon: <LayoutDashboard />, name: "Dashboard", path: "/admin" },
+    // Dashboard - permission controlled
+    {
+      icon: <LayoutDashboard />,
+      name: "Dashboard",
+      path: "/admin/dashboard",
+      permission: "admin.dashboard.dashboard",
+    },
 
     // Member Manage - Section: "member manage", Action: "member manage"
     {
@@ -270,8 +275,13 @@ export const NAV_CONFIG = {
   ],
 
   merchant: [
-    // Dashboard - always visible
-    { icon: <LayoutDashboard />, name: "Dashboard", path: "/merchant" },
+    // Dashboard - permission controlled
+    {
+      icon: <LayoutDashboard />,
+      name: "Dashboard",
+      path: "/merchant",
+      permission: "dashboard.dashboard",
+    },
 
     // Member Registration
     {
