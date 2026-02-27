@@ -34,6 +34,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Pencil, Trash2, Plus, AlertTriangle, Loader } from "lucide-react";
+import HasPermission from "@/components/common/HasPermission";
 
 // Schema Validation (Zod)
 const permissionSchema = z.object({
@@ -54,15 +55,19 @@ const PermissionList = () => {
   const [perPage] = useState(10);
 
   // API Hooks
-  const { data: permissionsData, isLoading: isLoadingPermissions } = useGetPermissionsQuery({
-    page,
-    per_page: perPage,
-  });
+  const { data: permissionsData, isLoading: isLoadingPermissions } =
+    useGetPermissionsQuery({
+      page,
+      per_page: perPage,
+    });
   const { data: sectionsData } = useGetSectionsQuery();
   const { data: actionsData } = useGetActionsQuery();
-  const [createPermission, { isLoading: isCreating }] = useCreatePermissionMutation();
-  const [updatePermission, { isLoading: isUpdating }] = useUpdatePermissionMutation();
-  const [deletePermission, { isLoading: isDeleting }] = useDeletePermissionMutation();
+  const [createPermission, { isLoading: isCreating }] =
+    useCreatePermissionMutation();
+  const [updatePermission, { isLoading: isUpdating }] =
+    useUpdatePermissionMutation();
+  const [deletePermission, { isLoading: isDeleting }] =
+    useDeletePermissionMutation();
 
   const {
     register,
@@ -94,7 +99,8 @@ const PermissionList = () => {
       // generatedName = `${watchGuardName}.${watchSection}.${watchAction}`;
 
       if (watchGuardName === "admin") {
-        generatedName = `${watchGuardName}.${watchSection}.${watchAction}`.toLowerCase();
+        generatedName =
+          `${watchGuardName}.${watchSection}.${watchAction}`.toLowerCase();
       } else {
         // For merchant and other guards, exclude guard name
         generatedName = `${watchSection}.${watchAction}`.toLowerCase();
@@ -116,26 +122,35 @@ const PermissionList = () => {
 
       if (editingPermission) {
         // Update existing permission
-        res = await updatePermission({ id: editingPermission.id, data: apiData }).unwrap();
+        res = await updatePermission({
+          id: editingPermission.id,
+          data: apiData,
+        }).unwrap();
       } else {
         // Create new permission
         res = await createPermission(apiData).unwrap();
       }
 
       if (res?.success) {
-        toast.success(res?.message || `Permission ${editingPermission ? 'updated' : 'created'} successfully!`);
+        toast.success(
+          res?.message ||
+            `Permission ${editingPermission ? "updated" : "created"} successfully!`,
+        );
         reset();
         setIsModalOpen(false);
         setEditingPermission(null);
       } else {
-        toast.error(res?.message || `Failed to ${editingPermission ? 'update' : 'create'} permission`);
+        toast.error(
+          res?.message ||
+            `Failed to ${editingPermission ? "update" : "create"} permission`,
+        );
       }
     } catch (err) {
-      console.error(`${editingPermission ? 'Update' : 'Create'} Failed:`, err);
+      console.error(`${editingPermission ? "Update" : "Create"} Failed:`, err);
       const validationErrors = err?.data?.errors;
       if (validationErrors) {
         Object.entries(validationErrors).forEach(([field, messages]) =>
-          toast.error(`${field}: ${messages.join(", ")}`)
+          toast.error(`${field}: ${messages.join(", ")}`),
         );
       } else {
         toast.error(err?.data?.message || "Something went wrong!");
@@ -148,7 +163,7 @@ const PermissionList = () => {
     setEditingPermission(permission);
 
     // Parse permission name to extract section and action
-    const nameParts = permission.name.split('.');
+    const nameParts = permission.name.split(".");
     let section = "";
     let action = "";
 
@@ -226,14 +241,24 @@ const PermissionList = () => {
       <ComponentCard
         title="Permission List"
         headerAction={
-          <PrimaryButton onClick={() => {
-            setEditingPermission(null);
-            reset({ name: "", guard_name: "admin", section: "", action: "" });
-            setIsModalOpen(true);
-          }} className="flex items-center gap-2">
-            <Plus className="w-4 h-4" />
-            Create New Permission
-          </PrimaryButton>
+          <HasPermission required="admin.role permission.role permission.create">
+            <PrimaryButton
+              onClick={() => {
+                setEditingPermission(null);
+                reset({
+                  name: "",
+                  guard_name: "admin",
+                  section: "",
+                  action: "",
+                });
+                setIsModalOpen(true);
+              }}
+              className="flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Create New Permission
+            </PrimaryButton>
+          </HasPermission>
         }
       >
         {isLoadingPermissions ? (
@@ -257,7 +282,9 @@ const PermissionList = () => {
               {permissions.map((permission) => (
                 <TableRow key={permission.id}>
                   <TableCell>{permission.id}</TableCell>
-                  <TableCell className="font-medium">{permission.name}</TableCell>
+                  <TableCell className="font-medium">
+                    {permission.name}
+                  </TableCell>
                   <TableCell>
                     <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
                       {permission.guard_name}
@@ -268,20 +295,24 @@ const PermissionList = () => {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <button
-                        onClick={() => handleEdit(permission)}
-                        className="p-2 hover:bg-gray-100 rounded"
-                        title="Edit Permission"
-                      >
-                        <Pencil className="w-4 h-4 text-blue-600" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteClick(permission.id)}
-                        className="p-2 hover:bg-gray-100 rounded"
-                        title="Delete Permission"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-600" />
-                      </button>
+                      <HasPermission required="admin.role permission.role permission.edit">
+                        <button
+                          onClick={() => handleEdit(permission)}
+                          className="p-2 hover:bg-gray-100 rounded"
+                          title="Edit Permission"
+                        >
+                          <Pencil className="w-4 h-4 text-blue-600" />
+                        </button>
+                      </HasPermission>
+                      <HasPermission required="admin.role permission.role permission.delete">
+                        <button
+                          onClick={() => handleDeleteClick(permission.id)}
+                          className="p-2 hover:bg-gray-100 rounded"
+                          title="Delete Permission"
+                        >
+                          <Trash2 className="w-4 h-4 text-red-600" />
+                        </button>
+                      </HasPermission>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -292,16 +323,26 @@ const PermissionList = () => {
       </ComponentCard>
 
       {/* Create/Edit Permission Modal */}
-      <Dialog open={isModalOpen} onOpenChange={(open) => {
-        setIsModalOpen(open);
-        if (!open) {
-          setEditingPermission(null);
-          reset({ name: "", guard_name: "merchant", section: "", action: "" });
-        }
-      }}>
+      <Dialog
+        open={isModalOpen}
+        onOpenChange={(open) => {
+          setIsModalOpen(open);
+          if (!open) {
+            setEditingPermission(null);
+            reset({
+              name: "",
+              guard_name: "merchant",
+              section: "",
+              action: "",
+            });
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>{editingPermission ? 'Edit Permission' : 'Create New Permission'}</DialogTitle>
+            <DialogTitle>
+              {editingPermission ? "Edit Permission" : "Create New Permission"}
+            </DialogTitle>
           </DialogHeader>
           <hr className="my-2" />
 
@@ -358,7 +399,9 @@ const PermissionList = () => {
               <div>
                 <Label htmlFor="name">
                   Permission Name
-                  <span className="text-xs text-gray-500 ml-2">(Auto-generated)</span>
+                  <span className="text-xs text-gray-500 ml-2">
+                    (Auto-generated)
+                  </span>
                 </Label>
                 <Input
                   type="text"
@@ -373,8 +416,6 @@ const PermissionList = () => {
               </div>
             </div>
 
-
-
             <DialogFooter className="mt-6">
               <PrimaryButton
                 variant="secondary"
@@ -382,16 +423,24 @@ const PermissionList = () => {
                 onClick={() => {
                   setIsModalOpen(false);
                   setEditingPermission(null);
-                  reset({ name: "", guard_name: "merchant", section: "", action: "" });
+                  reset({
+                    name: "",
+                    guard_name: "merchant",
+                    section: "",
+                    action: "",
+                  });
                 }}
               >
                 Cancel
               </PrimaryButton>
               <PrimaryButton type="submit" disabled={isCreating || isUpdating}>
                 {editingPermission
-                  ? (isUpdating ? "Updating..." : "Update Permission")
-                  : (isCreating ? "Creating..." : "Create Permission")
-                }
+                  ? isUpdating
+                    ? "Updating..."
+                    : "Update Permission"
+                  : isCreating
+                    ? "Creating..."
+                    : "Create Permission"}
               </PrimaryButton>
             </DialogFooter>
           </form>

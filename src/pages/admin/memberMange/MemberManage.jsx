@@ -38,10 +38,9 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle,
-  DialogDescription,
   DialogFooter,
 } from "../../../components/ui/dialog";
+import HasPermission from "@/components/common/HasPermission";
 
 const useDebounced = (value, delay = 400) => {
   const [v, setV] = useState(value);
@@ -66,7 +65,7 @@ const MemberManage = () => {
 
   const dispatch = useDispatch();
   const { search, status, perPage, memberType } = useSelector(
-    (s) => s.memberManagement
+    (s) => s.memberManagement,
   );
 
   const { members, meta, isLoading, isFetching, isError } = useMembers();
@@ -97,7 +96,7 @@ const MemberManage = () => {
 
   const toggleSelect = (id) => {
     setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
 
@@ -181,7 +180,7 @@ const MemberManage = () => {
     const success = await handleStatusChange(
       actionDialog.member.id,
       targetStatus,
-      trimmedReason
+      trimmedReason,
     );
 
     if (success) {
@@ -203,9 +202,11 @@ const MemberManage = () => {
           />
 
           <div className="flex flex-wrap items-center gap-3">
-            <PrimaryButton to="/admin/member-registration" variant="primary">
-              <Plus size={16} /> Register Member
-            </PrimaryButton>
+            <HasPermission required="admin.member manage.member manage.create">
+              <PrimaryButton to="/admin/member-registration" variant="primary">
+                <Plus size={16} /> Register Member
+              </PrimaryButton>
+            </HasPermission>
             <DropdownSelect
               value={memberType}
               onChange={(val) => dispatch(setMemberType(val))}
@@ -371,18 +372,22 @@ const MemberManage = () => {
                       </TableCell>
                       <TableCell className="whitespace-normal break-words">
                         <div className="flex gap-2">
-                          <Link
-                            to={`/admin/member-manage/details/${m.id}`}
-                            className="p-2 rounded-md bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
-                          >
-                            <Eye size={16} />
-                          </Link>
-                          <Link
-                            to={`/admin/member-manage/edit/${m.id}`}
-                            className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200"
-                          >
-                            <PencilLine size={16} />
-                          </Link>
+                          <HasPermission required="admin.member manage.member manage.view">
+                            <Link
+                              to={`/admin/member-manage/details/${m.id}`}
+                              className="p-2 rounded-md bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
+                            >
+                              <Eye size={16} />
+                            </Link>
+                          </HasPermission>
+                          <HasPermission required="admin.member manage.member manage.edit">
+                            <Link
+                              to={`/admin/member-manage/edit/${m.id}`}
+                              className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200"
+                            >
+                              <PencilLine size={16} />
+                            </Link>
+                          </HasPermission>
                           {isBlocked ? (
                             <button
                               onClick={() => handleStatusChange(m.id, "active")}

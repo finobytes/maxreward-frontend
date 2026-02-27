@@ -22,6 +22,7 @@ import {
   TableRow,
 } from "../../../../components/ui/table";
 import { useModel } from "../../../../redux/features/admin/model/useModel";
+import HasPermission from "@/components/common/HasPermission";
 import {
   setSearch,
   setPage,
@@ -107,7 +108,7 @@ const Model = () => {
     try {
       await handleSubmit(e);
       toast.success(
-        editId ? "Model updated successfully!" : "Model created successfully!"
+        editId ? "Model updated successfully!" : "Model created successfully!",
       );
       setIsModalOpen(false);
     } catch (err) {
@@ -164,9 +165,11 @@ const Model = () => {
           />
 
           <div className="flex items-center gap-3">
-            <PrimaryButton variant="primary" onClick={openCreateModal}>
-              <Plus size={16} /> Create
-            </PrimaryButton>
+            <HasPermission required="admin.e-commerce.brand model.create">
+              <PrimaryButton variant="primary" onClick={openCreateModal}>
+                <Plus size={16} /> Create
+              </PrimaryButton>
+            </HasPermission>
 
             <DropdownSelect
               value={per_page}
@@ -238,19 +241,23 @@ const Model = () => {
 
                     <TableCell>
                       <div className="flex gap-2">
-                        <button
-                          onClick={() => openEditModal(item)}
-                          className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200"
-                        >
-                          <PencilLine size={16} />
-                        </button>
+                        <HasPermission required="admin.e-commerce.brand model.edit">
+                          <button
+                            onClick={() => openEditModal(item)}
+                            className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200"
+                          >
+                            <PencilLine size={16} />
+                          </button>
+                        </HasPermission>
 
-                        <button
-                          onClick={() => openDeleteModal(item.id)}
-                          className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200"
-                        >
-                          <Trash2Icon size={16} />
-                        </button>
+                        <HasPermission required="admin.e-commerce.brand model.delete">
+                          <button
+                            onClick={() => openDeleteModal(item.id)}
+                            className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200"
+                          >
+                            <Trash2Icon size={16} />
+                          </button>
+                        </HasPermission>
                       </div>
                     </TableCell>
                   </TableRow>

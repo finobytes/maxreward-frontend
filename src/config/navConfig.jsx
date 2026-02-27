@@ -497,7 +497,7 @@ export const NAV_CONFIG = {
       name: "Shipping Rate Settings",
       icon: <Settings />,
       path: "/merchant/shipping-rate-settings",
-      permission: "settings.shipping rate settings",
+      permission: "shipping rate settings",
     },
 
     // Profile & Logout - always visible

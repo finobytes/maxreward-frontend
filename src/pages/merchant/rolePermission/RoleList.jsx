@@ -31,6 +31,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Pencil, Trash2, Plus, AlertTriangle, Loader } from "lucide-react";
+import HasPermission from "@/components/common/HasPermission";
 
 const roleSchema = z.object({
   name: z.string().min(2, "Role name is required"),
@@ -77,14 +78,15 @@ const RoleList = () => {
 
       if (res?.success) {
         toast.success(
-          res?.message || `Role ${editingRole ? "updated" : "created"} successfully!`
+          res?.message ||
+            `Role ${editingRole ? "updated" : "created"} successfully!`,
         );
         reset();
         setIsModalOpen(false);
         setEditingRole(null);
       } else {
         toast.error(
-          res?.message || `Failed to ${editingRole ? "update" : "create"} role`
+          res?.message || `Failed to ${editingRole ? "update" : "create"} role`,
         );
       }
     } catch (err) {
@@ -92,7 +94,7 @@ const RoleList = () => {
       const validationErrors = err?.data?.errors;
       if (validationErrors) {
         Object.entries(validationErrors).forEach(([field, messages]) =>
-          toast.error(`${field}: ${messages.join(", ")}`)
+          toast.error(`${field}: ${messages.join(", ")}`),
         );
       } else {
         toast.error(err?.data?.message || "Something went wrong!");
@@ -145,17 +147,19 @@ const RoleList = () => {
       <ComponentCard
         title="Role List"
         headerAction={
-          <PrimaryButton
-            onClick={() => {
-              setEditingRole(null);
-              reset({ name: "" });
-              setIsModalOpen(true);
-            }}
-            className="flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            Create New Role
-          </PrimaryButton>
+          <HasPermission required="role permission.role permission.create">
+            <PrimaryButton
+              onClick={() => {
+                setEditingRole(null);
+                reset({ name: "" });
+                setIsModalOpen(true);
+              }}
+              className="flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Create New Role
+            </PrimaryButton>
+          </HasPermission>
         }
       >
         {isLoadingRoles ? (
@@ -203,20 +207,24 @@ const RoleList = () => {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <button
-                        onClick={() => handleEdit(role)}
-                        className="p-2 hover:bg-gray-100 rounded"
-                        title="Edit Role"
-                      >
-                        <Pencil className="w-4 h-4 text-blue-600" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteClick(role.id)}
-                        className="p-2 hover:bg-gray-100 rounded"
-                        title="Delete Role"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-600" />
-                      </button>
+                      <HasPermission required="role permission.role permission.edit">
+                        <button
+                          onClick={() => handleEdit(role)}
+                          className="p-2 hover:bg-gray-100 rounded"
+                          title="Edit Role"
+                        >
+                          <Pencil className="w-4 h-4 text-blue-600" />
+                        </button>
+                      </HasPermission>
+                      <HasPermission required="role permission.role permission.delete">
+                        <button
+                          onClick={() => handleDeleteClick(role.id)}
+                          className="p-2 hover:bg-gray-100 rounded"
+                          title="Delete Role"
+                        >
+                          <Trash2 className="w-4 h-4 text-red-600" />
+                        </button>
+                      </HasPermission>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -277,8 +285,8 @@ const RoleList = () => {
                     ? "Updating..."
                     : "Update Role"
                   : isCreating
-                  ? "Creating..."
-                  : "Create Role"}
+                    ? "Creating..."
+                    : "Create Role"}
               </PrimaryButton>
             </DialogFooter>
           </form>
