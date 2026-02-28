@@ -23,6 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import HasPermission from "@/components/common/HasPermission";
 import { useProduct } from "../../../../redux/features/merchant/product/useProduct";
 import {
   useDeleteProductMutation,
@@ -83,7 +84,7 @@ const ProductList = ({ statusFilter = "", title = "Products" }) => {
 
   const toggleSelect = (id) => {
     setSelected((prev) =>
-      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id],
     );
   };
 
@@ -155,13 +156,15 @@ const ProductList = ({ statusFilter = "", title = "Products" }) => {
               Reset
             </PrimaryButton>
 
-            <PrimaryButton
-              variant="primary"
-              size="md"
-              to="/merchant/product/create"
-            >
-              <Plus size={18} /> Add Product
-            </PrimaryButton>
+            <HasPermission required="products.active products.create">
+              <PrimaryButton
+                variant="primary"
+                size="md"
+                to="/merchant/product/create"
+              >
+                <Plus size={18} /> Add Product
+              </PrimaryButton>
+            </HasPermission>
           </div>
         </div>
 
@@ -326,65 +329,77 @@ const ProductList = ({ statusFilter = "", title = "Products" }) => {
                       </TableCell>
                       <TableCell className="align-middle">
                         <div className="flex gap-2 justify-center">
-                          <Link
-                            to={`/merchant/product/view/${product.id}`}
-                            className="p-2 rounded-md bg-gray-50 hover:bg-gray-100 text-gray-600 transition-colors border border-gray-200"
-                            title="View"
-                          >
-                            <Eye size={16} />
-                          </Link>
+                          <HasPermission required="products.active products.view">
+                            <Link
+                              to={`/merchant/product/view/${product.id}`}
+                              className="p-2 rounded-md bg-gray-50 hover:bg-gray-100 text-gray-600 transition-colors border border-gray-200"
+                              title="View"
+                            >
+                              <Eye size={16} />
+                            </Link>
+                          </HasPermission>
 
-                          <Link
-                            to={`/merchant/product/edit/${product.id}`}
-                            className="p-2 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors border border-blue-200"
-                            title="Edit"
-                          >
-                            <PencilLine size={16} />
-                          </Link>
+                          <HasPermission required="products.active products.edit">
+                            <Link
+                              to={`/merchant/product/edit/${product.id}`}
+                              className="p-2 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors border border-blue-200"
+                              title="Edit"
+                            >
+                              <PencilLine size={16} />
+                            </Link>
+                          </HasPermission>
 
                           {product.status === "draft" && (
-                            <button
-                              onClick={() =>
-                                handleStatusUpdate(product, "active")
-                              }
-                              className="p-2 rounded-md bg-green-50 hover:bg-green-100 text-green-600 transition-colors border border-green-200"
-                              title="Publish (Set to Active)"
-                            >
-                              <span className="font-bold text-xs">PUB</span>
-                            </button>
+                            <HasPermission required="products.active products.edit">
+                              <button
+                                onClick={() =>
+                                  handleStatusUpdate(product, "active")
+                                }
+                                className="p-2 rounded-md bg-green-50 hover:bg-green-100 text-green-600 transition-colors border border-green-200"
+                                title="Publish (Set to Active)"
+                              >
+                                <span className="font-bold text-xs">PUB</span>
+                              </button>
+                            </HasPermission>
                           )}
 
                           {product.status === "active" && (
-                            <button
-                              onClick={() =>
-                                handleStatusUpdate(product, "inactive")
-                              }
-                              className="p-2 rounded-md bg-yellow-50 hover:bg-yellow-100 text-yellow-600 transition-colors border border-yellow-200"
-                              title="Deactivate"
-                            >
-                              <span className="font-bold text-xs">DEACT</span>
-                            </button>
+                            <HasPermission required="products.active products.edit">
+                              <button
+                                onClick={() =>
+                                  handleStatusUpdate(product, "inactive")
+                                }
+                                className="p-2 rounded-md bg-yellow-50 hover:bg-yellow-100 text-yellow-600 transition-colors border border-yellow-200"
+                                title="Deactivate"
+                              >
+                                <span className="font-bold text-xs">DEACT</span>
+                              </button>
+                            </HasPermission>
                           )}
 
                           {product.status === "inactive" && (
-                            <button
-                              onClick={() =>
-                                handleStatusUpdate(product, "active")
-                              }
-                              className="p-2 rounded-md bg-green-50 hover:bg-green-100 text-green-600 transition-colors border border-green-200"
-                              title="Activate"
-                            >
-                              <span className="font-bold text-xs">ACT</span>
-                            </button>
+                            <HasPermission required="products.active products.edit">
+                              <button
+                                onClick={() =>
+                                  handleStatusUpdate(product, "active")
+                                }
+                                className="p-2 rounded-md bg-green-50 hover:bg-green-100 text-green-600 transition-colors border border-green-200"
+                                title="Activate"
+                              >
+                                <span className="font-bold text-xs">ACT</span>
+                              </button>
+                            </HasPermission>
                           )}
 
-                          <button
-                            onClick={() => handleDelete(product.id)}
-                            className="p-2 rounded-md bg-red-50 hover:bg-red-100 text-red-600 transition-colors border border-red-200"
-                            title="Delete"
-                          >
-                            <Trash2Icon size={16} />
-                          </button>
+                          <HasPermission required="products.active products.delete">
+                            <button
+                              onClick={() => handleDelete(product.id)}
+                              className="p-2 rounded-md bg-red-50 hover:bg-red-100 text-red-600 transition-colors border border-red-200"
+                              title="Delete"
+                            >
+                              <Trash2Icon size={16} />
+                            </button>
+                          </HasPermission>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -410,8 +425,8 @@ const ProductList = ({ statusFilter = "", title = "Products" }) => {
               {itemToUpdate?.newStatus === "active"
                 ? "Publish Product"
                 : itemToUpdate?.newStatus === "inactive"
-                ? "Deactivate Product"
-                : "Update Status"}
+                  ? "Deactivate Product"
+                  : "Update Status"}
             </DialogTitle>
             <DialogDescription>
               Are you sure you want to change the status of{" "}

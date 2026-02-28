@@ -36,6 +36,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "../../../components/ui/dialog";
+import HasPermission from "@/components/common/HasPermission";
 
 const initialRejectState = {
   open: false,
@@ -177,14 +178,16 @@ const PendingMerchant = () => {
           />
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
-            <PrimaryButton
-              variant="primary"
-              size="md"
-              to="/admin/merchant/merchant-registration?from=pending"
-            >
-              <Plus size={18} />
-              Add New Merchant
-            </PrimaryButton>
+            <HasPermission required="admin.merchant manage.pending merchant.create">
+              <PrimaryButton
+                variant="primary"
+                size="md"
+                to="/admin/merchant/merchant-registration?from=pending"
+              >
+                <Plus size={18} />
+                Add New Merchant
+              </PrimaryButton>
+            </HasPermission>
 
             <PrimaryButton
               variant="secondary"
@@ -309,31 +312,37 @@ const PendingMerchant = () => {
                         {new Date(merchant.created_at).toLocaleDateString()}
                       </TableCell>
                       <TableCell className="py-4 flex gap-2">
-                        <Link
-                          to={`/admin/pending-merchant/details/${merchant?.id}`}
-                          className="p-2 rounded-md bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
-                        >
-                          <Eye size={16} />
-                        </Link>
-                        <button
-                          onClick={() => handleApprove(merchant.id)}
-                          disabled={isUpdating}
-                          className="px-2 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-500 disabled:opacity-50"
-                        >
-                          Approve
-                        </button>
+                        <HasPermission required="admin.merchant manage.pending merchant.view">
+                          <Link
+                            to={`/admin/pending-merchant/details/${merchant?.id}`}
+                            className="p-2 rounded-md bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
+                          >
+                            <Eye size={16} />
+                          </Link>
+                        </HasPermission>
+                        <HasPermission required="admin.merchant manage.pending merchant.approve">
+                          <button
+                            onClick={() => handleApprove(merchant.id)}
+                            disabled={isUpdating}
+                            className="px-2 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-500 disabled:opacity-50"
+                          >
+                            Approve
+                          </button>
+                        </HasPermission>
 
-                        <button
-                          onClick={() => openRejectModal(merchant)}
-                          disabled={isRejected || isCurrentMerchantSubmitting}
-                          className="px-2 rounded-md bg-yellow-100 text-gray-700 hover:bg-yellow-200 disabled:opacity-50"
-                        >
-                          {isCurrentMerchantSubmitting
-                            ? "Submitting..."
-                            : isRejected
-                              ? "Rejected"
-                              : "Reject"}
-                        </button>
+                        <HasPermission required="admin.merchant manage.pending merchant.reject">
+                          <button
+                            onClick={() => openRejectModal(merchant)}
+                            disabled={isRejected || isCurrentMerchantSubmitting}
+                            className="px-2 rounded-md bg-yellow-100 text-gray-700 hover:bg-yellow-200 disabled:opacity-50"
+                          >
+                            {isCurrentMerchantSubmitting
+                              ? "Submitting..."
+                              : isRejected
+                                ? "Rejected"
+                                : "Reject"}
+                          </button>
+                        </HasPermission>
                       </TableCell>
                     </TableRow>
                   );

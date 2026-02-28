@@ -32,6 +32,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Pencil, Trash2, Plus, AlertTriangle, Loader } from "lucide-react";
+import HasPermission from "@/components/common/HasPermission";
 
 // Schema Validation (Zod)
 const actionSchema = z.object({
@@ -48,7 +49,8 @@ const ActionList = () => {
   const [deletingActionId, setDeletingActionId] = useState(null);
 
   // API Hooks
-  const { data: actionsData, isLoading: isLoadingActions } = useGetActionsQuery();
+  const { data: actionsData, isLoading: isLoadingActions } =
+    useGetActionsQuery();
   const [createAction, { isLoading: isCreating }] = useCreateActionMutation();
   const [updateAction, { isLoading: isUpdating }] = useUpdateActionMutation();
   const [deleteAction, { isLoading: isDeleting }] = useDeleteActionMutation();
@@ -79,26 +81,35 @@ const ActionList = () => {
 
       if (editingAction) {
         // Update existing action
-        res = await updateAction({ id: editingAction.id, data: payload }).unwrap();
+        res = await updateAction({
+          id: editingAction.id,
+          data: payload,
+        }).unwrap();
       } else {
         // Create new action
         res = await createAction(payload).unwrap();
       }
 
       if (res?.success) {
-        toast.success(res?.message || `Action ${editingAction ? 'updated' : 'created'} successfully!`);
+        toast.success(
+          res?.message ||
+            `Action ${editingAction ? "updated" : "created"} successfully!`,
+        );
         reset();
         setIsModalOpen(false);
         setEditingAction(null);
       } else {
-        toast.error(res?.message || `Failed to ${editingAction ? 'update' : 'create'} action`);
+        toast.error(
+          res?.message ||
+            `Failed to ${editingAction ? "update" : "create"} action`,
+        );
       }
     } catch (err) {
-      console.error(`${editingAction ? 'Update' : 'Create'} Failed:`, err);
+      console.error(`${editingAction ? "Update" : "Create"} Failed:`, err);
       const validationErrors = err?.data?.errors;
       if (validationErrors) {
         Object.entries(validationErrors).forEach(([field, messages]) =>
-          toast.error(`${field}: ${messages.join(", ")}`)
+          toast.error(`${field}: ${messages.join(", ")}`),
         );
       } else {
         toast.error(err?.data?.message || "Something went wrong!");
@@ -111,7 +122,10 @@ const ActionList = () => {
     setEditingAction(action);
     reset({
       name: action.name,
-      status: action.status === true || action.status === "active" ? "active" : "inactive",
+      status:
+        action.status === true || action.status === "active"
+          ? "active"
+          : "inactive",
     });
     setIsModalOpen(true);
   };
@@ -155,14 +169,19 @@ const ActionList = () => {
       <ComponentCard
         title="Action List"
         headerAction={
-          <PrimaryButton onClick={() => {
-            setEditingAction(null);
-            reset({ name: "", status: "active" });
-            setIsModalOpen(true);
-          }} className="flex items-center gap-2">
-            <Plus className="w-4 h-4" />
-            Create New Action
-          </PrimaryButton>
+          <HasPermission required="admin.role permission.role permission.create">
+            <PrimaryButton
+              onClick={() => {
+                setEditingAction(null);
+                reset({ name: "", status: "active" });
+                setIsModalOpen(true);
+              }}
+              className="flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Create New Action
+            </PrimaryButton>
+          </HasPermission>
         }
       >
         {isLoadingActions ? (
@@ -188,33 +207,41 @@ const ActionList = () => {
                   <TableCell>{action.id}</TableCell>
                   <TableCell className="font-medium">{action.name}</TableCell>
                   <TableCell>
-                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                      action.status === 'active'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {action.status ? 'Active' : 'Inactive'}
+                    <span
+                      className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                        action.status === "active"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {action.status ? "Active" : "Inactive"}
                     </span>
                   </TableCell>
                   <TableCell>
-                    {action.created_at ? new Date(action.created_at).toLocaleDateString() : '-'}
+                    {action.created_at
+                      ? new Date(action.created_at).toLocaleDateString()
+                      : "-"}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <button
-                        onClick={() => handleEdit(action)}
-                        className="p-2 hover:bg-gray-100 rounded"
-                        title="Edit Action"
-                      >
-                        <Pencil className="w-4 h-4 text-blue-600" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteClick(action.id)}
-                        className="p-2 hover:bg-gray-100 rounded"
-                        title="Delete Action"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-600" />
-                      </button>
+                      <HasPermission required="admin.role permission.role permission.edit">
+                        <button
+                          onClick={() => handleEdit(action)}
+                          className="p-2 hover:bg-gray-100 rounded"
+                          title="Edit Action"
+                        >
+                          <Pencil className="w-4 h-4 text-blue-600" />
+                        </button>
+                      </HasPermission>
+                      <HasPermission required="admin.role permission.role permission.delete">
+                        <button
+                          onClick={() => handleDeleteClick(action.id)}
+                          className="p-2 hover:bg-gray-100 rounded"
+                          title="Delete Action"
+                        >
+                          <Trash2 className="w-4 h-4 text-red-600" />
+                        </button>
+                      </HasPermission>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -225,16 +252,21 @@ const ActionList = () => {
       </ComponentCard>
 
       {/* Create/Edit Action Modal */}
-      <Dialog open={isModalOpen} onOpenChange={(open) => {
-        setIsModalOpen(open);
-        if (!open) {
-          setEditingAction(null);
-          reset({ name: "", status: "active" });
-        }
-      }}>
+      <Dialog
+        open={isModalOpen}
+        onOpenChange={(open) => {
+          setIsModalOpen(open);
+          if (!open) {
+            setEditingAction(null);
+            reset({ name: "", status: "active" });
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>{editingAction ? 'Edit Action' : 'Create New Action'}</DialogTitle>
+            <DialogTitle>
+              {editingAction ? "Edit Action" : "Create New Action"}
+            </DialogTitle>
           </DialogHeader>
           <hr className="my-2" />
 
@@ -282,9 +314,12 @@ const ActionList = () => {
               </PrimaryButton>
               <PrimaryButton type="submit" disabled={isCreating || isUpdating}>
                 {editingAction
-                  ? (isUpdating ? "Updating..." : "Update Action")
-                  : (isCreating ? "Creating..." : "Create Action")
-                }
+                  ? isUpdating
+                    ? "Updating..."
+                    : "Update Action"
+                  : isCreating
+                    ? "Creating..."
+                    : "Create Action"}
               </PrimaryButton>
             </DialogFooter>
           </form>
@@ -300,9 +335,7 @@ const ActionList = () => {
                 <AlertTriangle className="w-6 h-6 text-red-600" />
               </div>
 
-              <DialogTitle className="text-xl mt-2">
-                Delete Action
-              </DialogTitle>
+              <DialogTitle className="text-xl mt-2">Delete Action</DialogTitle>
               <DialogDescription className="text-center mt-2">
                 Are you sure you want to delete this action? This action is
                 permanent and cannot be undone.

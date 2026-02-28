@@ -37,6 +37,7 @@ import {
   useToggleShippingMethodStatusMutation,
   useUpdateShippingMethodMutation,
 } from "../../../redux/features/admin/shippingMethod/shippingMethodApi";
+import HasPermission from "@/components/common/HasPermission";
 
 const useDebounced = (value, delay = 400) => {
   const [v, setV] = useState(value);
@@ -254,9 +255,11 @@ const ShippingMethods = () => {
           />
 
           <div className="flex flex-wrap items-center gap-3">
-            <PrimaryButton variant="primary" onClick={openCreateModal}>
-              <Plus size={16} /> Create
-            </PrimaryButton>
+            <HasPermission required="admin.e-commerce.shipping methods.create">
+              <PrimaryButton variant="primary" onClick={openCreateModal}>
+                <Plus size={16} /> Create
+              </PrimaryButton>
+            </HasPermission>
 
             <DropdownSelect
               value={statusFilter}
@@ -363,18 +366,22 @@ const ShippingMethods = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          <button
-                            onClick={() => openEditModal(method)}
-                            className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200"
-                          >
-                            <PencilLine size={16} />
-                          </button>
-                          <button
-                            onClick={() => openDeleteModal(method.id)}
-                            className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200"
-                          >
-                            <Trash2Icon size={16} />
-                          </button>
+                          <HasPermission required="admin.e-commerce.shipping methods.edit">
+                            <button
+                              onClick={() => openEditModal(method)}
+                              className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200"
+                            >
+                              <PencilLine size={16} />
+                            </button>
+                          </HasPermission>
+                          <HasPermission required="admin.e-commerce.shipping methods.delete">
+                            <button
+                              onClick={() => openDeleteModal(method.id)}
+                              className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200"
+                            >
+                              <Trash2Icon size={16} />
+                            </button>
+                          </HasPermission>
                         </div>
                       </TableCell>
                     </TableRow>

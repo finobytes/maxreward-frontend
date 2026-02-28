@@ -60,6 +60,76 @@ const Sidebar = () => {
   const items = useMemo(() => {
     let navItems = NAV_CONFIG[role] || [];
 
+    // For admin-type users (type === "admin"), show all menus without filtering
+    const isMainAdmin = role === "admin" && data?.type === "admin";
+
+    // A merchant who is the business owner or holds super-admin role
+    const isMainMerchant =
+      role === "merchant" &&
+      data?.roles?.some((r) => r.name.toLowerCase().includes("super-admin"));
+
+    // Extract permissions from roles[].permissions[].name
+    let userPermissions = [];
+    if (data?.roles && Array.isArray(data.roles)) {
+      data.roles.forEach((roleObj) => {
+        if (roleObj.permissions && Array.isArray(roleObj.permissions)) {
+          roleObj.permissions.forEach((perm) => {
+            if (perm.name && !userPermissions.includes(perm.name)) {
+              userPermissions.push(perm.name);
+            }
+          });
+        }
+      });
+    }
+
+    // Also include any direct permissions if available
+    if (data?.permissions && Array.isArray(data.permissions)) {
+      data.permissions.forEach((perm) => {
+        const permName = typeof perm === "string" ? perm : perm?.name;
+        if (permName && !userPermissions.includes(permName)) {
+          userPermissions.push(permName);
+        }
+      });
+    }
+
+    const hasPermission = (requiredPerm, userPerms) => {
+      return userPerms.some(
+        (userPerm) =>
+          userPerm === requiredPerm || userPerm.startsWith(requiredPerm + "."),
+      );
+    };
+
+    const filterNavItems = (items, permissions) => {
+      return items
+        .filter((item) => {
+          if (!item.permission) return true;
+          if (hasPermission(item.permission, permissions)) return true;
+          if (item.subItems) return true;
+          return false;
+        })
+        .map((item) => {
+          if (item.subItems) {
+            return {
+              ...item,
+              subItems: filterNavItems(item.subItems, permissions),
+            };
+          }
+          return item;
+        })
+        .filter((item) => {
+          if (item.subItems && item.subItems.length === 0 && !item.path) {
+            return false;
+          }
+          return true;
+        });
+    };
+
+    // Filter items if user is not a master/bypass role
+    if (!isMainAdmin && !isMainMerchant && role !== "member") {
+      // If a staff user has NO permissions, pass an empty array so they only see public items (like Profile, Logout)
+      navItems = filterNavItems(navItems, userPermissions);
+    }
+
     // hide Merchant Application if member_type === 'corporate'
     if (role === "member" && userType === "corporate") {
       navItems = navItems.filter(
@@ -68,7 +138,7 @@ const Sidebar = () => {
     }
 
     return navItems;
-  }, [role, userType]);
+  }, [role, userType, data]);
 
   const isActive = useCallback(
     (path) => location.pathname === path,

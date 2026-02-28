@@ -39,11 +39,11 @@ const Login = () => {
             role: formData.userName.startsWith("A")
               ? "admin"
               : formData.userName.startsWith("M")
-              ? "merchant"
-              : "member",
+                ? "merchant"
+                : "member",
           },
           token: res.access_token,
-        })
+        }),
       );
 
       // Redirect role
@@ -51,8 +51,8 @@ const Login = () => {
         formData.userName.startsWith("A")
           ? "/admin"
           : formData.userName.startsWith("M")
-          ? "/merchant"
-          : "/member"
+            ? "/merchant"
+            : "/member",
       );
     } catch (err) {
       // console.log("Login failed:::", err?.data?.error)
@@ -63,11 +63,11 @@ const Login = () => {
         err?.error?.includes("Failed to fetch")
       ) {
         toast.error(
-          "Unable to connect to server. Please check your internet or try again later."
+          "Unable to connect to server. Please check your internet or try again later.",
         );
       } else if (err?.status === 401 || err?.status === 400) {
         toast.error("Invalid username or password.");
-      }else if (err?.status === 403 ) {
+      } else if (err?.status === 403) {
         toast.error(err?.data?.error || "Access forbidden.");
       } else if (err?.status === 500) {
         toast.error("Server error. Please try again later.");

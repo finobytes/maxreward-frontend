@@ -38,6 +38,7 @@ import {
   useToggleShippingZoneStatusMutation,
   useUpdateShippingZoneMutation,
 } from "../../../redux/features/admin/shippingZone/shippingZoneApi";
+import HasPermission from "@/components/common/HasPermission";
 
 const useDebounced = (value, delay = 400) => {
   const [v, setV] = useState(value);
@@ -261,9 +262,11 @@ const ShippingZone = () => {
           />
 
           <div className="flex flex-wrap items-center gap-3">
-            <PrimaryButton variant="primary" onClick={openCreateModal}>
-              <Plus size={16} /> Create
-            </PrimaryButton>
+            <HasPermission required="admin.e-commerce.shipping zone.create">
+              <PrimaryButton variant="primary" onClick={openCreateModal}>
+                <Plus size={16} /> Create
+              </PrimaryButton>
+            </HasPermission>
 
             <DropdownSelect
               value={regionFilter}
@@ -388,18 +391,22 @@ const ShippingZone = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          <button
-                            onClick={() => openEditModal(zone)}
-                            className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200"
-                          >
-                            <PencilLine size={16} />
-                          </button>
-                          <button
-                            onClick={() => openDeleteModal(zone.id)}
-                            className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200"
-                          >
-                            <Trash2Icon size={16} />
-                          </button>
+                          <HasPermission required="admin.e-commerce.shipping zone.edit">
+                            <button
+                              onClick={() => openEditModal(zone)}
+                              className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200"
+                            >
+                              <PencilLine size={16} />
+                            </button>
+                          </HasPermission>
+                          <HasPermission required="admin.e-commerce.shipping zone.delete">
+                            <button
+                              onClick={() => openDeleteModal(zone.id)}
+                              className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200"
+                            >
+                              <Trash2Icon size={16} />
+                            </button>
+                          </HasPermission>
                         </div>
                       </TableCell>
                     </TableRow>

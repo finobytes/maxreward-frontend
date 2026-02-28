@@ -21,6 +21,7 @@ import { useAdminStaff } from "../../../redux/features/admin/adminStaff/useAdmin
 import { useDeleteAdminStaffMutation } from "../../../redux/features/admin/adminStaff/adminStaffApi";
 import BulkActionBar from "../../../components/table/BulkActionBar";
 import { useGetAllRolesQuery } from "../../../redux/features/admin/rolePermission/rolePermissionApi";
+import HasPermission from "@/components/common/HasPermission";
 
 const StaffManage = () => {
   const {
@@ -63,7 +64,7 @@ const StaffManage = () => {
 
   const toggleSelect = (id) => {
     setSelected((prev) =>
-      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id],
     );
   };
 
@@ -86,13 +87,15 @@ const StaffManage = () => {
           />
 
           <div className="flex flex-wrap gap-3 items-center">
-            <PrimaryButton
-              variant="primary"
-              size="md"
-              to="/admin/staff-manage/create"
-            >
-              <Plus size={18} /> Add New Staff
-            </PrimaryButton>
+            <HasPermission required="admin.staff manage.staff manage.create">
+              <PrimaryButton
+                variant="primary"
+                size="md"
+                to="/admin/staff-manage/create"
+              >
+                <Plus size={18} /> Add New Staff
+              </PrimaryButton>
+            </HasPermission>
             <DropdownSelect
               value={status}
               onChange={(val) => setStatus(val)}
@@ -256,7 +259,9 @@ const StaffManage = () => {
                     </TableCell>
 
                     <TableCell className="whitespace-normal break-words relative group">
-                          <span className="text-gray-500">{staff?.roles[0]?.name || "N/A"}</span>
+                      <span className="text-gray-500">
+                        {staff?.roles[0]?.name || "N/A"}
+                      </span>
                       {/* <div className="hidden group-hover:block absolute inset-0 bg-white z-10 p-2">
                         <select
                           className="w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -278,19 +283,23 @@ const StaffManage = () => {
 
                     <TableCell>
                       <div className="py-2 flex gap-2 justify-center">
-                        <Link
-                          to={`/admin/staff-manage/details/${staff.id}`}
-                          className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500"
-                        >
-                          <Eye size={20} />
-                        </Link>
+                        <HasPermission required="admin.staff manage.staff manage.view">
+                          <Link
+                            to={`/admin/staff-manage/details/${staff.id}`}
+                            className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500"
+                          >
+                            <Eye size={20} />
+                          </Link>
+                        </HasPermission>
 
-                        <Link
-                          to={`/admin/staff-manage/update/${staff.id}`}
-                          className="p-2 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-500"
-                        >
-                          <PencilLine size={16} />
-                        </Link>
+                        <HasPermission required="admin.staff manage.staff manage.edit">
+                          <Link
+                            to={`/admin/staff-manage/update/${staff.id}`}
+                            className="p-2 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-500"
+                          >
+                            <PencilLine size={16} />
+                          </Link>
+                        </HasPermission>
 
                         {/* <button
                           onClick={() => handleDelete(staff.id)}

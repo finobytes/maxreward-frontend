@@ -49,10 +49,6 @@ const StaffDetails = () => {
             <ComponentCard>
               <StaffProfile staff={staff?.data} />
             </ComponentCard>
-
-            <div className="">
-              <StaffInfo staff={staff?.data} />
-            </div>
             <div>
               <StaffDocuments staff={staff?.data} />
             </div>
@@ -61,12 +57,9 @@ const StaffDetails = () => {
           {/* Right Column */}
           <div className="lg:col-span-1">
             <ComponentCard>
-              <StaffDetailsTabs
-                tabs={tabs}
-                currentTab={currentTab}
-                setCurrentTab={setCurrentTab}
-              />
-              <StaffTabContent currentTab={currentTab} staff={staff?.data} />
+              <div className="">
+                <StaffInfo staff={staff?.data} />
+              </div>
             </ComponentCard>
           </div>
         </div>
