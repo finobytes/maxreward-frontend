@@ -32,6 +32,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Pencil, Trash2, Plus, AlertTriangle, Loader } from "lucide-react";
+import HasPermission from "@/components/common/HasPermission";
 
 // Schema Validation (Zod)
 const roleSchema = z.object({
@@ -85,19 +86,24 @@ const RoleList = () => {
       }
 
       if (res?.success) {
-        toast.success(res?.message || `Role ${editingRole ? 'updated' : 'created'} successfully!`);
+        toast.success(
+          res?.message ||
+            `Role ${editingRole ? "updated" : "created"} successfully!`,
+        );
         reset();
         setIsModalOpen(false);
         setEditingRole(null);
       } else {
-        toast.error(res?.message || `Failed to ${editingRole ? 'update' : 'create'} role`);
+        toast.error(
+          res?.message || `Failed to ${editingRole ? "update" : "create"} role`,
+        );
       }
     } catch (err) {
-      console.error(`${editingRole ? 'Update' : 'Create'} Failed:`, err);
+      console.error(`${editingRole ? "Update" : "Create"} Failed:`, err);
       const validationErrors = err?.data?.errors;
       if (validationErrors) {
         Object.entries(validationErrors).forEach(([field, messages]) =>
-          toast.error(`${field}: ${messages.join(", ")}`)
+          toast.error(`${field}: ${messages.join(", ")}`),
         );
       } else {
         toast.error(err?.data?.message || "Something went wrong!");
@@ -170,14 +176,19 @@ const RoleList = () => {
       <ComponentCard
         title="Role List"
         headerAction={
-          <PrimaryButton onClick={() => {
-            setEditingRole(null);
-            reset({ name: "", guard_name: "merchant" });
-            setIsModalOpen(true);
-          }} className="flex items-center gap-2">
-            <Plus className="w-4 h-4" />
-            Create New Role
-          </PrimaryButton>
+          <HasPermission required="admin.role permission.role permission.create">
+            <PrimaryButton
+              onClick={() => {
+                setEditingRole(null);
+                reset({ name: "", guard_name: "merchant" });
+                setIsModalOpen(true);
+              }}
+              className="flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Create New Role
+            </PrimaryButton>
+          </HasPermission>
         }
       >
         {isLoadingRoles ? (
@@ -211,10 +222,13 @@ const RoleList = () => {
                   <TableCell>
                     {role.permissions?.length > 0 ? (
                       <span className="text-sm text-gray-600">
-                        {role.permissions.length} permission{role.permissions.length > 1 ? 's' : ''}
+                        {role.permissions.length} permission
+                        {role.permissions.length > 1 ? "s" : ""}
                       </span>
                     ) : (
-                      <span className="text-sm text-gray-400">No permissions</span>
+                      <span className="text-sm text-gray-400">
+                        No permissions
+                      </span>
                     )}
                   </TableCell>
                   <TableCell>
@@ -222,20 +236,24 @@ const RoleList = () => {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <button
-                        onClick={() => handleEdit(role)}
-                        className="p-2 hover:bg-gray-100 rounded"
-                        title="Edit Role"
-                      >
-                        <Pencil className="w-4 h-4 text-blue-600" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteClick(role.id)}
-                        className="p-2 hover:bg-gray-100 rounded"
-                        title="Delete Role"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-600" />
-                      </button>
+                      <HasPermission required="admin.role permission.role permission.edit">
+                        <button
+                          onClick={() => handleEdit(role)}
+                          className="p-2 hover:bg-gray-100 rounded"
+                          title="Edit Role"
+                        >
+                          <Pencil className="w-4 h-4 text-blue-600" />
+                        </button>
+                      </HasPermission>
+                      <HasPermission required="admin.role permission.role permission.delete">
+                        <button
+                          onClick={() => handleDeleteClick(role.id)}
+                          className="p-2 hover:bg-gray-100 rounded"
+                          title="Delete Role"
+                        >
+                          <Trash2 className="w-4 h-4 text-red-600" />
+                        </button>
+                      </HasPermission>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -246,16 +264,21 @@ const RoleList = () => {
       </ComponentCard>
 
       {/* Create/Edit Role Modal */}
-      <Dialog open={isModalOpen} onOpenChange={(open) => {
-        setIsModalOpen(open);
-        if (!open) {
-          setEditingRole(null);
-          reset({ name: "", guard_name: "merchant" });
-        }
-      }}>
+      <Dialog
+        open={isModalOpen}
+        onOpenChange={(open) => {
+          setIsModalOpen(open);
+          if (!open) {
+            setEditingRole(null);
+            reset({ name: "", guard_name: "merchant" });
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>{editingRole ? 'Edit Role' : 'Create New Role'}</DialogTitle>
+            <DialogTitle>
+              {editingRole ? "Edit Role" : "Create New Role"}
+            </DialogTitle>
           </DialogHeader>
           <hr className="my-2" />
 
@@ -290,8 +313,6 @@ const RoleList = () => {
               </div>
             </div>
 
-
-
             <DialogFooter className="mt-6">
               <PrimaryButton
                 variant="secondary"
@@ -306,9 +327,12 @@ const RoleList = () => {
               </PrimaryButton>
               <PrimaryButton type="submit" disabled={isCreating || isUpdating}>
                 {editingRole
-                  ? (isUpdating ? "Updating..." : "Update Role")
-                  : (isCreating ? "Creating..." : "Create Role")
-                }
+                  ? isUpdating
+                    ? "Updating..."
+                    : "Update Role"
+                  : isCreating
+                    ? "Creating..."
+                    : "Create Role"}
               </PrimaryButton>
             </DialogFooter>
           </form>
@@ -324,9 +348,7 @@ const RoleList = () => {
                 <AlertTriangle className="w-6 h-6 text-red-600" />
               </div>
 
-              <DialogTitle className="text-xl mt-2">
-                Delete Role
-              </DialogTitle>
+              <DialogTitle className="text-xl mt-2">Delete Role</DialogTitle>
               <DialogDescription className="text-center mt-2">
                 Are you sure you want to delete this role? This action is
                 permanent and cannot be undone.

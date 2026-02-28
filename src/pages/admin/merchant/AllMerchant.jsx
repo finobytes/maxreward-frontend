@@ -35,6 +35,7 @@ import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSke
 import BulkActionBar from "../../../components/table/BulkActionBar";
 import StatusBadge from "../../../components/table/StatusBadge";
 import { toast } from "sonner";
+import HasPermission from "@/components/common/HasPermission";
 
 const initialSuspendState = {
   open: false,
@@ -99,7 +100,7 @@ const AllMerchant = () => {
 
   const toggleSelect = (id) => {
     setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
 
@@ -208,14 +209,16 @@ const AllMerchant = () => {
                   ]}
                 />
               )}
-              <PrimaryButton
-                variant="primary"
-                size="md"
-                to="/admin/merchant/merchant-registration?from=all"
-              >
-                <Plus size={18} />
-                Add New Merchant
-              </PrimaryButton>
+              <HasPermission required="admin.merchant manage.all merchant.create">
+                <PrimaryButton
+                  variant="primary"
+                  size="md"
+                  to="/admin/merchant/merchant-registration?from=all"
+                >
+                  <Plus size={18} />
+                  Add New Merchant
+                </PrimaryButton>
+              </HasPermission>
 
               <PrimaryButton
                 variant="secondary"
@@ -384,37 +387,43 @@ const AllMerchant = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          <Link
-                            to={`/admin/merchant/details/${m?.id}`}
-                            className="p-2 rounded-md bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
-                          >
-                            <Eye size={16} />
-                          </Link>
-                          <Link
-                            to={`/admin/merchant/update/${m?.id}`}
-                            className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200"
-                          >
-                            <PencilLine size={16} />
-                          </Link>
-                          <button
-                            onClick={() =>
-                              isSuspended
-                                ? handleUnsuspend(m.id)
-                                : openSuspendModal(m)
-                            }
-                            disabled={isCurrentMerchantSubmitting}
-                            className={`px-2 rounded-md ${
-                              isSuspended
-                                ? "bg-green-100 text-green-700 hover:bg-green-200"
-                                : "bg-yellow-100 text-gray-700 hover:bg-yellow-200"
-                            } disabled:opacity-50`}
-                          >
-                            {isCurrentMerchantSubmitting
-                              ? "Submitting..."
-                              : isSuspended
-                              ? "Unsuspend"
-                              : "Suspend"}
-                          </button>
+                          <HasPermission required="admin.merchant manage.all merchant.view">
+                            <Link
+                              to={`/admin/merchant/details/${m?.id}`}
+                              className="p-2 rounded-md bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
+                            >
+                              <Eye size={16} />
+                            </Link>
+                          </HasPermission>
+                          <HasPermission required="admin.merchant manage.all merchant.edit">
+                            <Link
+                              to={`/admin/merchant/update/${m?.id}`}
+                              className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200"
+                            >
+                              <PencilLine size={16} />
+                            </Link>
+                          </HasPermission>
+                          <HasPermission required="admin.merchant manage.all merchant.edit">
+                            <button
+                              onClick={() =>
+                                isSuspended
+                                  ? handleUnsuspend(m.id)
+                                  : openSuspendModal(m)
+                              }
+                              disabled={isCurrentMerchantSubmitting}
+                              className={`px-2 rounded-md ${
+                                isSuspended
+                                  ? "bg-green-100 text-green-700 hover:bg-green-200"
+                                  : "bg-yellow-100 text-gray-700 hover:bg-yellow-200"
+                              } disabled:opacity-50`}
+                            >
+                              {isCurrentMerchantSubmitting
+                                ? "Submitting..."
+                                : isSuspended
+                                  ? "Unsuspend"
+                                  : "Suspend"}
+                            </button>
+                          </HasPermission>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -512,7 +521,7 @@ const AllMerchant = () => {
           <div className="p-4 bg-white rounded-xl shadow-sm border border-gray-100">
             {(() => {
               const userName = qrModal.data?.staffs?.find(
-                (staff) => staff?.type === "merchant"
+                (staff) => staff?.type === "merchant",
               )?.user_name;
 
               return userName ? (

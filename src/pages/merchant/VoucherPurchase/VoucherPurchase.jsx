@@ -7,6 +7,7 @@ import { Eye, Plus, Loader } from "lucide-react";
 import Pagination from "../../../components/table/Pagination";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import { Link } from "react-router";
+import HasPermission from "@/components/common/HasPermission";
 import {
   Table,
   TableBody,
@@ -72,7 +73,7 @@ const VoucherPurchase = () => {
 
   const toggleSelect = (id) => {
     setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
 
@@ -104,10 +105,12 @@ const VoucherPurchase = () => {
             />
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
-              <PrimaryButton variant="primary" size="md" to="/merchant/add">
-                <Plus size={18} />
-                Add Voucher
-              </PrimaryButton>
+              <HasPermission required="voucher purchase.voucher purchase.create">
+                <PrimaryButton variant="primary" size="md" to="/merchant/add">
+                  <Plus size={18} />
+                  Add Voucher
+                </PrimaryButton>
+              </HasPermission>
               <div className="flex items-center gap-4">
                 <DropdownSelect
                   value={statusFilter}
@@ -234,12 +237,14 @@ const VoucherPurchase = () => {
                         <StatusBadge status={v.status}>{v.status}</StatusBadge>
                       </TableCell>
                       <TableCell className="text-center">
-                        <Link
-                          to={`/merchant/voucher-details/${v.id}`}
-                          className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500 inline-block"
-                        >
-                          <Eye size={18} />
-                        </Link>
+                        <HasPermission required="voucher purchase.voucher purchase.view">
+                          <Link
+                            to={`/merchant/voucher-details/${v.id}`}
+                            className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500 inline-block"
+                          >
+                            <Eye size={18} />
+                          </Link>
+                        </HasPermission>
                       </TableCell>
                     </TableRow>
                   ))}
