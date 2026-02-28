@@ -6,6 +6,7 @@ import PurchasedVsRedeemed from "./components/PurchasedVsRedeemed";
 import { useVerifyMeQuery } from "../../../redux/features/auth/authApi";
 import MembershipCard from "../../../components/common/MembershipCard";
 import MemberDashboardSkeleton from "../../../components/skeleton/MemberDashboardSkeleton";
+import { DollarSignIcon } from "lucide-react";
 
 const MerchantDashboard = () => {
   const { data, isLoading, isFetching, isError } = useVerifyMeQuery("merchant");
@@ -70,7 +71,17 @@ const MerchantDashboard = () => {
       changeText: "+0.892",
       changeColor: "text-green-500",
       subtitle: "Increased",
-      chartColor: "#3B82F6", // blue
+      chartColor: "#3B82F6", // indigo
+      chartData: [6, 8, 7, 9, 8, 10, 9],
+    },
+    {
+      icon: dollar,
+      title: "Redeemed Balance",
+      value: wallet.redeemed_balance || "0",
+      changeText: "+0.892",
+      changeColor: "text-green-500",
+      subtitle: "Increased",
+      chartColor: "#3B82F6", // yellow
       chartData: [6, 8, 7, 9, 8, 10, 9],
     },
   ];
