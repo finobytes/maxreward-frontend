@@ -39,6 +39,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogFooter,
+  DialogTitle,
+  DialogDescription,
 } from "../../../components/ui/dialog";
 import HasPermission from "@/components/common/HasPermission";
 
