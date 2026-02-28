@@ -8,6 +8,7 @@ import PrimaryButton from "../../../components/ui/PrimaryButton";
 import Pagination from "../../../components/table/Pagination";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import MerchantStaffSkeleton from "../../../components/skeleton/MerchantStaffSkeleton";
+import HasPermission from "@/components/common/HasPermission";
 import {
   Table,
   TableBody,
@@ -104,7 +105,7 @@ const Denomination = () => {
   };
   const toggleSelect = (id) => {
     setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
   // Bulk actions (placeholder)
@@ -128,9 +129,11 @@ const Denomination = () => {
         {/* Filters */}
         <div className="flex flex-col items-end">
           <div className="flex flex-wrap items-center gap-3">
-            <PrimaryButton variant="primary" onClick={openCreateModal}>
-              <Plus size={16} /> Create
-            </PrimaryButton>
+            <HasPermission required="admin.accounts.denomination.create">
+              <PrimaryButton variant="primary" onClick={openCreateModal}>
+                <Plus size={16} /> Create
+              </PrimaryButton>
+            </HasPermission>
           </div>
         </div>
 
@@ -170,12 +173,14 @@ const Denomination = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          <button
-                            onClick={() => openEditModal(item)}
-                            className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200"
-                          >
-                            <PencilLine size={16} />
-                          </button>
+                          <HasPermission required="admin.accounts.denomination.edit">
+                            <button
+                              onClick={() => openEditModal(item)}
+                              className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200"
+                            >
+                              <PencilLine size={16} />
+                            </button>
+                          </HasPermission>
                         </div>
                       </TableCell>
                     </TableRow>

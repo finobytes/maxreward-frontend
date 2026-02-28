@@ -7,6 +7,7 @@ import Pagination from "../../../components/table/Pagination";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import { Eye, PencilLine, Plus, Trash2Icon } from "lucide-react";
 import { Link } from "react-router";
+import HasPermission from "@/components/common/HasPermission";
 import {
   Table,
   TableBody,
@@ -30,7 +31,7 @@ const MerchantStaff = () => {
   console.log(staffs);
   const toggleSelect = (id) => {
     setSelected((prev) =>
-      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id],
     );
   };
 
@@ -72,13 +73,15 @@ const MerchantStaff = () => {
               Clear
             </PrimaryButton>
 
-            <PrimaryButton
-              variant="primary"
-              size="md"
-              to="/merchant/merchant-staff/create"
-            >
-              <Plus size={18} /> Add New Staff
-            </PrimaryButton>
+            <HasPermission required="staff.merchant staff.create">
+              <PrimaryButton
+                variant="primary"
+                size="md"
+                to="/merchant/merchant-staff/create"
+              >
+                <Plus size={18} /> Add New Staff
+              </PrimaryButton>
+            </HasPermission>
           </div>
         </div>
 
@@ -167,19 +170,23 @@ const MerchantStaff = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2 justify-center">
-                        <Link
-                          to={`/merchant/merchant-staff/${staff.id}`}
-                          className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500"
-                        >
-                          <Eye size={20} />
-                        </Link>
+                        <HasPermission required="staff.merchant staff.view">
+                          <Link
+                            to={`/merchant/merchant-staff/${staff.id}`}
+                            className="p-2 rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-500"
+                          >
+                            <Eye size={20} />
+                          </Link>
+                        </HasPermission>
 
-                        <Link
-                          to={`/merchant/merchant-staff/update/${staff.id}`}
-                          className="p-2 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-500"
-                        >
-                          <PencilLine size={16} />
-                        </Link>
+                        <HasPermission required="staff.merchant staff.edit">
+                          <Link
+                            to={`/merchant/merchant-staff/update/${staff.id}`}
+                            className="p-2 rounded-md bg-blue-100 hover:bg-blue-200 text-blue-500"
+                          >
+                            <PencilLine size={16} />
+                          </Link>
+                        </HasPermission>
 
                         {/* <button
                           onClick={() => handleDelete(staff.id)}

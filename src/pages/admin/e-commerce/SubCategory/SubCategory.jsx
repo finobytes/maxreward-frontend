@@ -25,6 +25,7 @@ import {
 } from "../../../../components/ui/table";
 import { useSubCategory } from "../../../../redux/features/admin/subCategory/useSubCategory";
 import { useGetAllCategoriesQuery } from "../../../../redux/features/admin/category/categoryApi";
+import HasPermission from "@/components/common/HasPermission";
 import {
   setSearch,
   setPage,
@@ -120,7 +121,7 @@ const SubCategory = () => {
       toast.success(
         editId
           ? "Sub Category updated successfully!"
-          : "Sub Category created successfully!"
+          : "Sub Category created successfully!",
       );
       setIsModalOpen(false);
     } catch (err) {
@@ -177,9 +178,11 @@ const SubCategory = () => {
           />
 
           <div className="flex flex-wrap items-center gap-3">
-            <PrimaryButton variant="primary" onClick={openCreateModal}>
-              <Plus size={16} /> Create
-            </PrimaryButton>
+            <HasPermission required="admin.e-commerce.sub category.create">
+              <PrimaryButton variant="primary" onClick={openCreateModal}>
+                <Plus size={16} /> Create
+              </PrimaryButton>
+            </HasPermission>
 
             <DropdownSelect
               value={per_page}
@@ -252,18 +255,22 @@ const SubCategory = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        <button
-                          onClick={() => openEditModal(b)}
-                          className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200"
-                        >
-                          <PencilLine size={16} />
-                        </button>
-                        <button
-                          onClick={() => openDeleteModal(b.id)}
-                          className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200"
-                        >
-                          <Trash2Icon size={16} />
-                        </button>
+                        <HasPermission required="admin.e-commerce.sub category.edit">
+                          <button
+                            onClick={() => openEditModal(b)}
+                            className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200"
+                          >
+                            <PencilLine size={16} />
+                          </button>
+                        </HasPermission>
+                        <HasPermission required="admin.e-commerce.sub category.delete">
+                          <button
+                            onClick={() => openDeleteModal(b.id)}
+                            className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200"
+                          >
+                            <Trash2Icon size={16} />
+                          </button>
+                        </HasPermission>
                       </div>
                     </TableCell>
                   </TableRow>

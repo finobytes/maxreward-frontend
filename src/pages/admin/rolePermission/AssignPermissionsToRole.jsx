@@ -11,24 +11,104 @@ import {
   useGetAllPermissionsQuery,
   useAssignPermissionsToRoleMutation,
 } from "../../../redux/features/admin/rolePermission/rolePermissionApi";
-import { Search, CheckSquare, Square, Loader2, Shield } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
+import { NAV_CONFIG } from "@/config/navConfig";
 
-const normalizePermissionParts = (permissionName) => {
-  const parts = permissionName.split(".");
-  if (
-    parts.length >= 3 &&
-    ["admin", "merchant", "member"].includes(parts[0])
-  ) {
-    return parts.slice(1);
+// Function to find menu and submenu name from navConfig
+const getMenuInfo = (permissionName, guard) => {
+  const navItems = NAV_CONFIG[guard] || [];
+
+  let matches = [];
+
+  for (const item of navItems) {
+    if (item.subItems) {
+      for (const sub of item.subItems) {
+        if (
+          sub.permission &&
+          (permissionName === sub.permission ||
+            permissionName.startsWith(sub.permission + "."))
+        ) {
+          matches.push({
+            menuName: item.name,
+            subMenuName: sub.name,
+            matchedLen: sub.permission.length,
+            permissionStr: sub.permission,
+          });
+        }
+      }
+    }
+    if (
+      item.permission &&
+      (permissionName === item.permission ||
+        permissionName.startsWith(item.permission + "."))
+    ) {
+      matches.push({
+        menuName: item.name,
+        subMenuName: "",
+        matchedLen: item.permission.length,
+        permissionStr: item.permission,
+      });
+    }
   }
-  return parts;
+
+  if (matches.length > 0) {
+    // get the one with the longest match
+    matches.sort((a, b) => b.matchedLen - a.matchedLen);
+    const bestMatch = matches[0];
+    let action = permissionName.substring(bestMatch.matchedLen);
+    if (action.startsWith(".")) action = action.substring(1);
+
+    // Capitalize action nicely
+    if (!action) {
+      action = "Access / List";
+    } else {
+      action = action
+        .split(" ")
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" ");
+      action = action
+        .split("-")
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" ");
+    }
+
+    return {
+      menuName: bestMatch.menuName,
+      subMenuName: bestMatch.subMenuName,
+      action: action,
+    };
+  }
+
+  // Fallback
+  const parts = permissionName.split(".");
+  let menuName = parts.length > 1 ? parts[0] : "Others";
+  if (parts.length >= 3 && ["admin", "merchant", "member"].includes(parts[0])) {
+    menuName = parts[1];
+  }
+
+  let action = parts[parts.length - 1] || "";
+  if (action) {
+    action = action
+      .split(" ")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
+    action = action
+      .split("-")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
+  }
+
+  return {
+    menuName: menuName.charAt(0).toUpperCase() + menuName.slice(1),
+    subMenuName: "",
+    action: action || "Access",
+  };
 };
 
 const AssignPermissionsToRole = () => {
   const [selectedRoleId, setSelectedRoleId] = useState("");
   const [selectedPermissions, setSelectedPermissions] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const selectedGuard = "admin";
 
   // API Hooks
   const { data: rolesData, isLoading: isLoadingRoles } = useGetAllRolesQuery();
@@ -37,20 +117,14 @@ const AssignPermissionsToRole = () => {
   const [assignPermissions, { isLoading: isAssigning }] =
     useAssignPermissionsToRoleMutation();
 
-
-    console.log("rolesData--------", rolesData);
-
-  // Get roles based on selected guard
+  // Combine admin and merchant roles into a single array
   const roles = useMemo(() => {
     if (!rolesData?.data) return [];
-    return rolesData.data[selectedGuard] || [];
-  }, [rolesData, selectedGuard]);
-
-  // Get permissions based on selected guard
-  const permissions = useMemo(() => {
-    if (!permissionsData?.data) return [];
-    return permissionsData.data[selectedGuard] || [];
-  }, [permissionsData, selectedGuard]);
+    const _roles = [];
+    if (rolesData.data.admin) _roles.push(...rolesData.data.admin);
+    if (rolesData.data.merchant) _roles.push(...rolesData.data.merchant);
+    return _roles;
+  }, [rolesData]);
 
   // Get selected role details
   const selectedRole = useMemo(() => {
@@ -58,48 +132,78 @@ const AssignPermissionsToRole = () => {
     return roles.find((role) => role.id === parseInt(selectedRoleId));
   }, [selectedRoleId, roles]);
 
+  // Get permissions based on the selected role's guard
+  const permissions = useMemo(() => {
+    if (!permissionsData?.data || !selectedRole) return [];
+    return permissionsData.data[selectedRole.guard_name] || [];
+  }, [permissionsData, selectedRole]);
+
   // Filter permissions by search query
   const filteredPermissions = useMemo(() => {
     if (!searchQuery.trim()) return permissions;
     return permissions.filter((permission) =>
-      permission.name.toLowerCase().includes(searchQuery.toLowerCase())
+      permission.name.toLowerCase().includes(searchQuery.toLowerCase()),
     );
   }, [permissions, searchQuery]);
 
   const filteredPermissionNames = useMemo(
     () => filteredPermissions.map((permission) => permission.name),
-    [filteredPermissions]
+    [filteredPermissions],
   );
 
   const allFilteredSelected = useMemo(() => {
     if (filteredPermissionNames.length === 0) return false;
     return filteredPermissionNames.every((name) =>
-      selectedPermissions.includes(name)
+      selectedPermissions.includes(name),
     );
   }, [filteredPermissionNames, selectedPermissions]);
 
-  // Group permissions by category (section)
+  // Group permissions by category (Menu > SubMenu)
   const groupedPermissions = useMemo(() => {
     const groups = {};
 
     filteredPermissions.forEach((permission) => {
-      // Extract category from permission name (e.g., "admin.product.index" -> "product")
-      const parts = normalizePermissionParts(permission.name);
-      const category = parts.length > 1 ? parts[0] : "others";
+      const guardToUse =
+        permission.guard_name || selectedRole?.guard_name || "admin";
+      const info = getMenuInfo(permission.name, guardToUse);
+
+      // Create a display category name
+      const category = info.subMenuName
+        ? `${info.menuName} > ${info.subMenuName}`
+        : info.menuName;
 
       if (!groups[category]) {
         groups[category] = [];
       }
-      groups[category].push(permission);
+
+      // Store the formatted info to be used in UI
+      groups[category].push({
+        ...permission,
+        menuInfo: info,
+      });
     });
 
-    return groups;
-  }, [filteredPermissions]);
+    // Sort group keys alphabetically for a stable UI
+    const sortedGroups = Object.keys(groups)
+      .sort()
+      .reduce((acc, key) => {
+        acc[key] = groups[key];
+        return acc;
+      }, {});
+
+    return sortedGroups;
+  }, [filteredPermissions, selectedRole]);
 
   // Initialize selected permissions when role changes
   const handleRoleChange = (e) => {
     const roleId = e.target.value;
     setSelectedRoleId(roleId);
+
+    // If changing role, reset permissions
+    if (!roleId) {
+      setSelectedPermissions([]);
+      return;
+    }
 
     // Pre-select existing permissions for this role
     const role = roles.find((r) => r.id === parseInt(roleId));
@@ -133,7 +237,7 @@ const AssignPermissionsToRole = () => {
     }
 
     setSelectedPermissions((prev) =>
-      prev.filter((p) => !categoryPermissions.includes(p))
+      prev.filter((p) => !categoryPermissions.includes(p)),
     );
   };
 
@@ -147,19 +251,13 @@ const AssignPermissionsToRole = () => {
     }
 
     setSelectedPermissions((prev) =>
-      prev.filter((name) => !filteredPermissionNames.includes(name))
+      prev.filter((name) => !filteredPermissionNames.includes(name)),
     );
   };
 
   // Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-
-    console.log("selectedPermissions:::::", selectedPermissions);
-
-
-    console.log("selectedRoleId:::::", selectedRoleId);
 
     if (!selectedRoleId) {
       toast.error("Please select a role");
@@ -180,7 +278,7 @@ const AssignPermissionsToRole = () => {
       if (res?.success) {
         toast.success(
           res?.message ||
-            `${selectedPermissions.length} permissions assigned successfully!`
+            `${selectedPermissions.length} permissions assigned successfully!`,
         );
       } else {
         toast.error(res?.message || "Failed to assign permissions");
@@ -201,9 +299,7 @@ const AssignPermissionsToRole = () => {
         ]}
       />
 
-      <ComponentCard
-        title="Assign Permissions to Role"
-      >
+      <ComponentCard title="Assign Permissions to Role">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Role Selection Section */}
           <div className="grid grid-cols-1 gap-4 p-4 bg-gray-50 rounded-lg border">
@@ -219,7 +315,7 @@ const AssignPermissionsToRole = () => {
                   { value: "", label: "-- Select a Role --" },
                   ...roles.map((role) => ({
                     value: role.id.toString(),
-                    label: `${role.name} (${role.permissions?.length || 0} permissions)`,
+                    label: `${role.name} (${role.guard_name.charAt(0).toUpperCase() + role.guard_name.slice(1)}) - ${role.permissions?.length || 0} permissions`,
                   })),
                 ]}
               />
@@ -232,10 +328,12 @@ const AssignPermissionsToRole = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-lg font-semibold text-blue-900">
-                    {selectedRole.name}
+                    {selectedRole.name}{" "}
+                    <span className="text-sm font-normal text-blue-700 ml-2">
+                      ({selectedRole.guard_name.toUpperCase()})
+                    </span>
                   </h3>
                   <p className="text-sm text-blue-700">
-                    {/* Guard: <span className="font-medium">{selectedRole.guard_name}</span> | */}
                     Current Permissions:{" "}
                     <span className="font-medium">
                       {selectedRole.permissions?.length || 0}
@@ -276,9 +374,7 @@ const AssignPermissionsToRole = () => {
                     onCheckedChange={handleSelectAllChange}
                     disabled={filteredPermissionNames.length === 0}
                   />
-                  <span>
-                    Select All ({filteredPermissions.length})
-                  </span>
+                  <span>Select All ({filteredPermissions.length})</span>
                 </label>
               </div>
 
@@ -286,7 +382,9 @@ const AssignPermissionsToRole = () => {
               {isLoadingPermissions ? (
                 <div className="text-center py-8">
                   <Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" />
-                  <p className="text-sm text-gray-500 mt-2">Loading permissions...</p>
+                  <p className="text-sm text-gray-500 mt-2">
+                    Loading permissions...
+                  </p>
                 </div>
               ) : Object.keys(groupedPermissions).length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
@@ -294,84 +392,102 @@ const AssignPermissionsToRole = () => {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {Object.entries(groupedPermissions).map(([category, perms]) => {
-                    const allSelected = perms.every((p) =>
-                      selectedPermissions.includes(p.name)
-                    );
-                    const someSelected = perms.some((p) =>
-                      selectedPermissions.includes(p.name)
-                    );
+                  {Object.entries(groupedPermissions).map(
+                    ([category, perms]) => {
+                      const allSelected = perms.every((p) =>
+                        selectedPermissions.includes(p.name),
+                      );
+                      const someSelected = perms.some((p) =>
+                        selectedPermissions.includes(p.name),
+                      );
 
-                    return (
-                      <div
-                        key={category}
-                        className="border border-gray-200 rounded-lg overflow-hidden"
-                      >
-                        {/* Category Header */}
+                      return (
                         <div
-                          className={`px-4 py-3 transition-colors ${
-                            allSelected
-                              ? "bg-blue-100 border-blue-300"
-                              : someSelected
-                              ? "bg-blue-50"
-                              : "bg-gray-50"
-                          }`}
+                          key={category}
+                          className="border border-gray-200 rounded-lg overflow-hidden"
                         >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <Checkbox
-                                checked={allSelected}
-                                onCheckedChange={(checked) =>
-                                  handleCategoryToggle(category, checked)
-                                }
-                                className={
-                                  someSelected && !allSelected
-                                    ? "data-[state=checked]:bg-blue-500"
-                                    : ""
-                                }
-                              />
-                              <h4 className="font-semibold text-gray-900 capitalize">
-                                {category}
-                              </h4>
+                          {/* Category Header */}
+                          <div
+                            className={`px-4 py-3 transition-colors ${
+                              allSelected
+                                ? "bg-blue-100 border-blue-300"
+                                : someSelected
+                                  ? "bg-blue-50"
+                                  : "bg-gray-50"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <Checkbox
+                                  checked={allSelected}
+                                  onCheckedChange={(checked) =>
+                                    handleCategoryToggle(category, checked)
+                                  }
+                                  className={
+                                    someSelected && !allSelected
+                                      ? "data-[state=checked]:bg-blue-500"
+                                      : ""
+                                  }
+                                />
+                                <h4 className="font-semibold text-gray-900">
+                                  {category}
+                                </h4>
+                              </div>
+                              <span className="text-sm text-gray-600">
+                                {
+                                  perms.filter((p) =>
+                                    selectedPermissions.includes(p.name),
+                                  ).length
+                                }{" "}
+                                / {perms.length} selected
+                              </span>
                             </div>
-                            <span className="text-sm text-gray-600">
-                              {perms.filter((p) => selectedPermissions.includes(p.name)).length} / {perms.length} selected
-                            </span>
+                          </div>
+
+                          {/* Permissions in Category */}
+                          <div className="p-4 bg-white grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            {perms.map((permission) => {
+                              const checkboxId = `perm-${permission.id}`;
+                              return (
+                                <div
+                                  key={permission.id}
+                                  className="flex items-start gap-2 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                                >
+                                  <Checkbox
+                                    id={checkboxId}
+                                    checked={selectedPermissions.includes(
+                                      permission.name,
+                                    )}
+                                    onCheckedChange={(checked) =>
+                                      handlePermissionToggle(
+                                        permission.name,
+                                        checked,
+                                      )
+                                    }
+                                    className="mt-0.5"
+                                  />
+                                  <Label
+                                    htmlFor={checkboxId}
+                                    className="flex-1 min-w-0 cursor-pointer"
+                                  >
+                                    <p className="text-sm font-medium text-gray-900 truncate">
+                                      {permission.menuInfo?.action}
+                                    </p>
+                                    <p
+                                      className="text-xs text-gray-400 truncate"
+                                      title={permission.name}
+                                    >
+                                      {permission.name}
+                                    </p>
+                                  </Label>
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
-
-                        {/* Permissions in Category */}
-                        <div className="p-4 bg-white grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                          {perms.map((permission) => {
-                            const checkboxId = `perm-${permission.id}`;
-                            return (
-                              <div
-                                key={permission.id}
-                                className="flex items-start gap-2 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
-                              >
-                                <Checkbox
-                                  id={checkboxId}
-                                  checked={selectedPermissions.includes(permission.name)}
-                                  onCheckedChange={(checked) =>
-                                    handlePermissionToggle(permission.name, checked)
-                                  }
-                                  className="mt-0.5"
-                                />
-                                <Label htmlFor={checkboxId} className="flex-1 min-w-0 cursor-pointer">
-                                  <p className="text-sm font-medium text-gray-900 truncate">
-                                    {normalizePermissionParts(permission.name).slice(-1)[0]}
-                                  </p>
-                                  {/* <p className="text-xs text-gray-500 truncate">
-                                    {permission.name}
-                                  </p> */}
-                                </Label>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    },
+                  )}
                 </div>
               )}
             </div>

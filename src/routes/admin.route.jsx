@@ -1,3 +1,4 @@
+import AdminHomeRedirect from "../components/layouts/AdminHomeRedirect";
 import AdminDashboard from "../pages/admin/adminDashboard/AdminDashboard";
 import Profile from "../pages/admin/profile/Profile";
 import MemberPointsReport from "../pages/admin/reports/MemberPointsReport";
@@ -58,6 +59,10 @@ import Settings from "../pages/admin/Settings/Settings";
 export const adminRoutes = [
   {
     index: true,
+    element: <AdminHomeRedirect />,
+  },
+  {
+    path: "dashboard",
     element: <AdminDashboard />,
   },
   {

@@ -6,6 +6,7 @@ import {
   Plus,
   Trash2Icon,
 } from "lucide-react";
+import HasPermission from "@/components/common/HasPermission";
 import PageBreadcrumb from "../../../components/common/PageBreadcrumb";
 import InputField from "../../../components/form/input/InputField";
 import DropdownSelect from "../../../components/ui/dropdown/DropdownSelect";
@@ -123,7 +124,7 @@ const ShippingRateSetting = () => {
         label: zone.name,
         value: String(zone.id),
       })),
-    [zones]
+    [zones],
   );
 
   const methodOptions = useMemo(
@@ -132,7 +133,7 @@ const ShippingRateSetting = () => {
         label: method.name,
         value: String(method.id),
       })),
-    [methods]
+    [methods],
   );
 
   const rates = ratesResponse?.data?.data || ratesResponse?.data || [];
@@ -190,8 +191,7 @@ const ShippingRateSetting = () => {
       Number.isNaN(weightTo) ||
       Number.isNaN(basePoints) ||
       Number.isNaN(perKgPoints) ||
-      (freeShippingMinOrder !== null &&
-        Number.isNaN(freeShippingMinOrder))
+      (freeShippingMinOrder !== null && Number.isNaN(freeShippingMinOrder))
     ) {
       toast.error("Please enter valid numeric values.");
       return;
@@ -225,7 +225,7 @@ const ShippingRateSetting = () => {
       toast.success(
         editId
           ? "Shipping rate updated successfully!"
-          : "Shipping rate created successfully!"
+          : "Shipping rate created successfully!",
       );
       setIsModalOpen(false);
       setFormData(initialFormState);
@@ -292,7 +292,7 @@ const ShippingRateSetting = () => {
 
   const toggleSelect = (id) => {
     setSelectedRates((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
     );
   };
 
@@ -325,7 +325,7 @@ const ShippingRateSetting = () => {
     setBulkCreateData((prev) => ({
       ...prev,
       weight_ranges: prev.weight_ranges.map((range, idx) =>
-        idx === index ? { ...range, [field]: value } : range
+        idx === index ? { ...range, [field]: value } : range,
       ),
     }));
   };
@@ -391,10 +391,7 @@ const ShippingRateSetting = () => {
         ? null
         : Number(bulkCreateData.free_shipping_min_order);
 
-    if (
-      freeShippingMinOrder !== null &&
-      Number.isNaN(freeShippingMinOrder)
-    ) {
+    if (freeShippingMinOrder !== null && Number.isNaN(freeShippingMinOrder)) {
       toast.error("Free shipping minimum must be a valid number.");
       return;
     }
@@ -424,7 +421,7 @@ const ShippingRateSetting = () => {
       refetch();
     } catch (error) {
       toast.error(
-        error?.data?.message || "Failed to bulk create shipping rates."
+        error?.data?.message || "Failed to bulk create shipping rates.",
       );
     }
   };
@@ -440,10 +437,10 @@ const ShippingRateSetting = () => {
     try {
       setIsBulkDeleteProcessing(true);
       const results = await Promise.allSettled(
-        selectedRates.map((id) => deleteShippingRate(id).unwrap())
+        selectedRates.map((id) => deleteShippingRate(id).unwrap()),
       );
       const successCount = results.filter(
-        (result) => result.status === "fulfilled"
+        (result) => result.status === "fulfilled",
       ).length;
       const failureCount = results.length - successCount;
 
@@ -457,9 +454,7 @@ const ShippingRateSetting = () => {
       setSelectedRates([]);
       refetch();
     } catch (error) {
-      toast.error(
-        error?.data?.message || "Failed to delete shipping rates."
-      );
+      toast.error(error?.data?.message || "Failed to delete shipping rates.");
     } finally {
       setIsBulkDeleteProcessing(false);
     }
@@ -468,7 +463,10 @@ const ShippingRateSetting = () => {
   return (
     <div>
       <PageBreadcrumb
-        items={[{ label: "Home", to: "/" }, { label: "Shipping Rate Settings" }]}
+        items={[
+          { label: "Home", to: "/" },
+          { label: "Shipping Rate Settings" },
+        ]}
       />
 
       <div className="rounded-xl border bg-white p-4 relative">
@@ -481,36 +479,34 @@ const ShippingRateSetting = () => {
         {/* Filters */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3">
-            <PrimaryButton variant="primary" onClick={openCreateModal}>
-              <Plus size={16} /> Create
-            </PrimaryButton>
+            <HasPermission required="shipping rate settings.create">
+              <PrimaryButton variant="primary" onClick={openCreateModal}>
+                <Plus size={16} /> Create
+              </PrimaryButton>
+            </HasPermission>
 
-            <PrimaryButton
-              variant="secondary"
-              onClick={openBulkCreateModal}
-              disabled={isOptionsLoading}
-            >
-              <Plus size={16} /> Bulk Create
-            </PrimaryButton>
+            <HasPermission required="shipping rate settings.create">
+              <PrimaryButton
+                variant="secondary"
+                onClick={openBulkCreateModal}
+                disabled={isOptionsLoading}
+              >
+                <Plus size={16} /> Bulk Create
+              </PrimaryButton>
+            </HasPermission>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
             <DropdownSelect
               value={zoneFilter}
               onChange={(val) => setZoneFilter(val)}
-              options={[
-                { label: "All Zones", value: "" },
-                ...zoneOptions,
-              ]}
+              options={[{ label: "All Zones", value: "" }, ...zoneOptions]}
             />
 
             <DropdownSelect
               value={methodFilter}
               onChange={(val) => setMethodFilter(val)}
-              options={[
-                { label: "All Methods", value: "" },
-                ...methodOptions,
-              ]}
+              options={[{ label: "All Methods", value: "" }, ...methodOptions]}
             />
 
             <DropdownSelect
@@ -541,17 +537,19 @@ const ShippingRateSetting = () => {
 
         {/* Bulk Actions */}
         {selectedRates.length > 0 && (
-          <BulkActionBar
-            selectedCount={selectedRates.length}
-            actions={[
-              {
-                label: "Delete",
-                variant: "danger",
-                icon: "delete",
-                onClick: openBulkDeleteModal,
-              },
-            ]}
-          />
+          <HasPermission required="shipping rate settings.delete">
+            <BulkActionBar
+              selectedCount={selectedRates.length}
+              actions={[
+                {
+                  label: "Delete",
+                  variant: "danger",
+                  icon: "delete",
+                  onClick: openBulkDeleteModal,
+                },
+              ]}
+            />
+          </HasPermission>
         )}
 
         {/* Table */}
@@ -597,8 +595,7 @@ const ShippingRateSetting = () => {
                 {rates.map((rate, idx) => {
                   const isActive =
                     rate?.is_active === 1 || rate?.is_active === true;
-                  const zoneName =
-                    rate?.zone?.name || rate?.zone_name || "N/A";
+                  const zoneName = rate?.zone?.name || rate?.zone_name || "N/A";
                   const methodName =
                     rate?.method?.name || rate?.method_name || "N/A";
 
@@ -626,44 +623,50 @@ const ShippingRateSetting = () => {
                         {rate.free_shipping_min_order ?? "N/A"}
                       </TableCell>
                       <TableCell>
-                        <button
-                          type="button"
-                          onClick={() => handleToggleStatus(rate)}
-                          disabled={togglingId === rate.id}
-                          className={`px-2 py-1 rounded-full text-xs font-medium transition ${
-                            isActive
-                              ? "bg-green-100 text-green-700 hover:bg-green-200"
-                              : "bg-red-100 text-red-700 hover:bg-red-200"
-                          } ${
-                            togglingId === rate.id
-                              ? "opacity-70 cursor-not-allowed"
-                              : ""
-                          }`}
-                          title="Toggle status"
-                        >
-                          {togglingId === rate.id ? (
-                            <Loader className="w-3 h-3 animate-spin" />
-                          ) : isActive ? (
-                            "Active"
-                          ) : (
-                            "Inactive"
-                          )}
-                        </button>
+                        <HasPermission required="shipping rate settings.edit">
+                          <button
+                            type="button"
+                            onClick={() => handleToggleStatus(rate)}
+                            disabled={togglingId === rate.id}
+                            className={`px-2 py-1 rounded-full text-xs font-medium transition ${
+                              isActive
+                                ? "bg-green-100 text-green-700 hover:bg-green-200"
+                                : "bg-red-100 text-red-700 hover:bg-red-200"
+                            } ${
+                              togglingId === rate.id
+                                ? "opacity-70 cursor-not-allowed"
+                                : ""
+                            }`}
+                            title="Toggle status"
+                          >
+                            {togglingId === rate.id ? (
+                              <Loader className="w-3 h-3 animate-spin" />
+                            ) : isActive ? (
+                              "Active"
+                            ) : (
+                              "Inactive"
+                            )}
+                          </button>
+                        </HasPermission>
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          <button
-                            onClick={() => openEditModal(rate)}
-                            className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200"
-                          >
-                            <PencilLine size={16} />
-                          </button>
-                          <button
-                            onClick={() => openDeleteModal(rate.id)}
-                            className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200"
-                          >
-                            <Trash2Icon size={16} />
-                          </button>
+                          <HasPermission required="shipping rate settings.edit">
+                            <button
+                              onClick={() => openEditModal(rate)}
+                              className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200"
+                            >
+                              <PencilLine size={16} />
+                            </button>
+                          </HasPermission>
+                          <HasPermission required="shipping rate settings.delete">
+                            <button
+                              onClick={() => openDeleteModal(rate.id)}
+                              className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200"
+                            >
+                              <Trash2Icon size={16} />
+                            </button>
+                          </HasPermission>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -835,7 +838,9 @@ const ShippingRateSetting = () => {
               <PrimaryButton
                 type="button"
                 variant="secondary"
-                onClick={() => !isCreating && !isUpdating && setIsModalOpen(false)}
+                onClick={() =>
+                  !isCreating && !isUpdating && setIsModalOpen(false)
+                }
                 disabled={isCreating || isUpdating}
               >
                 Cancel
@@ -963,7 +968,7 @@ const ShippingRateSetting = () => {
                         <input
                           type="checkbox"
                           checked={bulkCreateData.selectedZones.includes(
-                            zone.value
+                            zone.value,
                           )}
                           onChange={() => toggleZoneSelection(zone.value)}
                           className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
@@ -972,9 +977,7 @@ const ShippingRateSetting = () => {
                       </label>
                     ))
                   ) : (
-                    <p className="text-sm text-gray-500">
-                      No zones available.
-                    </p>
+                    <p className="text-sm text-gray-500">No zones available.</p>
                   )}
                 </div>
               </div>
@@ -1033,9 +1036,7 @@ const ShippingRateSetting = () => {
                           updateWeightRange(idx, "per_kg", e.target.value)
                         }
                         placeholder="Per Kg"
-                        aria-label={`Per kilogram points for range ${
-                          idx + 1
-                        }`}
+                        aria-label={`Per kilogram points for range ${idx + 1}`}
                       />
                     </div>
                     <div className="flex gap-2 sm:col-span-2 lg:col-span-1">
@@ -1085,9 +1086,7 @@ const ShippingRateSetting = () => {
               <PrimaryButton
                 type="button"
                 variant="secondary"
-                onClick={() =>
-                  !isBulkCreating && setIsBulkCreateOpen(false)
-                }
+                onClick={() => !isBulkCreating && setIsBulkCreateOpen(false)}
                 disabled={isBulkCreating}
               >
                 Cancel

@@ -36,6 +36,7 @@ import {
 } from "../../../redux/features/member/voucherPurchase/voucherApi";
 import Select from "../../../components/form/Select";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
+import HasPermission from "@/components/common/HasPermission";
 import {
   Dialog,
   DialogContent,
@@ -117,7 +118,7 @@ const VoucherManage = () => {
     const success = await handleStatusUpdate(
       rejectDialog.voucher.id,
       "rejected",
-      { reason }
+      { reason },
     );
 
     if (success) {
@@ -134,7 +135,7 @@ const VoucherManage = () => {
   };
   const toggleSelect = (id) => {
     setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
   // Bulk actions (placeholder)
@@ -310,32 +311,38 @@ const VoucherManage = () => {
                       <div className="flex items-center gap-2">
                         {v.status === "pending" && (
                           <>
-                            <button
-                              onClick={() =>
-                                handleStatusUpdate(v.id, "approved")
-                              }
-                              disabled={updatingId === v.id}
-                              className="px-3 py-1 bg-green-100 text-green-600 rounded-md"
-                            >
-                              Approve
-                            </button>
+                            <HasPermission required="admin.accounts.voucher.approve">
+                              <button
+                                onClick={() =>
+                                  handleStatusUpdate(v.id, "approved")
+                                }
+                                disabled={updatingId === v.id}
+                                className="px-3 py-1 bg-green-100 text-green-600 rounded-md"
+                              >
+                                Approve
+                              </button>
+                            </HasPermission>
 
-                            <button
-                              onClick={() => openRejectDialog(v)}
-                              disabled={updatingId === v.id}
-                              className="px-3 py-1 bg-red-100 text-red-600 rounded-md"
-                            >
-                              Reject
-                            </button>
+                            <HasPermission required="admin.accounts.voucher.reject">
+                              <button
+                                onClick={() => openRejectDialog(v)}
+                                disabled={updatingId === v.id}
+                                className="px-3 py-1 bg-red-100 text-red-600 rounded-md"
+                              >
+                                Reject
+                              </button>
+                            </HasPermission>
                           </>
                         )}
 
-                        <Link
-                          to={`/admin/vouchers/${v.id}`}
-                          className="p-2 bg-indigo-100 rounded-md text-indigo-600"
-                        >
-                          <Eye size={16} />
-                        </Link>
+                        <HasPermission required="admin.accounts.voucher.view">
+                          <Link
+                            to={`/admin/vouchers/${v.id}`}
+                            className="p-2 bg-indigo-100 rounded-md text-indigo-600"
+                          >
+                            <Eye size={16} />
+                          </Link>
+                        </HasPermission>
                       </div>
                     </TableCell>
                   </TableRow>

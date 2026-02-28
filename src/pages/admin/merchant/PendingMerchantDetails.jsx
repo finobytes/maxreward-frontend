@@ -142,14 +142,14 @@ const PendingMerchantDetails = () => {
                 readOnly
               />
             </div>
-            <div>
+            {/* <div>
               <Label>Country</Label>
               <Input
                 value={merchant?.country || "N/A"}
                 placeholder="Country"
                 readOnly
               />
-            </div>
+            </div> */}
             <div>
               <Label>Product / Service</Label>
               <Input
@@ -158,14 +158,14 @@ const PendingMerchantDetails = () => {
                 readOnly
               />
             </div>
-            <div>
+            {/* <div>
               <Label>Business Description</Label>
               <Input
                 value={merchant?.business_description || "N/A"}
                 placeholder="Business Description"
                 readOnly
               />
-            </div>
+            </div> */}
             <div>
               <Label>Annual Sales Turnover</Label>
               <Input
@@ -268,28 +268,28 @@ const PendingMerchantDetails = () => {
                 readOnly
               />
             </div>
-            <div>
+            {/* <div>
               <Label>Gender</Label>
               <Input
                 value={merchant?.gender || "N/A"}
                 placeholder="Gender"
                 readOnly
               />
-            </div>
-            <div>
+            </div> */}
+            {/* <div>
               <Label>Owner Name</Label>
               <Input
                 value={merchant?.owner_name || "N/A"}
                 placeholder="Owner Name"
                 readOnly
               />
-            </div>
+            </div> */}
           </div>
         </ComponentCard>
       </div>
 
       {/* Payment Information */}
-      <div className="mt-6">
+      {/* <div className="mt-6">
         <ComponentCard title="Payment Information">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
@@ -342,10 +342,10 @@ const PendingMerchantDetails = () => {
             </div>
           </div>
         </ComponentCard>
-      </div>
+      </div> */}
 
       {/* Wallet Information */}
-      <div className="mt-6">
+      {/* <div className="mt-6">
         <ComponentCard title="Wallet Information">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
@@ -366,7 +366,7 @@ const PendingMerchantDetails = () => {
             </div>
           </div>
         </ComponentCard>
-      </div>
+      </div> */}
 
       {/* Corporate Member Information */}
       {merchant?.corporate_member && (
