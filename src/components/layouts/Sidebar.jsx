@@ -61,11 +61,14 @@ const Sidebar = () => {
     let navItems = NAV_CONFIG[role] || [];
 
     // For admin-type users (type === "admin"), show all menus without filtering
-    // Only staff users (type === "staff") get permission-based filtering
     const isMainAdmin = role === "admin" && data?.type === "admin";
 
+    // A merchant who is the business owner or holds super-admin role
+    const isMainMerchant =
+      role === "merchant" &&
+      data?.roles?.some((r) => r.name.toLowerCase().includes("super-admin"));
+
     // Extract permissions from roles[].permissions[].name
-    // API response: data.roles[0].permissions[{name: "admin.accounts.company info"}, ...]
     let userPermissions = [];
     if (data?.roles && Array.isArray(data.roles)) {
       data.roles.forEach((roleObj) => {
@@ -89,11 +92,6 @@ const Sidebar = () => {
       });
     }
 
-    // Check if user has permission matching the nav item's required permission.
-    // Supports both exact match and prefix match:
-    //   navConfig permission: "admin.accounts.voucher"
-    //   user permission:      "admin.accounts.voucher.view" → match (startsWith)
-    //   user permission:      "admin.accounts.voucher"      → match (exact)
     const hasPermission = (requiredPerm, userPerms) => {
       return userPerms.some(
         (userPerm) =>
@@ -101,41 +99,34 @@ const Sidebar = () => {
       );
     };
 
-    // Helper to recursively filter items based on permissions
     const filterNavItems = (items, permissions) => {
-      return (
-        items
-          .filter((item) => {
-            // If the item has no specific permission required, it's public (Dashboard, Profile, Logout)
-            if (!item.permission) return true;
-            // Check if user has any matching permission (exact or prefix)
-            if (hasPermission(item.permission, permissions)) return true;
-            // If item has subItems, don't filter it out yet — check children first
-            if (item.subItems) return true;
+      return items
+        .filter((item) => {
+          if (!item.permission) return true;
+          if (hasPermission(item.permission, permissions)) return true;
+          if (item.subItems) return true;
+          return false;
+        })
+        .map((item) => {
+          if (item.subItems) {
+            return {
+              ...item,
+              subItems: filterNavItems(item.subItems, permissions),
+            };
+          }
+          return item;
+        })
+        .filter((item) => {
+          if (item.subItems && item.subItems.length === 0 && !item.path) {
             return false;
-          })
-          .map((item) => {
-            if (item.subItems) {
-              return {
-                ...item,
-                subItems: filterNavItems(item.subItems, permissions),
-              };
-            }
-            return item;
-          })
-          // Remove parent items that ended up with no accessible subItems
-          .filter((item) => {
-            if (item.subItems && item.subItems.length === 0 && !item.path) {
-              return false;
-            }
-            return true;
-          })
-      );
+          }
+          return true;
+        });
     };
 
-    // Only apply permission filtering for staff users who have roles with permissions
-    // Main admin sees everything, member also sees everything (no permission system for member)
-    if (!isMainAdmin && role !== "member" && userPermissions.length > 0) {
+    // Filter items if user is not a master/bypass role
+    if (!isMainAdmin && !isMainMerchant && role !== "member") {
+      // If a staff user has NO permissions, pass an empty array so they only see public items (like Profile, Logout)
       navItems = filterNavItems(navItems, userPermissions);
     }
 
