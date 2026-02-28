@@ -42,12 +42,17 @@ export const usePermissions = () => {
   const isMainAdmin = role === "admin" && data?.type === "admin";
   const isMember = role === "member";
 
+  // A merchant who is the business owner or holds super-admin role
+  const isMainMerchant =
+    role === "merchant" &&
+    data?.roles?.some((r) => r.name.toLowerCase().includes("super-admin"));
+
   /**
    * Check if the user has the required action permission
    */
   const hasPermission = (requiredPerm) => {
-    // 1. If it's the master admin or generic member, allow bypass
-    if (isMainAdmin || isMember) return true;
+    // 1. If it's the master admin, generic member, or super-admin merchant, allow bypass
+    if (isMainAdmin || isMember || isMainMerchant) return true;
 
     if (!requiredPerm) return false;
 
@@ -62,5 +67,5 @@ export const usePermissions = () => {
     );
   };
 
-  return { permissions, hasPermission, isLoading, isMainAdmin };
+  return { permissions, hasPermission, isLoading, isMainAdmin, isMainMerchant };
 };
